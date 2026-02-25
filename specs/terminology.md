@@ -1,0 +1,14 @@
+
+- 本体（Ontology）
+- 对象类型（Object Type）
+- 对象（Object，实例）
+- 对象集（Object Set）
+- 属性（Property）/ 属性值（Property Value）
+- 共享属性（Shared Property）
+- 关系类型（Link Type）/ 关系（Link）
+- 动作类型（Action Type）/ 动作（Action）
+- 写回（Writeback）
+- 角色（Role）
+- 函数（Function）
+- 接口（Interface）
+- 对象视图（Object View）
