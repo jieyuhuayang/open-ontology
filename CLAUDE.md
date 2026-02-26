@@ -17,18 +17,28 @@ This repository is currently in the **specification/design phase**. It contains 
 ## Repository Structure
 
 ```
-specs/                                # Domain model specifications
-├── terminology.md                    # Glossary of key domain terms
-├── supported-property-types.md       # Property type specifications (21 types)
-├── object-type-metadata.md           # Object type metadata fields
-├── link-type-metadata.md             # Link type metadata fields
-└── property-value-formatting.md      # Value formatting and conditional formatting
-PRD/
-├── 0 概念定义/                       # Foundational domain concepts
-│   └── 0 概念定义.md                 # Data layer, object layer, security model
-└── 0_1_0（MVP）/                     # MVP (v0.1.0) specifications
-    ├── 本体管理平台（Ontology Manager） PRD.md  # Main PRD (~67KB)
-    └── images/                       # UI design screenshots (~78 images)
+docs/
+├── architecture/                     # Architecture design documents
+│   ├── 00-design-principles.md       # Core design principles
+│   ├── 01-system-architecture.md     # System architecture overview
+│   ├── 02-domain-model.md            # Domain model design
+│   ├── 03-agent-context-architecture.md  # Agent context architecture
+│   ├── 04-tech-stack-recommendations.md  # Tech stack recommendations
+│   └── README.md
+├── prd/                              # Product Requirements Documents
+│   ├── 0 概念定义/                   # Foundational domain concepts
+│   │   └── 0 概念定义.md             # Data layer, object layer, security model
+│   └── 0_1_0（MVP）/                 # MVP (v0.1.0) specifications
+│       ├── 本体管理平台（Ontology Manager） PRD.md  # Main PRD (~67KB)
+│       └── images/                   # UI design screenshots (~78 images)
+├── specs/                            # Domain model specifications
+│   ├── terminology.md                # Glossary of key domain terms
+│   ├── supported-property-types.md   # Property type specifications (21 types)
+│   ├── object-type-metadata.md       # Object type metadata fields
+│   ├── link-type-metadata.md         # Link type metadata fields
+│   └── property-value-formatting.md  # Value formatting and conditional formatting
+└── research/                         # Technical research notes
+    └── unstructured-data-in-ontology.md
 ```
 
 ## Domain Terminology
@@ -57,3 +67,14 @@ Use the bilingual terms consistently (Chinese with English in parentheses):
 ## Internationalization
 
 The PRD is written in Chinese (Simplified). The platform UI should support internationalization (i18n).
+
+## Workflow: Auto-commit on File Edit
+
+A `PostToolUse` hook in `.claude/settings.json` automatically commits every file change Claude Code makes:
+
+- Triggers after `Write`, `Edit`, and `NotebookEdit` tool calls
+- Stages all changes (`git add -A`) and commits with message: `chore: auto-save <filename> (HH:MM:SS)`
+- Skips the commit if there are no staged changes (idempotent)
+- Runs asynchronously so it does not block Claude's responses
+
+This ensures every incremental change is recoverable via `git log` without requiring manual `/commit` invocations.
