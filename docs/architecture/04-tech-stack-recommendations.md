@@ -15,12 +15,13 @@
 | Choice | Technology | Rationale |
 |--------|-----------|-----------|
 | **Framework** | React 18+ with TypeScript | 最成熟的 SPA 生态，TS 提供类型安全 |
-| **UI Library** | Ant Design 5.x 或 Shadcn/ui | Ant Design 适合后台管理系统，中文社区强；Shadcn/ui 更现代、可定制性强 |
-| **State Mgmt** | Zustand 或 React Query | 轻量级，适合 CRUD 应用 |
+| **UI Library** | **Ant Design 5.x** | 内置 Table（过滤/排序/分页/多选开箱即用）、Form.List 支持动态字段、ConfigProvider 一行切换 zh_CN/en_US；后台管理系统首选，2.1M 周下载量，748k 依赖项目 |
+| **Server State** | **TanStack Query v5** | 管理服务端数据（对象类型、链接类型列表）：缓存、自动 stale 失效、乐观更新、内置 loading/error 状态 |
+| **Client State** | **Zustand v5** | 管理纯 UI 状态（Modal 开关、选中行 ID、表格排序筛选）：2.3kB，零样板代码 |
 | **Router** | React Router v6 | 标准选择 |
-| **Graph Viz** | ReactFlow 或 D3.js | 用于链接类型图（Link Type Graph）可视化 |
+| **Graph Viz** | **ReactFlow v12 (`@xyflow/react`) + ELK** | MIT 许可，原生 React/TS，10-200 节点性能良好；ELK 提供专业自动布局；D3.js 开发成本高 3-4 倍不选 |
 | **Build Tool** | Vite | 快速开发体验 |
-| **i18n** | react-intl 或 i18next | 支持中英文国际化 |
+| **i18n** | **i18next + react-i18next** | 生态最大、文档完善；Ant Design 组件层通过 ConfigProvider 自动处理，业务文案通过 i18next 管理 |
 
 ### Backend: Application Server
 
