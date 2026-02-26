@@ -62,7 +62,7 @@ Open Ontology 采用分层架构，从上到下分为 5 层：
 - 对象类型的属性值最终来自于这些数据源
 - 每个数据源只能支撑一个对象类型（与 Palantir 一致的约束）
 
-**MVP 范围**: 数据源管理是基础功能，但 MVP 聚焦于 Ontology Schema 的管理，数据源连接可以是简化版。
+**MVP 范围**: Ontology Manager 聚焦于 Schema 管理，不提供独立的数据源管理页面。MySQL 连接配置与数据导入内嵌于对象类型编辑流程，按需触发，导入结果以平台内部 Dataset 快照形式存储。
 
 ### Layer 2: Storage Layer（存储层）
 
