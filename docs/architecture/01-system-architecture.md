@@ -230,7 +230,7 @@ Edit → Working State (本地) → Save → Published State (全局)
 ├── Schema Store（关系型数据库）
 ├── Change History Store
 ├── JSON Import/Export
-└── 数据源管理（基础版）：MySQL 连接配置 + 一次性数据导入
+└── MySQL Dataset 导入：在对象类型编辑流程内配置连接并导入快照
 
 ⬜ 后续版本:
 ├── MCP Server（Agent 接口）
