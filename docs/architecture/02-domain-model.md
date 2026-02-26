@@ -40,6 +40,19 @@ Open Ontology 的领域模型定义了系统中所有一等公民实体及其关
      └─────────────────┘
 ```
 
+## Naming Convention / 命名约定
+
+本体中的每个资源使用三层命名体系（详见 01-system-architecture.md AD-5）：
+
+| 层级 | 字段名 | 格式 | 可变性 | 用途 |
+|------|--------|------|--------|------|
+| **RID** | `rid` | `ri.<namespace>.<type>.<hash>` | 不可变 | 系统内部引用、外键、API 路径参数 |
+| **ID** | `id` | 小写字母+数字+短横线 | experimental 阶段可改，active 后不可变 | URL slug、用户可见标识 |
+| **API Name** | `apiName` | ObjectType: PascalCase；Property: camelCase | experimental 阶段可改，active 后不可变 | 代码生成、SDK 方法名 |
+| **Display Name** | `displayName` | 任意 Unicode | 始终可变 | UI 展示、i18n |
+
+> 文档中 `rid` 即 Resource Identifier，与 "resource id" 同义。所有跨实体引用统一使用 `rid` 字段名。
+
 ## Core Entities
 
 ### 1. Space（空间）
@@ -352,7 +365,7 @@ interface WorkingState {
 interface Change {
   id: string;
   resourceType: "ObjectType" | "Property" | "LinkType" | "ActionType";
-  resourceRid: string;
+  resourceRid: string;             // 目标资源的 RID（命名约定见上方 Naming Convention）
   changeType: "CREATE" | "UPDATE" | "DELETE";
   before?: any;                    // 变更前的状态 (CREATE 时为空)
   after?: any;                     // 变更后的状态 (DELETE 时为空)

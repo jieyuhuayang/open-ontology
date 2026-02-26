@@ -11,6 +11,9 @@ This folder contains the technical architecture design for Open Ontology v0.1.0 
 | [02-domain-model.md](./02-domain-model.md) | Core domain model and type system |
 | [03-agent-context-architecture.md](./03-agent-context-architecture.md) | Agent-era context management architecture |
 | [04-tech-stack-recommendations.md](./04-tech-stack-recommendations.md) | Technology stack recommendations for MVP |
+| [05-data-connectivity.md](./05-data-connectivity.md) | Data connectivity & integration architecture |
+| [06-change-management.md](./06-change-management.md) | Change management lifecycle and conflict resolution |
+| [reviews/](./reviews/) | Architecture review records |
 
 ## Design Philosophy
 
