@@ -316,3 +316,6 @@ CREATE INDEX idx_object_types_search ON object_types
 | 7 | Search (MVP) | PG Full-Text | Elasticsearch, Meilisearch | 减少运维，MVP 足够 |
 | 8 | 前后端类型共享 | OpenAPI codegen | 共享 TS 包, 手动同步 | FastAPI 自动生成 OpenAPI spec → openapi-typescript 生成前端类型，CI 保证同步 |
 | 9 | API 兼容性门禁 | oasdiff (CI) | 人工 review、无门禁 | 防止 API 变更破坏前端 |
+| 10 | UI 组件库 | Ant Design 5.x | Shadcn/ui | Table 开箱即用（过滤/排序/分页）、ConfigProvider 一键 i18n 切换、Form.List 支持动态字段；MVP 速度比 Shadcn/ui 快 4-8 周；2.1M 周下载量、748k 依赖项目 |
+| 11 | 前端状态管理 | TanStack Query v5（服务端）+ Zustand v5（客户端） | Redux Toolkit、Jotai | 两者互补而非竞争：Query 负责 API 缓存/失效/乐观更新；Zustand 负责 Modal 开关、选中行等纯 UI 状态；合计 < 16kB |
+| 12 | 图可视化 | ReactFlow v12 (`@xyflow/react`) + ELK | D3.js、Cytoscape.js、AntV G6 | MIT 许可无商用顾虑；原生 React/TS 无 DOM 冲突；10-200 节点性能良好；ELK 提供分层/力导向自动布局；D3.js 开发成本高 3-4 倍；Cytoscape 适合 300+ 节点场景，当前不需要 |
