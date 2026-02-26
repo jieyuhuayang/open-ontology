@@ -15,7 +15,7 @@
 | Choice | Technology | Rationale |
 |--------|-----------|-----------|
 | **Framework** | React 18+ with TypeScript | 最成熟的 SPA 生态，TS 提供类型安全 |
-| **UI Library** | **Ant Design 5.x** | 内置 Table（过滤/排序/分页/多选开箱即用）、Form.List 支持动态字段、ConfigProvider 一行切换 zh_CN/en_US；后台管理系统首选，2.1M 周下载量，748k 依赖项目 |
+| **UI Library** | **Ant Design 5.x** | 内置 Table（过滤/排序/分页/多选开箱即用）、Form.List 支持动态字段、ConfigProvider 一行切换 zh_CN/en_US；后台管理系统首选，2.1M 周下载量，748k 依赖项目。注：v6 已于 2026-02 发布，MVP 用 v5 稳定版，后续可升级 |
 | **Server State** | **TanStack Query v5** | 管理服务端数据（对象类型、链接类型列表）：缓存、自动 stale 失效、乐观更新、内置 loading/error 状态 |
 | **Client State** | **Zustand v5** | 管理纯 UI 状态（Modal 开关、选中行 ID、表格排序筛选）：2.3kB，零样板代码 |
 | **Router** | React Router v6 | 标准选择 |
