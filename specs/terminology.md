@@ -1,14 +1,32 @@
 
-- 本体（Ontology）
-- 对象类型（Object Type）
-- 对象（Object，实例）
-- 对象集（Object Set）
-- 属性（Property）/ 属性值（Property Value）
-- 共享属性（Shared Property）
-- 关系类型（Link Type）/ 关系（Link）
-- 动作类型（Action Type）/ 动作（Action）
-- 写回（Writeback）
-- 角色（Role）
-- 函数（Function）
-- 接口（Interface）
-- 对象视图（Object View）
+## 本体核心概念
+
+| 中文 | English | 描述 |
+|------|---------|------|
+| 本体 | Ontology | 组织的完整语义模型，包含对象、属性、链接、动作等要素 |
+| 对象类型 | Object Type | 对现实世界真实实体或事件的抽象 |
+| 对象 | Object | 某个对象类型的单个实例 |
+| 对象集 | Object Set | 多个对象实例的集合 |
+| 属性 | Property | 对象类型的特征、状态或度量 |
+| 属性值 | Property Value | 某个对象上某属性的具体取值 |
+| 共享属性 | Shared Property | 可在多个对象类型上复用的属性 |
+| 链接类型 | Link Type | 定义对象之间语义关系的类型 |
+| 链接 | Link | 两个具体对象之间的一次链接类型实例 |
+| 动作类型 | Action Type | 定义用户可对对象执行的一组变更及其副作用 |
+| 动作 | Action | 动作类型的单次执行实例 |
+| 写回 | Writeback | 将变更同步回底层记录系统（ERP、CRM 等） |
+| 角色 | Role | 授予对资源不同级别访问能力的权限集合 |
+| 函数 | Function | 自定义业务逻辑（Python/ML 模型支持） |
+| 接口 | Interface | 描述对象类型形状与能力的多态性类型 |
+| 对象视图 | Object View | 对象数据的特定展示与过滤视图 |
+
+## 数据层概念
+
+| 中文 | English | 描述 |
+|------|---------|------|
+| 数据集 | Dataset | 平台中存储数据的基本单元，涵盖结构化、非结构化与半结构化数据 |
+| 数据源 | Data Source | 为对象类型提供数据的底层存储，包括表格数据集和媒体集 |
+| 表格数据集 | Tabular Dataset | 行列结构的数据集，包含数据文件及描述列的 schema 元数据，是当前对象类型的主要数据源类型 |
+| 媒体集 | Media Set | 非结构化媒体文件的集合（文档、图片、音频、视频等），作为一等数据源类型与表格数据集并列 |
+| 数据血缘 | Data Lineage | 追踪数据从输入数据集到输出数据集的完整生成链路 |
+| 空间 | Space | 共享同一个本体的项目高层容器 |
