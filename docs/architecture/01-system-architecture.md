@@ -229,14 +229,15 @@ Edit → Working State (本地) → Save → Published State (全局)
 ├── REST API（基础 CRUD）
 ├── Schema Store（关系型数据库）
 ├── Change History Store
-└── JSON Import/Export
+├── JSON Import/Export
+└── 数据源管理（基础版）：MySQL 连接配置 + 一次性数据导入
 
 ⬜ 后续版本:
 ├── MCP Server（Agent 接口）
 ├── OSDK 代码生成
 ├── Security Service（完整的 RBAC + MAC）
 ├── 向量索引 + 语义搜索
-├── Data Source 实际连接 + 数据同步
+├── Data Source 定期同步 + 增量更新（基础版已在 MVP 完成）
 ├── Action Type 执行引擎
 └── Function Runtime
 ```
