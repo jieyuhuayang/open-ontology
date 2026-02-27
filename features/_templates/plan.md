@@ -1,6 +1,5 @@
 # 技术方案: <名称>
-
-**关联规范**: [features/v0.1.0/NNN-name/spec.md]
+**关联规范**: [features/v0.1.0/NNN-name/spec.md]  
 **架构参考**: [docs/architecture/01-system-architecture.md §章节]
 
 ---
