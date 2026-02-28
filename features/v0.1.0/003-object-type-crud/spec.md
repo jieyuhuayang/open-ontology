@@ -77,5 +77,5 @@
 - 对象类型元数据规范: [docs/specs/object-type-metadata.md]
 - 领域模型: [docs/architecture/02-domain-model.md]
 - 依赖特性:
-  - 后端（F003a）: [features/v0.1.0/002-database-schema]、[features/v0.1.0/009-working-state]
-  - 前端（F003b）: [features/v0.1.0/008-app-shell]、F003a
+  - 后端: [features/v0.1.0/002-database-schema]（Working State 服务层已内嵌实现）
+  - 前端: 已拆为独立特性 [features/v0.1.0/005-object-type-crud-frontend]
