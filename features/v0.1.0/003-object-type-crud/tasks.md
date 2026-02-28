@@ -24,7 +24,7 @@
 
 ## Group 1: Domain 层
 
-- [ ] **T001**: 编写 Domain 层校验器单元测试
+- [x] **T001**: 编写 Domain 层校验器单元测试
   - 文件: `apps/server/tests/unit/__init__.py`, `apps/server/tests/unit/test_validators.py`
   - 内容:
     - `validate_api_name()` 测试：合法 PascalCase 通过、非 PascalCase 拒绝（小写开头、纯数字、含特殊字符）、保留字拒绝（`Ontology`→小写比较命中 `ontology`）
