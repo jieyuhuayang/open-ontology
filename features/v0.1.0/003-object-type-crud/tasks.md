@@ -165,7 +165,7 @@
   - 依赖: T008（ObjectTypeService）、T010（Router 层；可与 T010 并行编写，Router 就绪后运行）
   - AC 覆盖: AC1–AC8, AC10, AC10a, AC11–AC13
 
-- [ ] **T010**: 实现 Router 层 + 注册到 main.py
+- [x] **T010**: 实现 Router 层 + 注册到 main.py
   - 文件:
     - `apps/server/app/routers/object_types.py` — ObjectType CRUD 五个端点（GET list, POST create, GET detail, PUT update, DELETE）
     - `apps/server/app/routers/ontology.py` — 变更管理三个端点（POST save, DELETE discard, GET working-state）
