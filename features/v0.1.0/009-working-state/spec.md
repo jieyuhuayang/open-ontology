@@ -1,3 +1,7 @@
+> **已归档**：本特性的核心逻辑已在 003-object-type-crud 中实现（T005–T006）。
+> 后续如需扩展 Working State 能力，在各资源 CRUD 特性中增量完成。
+> 状态：Archived (merged into F003)
+
 # Feature: Working State 服务层
 
 **关联 PRD**: [docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md §变更管理与版本控制]
