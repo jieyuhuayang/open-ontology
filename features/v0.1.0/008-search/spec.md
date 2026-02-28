@@ -54,4 +54,4 @@
 ## 相关文档
 
 - 架构参考: [docs/architecture/01-system-architecture.md]
-- 依赖特性: [features/v0.1.0/003-object-type-crud]、[features/v0.1.0/004-link-type-crud]
+- 依赖特性: [features/v0.1.0/003-object-type-crud]、[features/v0.1.0/006-link-type-crud]、[features/v0.1.0/007-property-management]
