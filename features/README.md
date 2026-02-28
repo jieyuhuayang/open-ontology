@@ -112,63 +112,56 @@ When writing `plan.md`, always reference the relevant architecture document.
 | # | Feature | Phase | Priority | 状态 |
 |---|---------|-------|---------|------|
 | 001 | Project Scaffolding | 1 | P0 | ✅ 完成 |
-| 002 | Database Schema（扩充） | 2 | P0 | ✅ 完成 |
-| 003a | Object Type CRUD — 后端 | 2 | P0 | ✅ 完成（含 Working State 服务层） |
-| 008 | App Shell & UI 基础框架 | 3 | P0 | 📋 待开发 |
-| 003b | Object Type CRUD — 前端 | 4 | P0 | 📋 待开发 |
+| 002 | Database Schema | 2 | P0 | ✅ 完成 |
+| 003 | Object Type CRUD — 后端 | 2 | P0 | ✅ 完成（含 Working State 服务层） |
+| 004 | App Shell & UI 基础框架 | 3 | P0 | 📋 下一个开发 |
+| 005 | Object Type CRUD — 前端 | 4 | P0 | 📋 待开发 |
 | — | **🔍 Demo 走查检查点** | — | — | Phase 4 完成后执行 |
-| 004a | Link Type CRUD — 后端 | 5 | P0 | 📋 待开发 |
-| 004b | Link Type CRUD — 前端 | 5 | P0 | 📋 待开发 |
-| 005a | Property Management — 后端（基础类型） | 6 | P0 | 📋 待开发 |
-| 005b | Property Management — 前端 | 6 | P0 | 📋 待开发 |
-| 005c | Property Management — 属性类型扩展 | 7 | P0 | 📋 待开发 |
-| 006 | Search | 7 | P0 | 📋 待开发 |
-| 007 | Change Management UI | 7 | P0 | 📋 待开发 |
-| 009 | Working State 服务层（补充） | — | P0 | ⚠️ 见说明 |
+| 006 | Link Type CRUD（全栈） | 5 | P0 | 📋 待开发 |
+| 007 | Property Management（全栈） | 6 | P0 | 📋 待开发 |
+| 008 | Search | 7 | P0 | 📋 待开发 |
+| 009 | Change Management UI | 7 | P0 | 📋 待开发 |
 
 > 查看各 feature 状态：`just features-status`（扫描各目录 tasks.md 自动汇总）
 
-> **注意**：003/004/005 的 a/b/c 子特性共享同一个目录，在各自的 spec.md 中通过"特性拆分"章节区分。
+> **关于 Working State**：原 009-working-state 的核心逻辑已在 F003 中一并实现（见 003 tasks.md T005–T006），已归档。后续如需扩展 Working State 能力（如支持新的 ResourceType），在各资源 CRUD 特性中增量完成。
 
-### 关于 F009 Working State
+### Phase 说明
 
-F009 的核心逻辑（WorkingStateService、变更合并、合并视图、发布/丢弃）已在 F003a 中一并实现（见 003 tasks.md T005–T006）。F009 spec.md 中定义的 AC1–AC20 大部分已覆盖。
+| Phase | 描述 | 特性 | 里程碑 |
+|-------|------|------|--------|
+| 1 | 基础设施 | F001 | ✅ |
+| 2 | Schema + Object Type 后端 | F002, F003 | ✅ |
+| 3 | App Shell（UI 骨架） | F004 | 所有前端页面的基础 |
+| 4 | Object Type 前端 | F005 | **端到端闭环 → Demo 走查** |
+| 5 | Link Type 全栈 | F006 | 复用 F003 模式快速推进 |
+| 6 | Property 全栈 | F007 | |
+| 7 | 高级特性 | F008, F009 | F008 ∥ F009 可并行 |
 
-后续如果 F004a/F005a 发现需要扩展 Working State 能力（如支持新的 ResourceType），在各自特性中增量完成即可，**不再单独开 F009 的 plan/tasks**。
-
-### Phase 说明（已按实际进度调整）
-
-| Phase | 描述 | 可并行 | 里程碑 |
-|-------|------|--------|--------|
-| 1 | 基础设施 | — | ✅ |
-| 2 | Schema + Object Type 后端 | F002 ∥ F003a | ✅ |
-| 3 | App Shell（UI 骨架） | — | 所有前端页面的基础 |
-| 4 | Object Type 前端 | — | **端到端闭环 → Demo 走查** |
-| 5 | Link Type 全栈 | F004a ∥ F004b | 复用 003 模式快速推进 |
-| 6 | Property 全栈 | F005a ∥ F005b | |
-| 7 | 高级特性 | F005c ∥ F006 ∥ F007 | |
-
-### 依赖关系图（已更新）
+### 依赖关系图
 
 ```
-F001 ──→ F002 ──→ F003a ✅
-                    │
-                    ├──→ F004a ──→ F004b ──┐
-                    │                       │
-                    └──→ F005a ──→ F005b ──┼→ F005c
-                                            │
-F001 ──→ F008 ──→ F003b ──→ (Demo 走查)    ├→ F006
-              │                             │
-              └──→ F004b / F005b / F007 ────┘
+F001 ✅ ──→ F002 ✅ ──→ F003 ✅ (后端+WorkingState)
+                          │
+F001 ✅ ──→ F004 ──→ F005 ──→ 🔍 Demo 走查
+                │
+                ├──→ F006 (link-type 全栈)
+                ├──→ F007 (property 全栈)
+                ├──→ F008 (search) ←── F006, F007
+                └──→ F009 (change-management UI)
 ```
 
-### 调整说明（2026-02-28）
+### 重编号说明（2026-02-28）
 
-**原计划问题**：原 Phase 设计中 009 是 003a 的前置依赖，但实际开发中 003a 已将 Working State 一并实现。原计划的 Phase 2 包含 F008，但实际上 F002 和 F003a 先完成了。
+目录编号已重新排列，使编号 = 执行顺序：
 
-**调整策略**：
-1. **先做 008 App Shell** — 提供布局骨架（侧边栏、路由、主题、i18n），这是所有前端页面的基础
-2. **紧接 003b 前端** — 后端 API 已就绪，补上前端 UI 即可实现 Object Type 的端到端闭环
-3. **Demo 走查检查点** — Phase 4 完成后暂停，用户访问前端验证完整流程，确认 UI 模式和交互细节
-4. **004 改为全栈一起做** — 吸取 003 的经验，Link Type 的后端和前端在同一 Phase 内完成，避免割裂
-5. **F009 不再单独开发** — 已内嵌完成，后续按需增量扩展
+| 旧编号 | 新编号 | 说明 |
+|--------|--------|------|
+| 001–003 | 001–003 | 不变 |
+| 008 app-shell | **004** | 提前，下一个开发 |
+| *新增* | **005** object-type-crud-frontend | 从 F003b 拆出为独立特性 |
+| 004 link-type-crud | **006** | 重编号 |
+| 005 property-management | **007** | 重编号 |
+| 006 search | **008** | 重编号 |
+| 007 change-management | **009** | 重编号 |
+| 009 working-state | **归档** | 已合并到 F003 |
