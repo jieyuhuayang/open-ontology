@@ -108,21 +108,23 @@ When writing `plan.md`, always reference the relevant architecture document.
 
 ### v0.1.0 (MVP)
 
-| # | Feature | Phase | Priority | Status |
-|---|---------|-------|---------|--------|
-| 001 | Project Scaffolding | 1 | P0 | ✅ Done |
-| 002 | Database Schema（扩充） | 2 | P0 | ✅ Done |
-| 008 | App Shell & UI 基础框架 | 2 | P0 | 🔲 Draft |
-| 009 | Working State 服务层 | 3 | P0 | 🔲 Draft |
-| 003a | Object Type CRUD — 后端 | 4 | P0 | 🔲 Draft |
-| 004a | Link Type CRUD — 后端 | 4 | P0 | 🔲 Draft |
-| 005a | Property Management — 后端（基础类型） | 4 | P0 | 🔲 Draft |
-| 003b | Object Type CRUD — 前端 | 5 | P0 | 🔲 Draft |
-| 004b | Link Type CRUD — 前端 | 5 | P0 | 🔲 Draft |
-| 005b | Property Management — 前端 | 5 | P0 | 🔲 Draft |
-| 005c | Property Management — 属性类型扩展 | 6 | P0 | 🔲 Draft |
-| 006 | Search | 6 | P0 | 🔲 Draft |
-| 007 | Change Management UI | 6 | P0 | 🔲 Draft |
+| # | Feature | Phase | Priority |
+|---|---------|-------|---------|
+| 001 | Project Scaffolding | 1 | P0 |
+| 002 | Database Schema（扩充） | 2 | P0 |
+| 008 | App Shell & UI 基础框架 | 2 | P0 |
+| 009 | Working State 服务层 | 3 | P0 |
+| 003a | Object Type CRUD — 后端 | 4 | P0 |
+| 004a | Link Type CRUD — 后端 | 4 | P0 |
+| 005a | Property Management — 后端（基础类型） | 4 | P0 |
+| 003b | Object Type CRUD — 前端 | 5 | P0 |
+| 004b | Link Type CRUD — 前端 | 5 | P0 |
+| 005b | Property Management — 前端 | 5 | P0 |
+| 005c | Property Management — 属性类型扩展 | 6 | P0 |
+| 006 | Search | 6 | P0 |
+| 007 | Change Management UI | 6 | P0 |
+
+> 查看各 feature 状态：`just features-status`（扫描各目录 tasks.md 自动汇总）
 
 > **注意**：003/004/005 的 a/b/c 子特性共享同一个目录，在各自的 spec.md 中通过"特性拆分"章节区分。
 
