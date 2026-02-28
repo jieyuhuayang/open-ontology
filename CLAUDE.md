@@ -186,6 +186,21 @@ Before implementing a feature, **read the relevant doc first**:
 > ⚠️ **禁止跳步**：不得在 plan.md 和 tasks.md 完成前开始写代码。
 > 每个特性目录下必须存在这三个文件，否则视为流程未完成。
 
+### SDD 严格执行规则
+
+**每一步只产出该步骤的文件，不得提前执行后续步骤：**
+
+- 当用户要求"完成 plan.md"时，**只写 `plan.md` 文件**，不得生成任何源代码（`apps/` 目录下的 `.py`、`.ts`、`.tsx` 等）
+- 当用户要求"完成 tasks.md"时，**只写 `tasks.md` 文件**，不得生成源代码
+- 只有当用户明确要求"执行任务"或"开始实现"时，才可以编写源代码
+- 如果当前特性目录下缺少 `plan.md` 或 `tasks.md`，**必须先补齐，再开始写代码**
+
+**常见违规场景（必须避免）：**
+
+1. 完成 plan.md 后直接开始写代码，跳过了 tasks.md
+2. 在 plan 审批通过后自动进入实现阶段，没有等待用户指令
+3. 将 plan.md 和代码实现混在同一次会话中完成
+
 ## Workflow: Auto-commit on File Edit
 
 A `PostToolUse` hook in `.claude/settings.json` automatically commits every file change Claude Code makes:
