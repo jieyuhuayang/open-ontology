@@ -1,0 +1,10 @@
+{
+  "app": {
+    "title": "Open Ontology",
+    "subtitle": "本体管理平台"
+  },
+  "home": {
+    "welcome": "欢迎使用 Open Ontology",
+    "description": "面向 Agent 时代的本体平台"
+  }
+}
