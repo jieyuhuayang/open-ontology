@@ -89,7 +89,7 @@
   - 依赖: T002（Domain 模型）
   - AC 覆盖: AC11, AC12, AC13
 
-- [ ] **T006**: 实现 WorkingStateService
+- [x] **T006**: 实现 WorkingStateService
   - 文件: `apps/server/app/services/working_state_service.py`
   - 内容:
     - `get_or_create(ontology_rid)` — 获取现有 WS 或自动创建
