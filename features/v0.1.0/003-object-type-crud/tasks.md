@@ -58,7 +58,7 @@
   - 依赖: T002（需要 Domain 模型定义）
   - AC 覆盖: 间接支持所有 AC（数据层正确性保证）
 
-- [ ] **T004**: 实现 Storage 层三个模块
+- [x] **T004**: 实现 Storage 层三个模块
   - 文件:
     - `apps/server/app/storage/working_state_storage.py` — `get_by_ontology()`, `create()`, `update_changes()`, `delete()`
     - `apps/server/app/storage/object_type_storage.py` — `list_by_ontology()`, `get_by_rid()`, `get_by_id()`, `get_by_api_name()`, `create()`, `update()`, `delete()`, `get_related_link_type_rids()`
