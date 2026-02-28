@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ontology
+      POSTGRES_PASSWORD: ontology
+      POSTGRES_DB: open_ontology
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ontology"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  server:
+    build: ./apps/server
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ontology:ontology@db:5432/open_ontology
+      ENVIRONMENT: development
+    volumes:
+      - ./apps/server:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "uv run alembic upgrade head &&
+             uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  web:
+    build: ./apps/web
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: http://server:8000
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+    depends_on:
+      - server
+    command: pnpm dev --host 0.0.0.0
+
+volumes:
+  pgdata:
