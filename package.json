@@ -1,0 +1,16 @@
+{
+  "name": "open-ontology",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open Ontology — an ontology platform for the agent era",
+  "scripts": {
+    "dev": "pnpm --filter @open-ontology/web dev",
+    "build": "pnpm --filter @open-ontology/web build",
+    "test": "pnpm --filter @open-ontology/web test",
+    "lint": "pnpm --filter @open-ontology/web lint"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
