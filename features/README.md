@@ -28,11 +28,13 @@ features/
 └── v0.1.0/                      # MVP feature set
     ├── 001-project-scaffolding/
     ├── 002-database-schema/
-    ├── 003-object-type-crud/
-    ├── 004-link-type-crud/
-    ├── 005-property-management/
+    ├── 003-object-type-crud/     # 拆分为 003a(后端) + 003b(前端)
+    ├── 004-link-type-crud/       # 拆分为 004a(后端) + 004b(前端)
+    ├── 005-property-management/  # 拆分为 005a(后端) + 005b(前端) + 005c(类型扩展)
     ├── 006-search/
-    └── 007-change-management/
+    ├── 007-change-management/    # 范围缩减为 UI 层
+    ├── 008-app-shell/            # 新增：App Shell & UI 基础框架
+    └── 009-working-state/        # 新增：Working State 服务层
 ```
 
 ---
