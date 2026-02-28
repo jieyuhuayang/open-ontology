@@ -71,6 +71,8 @@
 - 变更管理架构: [docs/architecture/06-change-management.md]
 - Agent 上下文架构: [docs/architecture/03-agent-context-architecture.md]（Working State 对 Agent 的影响）
 - 依赖特性:
-  - [features/v0.1.0/009-working-state]（后端基础设施）
-  - [features/v0.1.0/008-app-shell]（UI 框架）
-  - [features/v0.1.0/003-object-type-crud]（前端部分）、[features/v0.1.0/004-link-type-crud]（前端部分）、[features/v0.1.0/005-property-management]（前端部分）
+  - [features/v0.1.0/003-object-type-crud]（Working State 后端基础设施）
+  - [features/v0.1.0/004-app-shell]（UI 框架）
+  - [features/v0.1.0/005-object-type-crud-frontend]（前端部分）
+  - [features/v0.1.0/006-link-type-crud]（前端部分）
+  - [features/v0.1.0/007-property-management]（前端部分）
