@@ -10,7 +10,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import ENUM, JSONB, TSVECTOR
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
 
 # revision identifiers, used by Alembic.
 revision: str = "0002"
@@ -18,82 +18,35 @@ down_revision: Union[str, None] = "0001"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-# ---------------------------------------------------------------------------
-# Reusable ENUM definitions (create_type=False — managed manually)
-# ---------------------------------------------------------------------------
-resource_status = ENUM(
-    "active",
-    "experimental",
-    "deprecated",
-    name="resource_status",
-    create_type=False,
-)
-visibility = ENUM(
-    "prominent",
-    "normal",
-    "hidden",
-    name="visibility",
-    create_type=False,
-)
-cardinality = ENUM(
-    "one-to-one",
-    "one-to-many",
-    "many-to-one",
-    "many-to-many",
-    name="cardinality",
-    create_type=False,
-)
-join_method = ENUM(
-    "foreign-key",
-    "join-table",
-    "backing-object",
-    name="join_method",
-    create_type=False,
-)
-link_side = ENUM(
-    "A",
-    "B",
-    name="link_side",
-    create_type=False,
-)
-property_base_type = ENUM(
-    "string",
-    "integer",
-    "long",
-    "float",
-    "double",
-    "decimal",
-    "boolean",
-    "date",
-    "timestamp",
-    "byte",
-    "short",
-    "array",
-    "struct",
-    "vector",
-    "geopoint",
-    "geoshape",
-    "attachment",
-    "time-series",
-    "media-reference",
-    "marking",
-    "cipher",
-    name="property_base_type",
-    create_type=False,
-)
-
 
 def upgrade() -> None:
     # ------------------------------------------------------------------
     # 1. Create PostgreSQL ENUM types
     # ------------------------------------------------------------------
-    bind = op.get_bind()
-    resource_status.create(bind, checkfirst=True)
-    visibility.create(bind, checkfirst=True)
-    cardinality.create(bind, checkfirst=True)
-    join_method.create(bind, checkfirst=True)
-    link_side.create(bind, checkfirst=True)
-    property_base_type.create(bind, checkfirst=True)
+    op.execute("""
+        CREATE TYPE resource_status AS ENUM ('active', 'experimental', 'deprecated');
+    """)
+    op.execute("""
+        CREATE TYPE visibility AS ENUM ('prominent', 'normal', 'hidden');
+    """)
+    op.execute("""
+        CREATE TYPE cardinality AS ENUM ('one-to-one', 'one-to-many', 'many-to-one', 'many-to-many');
+    """)
+    op.execute("""
+        CREATE TYPE join_method AS ENUM ('foreign-key', 'join-table', 'backing-object');
+    """)
+    op.execute("""
+        CREATE TYPE link_side AS ENUM ('A', 'B');
+    """)
+    op.execute("""
+        CREATE TYPE property_base_type AS ENUM (
+            'string', 'integer', 'long', 'float', 'double', 'decimal',
+            'boolean', 'date', 'timestamp', 'byte', 'short',
+            'array', 'struct', 'vector',
+            'geopoint', 'geoshape', 'attachment',
+            'time-series', 'media-reference', 'marking', 'cipher'
+        );
+    """)
 
     # ------------------------------------------------------------------
     # 2. Create tables
@@ -144,8 +97,20 @@ def upgrade() -> None:
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("aliases", JSONB(), nullable=True),
         sa.Column("icon", JSONB(), nullable=False),
-        sa.Column("status", resource_status, nullable=False, server_default="experimental"),
-        sa.Column("visibility", visibility, nullable=False, server_default="normal"),
+        sa.Column(
+            "status",
+            sa.Enum(
+                "active", "experimental", "deprecated", name="resource_status", create_type=False
+            ),
+            nullable=False,
+            server_default="experimental",
+        ),
+        sa.Column(
+            "visibility",
+            sa.Enum("prominent", "normal", "hidden", name="visibility", create_type=False),
+            nullable=False,
+            server_default="normal",
+        ),
         sa.Column("backing_datasource", JSONB(), nullable=True),
         sa.Column("primary_key_property_id", sa.String(255), nullable=True),
         sa.Column("title_key_property_id", sa.String(255), nullable=True),
@@ -184,12 +149,80 @@ def upgrade() -> None:
         ),
         sa.Column("display_name", sa.String(255), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
-        sa.Column("base_type", property_base_type, nullable=False),
-        sa.Column("array_inner_type", property_base_type, nullable=True),
+        sa.Column(
+            "base_type",
+            sa.Enum(
+                "string",
+                "integer",
+                "long",
+                "float",
+                "double",
+                "decimal",
+                "boolean",
+                "date",
+                "timestamp",
+                "byte",
+                "short",
+                "array",
+                "struct",
+                "vector",
+                "geopoint",
+                "geoshape",
+                "attachment",
+                "time-series",
+                "media-reference",
+                "marking",
+                "cipher",
+                name="property_base_type",
+                create_type=False,
+            ),
+            nullable=False,
+        ),
+        sa.Column(
+            "array_inner_type",
+            sa.Enum(
+                "string",
+                "integer",
+                "long",
+                "float",
+                "double",
+                "decimal",
+                "boolean",
+                "date",
+                "timestamp",
+                "byte",
+                "short",
+                "array",
+                "struct",
+                "vector",
+                "geopoint",
+                "geoshape",
+                "attachment",
+                "time-series",
+                "media-reference",
+                "marking",
+                "cipher",
+                name="property_base_type",
+                create_type=False,
+            ),
+            nullable=True,
+        ),
         sa.Column("struct_schema", JSONB(), nullable=True),
         sa.Column("backing_column", sa.String(255), nullable=True),
-        sa.Column("status", resource_status, nullable=False, server_default="experimental"),
-        sa.Column("visibility", visibility, nullable=False, server_default="normal"),
+        sa.Column(
+            "status",
+            sa.Enum(
+                "active", "experimental", "deprecated", name="resource_status", create_type=False
+            ),
+            nullable=False,
+            server_default="experimental",
+        ),
+        sa.Column(
+            "visibility",
+            sa.Enum("prominent", "normal", "hidden", name="visibility", create_type=False),
+            nullable=False,
+            server_default="normal",
+        ),
         sa.Column("value_formatting", JSONB(), nullable=True),
         sa.Column("conditional_formatting", JSONB(), nullable=True),
         sa.Column("is_primary_key", sa.Boolean(), nullable=False, server_default="false"),
@@ -207,9 +240,33 @@ def upgrade() -> None:
         "link_types",
         sa.Column("rid", sa.String(), primary_key=True),
         sa.Column("id", sa.String(255), nullable=False, unique=True),
-        sa.Column("cardinality", cardinality, nullable=False),
-        sa.Column("join_method", join_method, nullable=False),
-        sa.Column("status", resource_status, nullable=False, server_default="experimental"),
+        sa.Column(
+            "cardinality",
+            sa.Enum(
+                "one-to-one",
+                "one-to-many",
+                "many-to-one",
+                "many-to-many",
+                name="cardinality",
+                create_type=False,
+            ),
+            nullable=False,
+        ),
+        sa.Column(
+            "join_method",
+            sa.Enum(
+                "foreign-key", "join-table", "backing-object", name="join_method", create_type=False
+            ),
+            nullable=False,
+        ),
+        sa.Column(
+            "status",
+            sa.Enum(
+                "active", "experimental", "deprecated", name="resource_status", create_type=False
+            ),
+            nullable=False,
+            server_default="experimental",
+        ),
         sa.Column("project_rid", sa.String(), nullable=False),
         sa.Column(
             "ontology_rid",
@@ -240,7 +297,11 @@ def upgrade() -> None:
             sa.ForeignKey("link_types.rid", ondelete="CASCADE"),
             nullable=False,
         ),
-        sa.Column("side", link_side, nullable=False),
+        sa.Column(
+            "side",
+            sa.Enum("A", "B", name="link_side", create_type=False),
+            nullable=False,
+        ),
         sa.Column(
             "object_type_rid",
             sa.String(),
@@ -250,7 +311,12 @@ def upgrade() -> None:
         sa.Column("display_name", sa.String(255), nullable=False),
         sa.Column("plural_display_name", sa.String(255), nullable=True),
         sa.Column("api_name", sa.String(255), nullable=False),
-        sa.Column("visibility", visibility, nullable=False, server_default="normal"),
+        sa.Column(
+            "visibility",
+            sa.Enum("prominent", "normal", "hidden", name="visibility", create_type=False),
+            nullable=False,
+            server_default="normal",
+        ),
         sa.Column("foreign_key_property_id", sa.String(255), nullable=True),
         sa.UniqueConstraint("link_type_rid", "side", name="uq_link_type_endpoints_link_type_side"),
     )
@@ -399,10 +465,9 @@ def downgrade() -> None:
     op.execute("DROP FUNCTION IF EXISTS properties_search_vector_update() CASCADE;")
 
     # Drop ENUM types
-    bind = op.get_bind()
-    property_base_type.drop(bind, checkfirst=True)
-    link_side.drop(bind, checkfirst=True)
-    join_method.drop(bind, checkfirst=True)
-    cardinality.drop(bind, checkfirst=True)
-    visibility.drop(bind, checkfirst=True)
-    resource_status.drop(bind, checkfirst=True)
+    op.execute("DROP TYPE IF EXISTS property_base_type;")
+    op.execute("DROP TYPE IF EXISTS link_side;")
+    op.execute("DROP TYPE IF EXISTS join_method;")
+    op.execute("DROP TYPE IF EXISTS cardinality;")
+    op.execute("DROP TYPE IF EXISTS visibility;")
+    op.execute("DROP TYPE IF EXISTS resource_status;")
