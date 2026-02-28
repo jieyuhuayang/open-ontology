@@ -25,9 +25,9 @@
 
 | 级别 | 类型 | MVP 支持程度 |
 |------|------|-------------|
-| **核心** | String, Integer, Boolean, Date, Timestamp, Double, Long | F005a/b 完整验证 + UI |
-| **标准** | Short, Byte, Float, Decimal | F005a/b Schema 支持 + 基础 UI |
-| **复合** | Array, Struct | F005c 中完整实现（嵌套配置 UI） |
+| **核心** | String, Integer, Boolean, Date, Timestamp, Double, Long | 完整验证 + UI |
+| **标准** | Short, Byte, Float, Decimal | Schema 支持 + 基础 UI |
+| **复合** | Array, Struct | 增量完成（嵌套配置 UI） |
 | **高级** | Vector, Geopoint, Geoshape, Attachment, TimeSeries, MediaReference, Marking, Cipher | Schema 枚举值预留，UI 显示 "coming soon" |
 
 ---
