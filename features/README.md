@@ -67,7 +67,7 @@ Examples:
 - `001-project-scaffolding`
 - `003-object-type-crud`
 
-When a feature is complete, **do not delete or renumber** — the directory becomes a permanent record.
+Feature directories serve as permanent records. Renumbering is acceptable during pre-implementation phases to align numbering with execution order.
 
 ---
 
