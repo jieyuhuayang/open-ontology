@@ -106,7 +106,7 @@
 
 ## Group 4: ObjectTypeService
 
-- [ ] **T007**: 编写 ObjectTypeService 单元测试
+- [x] **T007**: 编写 ObjectTypeService 单元测试
   - 文件: `apps/server/tests/unit/test_object_type_service.py`
   - 内容:
     - `create()`: 唯一性校验（id 重复 → 409, apiName 重复 → 409）、格式校验委托 validators、正常创建生成 CREATE 变更
