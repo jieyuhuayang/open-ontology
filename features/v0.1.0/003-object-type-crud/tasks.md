@@ -136,7 +136,7 @@
 
 ## Group 5: Router + 集成测试
 
-- [ ] **T009**: 编写集成测试 fixtures + API 集成测试
+- [x] **T009**: 编写集成测试 fixtures + API 集成测试
   - 文件:
     - `apps/server/tests/conftest.py` — 测试 fixtures: 异步测试 DB session（独立测试数据库）、httpx `AsyncClient` 绑定 FastAPI app、每个测试自动回滚事务
     - `apps/server/tests/integration/__init__.py`
