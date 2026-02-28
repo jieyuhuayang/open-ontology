@@ -1,0 +1,10 @@
+{
+  "app": {
+    "title": "Open Ontology",
+    "subtitle": "Ontology Manager"
+  },
+  "home": {
+    "welcome": "Welcome to Open Ontology",
+    "description": "An ontology platform for the agent era"
+  }
+}
