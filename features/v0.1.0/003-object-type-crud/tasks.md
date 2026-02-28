@@ -118,7 +118,7 @@
   - 依赖: T002（Domain 模型）、T006（WorkingStateService 接口）
   - AC 覆盖: AC1, AC2, AC4, AC6, AC7, AC10, AC10a, AC12
 
-- [ ] **T008**: 实现 ObjectTypeService
+- [x] **T008**: 实现 ObjectTypeService
   - 文件: `apps/server/app/services/object_type_service.py`
   - 内容:
     - `create(req)` — 校验 id/apiName → 唯一性检查（主表 + 草稿 CREATE 双重检查）→ 生成 rid → add_change(CREATE)
