@@ -13,8 +13,8 @@
 
 | 子特性 | 范围 | 依赖 |
 |--------|------|------|
-| **F003a** — 后端 | API + Service + Storage 层，通过 Working State 写入 | F002, F009 |
-| **F003b** — 前端 | 列表页、详情页、创建/编辑表单、删除确认 | F008, F003a |
+| **F003 后端** ✅ | API + Service + Storage 层，通过 Working State 写入 | F002 |
+| **F005 前端** | 已拆为独立特性 [005-object-type-crud-frontend](../005-object-type-crud-frontend/spec.md) | F004, F003 |
 
 ---
 
