@@ -48,7 +48,7 @@
 
 ## Group 2: Storage 层
 
-- [ ] **T003**: 编写 Storage 层单元测试
+- [x] **T003**: 编写 Storage 层单元测试
   - 文件: `apps/server/tests/unit/test_storage.py`
   - 内容:
     - `WorkingStateStorage`: 测试 `_to_domain()` ORM→Domain 转换（changes JSONB 反序列化为 `list[Change]`）
