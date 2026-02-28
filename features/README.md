@@ -26,15 +26,16 @@ features/
 │   ├── plan.md
 │   └── tasks.md
 └── v0.1.0/                      # MVP feature set
-    ├── 001-project-scaffolding/
-    ├── 002-database-schema/
-    ├── 003-object-type-crud/     # 拆分为 003a(后端) + 003b(前端)
-    ├── 004-link-type-crud/       # 拆分为 004a(后端) + 004b(前端)
-    ├── 005-property-management/  # 拆分为 005a(后端) + 005b(前端) + 005c(类型扩展)
-    ├── 006-search/
-    ├── 007-change-management/    # 范围缩减为 UI 层
-    ├── 008-app-shell/            # 新增：App Shell & UI 基础框架
-    └── 009-working-state/        # 新增：Working State 服务层
+    ├── 001-project-scaffolding/          ✅ 完成
+    ├── 002-database-schema/              ✅ 完成
+    ├── 003-object-type-crud/             ✅ 后端完成（含 Working State）
+    ├── 004-app-shell/                    📋 下一个开发
+    ├── 005-object-type-crud-frontend/    📋 待开发（Demo 走查目标）
+    ├── 006-link-type-crud/               📋 全栈
+    ├── 007-property-management/          📋 全栈
+    ├── 008-search/                       📋
+    ├── 009-change-management/            📋
+    └── 009-working-state/                📦 已归档（merged into F003）
 ```
 
 ---
