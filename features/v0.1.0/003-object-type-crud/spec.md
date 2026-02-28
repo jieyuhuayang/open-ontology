@@ -29,9 +29,10 @@
 ## 验收标准
 
 ### 创建
-- **AC1**: 用户可以填写对象类型的基本信息（API name、显示名、描述、图标、颜色）并保存
-- **AC2**: API name 在本体内唯一；重复时返回明确的错误提示
-- **AC3**: API name 仅允许字母、数字、下划线，且不能以数字开头；前端实时校验
+- **AC1**: 用户可以填写对象类型的基本信息（id、API name、显示名、描述、图标）并保存；status 默认为 `experimental`，visibility 默认为 `normal`
+- **AC2**: API name 和 id 在本体内各自唯一；重复时返回明确的错误提示
+- **AC3a**: API name 仅允许字母、数字、下划线，遵循 PascalCase 约定，不能以数字开头，不可使用保留关键字（`ontology`、`object`、`property`、`link`、`relation`、`rid`、`primaryKey`、`typeId`、`ontologyObject`）；前端实时校验
+- **AC3b**: id 仅允许小写字母、数字、连字符，必须以小写字母开头；前端实时校验
 
 ### 查看
 - **AC4**: 列表页显示所有对象类型，含分页（默认每页 20 条）
