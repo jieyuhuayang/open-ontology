@@ -33,7 +33,7 @@
   - 依赖: 无
   - AC 覆盖: AC3a, AC3b
 
-- [ ] **T002**: 实现 Domain 层全部模型、常量和校验器
+- [x] **T002**: 实现 Domain 层全部模型、常量和校验器
   - 文件:
     - `apps/server/app/domain/constants.py` — `DEFAULT_USER_ID`, `DEFAULT_ONTOLOGY_RID`, `DEFAULT_PROJECT_RID`, `DEFAULT_PAGE_SIZE`, `MAX_PAGE_SIZE`
     - `apps/server/app/domain/validators.py` — `validate_api_name()`, `validate_object_type_id()`, `RESERVED_API_NAMES`, 正则常量
