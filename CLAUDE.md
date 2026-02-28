@@ -173,6 +173,19 @@ Before implementing a feature, **read the relevant doc first**:
 | UI design / interaction flows | PRD + `docs/prd/0_1_0（MVP）/images/` |
 | Full tech stack rationale | `docs/architecture/04-tech-stack-recommendations.md` |
 
+## Development Workflow (SDD — Spec-Driven Development)
+
+**所有新特性必须按以下顺序执行**（参见 `features/README.md`）：
+
+1. **spec.md** — 定义用户故事、验收标准、边界
+2. **评审** — 确认 AC 可测试、边界清晰
+3. **plan.md** — 设计数据结构、API 契约、组件树、架构决策
+4. **tasks.md** — 将 plan 拆解为原子任务（每个任务一次 AI 会话可完成）
+5. **执行** — 逐任务实施，完成后在 tasks.md 打勾
+
+> ⚠️ **禁止跳步**：不得在 plan.md 和 tasks.md 完成前开始写代码。
+> 每个特性目录下必须存在这三个文件，否则视为流程未完成。
+
 ## Workflow: Auto-commit on File Edit
 
 A `PostToolUse` hook in `.claude/settings.json` automatically commits every file change Claude Code makes:
