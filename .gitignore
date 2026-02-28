@@ -11,3 +11,43 @@ Thumbs.db
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Node / Frontend
+node_modules/
+.pnpm-store/
+*.tsbuildinfo
+
+# Vite
+apps/web/dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Database
+pgdata/
+
+# Generated (DO NOT EDIT manually)
+apps/web/src/generated/*.ts
+
+# Docker
+docker-compose.override.yml
