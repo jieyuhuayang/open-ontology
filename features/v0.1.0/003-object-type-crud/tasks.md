@@ -72,7 +72,7 @@
 
 ## Group 3: WorkingStateService
 
-- [ ] **T005**: 编写变更合并逻辑单元测试
+- [x] **T005**: 编写变更合并逻辑单元测试
   - 文件: `apps/server/tests/unit/test_change_collapsing.py`
   - 内容:
     - 变更合并（Change Collapsing）四种场景:
