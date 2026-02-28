@@ -211,6 +211,10 @@
 
 > 完成后，在此记录实现与 plan.md 的偏差，供后续参考。
 
+- `ObjectTypeStorage.list_by_ontology()` 返回全部列表而非分页元组，分页在 Service 层通过合并视图后截取实现（因为需要合并草稿数据后才能确定 total）
+- `ObjectTypeStorage._to_dict()` 使用 `model.model_dump(mode="json")` 而非手动字段映射
+- 集成测试 `conftest.py` 中使用 `create_all/drop_all` 方式管理测试表，而非 Alembic 迁移（测试环境简化）
+
 ---
 
 ## 会话记录
