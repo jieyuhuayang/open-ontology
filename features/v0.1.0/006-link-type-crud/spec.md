@@ -47,7 +47,7 @@
 - **AC9**: 删除前展示确认弹窗
 - **AC10**: 删除链接类型不影响两端对象类型本身
 
-### Working State 集成（F004a）
+### Working State 集成
 - **AC11**: 所有写入操作（创建/编辑/删除）通过 WorkingStateService 写入草稿，而非直接修改 `link_types` 主表
 - **AC12**: 列表和详情查询返回合并视图（已发布 + 草稿变更）
 - **AC13**: 合并视图中的资源标注变更状态（`published`、`created`、`modified`、`deleted`）
