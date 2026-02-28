@@ -79,3 +79,31 @@ server-openapi:
 # Generate TypeScript types from openapi.json
 web-typegen:
     cd apps/web && pnpm exec openapi-typescript ../../apps/server/openapi.json -o src/generated/api.ts
+
+# --- Feature Status ---
+
+# Show feature status (derived from tasks.md in each feature directory)
+features-status:
+    #!/usr/bin/env bash
+    printf "%-6s %-45s %s\n" "#" "Feature" "Status"
+    printf "%-6s %-45s %s\n" "---" "---------------------------------------------" "----------"
+    for dir in features/v0.1.0/*/; do
+        name=$(basename "$dir")
+        tasks="$dir/tasks.md"
+        if [ ! -f "$tasks" ]; then
+            status="📝 Draft"
+        else
+            total=$(grep -c '^\- \[' "$tasks" 2>/dev/null || echo 0)
+            done=$(grep -c '^\- \[x\]' "$tasks" 2>/dev/null || echo 0)
+            if [ "$total" -eq 0 ]; then
+                status="📝 Draft"
+            elif [ "$done" -eq "$total" ]; then
+                status="✅ Done ($done/$total)"
+            elif [ "$done" -gt 0 ]; then
+                status="🚧 In Progress ($done/$total)"
+            else
+                status="📋 Planned (0/$total)"
+            fi
+        fi
+        printf "%-6s %-45s %s\n" "${name%%-*}" "${name#*-}" "$status"
+    done
