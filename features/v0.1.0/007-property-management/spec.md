@@ -95,7 +95,6 @@
 - 对象类型元数据: [docs/specs/object-type-metadata.md]
 - 属性值格式化: [docs/specs/property-value-formatting.md]（P1 特性参考）
 - 依赖特性:
-  - 后端（F005a）: [features/v0.1.0/002-database-schema]、[features/v0.1.0/009-working-state]
-  - 前端（F005b）: [features/v0.1.0/008-app-shell]、F005a
-  - 扩展（F005c）: F005b
-  - 运行时依赖: [features/v0.1.0/003-object-type-crud]（属性属于对象类型）
+  - [features/v0.1.0/002-database-schema]（Schema）
+  - [features/v0.1.0/003-object-type-crud]（Working State 服务层 + 属性属于对象类型）
+  - [features/v0.1.0/004-app-shell]（UI 框架）
