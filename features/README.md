@@ -111,7 +111,7 @@ When writing `plan.md`, always reference the relevant architecture document.
 | # | Feature | Phase | Priority | Status |
 |---|---------|-------|---------|--------|
 | 001 | Project Scaffolding | 1 | P0 | ✅ Done |
-| 002 | Database Schema（扩充） | 2 | P0 | 🔲 Draft |
+| 002 | Database Schema（扩充） | 2 | P0 | ✅ Done |
 | 008 | App Shell & UI 基础框架 | 2 | P0 | 🔲 Draft |
 | 009 | Working State 服务层 | 3 | P0 | 🔲 Draft |
 | 003a | Object Type CRUD — 后端 | 4 | P0 | 🔲 Draft |
