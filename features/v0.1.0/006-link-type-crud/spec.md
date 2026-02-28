@@ -76,6 +76,6 @@
 - 链接类型元数据规范: [docs/specs/link-type-metadata.md]
 - 领域模型: [docs/architecture/02-domain-model.md]
 - 依赖特性:
-  - 后端（F004a）: [features/v0.1.0/002-database-schema]、[features/v0.1.0/009-working-state]
-  - 前端（F004b）: [features/v0.1.0/008-app-shell]、F004a
-  - 运行时依赖: [features/v0.1.0/003-object-type-crud]（需要已有对象类型可选择）
+  - [features/v0.1.0/002-database-schema]（Schema）
+  - [features/v0.1.0/003-object-type-crud]（Working State 服务层 + 需要已有对象类型可选择）
+  - [features/v0.1.0/004-app-shell]（UI 框架）
