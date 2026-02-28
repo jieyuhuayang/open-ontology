@@ -8,7 +8,7 @@ from sqlalchemy import text
 from app.config import settings
 from app.database import engine
 from app.exceptions import AppError, app_error_handler
-from app.routers import health
+from app.routers import health, object_types, ontology
 
 
 @asynccontextmanager
