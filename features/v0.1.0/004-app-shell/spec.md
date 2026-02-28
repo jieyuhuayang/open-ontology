@@ -75,4 +75,4 @@
 - 技术栈: [docs/architecture/04-tech-stack-recommendations.md]
 - 系统架构: [docs/architecture/01-system-architecture.md]
 - 依赖特性: [features/v0.1.0/001-project-scaffolding]
-- 被依赖: [features/v0.1.0/003-object-type-crud]（前端部分）、[features/v0.1.0/004-link-type-crud]（前端部分）、[features/v0.1.0/005-property-management]（前端部分）
+- 被依赖: [features/v0.1.0/005-object-type-crud-frontend]、[features/v0.1.0/006-link-type-crud]、[features/v0.1.0/007-property-management]、[features/v0.1.0/009-change-management]
