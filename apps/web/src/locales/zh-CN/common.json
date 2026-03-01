@@ -51,5 +51,63 @@
   "language": {
     "en-US": "English",
     "zh-CN": "中文"
+  },
+  "objectType": {
+    "listTitle": "对象类型",
+    "newObjectType": "新建对象类型",
+    "createTitle": "创建对象类型",
+    "createSuccess": "对象类型创建成功",
+    "deleteTitle": "删除对象类型",
+    "deleteConfirm": "确定要删除 \"{{name}}\" 吗？此操作不可撤销。",
+    "deleteSuccess": "对象类型删除成功",
+    "cannotDeleteActive": "无法删除状态为 Active 的对象类型",
+    "cannotModifyApiNameActive": "状态为 Active 时无法修改 API Name",
+    "emptyTitle": "创建你的第一个对象类型",
+    "emptyDescription": "对象类型代表本体中的真实世界实体。",
+    "fields": {
+      "displayName": "名称",
+      "description": "描述",
+      "id": "ID",
+      "apiName": "API Name",
+      "rid": "RID",
+      "icon": "图标",
+      "status": "状态",
+      "visibility": "可见性",
+      "changeState": "变更状态"
+    },
+    "status": {
+      "active": "活跃",
+      "experimental": "实验性",
+      "deprecated": "已弃用"
+    },
+    "visibility": {
+      "prominent": "突出",
+      "normal": "普通",
+      "hidden": "隐藏"
+    },
+    "changeState": {
+      "new": "新建",
+      "modified": "已修改",
+      "deleted": "已删除"
+    },
+    "validation": {
+      "idFormat": "ID 必须以小写字母开头，只能包含小写字母、数字和连字符",
+      "apiNameFormat": "API Name 必须以大写字母开头，只能包含字母、数字和下划线",
+      "apiNameReserved": "此 API Name 为保留名称，不可使用",
+      "displayNameRequired": "此字段为必填项",
+      "idConflict": "已存在相同 ID 的对象类型",
+      "apiNameConflict": "已存在相同 API Name 的对象类型"
+    },
+    "placeholders": {
+      "descriptionHint": "在此输入...",
+      "properties": "属性",
+      "propertiesEmpty": "暂未定义属性",
+      "actionTypes": "动作类型",
+      "actionTypesEmpty": "暂未定义动作类型",
+      "linkTypes": "链接类型",
+      "linkTypesEmpty": "暂未定义链接类型",
+      "data": "数据",
+      "dataEmpty": "暂未配置数据源"
+    }
   }
 }
