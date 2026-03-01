@@ -273,7 +273,7 @@ export function validateApiName(value: string): string | null;
 | `src/pages/object-types/components/ObjectTypeTable.tsx` | 列表表格 |
 | `src/pages/object-types/components/MetadataSection.tsx` | 元数据区 |
 
-### 修改文件 (~8 个)
+### 修改文件 (~10 个)
 
 | 文件 | 变更 |
 |------|------|
