@@ -8,6 +8,7 @@ import DiscoverPage from '@/pages/DiscoverPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import ObjectTypeListPage from '@/pages/object-types/ObjectTypeListPage';
 import ObjectTypeDetailLayout from '@/pages/object-types/ObjectTypeDetailLayout';
+import ObjectTypeOverviewPage from '@/pages/object-types/ObjectTypeOverviewPage';
 import LinkTypeListPage from '@/pages/link-types/LinkTypeListPage';
 import LinkTypeDetailLayout from '@/pages/link-types/LinkTypeDetailLayout';
 
@@ -22,7 +23,6 @@ export const routeConfig: RouteObject[] = [
         children: [
           { index: true, element: <DiscoverPage /> },
           { path: 'object-types', element: <ObjectTypeListPage /> },
-          { path: 'object-types/new', element: <PlaceholderPage title="Create Object Type" /> },
           { path: 'link-types', element: <LinkTypeListPage /> },
           { path: 'link-types/new', element: <PlaceholderPage title="Create Link Type" /> },
           { path: 'properties', element: <PlaceholderPage title="Properties" comingSoon /> },
@@ -34,7 +34,7 @@ export const routeConfig: RouteObject[] = [
         element: <ObjectTypeDetailLayout />,
         children: [
           { index: true, element: <Navigate to="overview" replace /> },
-          { path: 'overview', element: <PlaceholderPage title="Object Type Overview" /> },
+          { path: 'overview', element: <ObjectTypeOverviewPage /> },
           { path: 'properties', element: <PlaceholderPage title="Object Type Properties" /> },
           { path: 'datasources', element: <PlaceholderPage title="Object Type Datasources" /> },
         ],
