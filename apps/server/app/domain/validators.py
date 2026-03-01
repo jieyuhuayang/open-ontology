@@ -1,11 +1,13 @@
-"""Domain validators for Object Type fields."""
+"""Domain validators for Object Type and Link Type fields."""
 
 import re
+import unicodedata
 
 from app.exceptions import AppError
 
 PASCAL_CASE_PATTERN = re.compile(r"^[A-Z][a-zA-Z0-9_]*$")
 ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]*$")
+LINK_SIDE_API_NAME_PATTERN = re.compile(r"^[a-z][a-zA-Z0-9]{0,99}$")
 
 RESERVED_API_NAMES = frozenset(
     {
