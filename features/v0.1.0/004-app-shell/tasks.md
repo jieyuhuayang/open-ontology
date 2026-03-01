@@ -316,7 +316,7 @@
 
 ---
 
-### Task 20 — 实现：DetailLayout + 列表页占位
+### Task 20 — ✅ 实现：DetailLayout + 列表页占位
 
 **文件**:
 - `apps/web/src/pages/object-types/ObjectTypeDetailLayout.tsx`（新建）
