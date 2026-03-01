@@ -2,6 +2,11 @@ import { Modal, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useDeleteObjectType } from '@/api/object-types';
+import type { AxiosError } from 'axios';
+
+interface ApiErrorResponse {
+  error?: { code?: string; message?: string };
+}
 
 interface DeleteObjectTypeModalProps {
   rid: string;
@@ -21,10 +26,21 @@ export default function DeleteObjectTypeModal({
   const deleteMutation = useDeleteObjectType();
 
   const handleOk = async () => {
-    await deleteMutation.mutateAsync(rid);
-    message.success(t('objectType.deleteSuccess'));
-    onClose();
-    navigate('/object-types');
+    try {
+      await deleteMutation.mutateAsync(rid);
+      message.success(t('objectType.deleteSuccess'));
+      onClose();
+      navigate('/object-types');
+    } catch (err) {
+      const axiosErr = err as AxiosError<ApiErrorResponse>;
+      const code = axiosErr.response?.data?.error?.code;
+      if (code === 'OBJECT_TYPE_ACTIVE_CANNOT_DELETE') {
+        message.error(t('objectType.cannotDeleteActive'));
+      } else {
+        const serverMessage = axiosErr.response?.data?.error?.message;
+        message.error(serverMessage ?? t('error.somethingWentWrong'));
+      }
+    }
   };
 
   return (
