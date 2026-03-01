@@ -18,7 +18,7 @@ export interface DetailSidebarNavItem {
 interface DetailSidebarProps {
   resourceName: string;
   resourceIcon: ReactNode;
-  statusBadge?: ReactNode;
+  badges?: ReactNode;
   extra?: ReactNode;
   navItems: DetailSidebarNavItem[];
   backTo: string;
