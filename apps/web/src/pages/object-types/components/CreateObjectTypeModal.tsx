@@ -24,6 +24,8 @@ const ERROR_CODE_TO_FIELD: Record<string, { field: keyof FormValues; messageKey:
   OBJECT_TYPE_ID_CONFLICT: { field: 'id', messageKey: 'objectType.validation.idConflict' },
   OBJECT_TYPE_API_NAME_CONFLICT: { field: 'apiName', messageKey: 'objectType.validation.apiNameConflict' },
   OBJECT_TYPE_RESERVED_API_NAME: { field: 'apiName', messageKey: 'objectType.validation.apiNameReserved' },
+  OBJECT_TYPE_INVALID_ID: { field: 'id', messageKey: 'objectType.validation.idFormat' },
+  OBJECT_TYPE_INVALID_API_NAME: { field: 'apiName', messageKey: 'objectType.validation.apiNameFormat' },
 };
 
 export default function CreateObjectTypeModal() {
