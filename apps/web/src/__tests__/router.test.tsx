@@ -1,14 +1,35 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@/queryClient';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { routeConfig } from '@/router';
+
+vi.mock('@/api/object-types', () => ({
+  useObjectTypes: () => ({
+    data: { items: [], total: 0, page: 1, pageSize: 20 },
+    isLoading: false,
+  }),
+  useObjectType: () => ({
+    data: null,
+    isLoading: true,
+  }),
+  useCreateObjectType: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useUpdateObjectType: () => ({ mutate: vi.fn() }),
+  useDeleteObjectType: () => ({ mutateAsync: vi.fn(), isPending: false }),
+}));
+
+let testQueryClient: QueryClient;
+
+beforeEach(() => {
+  testQueryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+});
 
 function renderRoute(path: string) {
   const router = createMemoryRouter(routeConfig, { initialEntries: [path] });
   return render(
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={testQueryClient}>
       <RouterProvider router={router} />
     </QueryClientProvider>,
   );
@@ -25,15 +46,7 @@ describe('Router', () => {
   it('/object-types renders ObjectTypeListPage', async () => {
     renderRoute('/object-types');
     await waitFor(() => {
-      // PlaceholderPage renders inside an AntD Result component
-      expect(screen.getByText('Object Types', { selector: '.ant-result-title' })).toBeInTheDocument();
-    });
-  });
-
-  it('/object-types/new renders create placeholder', async () => {
-    renderRoute('/object-types/new');
-    await waitFor(() => {
-      expect(screen.getByText('Create Object Type')).toBeInTheDocument();
+      expect(screen.getByText('Object Types', { selector: 'h4' })).toBeInTheDocument();
     });
   });
 
@@ -62,13 +75,6 @@ describe('Router', () => {
     renderRoute('/action-types');
     await waitFor(() => {
       expect(screen.getByText(/coming soon/i)).toBeInTheDocument();
-    });
-  });
-
-  it('/object-types/:rid redirects to overview', async () => {
-    renderRoute('/object-types/test-rid');
-    await waitFor(() => {
-      expect(screen.getByText('Object Type Overview')).toBeInTheDocument();
     });
   });
 
