@@ -285,7 +285,7 @@
 
 ---
 
-### Task 18 — 实现：DiscoverPage
+### Task 18 — ✅ 实现：DiscoverPage
 
 **文件**:
 - `apps/web/src/pages/DiscoverPage.tsx`（新建）
