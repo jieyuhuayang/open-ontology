@@ -74,6 +74,7 @@ export function useDeleteObjectType() {
     mutationFn: async (rid: string) => {
       await apiClient.delete(`/object-types/${rid}`);
     },
+    meta: { skipGlobalError: true },
     onSuccess: (_data, rid) => {
       queryClient.invalidateQueries({ queryKey: objectTypeKeys.lists() });
       queryClient.removeQueries({ queryKey: objectTypeKeys.detail(rid) });
