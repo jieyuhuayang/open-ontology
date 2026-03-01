@@ -20,7 +20,7 @@ interface ApiErrorResponse {
   error?: { code?: string; message?: string };
 }
 
-const ERROR_CODE_TO_FIELD: Record<string, { field: string; messageKey: string }> = {
+const ERROR_CODE_TO_FIELD: Record<string, { field: keyof FormValues; messageKey: string }> = {
   OBJECT_TYPE_ID_CONFLICT: { field: 'id', messageKey: 'objectType.validation.idConflict' },
   OBJECT_TYPE_API_NAME_CONFLICT: { field: 'apiName', messageKey: 'objectType.validation.apiNameConflict' },
   OBJECT_TYPE_RESERVED_API_NAME: { field: 'apiName', messageKey: 'objectType.validation.apiNameReserved' },
