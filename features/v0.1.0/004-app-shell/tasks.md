@@ -225,7 +225,7 @@
 
 ---
 
-### Task 14 — 实现：DetailSidebarLayout
+### Task 14 — ✅ 实现：DetailSidebarLayout
 
 **文件**:
 - `apps/web/src/components/layout/DetailSidebarLayout.tsx`（新建）
