@@ -52,6 +52,67 @@
     "en-US": "English",
     "zh-CN": "中文"
   },
+  "linkType": {
+    "listTitle": "链接类型",
+    "newLinkType": "新建链接类型",
+    "createTitle": "创建链接类型",
+    "createSuccess": "链接类型创建成功",
+    "deleteTitle": "删除链接类型",
+    "deleteConfirm": "确定要删除 \"{{name}}\" 吗？此操作不可撤销。",
+    "deleteSuccess": "链接类型删除成功",
+    "cannotDeleteActive": "无法删除状态为 Active 的链接类型",
+    "filterEmpty": "当前页没有匹配的链接类型",
+    "emptyTitle": "创建你的第一个链接类型",
+    "emptyDescription": "链接类型定义对象类型之间的语义关系。",
+    "wizard": {
+      "step1": "基数",
+      "step2": "对象类型",
+      "step3": "详情",
+      "next": "下一步",
+      "back": "上一步",
+      "sideA": "A 端",
+      "sideB": "B 端",
+      "selectObjectType": "选择对象类型"
+    },
+    "fields": {
+      "id": "ID",
+      "rid": "RID",
+      "sideA": "A 端",
+      "sideB": "B 端",
+      "cardinality": "基数",
+      "status": "状态",
+      "visibility": "可见性",
+      "changeState": "变更状态",
+      "displayName": "显示名称",
+      "apiName": "API Name",
+      "objectType": "对象类型",
+      "createdAt": "创建时间",
+      "createdBy": "创建者",
+      "lastModifiedAt": "最后修改时间",
+      "lastModifiedBy": "最后修改者"
+    },
+    "filters": {
+      "objectType": "对象类型"
+    },
+    "cardinality": {
+      "one-to-one": "一对一",
+      "one-to-many": "一对多",
+      "many-to-one": "多对一"
+    },
+    "cardinalityDesc": {
+      "one-to-one": "两端的每个实例都恰好有一个对应实例",
+      "one-to-many": "A 端的一个实例链接到 B 端的多个实例",
+      "many-to-one": "A 端的多个实例链接到 B 端的一个实例"
+    },
+    "validation": {
+      "required": "此字段为必填项",
+      "idFormat": "ID 必须以小写字母开头，只能包含小写字母、数字和连字符",
+      "apiNameFormat": "API Name 必须以小写字母开头，只能包含字母和数字（1-100 个字符）",
+      "idConflict": "已存在相同 ID 的链接类型",
+      "apiNameConflict": "此 API Name 在关联的对象类型下已存在",
+      "selfLinkNotAllowed": "A 端和 B 端不能引用同一个对象类型"
+    }
+  },
   "objectType": {
     "listTitle": "对象类型",
     "newObjectType": "新建对象类型",
