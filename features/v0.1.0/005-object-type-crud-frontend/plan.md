@@ -174,6 +174,7 @@ ObjectTypeOverviewPage
 
 | 组件 | 文件路径 | 职责 |
 |------|---------|------|
+| `StatusBadge` | `src/components/StatusBadge.tsx` | 资源状态标签：active=绿, experimental=橙, deprecated=红 |
 | `ChangeStateBadge` | `src/components/ChangeStateBadge.tsx` | 变更状态标签：published 不显示, created=绿 "New", modified=蓝 "Modified", deleted=红 "Deleted" |
 | `DynamicIcon` | `src/components/DynamicIcon.tsx` | 根据 icon name 字符串渲染 Ant Design 图标 + color |
 | `IconSelector` | `src/components/IconSelector.tsx` | Popover：~25 个图标网格 + 12 色色板 |
