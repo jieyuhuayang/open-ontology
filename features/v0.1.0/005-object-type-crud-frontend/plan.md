@@ -219,6 +219,7 @@ export function validateApiName(value: string): string | null;
 修改 `src/router.tsx`：
 - **删除** `{ path: 'object-types/new', element: <PlaceholderPage ... /> }`
 - **替换** overview 子路由的 PlaceholderPage 为 `ObjectTypeOverviewPage`
+- **保留** 已有的 index 重定向 `<Navigate to="overview" replace />`
 
 修改 `CreateMenu.tsx`：
 - 去掉 `useNavigate` + `navigate('/object-types/new')`
