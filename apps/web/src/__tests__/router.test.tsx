@@ -64,14 +64,7 @@ describe('Router', () => {
   it('/link-types renders LinkTypeListPage', async () => {
     renderRoute('/link-types');
     await waitFor(() => {
-      expect(screen.getByText('Link Types', { selector: '.ant-result-title' })).toBeInTheDocument();
-    });
-  });
-
-  it('/link-types/new renders create placeholder', async () => {
-    renderRoute('/link-types/new');
-    await waitFor(() => {
-      expect(screen.getByText('Create Link Type')).toBeInTheDocument();
+      expect(screen.getByText('Link Types', { selector: 'h4' })).toBeInTheDocument();
     });
   });
 
