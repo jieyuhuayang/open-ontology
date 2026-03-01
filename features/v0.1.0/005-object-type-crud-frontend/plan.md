@@ -296,7 +296,7 @@ export function validateApiName(value: string): string | null;
 
 1. **列表页**：访问 `/object-types`，确认表格渲染、分页、筛选、空状态、行点击跳转
 2. **创建**：点击 "New object type" / TopBar CreateMenu，弹窗填写表单，验证实时校验（ID/API Name 格式、保留字），提交后跳转到详情页，列表刷新
-3. **详情页**：确认侧边栏显示图标+名称+变更状态，三点菜单可用
+3. **详情页**：确认侧边栏显示图标+名称+资源状态标签+变更状态标签，三点菜单可用
 4. **Overview**：内联编辑 displayName/description/apiName，确认即时保存；修改 status/visibility 下拉；active 状态下 apiName 禁用
 5. **删除**：非 active 可删除，确认弹窗后返回列表；active 菜单项置灰
 6. **图标选择器**：Popover 选择图标和颜色，实时预览
