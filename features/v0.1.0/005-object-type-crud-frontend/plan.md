@@ -140,7 +140,7 @@ ObjectTypeDetailLayout（修改现有）
 ├── DetailSidebarLayout（传入真实数据 + extra 三点菜单）
 │   ├── resourceIcon = DynamicIcon(data.icon)
 │   ├── resourceName = data.displayName
-│   ├── statusBadge = ChangeStateBadge(data.changeState)
+│   ├── badges = StatusBadge(data.status) + ChangeStateBadge(data.changeState)
 │   └── extra = Dropdown(三点菜单: Delete)
 ├── DeleteObjectTypeModal（确认弹窗）
 └── Outlet → ObjectTypeOverviewPage / PlaceholderPage
