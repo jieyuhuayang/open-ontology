@@ -3,14 +3,9 @@ import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DynamicIcon from '@/components/DynamicIcon';
+import StatusBadge from '@/components/StatusBadge';
 import ChangeStateBadge from '@/components/ChangeStateBadge';
 import type { ObjectType, ResourceStatus, Visibility } from '@/api/types';
-
-const STATUS_COLORS: Record<ResourceStatus, string> = {
-  active: 'green',
-  experimental: 'orange',
-  deprecated: 'red',
-};
 
 const VISIBILITY_COLORS: Record<Visibility, string> = {
   prominent: 'blue',
