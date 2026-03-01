@@ -241,7 +241,7 @@
 
 ---
 
-### Task 15 — 测试：AppShell + HomeLayout
+### Task 15 — ✅ 测试：AppShell + HomeLayout
 
 **文件**:
 - `apps/web/src/components/layout/__tests__/AppShell.test.tsx`
