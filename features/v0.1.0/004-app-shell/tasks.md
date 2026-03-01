@@ -108,7 +108,7 @@
 
 ---
 
-### Task 7 — 测试：LanguageSwitcher + SearchBarPlaceholder + CreateMenu
+### Task 7 — ✅ 测试：LanguageSwitcher + SearchBarPlaceholder + CreateMenu
 
 **文件**:
 - `apps/web/src/components/layout/__tests__/LanguageSwitcher.test.tsx`
