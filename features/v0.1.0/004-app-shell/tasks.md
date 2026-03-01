@@ -92,7 +92,7 @@
 
 ---
 
-### Task 6 — 实现：ErrorBoundary + PlaceholderPage + NotFoundPage
+### Task 6 — ✅ 实现：ErrorBoundary + PlaceholderPage + NotFoundPage
 
 **文件**:
 - `apps/web/src/components/ErrorBoundary.tsx`（新建）
