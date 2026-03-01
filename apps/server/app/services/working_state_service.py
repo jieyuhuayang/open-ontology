@@ -17,6 +17,7 @@ from app.domain.working_state import (
     WorkingState,
 )
 from app.exceptions import AppError
+from app.storage.link_type_storage import LinkTypeStorage
 from app.storage.object_type_storage import ObjectTypeStorage
 from app.storage.ontology_storage import OntologyStorage
 from app.storage.working_state_storage import WorkingStateStorage
