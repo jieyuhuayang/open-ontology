@@ -157,7 +157,7 @@
 
 ---
 
-### Task 10 — 实现：TopBar
+### Task 10 — ✅ 实现：TopBar
 
 **文件**:
 - `apps/web/src/components/layout/TopBar.tsx`（新建）
