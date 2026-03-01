@@ -64,9 +64,8 @@ export default function CreateObjectTypeModal() {
           return;
         }
       }
-      if (axiosErr.response) {
-        message.error(axiosErr.response.data?.error?.message ?? t('error.somethingWentWrong'));
-      }
+      const serverMessage = axiosErr.response?.data?.error?.message;
+      message.error(serverMessage ?? t('error.somethingWentWrong'));
     }
   };
 
