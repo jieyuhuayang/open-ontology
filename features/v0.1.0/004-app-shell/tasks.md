@@ -355,7 +355,7 @@
 
 ---
 
-### Task 22 — 实现：router.tsx + App.tsx 重构
+### Task 22 — ✅ 实现：router.tsx + App.tsx 重构
 
 **文件**:
 - `apps/web/src/router.tsx`（新建）
