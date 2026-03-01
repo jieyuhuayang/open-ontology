@@ -173,7 +173,7 @@
 
 ---
 
-### Task 11 — 测试：HomeSidebar
+### Task 11 — ✅ 测试：HomeSidebar
 
 **文件**:
 - `apps/web/src/components/layout/__tests__/HomeSidebar.test.tsx`
