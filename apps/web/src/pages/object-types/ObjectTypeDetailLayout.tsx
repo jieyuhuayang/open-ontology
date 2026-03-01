@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import DetailSidebarLayout from '@/components/layout/DetailSidebarLayout';
 import type { DetailSidebarNavItem } from '@/components/layout/DetailSidebarLayout';
 import DynamicIcon from '@/components/DynamicIcon';
+import StatusBadge from '@/components/StatusBadge';
 import ChangeStateBadge from '@/components/ChangeStateBadge';
 import DeleteObjectTypeModal from './components/DeleteObjectTypeModal';
 import { useObjectType } from '@/api/object-types';
