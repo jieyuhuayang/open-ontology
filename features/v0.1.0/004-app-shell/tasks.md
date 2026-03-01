@@ -190,7 +190,7 @@
 
 ---
 
-### Task 12 — 实现：HomeSidebar
+### Task 12 — ✅ 实现：HomeSidebar
 
 **文件**:
 - `apps/web/src/components/layout/HomeSidebar.tsx`（新建）
