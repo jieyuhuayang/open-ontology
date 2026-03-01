@@ -256,37 +256,37 @@ export function validateApiName(value: string): string | null;
 
 | 文件 | 说明 |
 |------|------|
-| `src/generated/api.ts` | openapi-typescript 自动生成 |
-| `src/api/types.ts` | 类型重导出 |
-| `src/api/object-types.ts` | Query hooks + query keys |
-| `src/utils/validation.ts` | ID / API Name 校验 |
-| `src/stores/create-object-type-modal-store.ts` | 创建弹窗状态 |
-| `src/components/StatusBadge.tsx` | 资源状态标签 |
-| `src/components/ChangeStateBadge.tsx` | 变更状态标签 |
-| `src/components/DynamicIcon.tsx` | 动态图标 |
-| `src/components/IconSelector.tsx` | 图标选择器 |
-| `src/components/InlineEditText.tsx` | 内联编辑 |
-| `src/components/PlaceholderCard.tsx` | 占位卡片 |
-| `src/pages/object-types/ObjectTypeOverviewPage.tsx` | Overview 页 |
-| `src/pages/object-types/components/CreateObjectTypeModal.tsx` | 创建弹窗 |
-| `src/pages/object-types/components/DeleteObjectTypeModal.tsx` | 删除确认弹窗 |
-| `src/pages/object-types/components/ObjectTypeTable.tsx` | 列表表格 |
-| `src/pages/object-types/components/MetadataSection.tsx` | 元数据区 |
+| `apps/web/src/generated/api.ts` | openapi-typescript 自动生成 |
+| `apps/web/src/api/types.ts` | 类型重导出 |
+| `apps/web/src/api/object-types.ts` | Query hooks + query keys |
+| `apps/web/src/utils/validation.ts` | ID / API Name 校验 |
+| `apps/web/src/stores/create-object-type-modal-store.ts` | 创建弹窗状态 |
+| `apps/web/src/components/StatusBadge.tsx` | 资源状态标签 |
+| `apps/web/src/components/ChangeStateBadge.tsx` | 变更状态标签 |
+| `apps/web/src/components/DynamicIcon.tsx` | 动态图标 |
+| `apps/web/src/components/IconSelector.tsx` | 图标选择器 |
+| `apps/web/src/components/InlineEditText.tsx` | 内联编辑 |
+| `apps/web/src/components/PlaceholderCard.tsx` | 占位卡片 |
+| `apps/web/src/pages/object-types/ObjectTypeOverviewPage.tsx` | Overview 页 |
+| `apps/web/src/pages/object-types/components/CreateObjectTypeModal.tsx` | 创建弹窗 |
+| `apps/web/src/pages/object-types/components/DeleteObjectTypeModal.tsx` | 删除确认弹窗 |
+| `apps/web/src/pages/object-types/components/ObjectTypeTable.tsx` | 列表表格 |
+| `apps/web/src/pages/object-types/components/MetadataSection.tsx` | 元数据区 |
 
 ### 修改文件 (~10 个)
 
 | 文件 | 变更 |
 |------|------|
 | `apps/server/openapi.json` | 重新生成（含 object-type 路由） |
-| `src/router.tsx` | 删除 /object-types/new，替换 overview placeholder |
-| `src/queryClient.ts` | 增加 `meta.skipGlobalError` 支持 |
-| `src/components/layout/CreateMenu.tsx` | navigate → Zustand store.open() |
-| `src/components/layout/DetailSidebarLayout.tsx` | 增加 `extra?: ReactNode` prop |
-| `src/components/layout/HomeLayout.tsx` | 增加 CreateObjectTypeModal |
-| `src/pages/object-types/ObjectTypeListPage.tsx` | 替换 placeholder 为完整列表 |
-| `src/pages/object-types/ObjectTypeDetailLayout.tsx` | 获取数据 + 传真实 props + 三点菜单 + 删除弹窗 + recently viewed |
-| `src/locales/en-US/common.json` | 增加 objectType.* 翻译 |
-| `src/locales/zh-CN/common.json` | 增加 objectType.* 翻译 |
+| `apps/web/src/router.tsx` | 删除 /object-types/new，替换 overview placeholder |
+| `apps/web/src/queryClient.ts` | 增加 `meta.skipGlobalError` 支持 + 改进全局错误消息提取 |
+| `apps/web/src/components/layout/CreateMenu.tsx` | navigate → Zustand store.open() |
+| `apps/web/src/components/layout/DetailSidebarLayout.tsx` | 增加 `extra?: ReactNode` + `badges?: ReactNode` prop |
+| `apps/web/src/components/layout/HomeLayout.tsx` | 增加 CreateObjectTypeModal |
+| `apps/web/src/pages/object-types/ObjectTypeListPage.tsx` | 替换 placeholder 为完整列表 |
+| `apps/web/src/pages/object-types/ObjectTypeDetailLayout.tsx` | 获取数据 + 传真实 props + 三点菜单 + 删除弹窗 + recently viewed |
+| `apps/web/src/locales/en-US/common.json` | 增加 objectType.* 翻译 |
+| `apps/web/src/locales/zh-CN/common.json` | 增加 objectType.* 翻译 |
 
 ---
 
