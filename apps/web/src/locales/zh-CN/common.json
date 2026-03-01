@@ -1,0 +1,55 @@
+{
+  "app": {
+    "title": "Open Ontology",
+    "subtitle": "本体管理"
+  },
+  "nav": {
+    "discover": "发现",
+    "objectTypes": "对象类型",
+    "properties": "属性",
+    "linkTypes": "链接类型",
+    "actionTypes": "动作类型"
+  },
+  "topBar": {
+    "searchPlaceholder": "按名称、RID、别名搜索...",
+    "new": "新建",
+    "createObjectType": "创建对象类型",
+    "createLinkType": "创建链接类型"
+  },
+  "sidebar": {
+    "resources": "资源",
+    "ontologyName": "默认本体",
+    "backHome": "返回首页"
+  },
+  "detail": {
+    "overview": "概览",
+    "properties": "属性",
+    "datasources": "数据源"
+  },
+  "discover": {
+    "recentlyViewed": "最近查看的对象类型",
+    "noRecentlyViewed": "暂无最近查看的对象类型"
+  },
+  "common": {
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "confirm": "确认",
+    "create": "创建",
+    "back": "返回",
+    "comingSoon": "即将推出",
+    "noData": "暂无数据",
+    "loading": "加载中..."
+  },
+  "error": {
+    "pageNotFound": "页面未找到",
+    "pageNotFoundDesc": "您访问的页面不存在。",
+    "backHome": "返回首页",
+    "somethingWentWrong": "出错了",
+    "somethingWentWrongDesc": "发生了意外错误，请尝试刷新页面。"
+  },
+  "language": {
+    "en-US": "English",
+    "zh-CN": "中文"
+  }
+}
