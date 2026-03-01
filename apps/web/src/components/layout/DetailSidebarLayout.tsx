@@ -71,7 +71,7 @@ export default function DetailSidebarLayout({
             <Text strong style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {resourceName}
             </Text>
-            {statusBadge}
+            {badges}
             {extra}
           </Flex>
         </div>
