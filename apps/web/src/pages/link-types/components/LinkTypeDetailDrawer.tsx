@@ -9,7 +9,6 @@ import {
   Button,
   Dropdown,
   Divider,
-  Popconfirm,
 } from 'antd';
 import { MoreOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
