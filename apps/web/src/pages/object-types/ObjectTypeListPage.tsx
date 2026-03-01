@@ -33,7 +33,6 @@ export default function ObjectTypeListPage() {
     setPageSize(newPageSize);
   };
 
-  const hasFilters = statusFilter.length > 0 || visibilityFilter.length > 0;
   const isGlobalEmpty = !isLoading && data?.total === 0;
   const isFilterEmpty = !isLoading && !isGlobalEmpty && filteredItems.length === 0;
 
