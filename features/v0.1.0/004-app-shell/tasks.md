@@ -7,7 +7,7 @@
 
 ## 任务列表
 
-### Task 1 — 测试：theme.ts + queryClient.ts + Zustand stores
+### Task 1 — ✅ 测试：theme.ts + queryClient.ts + Zustand stores
 
 **文件**:
 - `apps/web/src/__tests__/theme.test.ts`
