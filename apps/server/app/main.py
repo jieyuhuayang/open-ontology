@@ -38,4 +38,5 @@ app.add_exception_handler(AppError, app_error_handler)
 
 app.include_router(health.router)
 app.include_router(object_types.router)
+app.include_router(link_types.router)
 app.include_router(ontology.router)
