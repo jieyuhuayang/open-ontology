@@ -1,24 +1,17 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConfigProvider } from 'antd';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { RouterProvider } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import enUS from 'antd/locale/en_US';
 import zhCN from 'antd/locale/zh_CN';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 
-import HomePage from '@/pages/HomePage';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+import { queryClient } from '@/queryClient';
+import { router } from '@/router';
+import theme from '@/theme';
 
 const antdLocaleMap: Record<string, typeof enUS> = {
-  en: enUS,
-  zh: zhCN,
+  'en-US': enUS,
+  'zh-CN': zhCN,
 };
 
 export default function App() {
@@ -27,12 +20,8 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ConfigProvider locale={antdLocale}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-          </Routes>
-        </BrowserRouter>
+      <ConfigProvider theme={theme} locale={antdLocale}>
+        <RouterProvider router={router} />
       </ConfigProvider>
     </QueryClientProvider>
   );
