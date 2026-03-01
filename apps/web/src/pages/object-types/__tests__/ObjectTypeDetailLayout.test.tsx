@@ -91,4 +91,14 @@ describe('ObjectTypeDetailLayout', () => {
       expect(screen.getByText('Test Object')).toBeInTheDocument();
     });
   });
+
+  it('shows both status badge and change state badge', async () => {
+    renderWithRouter();
+    await waitFor(() => {
+      // StatusBadge renders "Experimental" (status=experimental)
+      expect(screen.getByText('Experimental')).toBeInTheDocument();
+      // ChangeStateBadge renders "New" (changeState=created)
+      expect(screen.getByText('New')).toBeInTheDocument();
+    });
+  });
 });
