@@ -230,6 +230,42 @@ class WorkingStateService:
         elif change.change_type == ChangeType.DELETE:
             await ObjectTypeStorage.delete(self._session, change.resource_rid)
 
+    async def _apply_link_type_change(self, change: Change) -> None:
+        if change.change_type == ChangeType.CREATE:
+            data = change.after or {}
+            lt = LinkType.model_validate(data)
+            await LinkTypeStorage.create(self._session, lt)
+        elif change.change_type == ChangeType.UPDATE:
+            after = change.after or {}
+            update_data: dict = {}
+            key_map = {
+                "cardinality": "cardinality",
+                "status": "status",
+                "lastModifiedAt": "last_modified_at",
+                "lastModifiedBy": "last_modified_by",
+            }
+            for camel_key, snake_key in key_map.items():
+                if camel_key in after:
+                    update_data[snake_key] = after[camel_key]
+            # Handle nested side updates
+            for side_camel, side_snake in [("sideA", "side_a"), ("sideB", "side_b")]:
+                if side_camel in after:
+                    side_data = after[side_camel]
+                    ep_update = {}
+                    side_key_map = {
+                        "displayName": "display_name",
+                        "visibility": "visibility",
+                    }
+                    for ck, sk in side_key_map.items():
+                        if ck in side_data:
+                            ep_update[sk] = side_data[ck]
+                    if ep_update:
+                        update_data[side_snake] = ep_update
+            if update_data:
+                await LinkTypeStorage.update(self._session, change.resource_rid, update_data)
+        elif change.change_type == ChangeType.DELETE:
+            await LinkTypeStorage.delete(self._session, change.resource_rid)
+
     async def discard(self, ontology_rid: str) -> None:
         ws = await self._get_working_state(ontology_rid)
         if not ws:
