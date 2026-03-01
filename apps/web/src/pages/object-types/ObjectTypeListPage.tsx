@@ -33,7 +33,9 @@ export default function ObjectTypeListPage() {
     setPageSize(newPageSize);
   };
 
-  const isEmpty = !isLoading && data?.total === 0;
+  const hasFilters = statusFilter.length > 0 || visibilityFilter.length > 0;
+  const isGlobalEmpty = !isLoading && data?.total === 0;
+  const isFilterEmpty = !isLoading && !isGlobalEmpty && filteredItems.length === 0;
 
   return (
     <div>
@@ -44,7 +46,7 @@ export default function ObjectTypeListPage() {
         </Button>
       </Flex>
 
-      {isEmpty ? (
+      {isGlobalEmpty ? (
         <Empty
           description={
             <span>
@@ -87,14 +89,18 @@ export default function ObjectTypeListPage() {
               ]}
             />
           </Flex>
-          <ObjectTypeTable
-            items={filteredItems}
-            loading={isLoading}
-            total={data?.total ?? 0}
-            page={page}
-            pageSize={pageSize}
-            onPageChange={handlePageChange}
-          />
+          {isFilterEmpty ? (
+            <Empty description={t('objectType.filterEmpty')} />
+          ) : (
+            <ObjectTypeTable
+              items={filteredItems}
+              loading={isLoading}
+              total={data?.total ?? 0}
+              page={page}
+              pageSize={pageSize}
+              onPageChange={handlePageChange}
+            />
+          )}
         </>
       )}
     </div>
