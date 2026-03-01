@@ -50,9 +50,7 @@ export default function ObjectTypeTable({
       dataIndex: 'status',
       key: 'status',
       width: 140,
-      render: (status: ResourceStatus) => (
-        <Tag color={STATUS_COLORS[status]}>{t(`objectType.status.${status}`)}</Tag>
-      ),
+      render: (status: ResourceStatus) => <StatusBadge status={status} />,
     },
     {
       title: t('objectType.fields.visibility'),
