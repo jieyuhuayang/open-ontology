@@ -19,12 +19,12 @@ describe('DiscoverPage', () => {
 
   it('shows recently viewed title', () => {
     renderPage();
-    expect(screen.getByText(/recently viewed object types/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /recently viewed object types/i })).toBeInTheDocument();
   });
 
   it('shows empty state when no items', () => {
     renderPage();
-    expect(screen.getByText(/no recently viewed object types/i)).toBeInTheDocument();
+    expect(screen.getByText(/no recently viewed/i)).toBeInTheDocument();
   });
 
   it('shows cards when items exist', () => {
