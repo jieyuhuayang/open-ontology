@@ -113,7 +113,10 @@ class WorkingStateService:
         # Get published resources
         if resource_type == ResourceType.OBJECT_TYPE:
             published = await self._get_published_object_types(ontology_rid)
-            published_map = {ot.rid: ot.model_dump(mode="json", by_alias=True) for ot in published}
+            published_map = {r.rid: r.model_dump(mode="json", by_alias=True) for r in published}
+        elif resource_type == ResourceType.LINK_TYPE:
+            published = await self._get_published_link_types(ontology_rid)
+            published_map = {r.rid: r.model_dump(mode="json", by_alias=True) for r in published}
         else:
             published_map = {}
 
