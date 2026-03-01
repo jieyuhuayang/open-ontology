@@ -97,9 +97,15 @@ Overview 页每个可编辑字段使用 `InlineEditText` 组件，内部维护 `
 
 后端 GET list API 仅支持 `page` + `pageSize`，不支持 status/visibility 筛选参数。MVP 阶段采用**客户端筛选**：前端拿到当前页数据后在内存中按 status/visibility 过滤显示。筛选条件和分页用组件本地 `useState`。注意客户端筛选后实际显示条数可能少于 pageSize，MVP 可接受。
 
-### AD-6: Recently Viewed 集成
+### AD-6: Recently Viewed 集成（可选跨特性增强）
 
-`ObjectTypeDetailLayout` 在获取详情数据后，通过 `useEffect` 调用 `useRecentlyViewedStore.addItem()`，与 Discover 页已有的最近查看功能打通。
+`ObjectTypeDetailLayout` 在获取详情数据后，通过 `useEffect` 调用 `useRecentlyViewedStore.addItem()`，与 Discover 页已有的最近查看功能打通。此功能为低风险可选增强，零额外依赖。
+
+### AD-7: 加载态设计
+
+- **列表页**: `loading={isLoading}` 传给 Ant Table，使用 Table 内置 Spin
+- **详情页**: `ObjectTypeDetailLayout` 在 `isLoading` 时返回居中 `<Spin />`
+- **Overview 页**: 父级已处理 loading，子页只在有 data 时渲染（通过 Outlet context 或条件渲染）
 
 ---
 
