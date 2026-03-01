@@ -43,7 +43,7 @@
 
 ---
 
-### Task 3 — 测试：i18n 重构（en-US / zh-CN 完整语言码）
+### Task 3 — ✅ 测试：i18n 重构（en-US / zh-CN 完整语言码）
 
 **文件**:
 - `apps/web/src/locales/__tests__/i18n.test.ts`
