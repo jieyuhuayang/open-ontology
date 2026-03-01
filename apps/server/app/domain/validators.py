@@ -48,3 +48,36 @@ def validate_object_type_id(id_value: str) -> None:
             message=f"id must match ^[a-z][a-z0-9-]*$: {id_value!r}",
             status_code=400,
         )
+
+
+def validate_link_type_id(id_value: str) -> None:
+    """Validate link type id: same format as object type id."""
+    if not ID_PATTERN.match(id_value):
+        raise AppError(
+            code="LINK_TYPE_INVALID_ID",
+            message=f"id must match ^[a-z][a-z0-9-]*$: {id_value!r}",
+            status_code=400,
+        )
+
+
+def validate_link_side_api_name(api_name: str, side: str) -> None:
+    """Validate link side apiName: camelCase, 1-100 chars, NFKC, no reserved words."""
+    normalized = unicodedata.normalize("NFKC", api_name)
+    if normalized != api_name:
+        raise AppError(
+            code="LINK_TYPE_API_NAME_NOT_NFKC",
+            message=f"Side {side} apiName must be NFKC normalized: {api_name!r}",
+            status_code=400,
+        )
+    if not LINK_SIDE_API_NAME_PATTERN.match(api_name):
+        raise AppError(
+            code="LINK_TYPE_INVALID_API_NAME",
+            message=f"Side {side} apiName must be camelCase (1-100 chars): {api_name!r}",
+            status_code=400,
+        )
+    if api_name.lower() in RESERVED_API_NAMES:
+        raise AppError(
+            code="LINK_TYPE_RESERVED_API_NAME",
+            message=f"Side {side} apiName is a reserved word: {api_name!r}",
+            status_code=400,
+        )
