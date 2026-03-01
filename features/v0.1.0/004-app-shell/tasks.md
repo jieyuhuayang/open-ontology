@@ -60,7 +60,7 @@
 
 ---
 
-### Task 4 — 实现：i18n 重构 + 翻译文件
+### Task 4 — ✅ 实现：i18n 重构 + 翻译文件
 
 **文件**:
 - `apps/web/src/locales/i18n.ts`（重写）
