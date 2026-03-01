@@ -333,7 +333,7 @@
 
 ---
 
-### Task 21 — 测试：路由配置（routes, redirects, 404）
+### Task 21 — ✅ 测试：路由配置（routes, redirects, 404）
 
 **文件**:
 - `apps/web/src/__tests__/router.test.tsx`
