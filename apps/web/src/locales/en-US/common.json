@@ -52,6 +52,67 @@
     "en-US": "English",
     "zh-CN": "中文"
   },
+  "linkType": {
+    "listTitle": "Link Types",
+    "newLinkType": "New link type",
+    "createTitle": "Create Link Type",
+    "createSuccess": "Link type created successfully",
+    "deleteTitle": "Delete Link Type",
+    "deleteConfirm": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+    "deleteSuccess": "Link type deleted successfully",
+    "cannotDeleteActive": "Cannot delete an active link type",
+    "filterEmpty": "No matching link types on this page",
+    "emptyTitle": "Create your first link type",
+    "emptyDescription": "Link types define semantic relationships between object types.",
+    "wizard": {
+      "step1": "Cardinality",
+      "step2": "Object Types",
+      "step3": "Details",
+      "next": "Next",
+      "back": "Back",
+      "sideA": "Side A",
+      "sideB": "Side B",
+      "selectObjectType": "Select an object type"
+    },
+    "fields": {
+      "id": "ID",
+      "rid": "RID",
+      "sideA": "Side A",
+      "sideB": "Side B",
+      "cardinality": "Cardinality",
+      "status": "Status",
+      "visibility": "Visibility",
+      "changeState": "Change State",
+      "displayName": "Display Name",
+      "apiName": "API Name",
+      "objectType": "Object Type",
+      "createdAt": "Created At",
+      "createdBy": "Created By",
+      "lastModifiedAt": "Last Modified At",
+      "lastModifiedBy": "Last Modified By"
+    },
+    "filters": {
+      "objectType": "Object Type"
+    },
+    "cardinality": {
+      "one-to-one": "One to One",
+      "one-to-many": "One to Many",
+      "many-to-one": "Many to One"
+    },
+    "cardinalityDesc": {
+      "one-to-one": "Each instance on both sides has exactly one counterpart",
+      "one-to-many": "One instance on Side A links to many on Side B",
+      "many-to-one": "Many instances on Side A link to one on Side B"
+    },
+    "validation": {
+      "required": "This field is required",
+      "idFormat": "ID must start with a lowercase letter and contain only lowercase letters, numbers, and hyphens",
+      "apiNameFormat": "API Name must start with a lowercase letter and contain only letters and digits (1-100 chars)",
+      "idConflict": "A link type with this ID already exists",
+      "apiNameConflict": "This API Name already exists for the associated object type",
+      "selfLinkNotAllowed": "Side A and Side B cannot reference the same object type"
+    }
+  },
   "objectType": {
     "listTitle": "Object Types",
     "newObjectType": "New object type",
