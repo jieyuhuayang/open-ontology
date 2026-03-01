@@ -1,8 +1,11 @@
-import { Modal, message } from 'antd';
+import { Modal, Typography, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useDeleteObjectType } from '@/api/object-types';
+import { useLinkTypes } from '@/api/link-types';
 import type { AxiosError } from 'axios';
+
+const { Text } = Typography;
 
 interface ApiErrorResponse {
   error?: { code?: string; message?: string };
@@ -24,6 +27,8 @@ export default function DeleteObjectTypeModal({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const deleteMutation = useDeleteObjectType();
+  const { data: relatedLinkTypes } = useLinkTypes(1, 100, { objectTypeRid: rid });
+  const relatedCount = relatedLinkTypes?.total ?? 0;
 
   const handleOk = async () => {
     try {
@@ -54,7 +59,12 @@ export default function DeleteObjectTypeModal({
       okButtonProps={{ danger: true }}
       confirmLoading={deleteMutation.isPending}
     >
-      {t('objectType.deleteConfirm', { name: displayName })}
+      <div>{t('objectType.deleteConfirm', { name: displayName })}</div>
+      {relatedCount > 0 && (
+        <Text type="warning" style={{ display: 'block', marginTop: 8 }}>
+          {t('objectType.deleteCascadeWarning', { count: relatedCount })}
+        </Text>
+      )}
     </Modal>
   );
 }
