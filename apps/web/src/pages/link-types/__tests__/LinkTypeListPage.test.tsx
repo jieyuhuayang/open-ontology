@@ -40,7 +40,7 @@ describe('LinkTypeListPage', () => {
     vi.mocked(useLinkTypes).mockReturnValue({
       data: { items: [], total: 0, page: 1, pageSize: 20 },
       isLoading: false,
-    } as ReturnType<typeof useLinkTypes>);
+    } as unknown as ReturnType<typeof useLinkTypes>);
 
     renderPage();
     expect(screen.getByText(/create your first link type/i)).toBeInTheDocument();
@@ -84,7 +84,7 @@ describe('LinkTypeListPage', () => {
         pageSize: 20,
       },
       isLoading: false,
-    } as ReturnType<typeof useLinkTypes>);
+    } as unknown as ReturnType<typeof useLinkTypes>);
 
     renderPage();
     expect(screen.getByText('employee-company')).toBeInTheDocument();
@@ -94,7 +94,7 @@ describe('LinkTypeListPage', () => {
     vi.mocked(useLinkTypes).mockReturnValue({
       data: { items: [], total: 0, page: 1, pageSize: 20 },
       isLoading: false,
-    } as ReturnType<typeof useLinkTypes>);
+    } as unknown as ReturnType<typeof useLinkTypes>);
 
     renderPage();
     expect(screen.getByText(/link types/i)).toBeInTheDocument();
