@@ -51,5 +51,63 @@
   "language": {
     "en-US": "English",
     "zh-CN": "中文"
+  },
+  "objectType": {
+    "listTitle": "Object Types",
+    "newObjectType": "New object type",
+    "createTitle": "Create Object Type",
+    "createSuccess": "Object type created successfully",
+    "deleteTitle": "Delete Object Type",
+    "deleteConfirm": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+    "deleteSuccess": "Object type deleted successfully",
+    "cannotDeleteActive": "Cannot delete an active object type",
+    "cannotModifyApiNameActive": "API Name cannot be modified when status is Active",
+    "emptyTitle": "Create your first object type",
+    "emptyDescription": "Object types represent real-world entities in your ontology.",
+    "fields": {
+      "displayName": "Name",
+      "description": "Description",
+      "id": "ID",
+      "apiName": "API Name",
+      "rid": "RID",
+      "icon": "Icon",
+      "status": "Status",
+      "visibility": "Visibility",
+      "changeState": "Change State"
+    },
+    "status": {
+      "active": "Active",
+      "experimental": "Experimental",
+      "deprecated": "Deprecated"
+    },
+    "visibility": {
+      "prominent": "Prominent",
+      "normal": "Normal",
+      "hidden": "Hidden"
+    },
+    "changeState": {
+      "new": "New",
+      "modified": "Modified",
+      "deleted": "Deleted"
+    },
+    "validation": {
+      "idFormat": "ID must start with a lowercase letter and contain only lowercase letters, numbers, and hyphens",
+      "apiNameFormat": "API Name must start with an uppercase letter and contain only letters, numbers, and underscores",
+      "apiNameReserved": "This API Name is reserved and cannot be used",
+      "displayNameRequired": "This field is required",
+      "idConflict": "An object type with this ID already exists",
+      "apiNameConflict": "An object type with this API Name already exists"
+    },
+    "placeholders": {
+      "descriptionHint": "Type here...",
+      "properties": "Properties",
+      "propertiesEmpty": "No properties defined yet",
+      "actionTypes": "Action Types",
+      "actionTypesEmpty": "No action types defined yet",
+      "linkTypes": "Link Types",
+      "linkTypesEmpty": "No link types defined yet",
+      "data": "Data",
+      "dataEmpty": "No data sources configured yet"
+    }
   }
 }
