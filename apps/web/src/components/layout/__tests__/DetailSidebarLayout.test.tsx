@@ -69,7 +69,7 @@ describe('DetailSidebarLayout', () => {
         <DetailSidebarLayout
           resourceName="Customer"
           resourceIcon={<AppstoreOutlined />}
-          statusBadge={<span>Draft</span>}
+          badges={<span>Draft</span>}
           navItems={navItems}
           backTo="/object-types"
           activeKey="overview"
