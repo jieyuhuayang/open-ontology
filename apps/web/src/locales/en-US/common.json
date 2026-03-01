@@ -62,6 +62,7 @@
     "deleteSuccess": "Object type deleted successfully",
     "cannotDeleteActive": "Cannot delete an active object type",
     "cannotModifyApiNameActive": "API Name cannot be modified when status is Active",
+    "filterEmpty": "No matching object types on this page",
     "emptyTitle": "Create your first object type",
     "emptyDescription": "Object types represent real-world entities in your ontology.",
     "fields": {
