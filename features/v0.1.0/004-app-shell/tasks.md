@@ -269,7 +269,7 @@
 
 ---
 
-### Task 17 — 测试：DiscoverPage
+### Task 17 — ✅ 测试：DiscoverPage
 
 **文件**:
 - `apps/web/src/pages/__tests__/DiscoverPage.test.tsx`
