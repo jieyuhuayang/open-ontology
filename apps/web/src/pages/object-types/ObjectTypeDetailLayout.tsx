@@ -91,7 +91,7 @@ export default function ObjectTypeDetailLayout() {
         <DetailSidebarLayout
           resourceName={data.displayName}
           resourceIcon={<DynamicIcon name={data.icon.name} color={data.icon.color} />}
-          statusBadge={<ChangeStateBadge state={data.changeState} />}
+          badges={<><StatusBadge status={data.status} /><ChangeStateBadge state={data.changeState} /></>}
           navItems={OT_NAV_ITEMS}
           backTo="/object-types"
           activeKey={activeKey}
