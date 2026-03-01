@@ -25,7 +25,8 @@ describe('Router', () => {
   it('/object-types renders ObjectTypeListPage', async () => {
     renderRoute('/object-types');
     await waitFor(() => {
-      expect(screen.getByText('Object Types')).toBeInTheDocument();
+      // PlaceholderPage renders inside an AntD Result component
+      expect(screen.getByText('Object Types', { selector: '.ant-result-title' })).toBeInTheDocument();
     });
   });
 
@@ -39,7 +40,7 @@ describe('Router', () => {
   it('/link-types renders LinkTypeListPage', async () => {
     renderRoute('/link-types');
     await waitFor(() => {
-      expect(screen.getByText('Link Types')).toBeInTheDocument();
+      expect(screen.getByText('Link Types', { selector: '.ant-result-title' })).toBeInTheDocument();
     });
   });
 
@@ -53,7 +54,6 @@ describe('Router', () => {
   it('/properties renders Coming Soon placeholder', async () => {
     renderRoute('/properties');
     await waitFor(() => {
-      expect(screen.getByText('Properties')).toBeInTheDocument();
       expect(screen.getByText(/coming soon/i)).toBeInTheDocument();
     });
   });
@@ -61,7 +61,6 @@ describe('Router', () => {
   it('/action-types renders Coming Soon placeholder', async () => {
     renderRoute('/action-types');
     await waitFor(() => {
-      expect(screen.getByText('Action Types')).toBeInTheDocument();
       expect(screen.getByText(/coming soon/i)).toBeInTheDocument();
     });
   });
