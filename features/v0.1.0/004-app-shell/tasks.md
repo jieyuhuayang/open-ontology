@@ -301,7 +301,7 @@
 
 ---
 
-### Task 19 — 测试：ObjectTypeDetailLayout + LinkTypeDetailLayout
+### Task 19 — ✅ 测试：ObjectTypeDetailLayout + LinkTypeDetailLayout
 
 **文件**:
 - `apps/web/src/pages/object-types/__tests__/ObjectTypeDetailLayout.test.tsx`
