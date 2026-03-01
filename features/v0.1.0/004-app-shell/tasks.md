@@ -255,7 +255,7 @@
 
 ---
 
-### Task 16 — 实现：AppShell + HomeLayout
+### Task 16 — ✅ 实现：AppShell + HomeLayout
 
 **文件**:
 - `apps/web/src/components/layout/AppShell.tsx`（新建）
