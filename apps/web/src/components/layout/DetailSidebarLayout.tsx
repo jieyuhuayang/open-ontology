@@ -19,18 +19,22 @@ interface DetailSidebarProps {
   resourceName: string;
   resourceIcon: ReactNode;
   statusBadge?: ReactNode;
+  extra?: ReactNode;
   navItems: DetailSidebarNavItem[];
   backTo: string;
   activeKey: string;
+  onNavClick?: (key: string) => void;
 }
 
 export default function DetailSidebarLayout({
   resourceName,
   resourceIcon,
   statusBadge,
+  extra,
   navItems,
   backTo,
   activeKey,
+  onNavClick,
 }: DetailSidebarProps) {
   const { t } = useTranslation();
 
@@ -47,6 +51,10 @@ export default function DetailSidebarLayout({
     ),
   }));
 
+  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+    onNavClick?.(key);
+  };
+
   return (
     <Sider width={240} style={{ borderRight: '1px solid #f0f0f0' }}>
       <nav>
@@ -60,8 +68,11 @@ export default function DetailSidebarLayout({
         <div style={{ padding: '8px 16px 16px' }}>
           <Flex align="center" gap={8}>
             {resourceIcon}
-            <Text strong>{resourceName}</Text>
+            <Text strong style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {resourceName}
+            </Text>
             {statusBadge}
+            {extra}
           </Flex>
         </div>
 
@@ -69,6 +80,7 @@ export default function DetailSidebarLayout({
           mode="inline"
           selectedKeys={[activeKey]}
           items={menuItems}
+          onClick={handleMenuClick}
           style={{ border: 'none' }}
         />
       </nav>
