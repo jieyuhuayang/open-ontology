@@ -252,7 +252,7 @@ export function validateApiName(value: string): string | null;
 
 ## 10. 文件清单
 
-### 新建文件 (~15 个)
+### 新建文件 (~16 个)
 
 | 文件 | 说明 |
 |------|------|
