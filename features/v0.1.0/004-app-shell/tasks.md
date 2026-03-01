@@ -207,7 +207,7 @@
 
 ---
 
-### Task 13 — 测试：DetailSidebarLayout
+### Task 13 — ✅ 测试：DetailSidebarLayout
 
 **文件**:
 - `apps/web/src/components/layout/__tests__/DetailSidebarLayout.test.tsx`
