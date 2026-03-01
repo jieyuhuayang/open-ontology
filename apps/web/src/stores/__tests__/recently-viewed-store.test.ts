@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { useRecentlyViewedStore } from '@/stores/recently-viewed-store';
 import type { RecentlyViewedItem } from '@/stores/recently-viewed-store';
 
-function makeItem(rid: string, viewedAt?: number): Omit<RecentlyViewedItem, 'viewedAt'> {
+function makeItem(rid: string): Omit<RecentlyViewedItem, 'viewedAt'> {
   return {
     rid,
     displayName: `Item ${rid}`,
@@ -19,19 +19,19 @@ describe('recently-viewed-store', () => {
   it('adds an item', () => {
     useRecentlyViewedStore.getState().addItem(makeItem('rid-1'));
     expect(useRecentlyViewedStore.getState().items).toHaveLength(1);
-    expect(useRecentlyViewedStore.getState().items[0].rid).toBe('rid-1');
+    expect(useRecentlyViewedStore.getState().items[0]!.rid).toBe('rid-1');
   });
 
   it('deduplicates by rid and updates viewedAt', () => {
     useRecentlyViewedStore.getState().addItem(makeItem('rid-1'));
-    const firstViewedAt = useRecentlyViewedStore.getState().items[0].viewedAt;
+    const firstViewedAt = useRecentlyViewedStore.getState().items[0]!.viewedAt;
 
     // Add same rid again after a small delay
     useRecentlyViewedStore.getState().addItem(makeItem('rid-1'));
     const items = useRecentlyViewedStore.getState().items;
 
     expect(items).toHaveLength(1);
-    expect(items[0].viewedAt).toBeGreaterThanOrEqual(firstViewedAt);
+    expect(items[0]!.viewedAt).toBeGreaterThanOrEqual(firstViewedAt);
   });
 
   it('limits to 6 items, evicting oldest', () => {
@@ -52,7 +52,7 @@ describe('recently-viewed-store', () => {
 
     const items = useRecentlyViewedStore.getState().items;
     for (let i = 0; i < items.length - 1; i++) {
-      expect(items[i].viewedAt).toBeGreaterThanOrEqual(items[i + 1].viewedAt);
+      expect(items[i]!.viewedAt).toBeGreaterThanOrEqual(items[i + 1]!.viewedAt);
     }
   });
 
