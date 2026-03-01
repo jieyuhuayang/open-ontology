@@ -62,6 +62,7 @@
     "deleteSuccess": "对象类型删除成功",
     "cannotDeleteActive": "无法删除状态为 Active 的对象类型",
     "cannotModifyApiNameActive": "状态为 Active 时无法修改 API Name",
+    "filterEmpty": "当前页没有匹配的对象类型",
     "emptyTitle": "创建你的第一个对象类型",
     "emptyDescription": "对象类型代表本体中的真实世界实体。",
     "fields": {
