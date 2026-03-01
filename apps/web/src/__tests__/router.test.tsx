@@ -18,6 +18,17 @@ vi.mock('@/api/object-types', () => ({
   useDeleteObjectType: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }));
 
+vi.mock('@/api/link-types', () => ({
+  useLinkTypes: () => ({
+    data: { items: [], total: 0, page: 1, pageSize: 20 },
+    isLoading: false,
+  }),
+  useLinkType: () => ({ data: null }),
+  useCreateLinkType: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useUpdateLinkType: () => ({ mutate: vi.fn() }),
+  useDeleteLinkType: () => ({ mutateAsync: vi.fn(), isPending: false }),
+}));
+
 let testQueryClient: QueryClient;
 
 beforeEach(() => {
