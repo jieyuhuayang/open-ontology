@@ -2,11 +2,13 @@ import { Button, Dropdown } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useCreateObjectTypeModalStore } from '@/stores/create-object-type-modal-store';
 import type { MenuProps } from 'antd';
 
 export default function CreateMenu() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const openCreateObjectType = useCreateObjectTypeModalStore((s) => s.open);
 
   const items: MenuProps['items'] = [
     {
@@ -21,7 +23,7 @@ export default function CreateMenu() {
 
   const onClick: MenuProps['onClick'] = ({ key }) => {
     if (key === 'create-object-type') {
-      navigate('/object-types/new');
+      openCreateObjectType();
     } else if (key === 'create-link-type') {
       navigate('/link-types/new');
     }
