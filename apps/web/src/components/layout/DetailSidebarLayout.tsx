@@ -29,7 +29,7 @@ interface DetailSidebarProps {
 export default function DetailSidebarLayout({
   resourceName,
   resourceIcon,
-  statusBadge,
+  badges,
   extra,
   navItems,
   backTo,
