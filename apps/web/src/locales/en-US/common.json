@@ -1,0 +1,55 @@
+{
+  "app": {
+    "title": "Open Ontology",
+    "subtitle": "Ontology Management"
+  },
+  "nav": {
+    "discover": "Discover",
+    "objectTypes": "Object Types",
+    "properties": "Properties",
+    "linkTypes": "Link Types",
+    "actionTypes": "Action Types"
+  },
+  "topBar": {
+    "searchPlaceholder": "Search by name, RID, aliases...",
+    "new": "New",
+    "createObjectType": "Create Object Type",
+    "createLinkType": "Create Link Type"
+  },
+  "sidebar": {
+    "resources": "Resources",
+    "ontologyName": "Default Ontology",
+    "backHome": "Back home"
+  },
+  "detail": {
+    "overview": "Overview",
+    "properties": "Properties",
+    "datasources": "Datasources"
+  },
+  "discover": {
+    "recentlyViewed": "Recently viewed object types",
+    "noRecentlyViewed": "No recently viewed object types"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "create": "Create",
+    "back": "Back",
+    "comingSoon": "Coming Soon",
+    "noData": "No data",
+    "loading": "Loading..."
+  },
+  "error": {
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundDesc": "The page you are looking for does not exist.",
+    "backHome": "Back to Home",
+    "somethingWentWrong": "Something went wrong",
+    "somethingWentWrongDesc": "An unexpected error occurred. Please try refreshing the page."
+  },
+  "language": {
+    "en-US": "English",
+    "zh-CN": "中文"
+  }
+}
