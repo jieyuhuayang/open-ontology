@@ -1,4 +1,5 @@
 import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
+import type { Mutation } from '@tanstack/react-query';
 import { message } from 'antd';
 
 function handleGlobalError(error: unknown) {
@@ -7,12 +8,22 @@ function handleGlobalError(error: unknown) {
   console.error('[API Error]', error);
 }
 
+function handleMutationError(
+  error: unknown,
+  _variables: unknown,
+  _context: unknown,
+  mutation: Mutation<unknown, unknown, unknown, unknown>,
+) {
+  if (mutation.meta?.skipGlobalError) return;
+  handleGlobalError(error);
+}
+
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: handleGlobalError,
   }),
   mutationCache: new MutationCache({
-    onError: handleGlobalError,
+    onError: handleMutationError,
   }),
   defaultOptions: {
     queries: {
