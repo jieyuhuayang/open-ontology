@@ -23,6 +23,914 @@
           }
         }
       }
+    },
+    "/api/v1/object-types": {
+      "get": {
+        "tags": [
+          "object-types"
+        ],
+        "summary": "List Object Types",
+        "operationId": "list_object_types_api_v1_object_types_get",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Pagesize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectTypeListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "object-types"
+        ],
+        "summary": "Create Object Type",
+        "operationId": "create_object_type_api_v1_object_types_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectTypeCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectTypeWithChangeState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/object-types/{rid}": {
+      "get": {
+        "tags": [
+          "object-types"
+        ],
+        "summary": "Get Object Type",
+        "operationId": "get_object_type_api_v1_object_types__rid__get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectTypeWithChangeState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "object-types"
+        ],
+        "summary": "Update Object Type",
+        "operationId": "update_object_type_api_v1_object_types__rid__put",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectTypeUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectTypeWithChangeState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "object-types"
+        ],
+        "summary": "Delete Object Type",
+        "operationId": "delete_object_type_api_v1_object_types__rid__delete",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ontologies/{rid}/save": {
+      "post": {
+        "tags": [
+          "ontology"
+        ],
+        "summary": "Publish Changes",
+        "operationId": "publish_changes_api_v1_ontologies__rid__save_post",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeRecord"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ontologies/{rid}/working-state": {
+      "delete": {
+        "tags": [
+          "ontology"
+        ],
+        "summary": "Discard Working State",
+        "operationId": "discard_working_state_api_v1_ontologies__rid__working_state_delete",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "ontology"
+        ],
+        "summary": "Get Working State",
+        "operationId": "get_working_state_api_v1_ontologies__rid__working_state_get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkingState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Change": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "resourceType": {
+            "$ref": "#/components/schemas/ResourceType"
+          },
+          "resourceRid": {
+            "type": "string",
+            "title": "Resourcerid"
+          },
+          "changeType": {
+            "$ref": "#/components/schemas/ChangeType"
+          },
+          "before": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Before"
+          },
+          "after": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "After"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "resourceType",
+          "resourceRid",
+          "changeType",
+          "timestamp"
+        ],
+        "title": "Change"
+      },
+      "ChangeRecord": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "ontologyRid": {
+            "type": "string",
+            "title": "Ontologyrid"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/Change"
+            },
+            "type": "array",
+            "title": "Changes"
+          },
+          "savedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Savedat"
+          },
+          "savedBy": {
+            "type": "string",
+            "title": "Savedby"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "ontologyRid",
+          "version",
+          "changes",
+          "savedAt",
+          "savedBy"
+        ],
+        "title": "ChangeRecord"
+      },
+      "ChangeState": {
+        "type": "string",
+        "enum": [
+          "published",
+          "created",
+          "modified",
+          "deleted"
+        ],
+        "title": "ChangeState",
+        "description": "Change state annotation in merged view."
+      },
+      "ChangeType": {
+        "type": "string",
+        "enum": [
+          "CREATE",
+          "UPDATE",
+          "DELETE"
+        ],
+        "title": "ChangeType"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Icon": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "color": {
+            "type": "string",
+            "title": "Color"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "color"
+        ],
+        "title": "Icon"
+      },
+      "ObjectTypeCreateRequest": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "apiName": {
+            "type": "string",
+            "title": "Apiname"
+          },
+          "displayName": {
+            "type": "string",
+            "title": "Displayname"
+          },
+          "pluralDisplayName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pluraldisplayname"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "icon": {
+            "$ref": "#/components/schemas/Icon"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "apiName",
+          "displayName",
+          "icon"
+        ],
+        "title": "ObjectTypeCreateRequest"
+      },
+      "ObjectTypeListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectTypeWithChangeState"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "pageSize": {
+            "type": "integer",
+            "title": "Pagesize"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
+        "title": "ObjectTypeListResponse"
+      },
+      "ObjectTypeUpdateRequest": {
+        "properties": {
+          "displayName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Displayname"
+          },
+          "pluralDisplayName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pluraldisplayname"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Icon"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResourceStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Visibility"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "apiName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apiname"
+          }
+        },
+        "type": "object",
+        "title": "ObjectTypeUpdateRequest"
+      },
+      "ObjectTypeWithChangeState": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "apiName": {
+            "type": "string",
+            "title": "Apiname"
+          },
+          "displayName": {
+            "type": "string",
+            "title": "Displayname"
+          },
+          "pluralDisplayName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pluraldisplayname"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "icon": {
+            "$ref": "#/components/schemas/Icon"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResourceStatus",
+            "default": "experimental"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/Visibility",
+            "default": "normal"
+          },
+          "backingDatasource": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backingdatasource"
+          },
+          "primaryKeyPropertyId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primarykeypropertyid"
+          },
+          "titleKeyPropertyId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Titlekeypropertyid"
+          },
+          "projectRid": {
+            "type": "string",
+            "title": "Projectrid"
+          },
+          "ontologyRid": {
+            "type": "string",
+            "title": "Ontologyrid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "createdBy": {
+            "type": "string",
+            "title": "Createdby"
+          },
+          "lastModifiedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Lastmodifiedat"
+          },
+          "lastModifiedBy": {
+            "type": "string",
+            "title": "Lastmodifiedby"
+          },
+          "changeState": {
+            "$ref": "#/components/schemas/ChangeState",
+            "default": "published"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "id",
+          "apiName",
+          "displayName",
+          "icon",
+          "projectRid",
+          "ontologyRid",
+          "createdAt",
+          "createdBy",
+          "lastModifiedAt",
+          "lastModifiedBy"
+        ],
+        "title": "ObjectTypeWithChangeState",
+        "description": "ObjectType with change state annotation for merged view."
+      },
+      "ResourceStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "experimental",
+          "deprecated"
+        ],
+        "title": "ResourceStatus"
+      },
+      "ResourceType": {
+        "type": "string",
+        "enum": [
+          "ObjectType",
+          "Property",
+          "LinkType"
+        ],
+        "title": "ResourceType"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "Visibility": {
+        "type": "string",
+        "enum": [
+          "prominent",
+          "normal",
+          "hidden"
+        ],
+        "title": "Visibility"
+      },
+      "WorkingState": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "userId": {
+            "type": "string",
+            "title": "Userid"
+          },
+          "ontologyRid": {
+            "type": "string",
+            "title": "Ontologyrid"
+          },
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/Change"
+            },
+            "type": "array",
+            "title": "Changes"
+          },
+          "baseVersion": {
+            "type": "integer",
+            "title": "Baseversion"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "lastModifiedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Lastmodifiedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "userId",
+          "ontologyRid",
+          "baseVersion",
+          "createdAt",
+          "lastModifiedAt"
+        ],
+        "title": "WorkingState"
+      }
     }
   }
 }
