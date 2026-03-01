@@ -124,7 +124,7 @@
 
 ---
 
-### Task 8 — 实现：LanguageSwitcher + SearchBarPlaceholder + CreateMenu
+### Task 8 — ✅ 实现：LanguageSwitcher + SearchBarPlaceholder + CreateMenu
 
 **文件**:
 - `apps/web/src/components/layout/LanguageSwitcher.tsx`（新建）
