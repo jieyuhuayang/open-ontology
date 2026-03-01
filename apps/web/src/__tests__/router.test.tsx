@@ -82,10 +82,10 @@ describe('Router', () => {
     });
   });
 
-  it('/link-types/:rid redirects to overview', async () => {
+  it('/link-types/:rid renders 404 (no detail route)', async () => {
     renderRoute('/link-types/test-rid');
     await waitFor(() => {
-      expect(screen.getByText('Link Type Overview')).toBeInTheDocument();
+      expect(screen.getByText(/page not found/i)).toBeInTheDocument();
     });
   });
 
