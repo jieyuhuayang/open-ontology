@@ -25,7 +25,7 @@
 
 ---
 
-### Task 2 — 实现：theme.ts + queryClient.ts + Zustand stores
+### Task 2 — ✅ 实现：theme.ts + queryClient.ts + Zustand stores
 
 **文件**:
 - `apps/web/src/theme.ts`（新建）
