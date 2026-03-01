@@ -261,6 +261,7 @@ export function validateApiName(value: string): string | null;
 | `src/api/object-types.ts` | Query hooks + query keys |
 | `src/utils/validation.ts` | ID / API Name 校验 |
 | `src/stores/create-object-type-modal-store.ts` | 创建弹窗状态 |
+| `src/components/StatusBadge.tsx` | 资源状态标签 |
 | `src/components/ChangeStateBadge.tsx` | 变更状态标签 |
 | `src/components/DynamicIcon.tsx` | 动态图标 |
 | `src/components/IconSelector.tsx` | 图标选择器 |
