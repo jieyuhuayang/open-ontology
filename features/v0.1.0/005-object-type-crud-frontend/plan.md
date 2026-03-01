@@ -8,7 +8,7 @@ F003（后端 Object Type CRUD）已完成，提供完整的 REST API。F004（A
 
 ## 1. 类型生成
 
-当前 `openapi.json` 仅含 `/health`，需先重新生成：
+仅当后端 schema 变更时再执行 `server-openapi` / `web-typegen` 重新生成类型：
 
 ```bash
 just server-openapi   # 从 FastAPI 重新生成 openapi.json
