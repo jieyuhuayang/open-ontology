@@ -122,6 +122,7 @@
     "deleteConfirm": "确定要删除 \"{{name}}\" 吗？此操作不可撤销。",
     "deleteSuccess": "对象类型删除成功",
     "cannotDeleteActive": "无法删除状态为 Active 的对象类型",
+    "deleteCascadeWarning": "此操作将同时删除 {{count}} 条关联的链接类型。",
     "cannotModifyApiNameActive": "状态为 Active 时无法修改 API Name",
     "filterEmpty": "当前页没有匹配的对象类型",
     "emptyTitle": "创建你的第一个对象类型",
