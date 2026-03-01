@@ -140,7 +140,7 @@
 
 ---
 
-### Task 9 — 测试：TopBar
+### Task 9 — ✅ 测试：TopBar
 
 **文件**:
 - `apps/web/src/components/layout/__tests__/TopBar.test.tsx`
