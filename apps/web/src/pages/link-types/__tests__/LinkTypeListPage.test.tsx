@@ -97,6 +97,6 @@ describe('LinkTypeListPage', () => {
     } as unknown as ReturnType<typeof useLinkTypes>);
 
     renderPage();
-    expect(screen.getByText(/link types/i)).toBeInTheDocument();
+    expect(screen.getByText('Link Types', { selector: 'h4' })).toBeInTheDocument();
   });
 });
