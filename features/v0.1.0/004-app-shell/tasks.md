@@ -76,7 +76,7 @@
 
 ---
 
-### Task 5 — 测试：ErrorBoundary + PlaceholderPage + NotFoundPage
+### Task 5 — ✅ 测试：ErrorBoundary + PlaceholderPage + NotFoundPage
 
 **文件**:
 - `apps/web/src/components/__tests__/ErrorBoundary.test.tsx`
