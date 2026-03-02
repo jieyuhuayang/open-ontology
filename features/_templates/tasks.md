@@ -1,7 +1,7 @@
 # Tasks: <特性名称>
 
 **关联规范**: [spec.md](./spec.md)
-**技术方案**: [plan.md](./plan.md)
+**技术方案**: [design.md](./design.md)
 **版本**: v0.1.0
 **开始日期**: YYYY-MM-DD
 **完成日期**: -
@@ -22,29 +22,29 @@
 
 - [ ] **T01**: <任务描述>
   - 文件: `apps/server/path/to/file.py`
-  - 内容: <简要说明要做什么，引用 plan.md 章节>
+  - 内容: <简要说明要做什么，引用 design.md 章节>
   - 依赖: 无
 
 - [ ] **T02**: <任务描述>
   - 文件: `apps/server/path/to/another_file.py`
-  - 内容: 见 [plan.md §数据结构](./plan.md#数据结构)
+  - 内容: 见 [design.md §数据结构](./design.md#数据结构)
   - 依赖: T01
 
 - [ ] **T03**: <任务描述>
   - 文件: `apps/server/path/to/router.py`
-  - 内容: 见 [plan.md §API 定义](./plan.md#api-定义)
+  - 内容: 见 [design.md §API 定义](./design.md#api-定义)
   - 依赖: T02
 
 ### 前端
 
 - [ ] **T04**: <任务描述>
   - 文件: `apps/web/src/api/<resource>.ts`
-  - 内容: API 客户端函数，对应 plan.md 中的端点定义
+  - 内容: API 客户端函数，对应 design.md 中的端点定义
   - 依赖: T03（API 端点已实现）
 
 - [ ] **T05**: <任务描述>
   - 文件: `apps/web/src/pages/<Resource>Page/index.tsx`
-  - 内容: 见 [plan.md §前端组件](./plan.md#前端组件)
+  - 内容: 见 [design.md §前端组件](./design.md#前端组件)
   - 依赖: T04
 
 ### 测试
@@ -63,7 +63,7 @@
 
 ## 实际偏差记录
 
-> 完成后，在此记录实现与 plan.md 的偏差，供后续参考。
+> 完成后，在此记录实现与 design.md 的偏差，供后续参考。
 
 - **偏差 1**: <描述实际做了什么，以及为何偏离原计划>
 
