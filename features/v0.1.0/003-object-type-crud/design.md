@@ -348,10 +348,10 @@ class Dataset(DomainModel):
     source_metadata: dict
     row_count: int = 0
     column_count: int = 0
+    status: str = "ready"  # "importing" | "ready"
     imported_at: datetime
     ontology_rid: str
     created_by: str
-    linked_object_type_rid: str | None = None
     columns: list[DatasetColumn] = []
 
 
