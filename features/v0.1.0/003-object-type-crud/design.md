@@ -1095,10 +1095,12 @@ class CryptoService:
 
 | 方法 | 修改说明 |
 |------|----------|
-| `create(req)` | 支持不完整创建：仅 `display_name` 必填，`id`/`api_name`/`icon` 自动推断；处理 `backing_datasource_rid`（查询 Dataset → 构建 `backing_datasource` JSONB）；处理 `intended_actions` |
-| `update(rid, req)` | 新增 `intended_actions`、`backing_datasource_rid`、`primary_key_property_id`、`title_key_property_id` 字段更新逻辑；更换 datasource 时更新 Dataset 关联 |
+| `create(req)` | 支持不完整创建：`display_name` 为空时生成占位名 `"Untitled Object Type xxxx"`（4 位随机后缀）；`id`/`api_name`/`icon` 自动推断；处理 `backing_datasource_rid`（查询 Dataset → 构建 `backing_datasource` JSONB）；处理 `intended_actions`；处理 `project_rid`（为空回退 AD-5 默认值） |
+| `update(rid, req)` | 新增 `intended_actions`、`backing_datasource_rid`、`primary_key_property_id`、`title_key_property_id` 字段更新逻辑 |
+| `delete(rid)` | **新增 status 校验**：已发布的 ObjectType 检查主表 `status` 字段；未发布（Working State CREATE）检查 `change.after.status`；`status == 'active'` 时拒绝删除，抛出 `OBJECT_TYPE_ACTIVE_CANNOT_DELETE`（HTTP 400） |
 | `_auto_infer_id(display_name)` | 新增：将 display_name 转为 kebab-case 小写 ID |
 | `_auto_infer_api_name(display_name)` | 新增：将 display_name 转为 PascalCase API name |
+| `_generate_placeholder_name()` | 新增：生成占位名 `"Untitled Object Type"` + 4 位随机十六进制后缀 |
 | `_ensure_unique(ontology_rid, id, api_name)` | 新增：检查唯一性，冲突时追加随机后缀 |
 
 自动推断逻辑：
