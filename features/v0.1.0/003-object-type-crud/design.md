@@ -1107,6 +1107,12 @@ class CryptoService:
 
 ```python
 import re
+import secrets
+
+def _generate_placeholder_name(self) -> str:
+    """生成占位名：Untitled Object Type + 4 位随机十六进制后缀。"""
+    suffix = secrets.token_hex(2)  # 4 位 hex，如 "a3b2"
+    return f"Untitled Object Type {suffix}"
 
 def _auto_infer_id(self, display_name: str) -> str:
     """将 display_name 转为 kebab-case 小写 ID。"""
