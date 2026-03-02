@@ -33,7 +33,7 @@ export const routeConfig: RouteObject[] = [
         children: [
           { index: true, element: <Navigate to="overview" replace /> },
           { path: 'overview', element: <ObjectTypeOverviewPage /> },
-          { path: 'properties', element: <PlaceholderPage title="Object Type Properties" /> },
+          { path: 'properties', element: <ObjectTypePropertiesPage /> },
           { path: 'datasources', element: <PlaceholderPage title="Object Type Datasources" /> },
         ],
       },
