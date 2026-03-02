@@ -1343,7 +1343,8 @@ async def browse_tables(rid: str):
 | 包 | 用途 |
 |----|------|
 | `aiomysql` | 异步 MySQL 连接 |
-| `openpyxl` | 读取 .xlsx/.xls 文件 |
+| `openpyxl` | 读取 .xlsx 文件 |
+| `python-calamine` | 读取 .xls 文件（Rust 实现，安全高效，替代 xlrd） |
 | `cryptography` | Fernet 对称加密（密码存储） |
 | `python-multipart` | FastAPI 文件上传支持 |
 
