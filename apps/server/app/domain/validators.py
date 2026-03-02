@@ -62,6 +62,39 @@ def validate_link_type_id(id_value: str) -> None:
         )
 
 
+def validate_property_id(id_value: str) -> None:
+    """Validate property id: starts with letter, contains letters/digits/hyphens/underscores."""
+    if not PROPERTY_ID_PATTERN.match(id_value):
+        raise AppError(
+            code="PROPERTY_INVALID_ID",
+            message=f"Property id must match ^[a-zA-Z][a-zA-Z0-9_-]*$: {id_value!r}",
+            status_code=400,
+        )
+
+
+def validate_property_api_name(api_name: str) -> None:
+    """Validate property apiName: camelCase, 1-100 chars, NFKC, no reserved words."""
+    normalized = unicodedata.normalize("NFKC", api_name)
+    if normalized != api_name:
+        raise AppError(
+            code="PROPERTY_INVALID_API_NAME",
+            message=f"Property apiName must be NFKC normalized: {api_name!r}",
+            status_code=400,
+        )
+    if not PROPERTY_API_NAME_PATTERN.match(api_name):
+        raise AppError(
+            code="PROPERTY_INVALID_API_NAME",
+            message=f"Property apiName must start with lowercase letter and contain only letters and digits (1-100 chars): {api_name!r}",
+            status_code=400,
+        )
+    if api_name.lower() in RESERVED_API_NAMES:
+        raise AppError(
+            code="PROPERTY_RESERVED_API_NAME",
+            message=f"Property apiName is a reserved word: {api_name!r}",
+            status_code=400,
+        )
+
+
 def validate_link_side_api_name(api_name: str, side: str) -> None:
     """Validate link side apiName: camelCase, 1-100 chars, NFKC, no reserved words."""
     normalized = unicodedata.normalize("NFKC", api_name)
