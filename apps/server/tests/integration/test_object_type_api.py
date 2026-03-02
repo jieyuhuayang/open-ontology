@@ -256,9 +256,27 @@ class TestObjectTypeCRUD:
         assert data["total"] == 1
         assert data["items"][0]["changeState"] == "created"
 
-    async def test_change_states(self, seeded_client: AsyncClient):
+    async def test_change_states(self, seeded_client: AsyncClient, db_session):
         """AC13: Verify created/modified/deleted/published changeState annotations."""
-        # Create → changeState=created
+        from app.storage.dataset_storage import DatasetStorage
+
+        # Seed dataset for backing datasource
+        await DatasetStorage.create(
+            db_session,
+            dataset_rid="ri.ontology.dataset.state-ds",
+            name="State DS",
+            source_type="csv",
+            source_metadata={},
+            ontology_rid="ri.ontology.ontology.default",
+            created_by="default",
+            columns=[
+                {"name": "id", "inferred_type": "integer"},
+                {"name": "name", "inferred_type": "string"},
+            ],
+            rows=[{"id": "1", "name": "A"}],
+        )
+
+        # Create complete OT → changeState=created
         create_resp = await seeded_client.post(
             "/api/v1/object-types",
             json={
@@ -266,13 +284,41 @@ class TestObjectTypeCRUD:
                 "apiName": "StateTest",
                 "displayName": "State",
                 "icon": {"name": "box", "color": "#000"},
+                "backingDatasourceRid": "ri.ontology.dataset.state-ds",
             },
         )
         assert create_resp.json()["changeState"] == "created"
         rid = create_resp.json()["rid"]
 
+        # Add mapped properties + set PK/TK
+        await seeded_client.post(
+            f"/api/v1/object-types/{rid}/properties",
+            json={
+                "id": "pk",
+                "apiName": "pk",
+                "displayName": "PK",
+                "baseType": "integer",
+                "backingColumn": "id",
+            },
+        )
+        await seeded_client.post(
+            f"/api/v1/object-types/{rid}/properties",
+            json={
+                "id": "nm",
+                "apiName": "nm",
+                "displayName": "Name",
+                "baseType": "string",
+                "backingColumn": "name",
+            },
+        )
+        await seeded_client.put(
+            f"/api/v1/object-types/{rid}",
+            json={"primaryKeyPropertyId": "pk", "titleKeyPropertyId": "nm"},
+        )
+
         # Publish → then it becomes published
-        await seeded_client.post("/api/v1/ontologies/ri.ontology.ontology.default/save")
+        pub_resp = await seeded_client.post("/api/v1/ontologies/ri.ontology.ontology.default/save")
+        assert pub_resp.status_code == 200
 
         get_resp = await seeded_client.get(f"/api/v1/object-types/{rid}")
         assert get_resp.json()["changeState"] == "published"
