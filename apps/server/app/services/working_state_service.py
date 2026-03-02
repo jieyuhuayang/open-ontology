@@ -309,8 +309,14 @@ class WorkingStateService:
         await self._validate_completeness(ws.changes)
         await self._validate_type_compatibility(ws.changes)
 
-        # Apply changes to main tables
-        for change in ws.changes:
+        # Apply changes to main tables (OT first, then LinkType, then Property for FK ordering)
+        type_order = {
+            ResourceType.OBJECT_TYPE: 0,
+            ResourceType.LINK_TYPE: 1,
+            ResourceType.PROPERTY: 2,
+        }
+        sorted_changes = sorted(ws.changes, key=lambda c: type_order.get(c.resource_type, 99))
+        for change in sorted_changes:
             if change.resource_type == ResourceType.OBJECT_TYPE:
                 await self._apply_object_type_change(change)
             elif change.resource_type == ResourceType.LINK_TYPE:
