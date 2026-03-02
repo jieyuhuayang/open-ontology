@@ -188,6 +188,112 @@ class WorkingStateService:
 
         return result
 
+    async def _has_mapped_properties(self, ot_rid: str, changes: list[Change]) -> bool:
+        """Check if OT has at least one property with backingColumn set."""
+        # Check WS CREATE properties for this OT
+        for c in changes:
+            if c.resource_type == ResourceType.PROPERTY and c.change_type == ChangeType.CREATE:
+                after = c.after or {}
+                if after.get("objectTypeRid") == ot_rid and after.get("backingColumn"):
+                    return True
+        # Check published properties
+        published_props = await self._get_published_properties("ri.ontology.ontology.default")
+        for p in published_props:
+            data = p.model_dump(mode="json", by_alias=True)
+            if data.get("objectTypeRid") == ot_rid and data.get("backingColumn"):
+                return True
+        return False
+
+    async def _validate_completeness(self, changes: list[Change]) -> None:
+        """Validate all CREATE/UPDATE ObjectTypes are complete before publish (AC-V4)."""
+        for change in changes:
+            if change.resource_type != ResourceType.OBJECT_TYPE:
+                continue
+            if change.change_type == ChangeType.DELETE:
+                continue
+
+            data = change.after or {}
+            missing = []
+
+            if not data.get("displayName"):
+                missing.append("displayName")
+            if not data.get("id"):
+                missing.append("id")
+            if not data.get("apiName"):
+                missing.append("apiName")
+            if not data.get("backingDatasource"):
+                missing.append("backingDatasource")
+            if not data.get("primaryKeyPropertyId"):
+                missing.append("primaryKeyPropertyId")
+            if not data.get("titleKeyPropertyId"):
+                missing.append("titleKeyPropertyId")
+
+            ot_rid = change.resource_rid
+            has_mapped = await self._has_mapped_properties(ot_rid, changes)
+            if not has_mapped:
+                missing.append("mappedProperties")
+
+            if missing:
+                raise AppError(
+                    code="INCOMPLETE_OBJECT_TYPE",
+                    message=f"Object type '{data.get('displayName', ot_rid)}' is incomplete and cannot be published",
+                    status_code=400,
+                    details={
+                        "objectTypeRid": ot_rid,
+                        "missingFields": missing,
+                    },
+                )
+
+    async def _validate_type_compatibility(self, changes: list[Change]) -> None:
+        """Validate Property baseType vs Dataset column inferredType (AC-V6)."""
+        from app.storage.dataset_storage import DatasetStorage
+
+        for change in changes:
+            if change.resource_type != ResourceType.OBJECT_TYPE:
+                continue
+            if change.change_type == ChangeType.DELETE:
+                continue
+
+            data = change.after or {}
+            backing = data.get("backingDatasource")
+            if not backing or not isinstance(backing, dict) or not backing.get("rid"):
+                continue
+
+            dataset = await DatasetStorage.get_by_rid(self._session, backing["rid"])
+            if not dataset:
+                continue
+
+            col_type_map = {col.name: col.inferred_type for col in dataset.columns}
+
+            # Check properties for this OT
+            for c in changes:
+                if c.resource_type != ResourceType.PROPERTY:
+                    continue
+                if c.change_type == ChangeType.DELETE:
+                    continue
+                prop_data = c.after or {}
+                if prop_data.get("objectTypeRid") != change.resource_rid:
+                    continue
+                backing_col = prop_data.get("backingColumn")
+                if not backing_col:
+                    continue
+                col_type = col_type_map.get(backing_col)
+                if col_type is None:
+                    continue
+                prop_type = prop_data.get("baseType", "string")
+                compatible = TYPE_COMPATIBILITY.get(prop_type, {prop_type})
+                if col_type not in compatible:
+                    raise AppError(
+                        code="FIELD_TYPE_INCOMPATIBLE",
+                        message=f"Property '{prop_data.get('id')}' type '{prop_type}' is incompatible with column '{backing_col}' type '{col_type}'",
+                        status_code=400,
+                        details={
+                            "propertyId": prop_data.get("id"),
+                            "propertyType": prop_type,
+                            "columnType": col_type,
+                        },
+                    )
+
     async def publish(self, ontology_rid: str) -> ChangeRecord:
         ws = await self._get_working_state(ontology_rid)
         if not ws or not ws.changes:
@@ -196,6 +302,10 @@ class WorkingStateService:
                 message="No changes to publish",
                 status_code=400,
             )
+
+        # Phase 2: completeness + type compatibility validation
+        await self._validate_completeness(ws.changes)
+        await self._validate_type_compatibility(ws.changes)
 
         # Apply changes to main tables
         for change in ws.changes:
