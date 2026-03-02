@@ -1,7 +1,7 @@
 # Tasks: Link Type CRUD（链接类型增删改查）
 
 **关联规范**: [spec.md](./spec.md)
-**技术方案**: [plan.md](./plan.md)
+**技术方案**: [design.md](./design.md)
 **版本**: v0.1.0
 **开始日期**: 2026-03-02
 **完成日期**: 2026-03-02
@@ -31,7 +31,7 @@
   - 文件:
     - `apps/server/app/domain/link_type.py` — `Cardinality`, `JoinMethod`, `LinkSide`, `LinkType`, `LinkTypeWithChangeState`, `LinkSideCreateInput`, `LinkTypeCreateRequest`, `LinkSideUpdateInput`, `LinkTypeUpdateRequest`, `LinkTypeListResponse`
     - `apps/server/app/domain/validators.py` — `LINK_SIDE_API_NAME_PATTERN`, `validate_link_type_id()`, `validate_link_side_api_name()`
-  - 内容: 见 [plan.md §数据结构设计](./plan.md#数据结构设计)。所有模型继承 `DomainModel`（camelCase alias）。校验器抛出 `AppError`，错误码见 plan.md §错误码
+  - 内容: 见 [design.md §数据结构设计](./design.md#数据结构设计)。所有模型继承 `DomainModel`（camelCase alias）。校验器抛出 `AppError`，错误码见 design.md §错误码
   - 依赖: 无（复用 F003 的 `validators.py` 基础设施）
   - AC 覆盖: AC5, AC6
   - 验证: T001 全部测试通过
@@ -215,7 +215,7 @@
 
 ## 实际偏差记录
 
-> 本特性实际先完成了实现，后补 plan.md 和 tasks.md（违反 SDD 流程）。以下记录实现与最终 plan 的偏差。
+> 本特性实际先完成了实现，后补 design.md 和 tasks.md（违反 SDD 流程）。以下记录实现与最终 plan 的偏差。
 
 - **偏差 1**: LinkTypeListPage 的过滤在客户端通过 `useMemo` 实现（而非服务端过滤），因为 merged view 已在内存中。与 ObjectTypeListPage 保持一致。
 - **偏差 2**: Router test 中 `/link-types/:rid` 改为 expect 404（因详情改为 Drawer），需要额外添加 `vi.mock('@/api/link-types')` 和 `window.matchMedia` polyfill。
@@ -228,4 +228,4 @@
 | 日期 | 完成任务 | 备注 |
 |------|---------|------|
 | 2026-03-02 | T001–T014 | 全部 14 个任务在一次会话中完成。后端 64 个单元测试通过（17 个新增），前端 88 个测试通过。TypeScript 编译 0 错误。|
-| 2026-03-02 | plan.md + tasks.md | 追溯补齐 SDD 文档。 |
+| 2026-03-02 | design.md + tasks.md | 追溯补齐 SDD 文档。 |
