@@ -479,19 +479,24 @@ class ImportTask(DomainModel):
 """MySQL 和 Excel/CSV 数据类型到 PropertyBaseType 的映射规则。"""
 
 # --- MySQL → PropertyBaseType ---
+# 按 PRD §8.7 统一映射规则：
+#   BIGINT/INT/TINYINT → integer（MVP 不引入 long/short）
+#   DECIMAL/FLOAT/DOUBLE → double（MVP 不引入 float/decimal）
+#   BOOLEAN/BIT(1) → boolean
+# 已知限制：BIGINT 超 32 位精度损失、DECIMAL 高精度丢失；后续版本可引入 long/decimal 类型支持
 MYSQL_TYPE_MAP: dict[str, str] = {
-    # 整数类型
+    # 整数类型 → 统一为 integer（PRD §8.7）
     "tinyint":    "integer",
-    "smallint":   "short",
+    "smallint":   "integer",
     "mediumint":  "integer",
     "int":        "integer",
     "integer":    "integer",
-    "bigint":     "long",
-    # 浮点 / 定点
-    "float":      "float",
+    "bigint":     "integer",
+    # 浮点 / 定点 → 统一为 double（PRD §8.7）
+    "float":      "double",
     "double":     "double",
-    "decimal":    "decimal",
-    "numeric":    "decimal",
+    "decimal":    "double",
+    "numeric":    "double",
     # 字符串
     "char":       "string",
     "varchar":    "string",
@@ -514,8 +519,9 @@ MYSQL_TYPE_MAP: dict[str, str] = {
     "timestamp":  "timestamp",
     "time":       "string",
     "year":       "integer",
-    # 布尔
+    # 布尔（PRD §8.7: BOOLEAN/BIT(1) → boolean）
     "bit":        "boolean",
+    "boolean":    "boolean",
     # JSON
     "json":       "string",
 }
