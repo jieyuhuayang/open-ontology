@@ -56,10 +56,6 @@ function SortableRow({ children, ...props }: SortableRowProps) {
   );
 }
 
-interface DragHandleCellProps {
-  listeners?: ReturnType<typeof useSortable>['listeners'];
-}
-
 function DragHandleCell({ rid }: { rid: string }) {
   const { listeners } = useSortable({ id: rid });
   return (
