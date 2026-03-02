@@ -37,6 +37,7 @@ class ObjectType(DomainModel):
     backing_datasource: dict | None = None
     primary_key_property_id: str | None = None
     title_key_property_id: str | None = None
+    intended_actions: list[str] | None = None
     project_rid: str
     ontology_rid: str
     created_at: datetime
