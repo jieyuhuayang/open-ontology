@@ -809,13 +809,12 @@ class ObjectTypeUpdateRequest(DomainModel):
 #### POST /api/v1/datasets/import/mysql
 
 ```jsonc
-// Request
+// Request — 使用已保存连接（服务端解密密码，不再由客户端传递）
 {
   "connectionRid": "ri.ontology.mysql-connection.def456",
   "table": "orders",
   "datasetName": "orders_snapshot_2026",
-  "selectedColumns": ["id", "customer_name", "amount", "created_at"],  // null = 全选
-  "password": "s3cret"  // 需要再次提供密码（不从服务端读取明文）
+  "selectedColumns": ["id", "customer_name", "amount", "created_at"]  // null = 全选
 }
 
 // Response 202
