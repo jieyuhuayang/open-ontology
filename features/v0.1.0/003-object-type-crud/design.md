@@ -1200,14 +1200,12 @@ router = APIRouter(prefix="/api/v1", tags=["imports"])
 # GET  /import-tasks/{task_id}     → ImportTaskService.get_task()
 ```
 
-**注意**：浏览/预览 MySQL 表的端点需要密码参数。考虑到 GET 不应有请求体，密码通过 `X-MySQL-Password` 自定义 Header 传递：
+**注意**：浏览/预览 MySQL 表的端点**使用已保存连接的加密密码**（服务端解密），不再要求客户端传递密码。用户流程为：test → save → browse/preview/import。这避免了通过 Header 传递明文密码的安全风险。
 
 ```python
 @router.get("/mysql-connections/{rid}/tables")
-async def browse_tables(
-    rid: str,
-    x_mysql_password: str = Header(alias="X-MySQL-Password"),
-):
+async def browse_tables(rid: str):
+    # 服务端从 mysql_connections 表读取加密密码并解密连接
     ...
 ```
 
