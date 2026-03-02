@@ -43,7 +43,7 @@ TEST_DATABASE_URL = os.environ.get(
     "postgresql+asyncpg://ontology:ontology@localhost:5432/open_ontology_test",
 )
 
-_test_engine = create_async_engine(TEST_DATABASE_URL, echo=False)
+_test_engine = create_async_engine(TEST_DATABASE_URL, echo=False, poolclass=NullPool)
 _test_session_factory = async_sessionmaker(_test_engine, expire_on_commit=False)
 
 
