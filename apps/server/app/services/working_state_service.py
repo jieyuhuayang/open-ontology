@@ -8,6 +8,7 @@ from app.domain.common import generate_rid
 from app.domain.constants import DEFAULT_USER_ID
 from app.domain.link_type import LinkType
 from app.domain.object_type import ObjectType
+from app.domain.property import Property
 from app.domain.working_state import (
     Change,
     ChangeRecord,
