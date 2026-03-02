@@ -1002,20 +1002,24 @@ class ObjectTypeUpdateRequest(DomainModel):
 
 | 方法 | 说明 |
 |------|------|
-| `test_connection(req)` | 测试 MySQL 连接（不保存），返回 `{success, error?}` |
+| `test_connection(req)` | 测试 MySQL 连接（不保存）；成功返回 200 `{success: true}`；失败抛出 `MYSQL_CONNECTION_FAILED`（422） |
 | `save_connection(req)` | 保存连接配置（密码加密后存储） |
 | `list_connections(ontology_rid)` | 列表已保存连接 |
-| `browse_tables(connection_rid, password)` | 连接 MySQL 获取表列表 |
-| `get_table_columns(connection_rid, table, password)` | 获取表列结构 + 类型映射 |
-| `preview_table(connection_rid, table, password, limit=50)` | 预览表数据 |
-| `start_import(connection_rid, table, dataset_name, selected_columns, password)` | 启动后台导入任务，返回 task_id |
+| `browse_tables(connection_rid)` | 使用已保存连接的加密密码（服务端解密）连接 MySQL，获取表列表 |
+| `get_table_columns(connection_rid, table)` | 使用已保存连接，获取表列结构 + 类型映射 |
+| `preview_table(connection_rid, table, limit=50)` | 使用已保存连接，预览表数据 |
+| `start_import(connection_rid, table, dataset_name, selected_columns)` | 启动后台导入任务，返回 task_id；使用已保存连接 |
 
-导入逻辑（后台执行）：
-1. 连接 MySQL，执行 `SELECT {columns} FROM {table}` 游标查询
-2. 批量 INSERT 到 `dataset_rows`（每批 1000 行）
-3. 创建 `dataset_columns` 记录（类型通过 `mysql_type_to_property_type` 映射）
-4. 更新 `datasets.row_count` 和 `column_count`
-5. 更新 `mysql_connections.last_used_at`
+导入逻辑（后台执行，**单事务保证**）：
+1. 在独立 async session 中开启事务
+2. INSERT `datasets` 记录（`status='importing'`）
+3. 连接 MySQL，执行 `SELECT {columns} FROM {table}` 游标查询
+4. 创建 `dataset_columns` 记录（类型通过 `mysql_type_to_property_type` 映射）
+5. 批量 INSERT 到 `dataset_rows`（每批 1000 行）
+6. UPDATE `datasets.row_count`、`column_count`、`status='ready'`
+7. 更新 `mysql_connections.last_used_at`
+8. COMMIT 事务
+9. **异常处理**：任何步骤失败 → ROLLBACK 全部（包括 datasets、columns、rows），不产生残留数据
 
 ### FileImportService（`app/services/file_import_service.py`）
 
