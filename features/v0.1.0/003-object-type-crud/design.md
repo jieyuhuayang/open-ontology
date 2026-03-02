@@ -1028,17 +1028,22 @@ class ObjectTypeUpdateRequest(DomainModel):
 | `upload_and_preview(file)` | 保存临时文件 → 解析预览 → 返回 file_token + 预览数据 |
 | `confirm_import(file_token, config)` | 启动后台导入任务，返回 task_id |
 
-解析逻辑：
-- **Excel**：使用 `openpyxl`（只读模式）读取指定 Sheet
-- **CSV**：使用 Python 标准库 `csv` 读取
+解析逻辑（按文件格式分派）：
+- **`.xlsx`**：使用 `openpyxl`（只读模式）读取指定 Sheet
+- **`.xls`**：使用 `python-calamine`（Rust 实现，安全高效）读取
+- **`.csv`**：使用 Python 标准库 `csv` 读取
 - 类型推断调用 `infer_column_type()` 处理前 1000 行
 
-导入逻辑（后台执行）：
-1. 从临时文件重新读取完整数据（按用户选择的 Sheet、列、类型）
-2. 批量 INSERT 到 `dataset_rows`（每批 1000 行）
-3. 创建 `dataset_columns`（使用用户确认/修改后的类型）
-4. 更新 `datasets.row_count` 和 `column_count`
-5. 删除临时文件
+导入逻辑（后台执行，**单事务保证**）：
+1. 在独立 async session 中开启事务
+2. INSERT `datasets` 记录（`status='importing'`）
+3. 从临时文件重新读取完整数据（按用户选择的 Sheet、列、类型）
+4. 创建 `dataset_columns`（使用用户确认/修改后的类型）
+5. 批量 INSERT 到 `dataset_rows`（每批 1000 行）
+6. UPDATE `datasets.row_count`、`column_count`、`status='ready'`
+7. COMMIT 事务
+8. 删除临时文件
+9. **异常处理**：任何步骤失败 → ROLLBACK 全部（包括 datasets、columns、rows），不产生残留数据；临时文件保留以便重试
 
 ### ImportTaskService（`app/services/import_task_service.py`）
 
