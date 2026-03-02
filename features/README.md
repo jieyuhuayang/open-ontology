@@ -9,7 +9,7 @@ SDD is a methodology where each feature is defined through up to three layered a
 | Artifact | File | Purpose |
 |----------|------|---------|
 | 需求规范 | `spec.md` | What to build — user stories, acceptance criteria, boundaries |
-| 技术方案 | `plan.md` | How to build it — data structures, API contracts, component design |
+| 技术方案 | `design.md` | How to build it — data structures, API contracts, component design |
 | 原子任务 | `tasks.md` | Execution checklist — one file per task, explicit dependencies |
 
 This structure is especially suited for AI-assisted development, where each conversation session can focus on a single, well-scoped task rather than an entire feature.
@@ -23,7 +23,7 @@ features/
 ├── README.md                    # This file
 ├── _templates/                  # Reusable templates
 │   ├── spec.md
-│   ├── plan.md
+│   ├── design.md
 │   └── tasks.md
 └── v0.1.0/                      # MVP feature set
     ├── 001-project-scaffolding/          ✅ 完成
@@ -46,7 +46,7 @@ Not every change requires all three artifacts. Use the table below to decide:
 
 | Change Scale | Required Artifacts |
 |-------------|-------------------|
-| **Complex feature** — crosses multiple layers, introduces new domain concepts | `spec.md` + `plan.md` + `tasks.md` |
+| **Complex feature** — crosses multiple layers, introduces new domain concepts | `spec.md` + `design.md` + `tasks.md` |
 | **Medium feature** — single CRUD endpoint or isolated UI component | `spec.md` (with brief technical notes) + `tasks.md` |
 | **Small change** — bug fix, style tweak, copy update | `tasks.md` only |
 
@@ -78,7 +78,7 @@ Each task in `tasks.md` should be completable in a **single AI conversation sess
 A well-scoped task:
 - Targets **one file** (or at most two closely related files)
 - Has **explicit dependencies** listed (which prior tasks must complete first)
-- References the relevant section of `plan.md` for technical details
+- References the relevant section of `design.md` for technical details
 
 ---
 
@@ -86,7 +86,7 @@ A well-scoped task:
 
 1. **Create spec.md** — derive from PRD and architecture docs
 2. **Review spec.md** — confirm acceptance criteria are testable
-3. **Create plan.md** — design data structures, API contracts, component trees
+3. **Create design.md** — design data structures, API contracts, component trees
 4. **Create tasks.md** — break plan into atomic file-level tasks
 5. **Execute tasks** — one per session, checking off as complete
 6. **Mark deviations** — if implementation differs from plan, note in tasks.md
@@ -101,7 +101,7 @@ A well-scoped task:
 - `features/` — bridges the above into executable development units
 
 When writing `spec.md`, always link back to the relevant PRD section.
-When writing `plan.md`, always reference the relevant architecture document.
+When writing `design.md`, always reference the relevant architecture document.
 
 ---
 
