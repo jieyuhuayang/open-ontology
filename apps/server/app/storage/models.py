@@ -364,7 +364,7 @@ class DatasetModel(Base):
     source_metadata = Column(JSONB, nullable=False, server_default=func.cast("{}", JSONB))
     row_count = Column(Integer, nullable=False, server_default="0")
     column_count = Column(Integer, nullable=False, server_default="0")
-    status = Column(String(20), nullable=False, server_default="'ready'")  # importing | ready
+    status = Column(String(20), nullable=False, server_default="ready")  # importing | ready
     imported_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     ontology_rid = Column(String, ForeignKey("ontologies.rid", ondelete="CASCADE"), nullable=False)
     created_by = Column(String(255), nullable=False)
