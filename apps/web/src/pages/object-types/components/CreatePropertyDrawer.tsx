@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Drawer, Form, Input, Select, message } from 'antd';
+import { Button, Drawer, Form, Input, Select, Space, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useCreateProperty } from '@/api/properties';
 import PropertyTypeSelector from './PropertyTypeSelector';
