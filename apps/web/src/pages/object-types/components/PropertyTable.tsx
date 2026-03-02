@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { createContext, useCallback, useContext } from 'react';
 import { Table, Tag, Tooltip } from 'antd';
 import { HolderOutlined, KeyOutlined } from '@ant-design/icons';
 import {
@@ -15,13 +15,13 @@ import {
   useSortable,
   arrayMove,
 } from '@dnd-kit/sortable';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import StatusBadge from '@/components/StatusBadge';
 import ChangeStateBadge from '@/components/ChangeStateBadge';
 import type { Property, ResourceStatus, ChangeState } from '@/api/types';
-
 
 const PRIMARY_KEY_TYPES = new Set([
   'string', 'integer', 'short', 'date', 'timestamp', 'boolean', 'byte', 'long',
@@ -32,34 +32,49 @@ const TITLE_KEY_TYPES = new Set([
   'float', 'double', 'decimal', 'geopoint', 'cipher', 'array',
 ]);
 
+interface RowContextType {
+  setActivatorNodeRef?: (element: HTMLElement | null) => void;
+  listeners?: SyntheticListenerMap;
+}
+
+const RowContext = createContext<RowContextType>({});
+
 interface SortableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
   'data-row-key': string;
 }
 
 function SortableRow({ children, ...props }: SortableRowProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: props['data-row-key'],
-  });
+  const {
+    attributes,
+    listeners,
+    setActivatorNodeRef,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: props['data-row-key'] });
 
   const style: React.CSSProperties = {
     ...props.style,
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
-    cursor: 'default',
+    ...(isDragging ? { position: 'relative', zIndex: 9999, opacity: 0.8 } : {}),
   };
 
   return (
-    <tr ref={setNodeRef} {...props} {...attributes} style={style}>
-      {children}
-    </tr>
+    <RowContext.Provider value={{ setActivatorNodeRef, listeners }}>
+      <tr ref={setNodeRef} {...props} {...attributes} style={style}>
+        {children}
+      </tr>
+    </RowContext.Provider>
   );
 }
 
-function DragHandleCell({ rid }: { rid: string }) {
-  const { listeners } = useSortable({ id: rid });
+function DragHandleCell() {
+  const { setActivatorNodeRef, listeners } = useContext(RowContext);
   return (
     <span
+      ref={setActivatorNodeRef}
       {...listeners}
       style={{ cursor: 'grab', padding: '0 8px', color: '#bfbfbf', fontSize: 16 }}
       onClick={(e) => e.stopPropagation()}
@@ -78,7 +93,6 @@ interface PropertyTableProps {
 
 export default function PropertyTable({
   properties,
-  objectTypeStatus,
   onRowClick,
   onReorder,
 }: PropertyTableProps) {
@@ -94,8 +108,8 @@ export default function PropertyTable({
     (event: DragEndEvent) => {
       const { active, over } = event;
       if (!over || active.id === over.id) return;
-      const oldIndex = properties.findIndex((p) => p.rid === active.id);
-      const newIndex = properties.findIndex((p) => p.rid === over.id);
+      const oldIndex = properties.findIndex((p) => p.rid === String(active.id));
+      const newIndex = properties.findIndex((p) => p.rid === String(over.id));
       if (oldIndex === -1 || newIndex === -1) return;
       const newOrder = arrayMove(properties, oldIndex, newIndex);
       onReorder?.(newOrder);
@@ -107,7 +121,7 @@ export default function PropertyTable({
     {
       key: 'drag',
       width: 40,
-      render: (_, record) => <DragHandleCell rid={record.rid} />,
+      render: () => <DragHandleCell />,
       onCell: () => ({ onClick: (e: React.MouseEvent) => e.stopPropagation() }),
     },
     {
