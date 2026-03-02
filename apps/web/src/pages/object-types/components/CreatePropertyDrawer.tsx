@@ -98,17 +98,16 @@ export default function CreatePropertyDrawer({
       width={480}
       footer={
         <div style={{ textAlign: 'right' }}>
-          <button
-            onClick={onClose}
-            style={{ marginRight: 8 }}
-          >
-            {t('common.cancel')}
-          </button>
-          <button
-            onClick={() => void handleSubmit()}
-          >
-            {t('common.create')}
-          </button>
+          <Space>
+            <Button onClick={onClose}>{t('common.cancel')}</Button>
+            <Button
+              type="primary"
+              loading={createMutation.isPending}
+              onClick={() => void handleSubmit()}
+            >
+              {t('common.create')}
+            </Button>
+          </Space>
         </div>
       }
       destroyOnClose
