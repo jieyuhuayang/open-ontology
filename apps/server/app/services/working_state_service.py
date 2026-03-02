@@ -40,6 +40,9 @@ class WorkingStateService:
     async def _get_published_link_types(self, ontology_rid: str) -> list[LinkType]:
         return await LinkTypeStorage.list_by_ontology(self._session, ontology_rid)
 
+    async def _get_published_properties(self, ontology_rid: str) -> list[Property]:
+        return await PropertyStorage.list_by_ontology(self._session, ontology_rid)
+
     async def get_or_create(self, ontology_rid: str) -> WorkingState:
         ws = await self._get_working_state(ontology_rid)
         if ws:
