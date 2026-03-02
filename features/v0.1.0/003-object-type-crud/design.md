@@ -1392,19 +1392,53 @@ async def browse_tables(rid: str):
 
 | 测试 | 覆盖 |
 |------|------|
-| `test_type_mapping.py` | MySQL 类型映射（全部 MySQL 类型 → PropertyBaseType）|
+| `test_type_mapping.py` | MySQL 类型映射（全部 MySQL 类型 → PropertyBaseType，按 PRD §8.7 规则）|
 | `test_type_mapping.py` | Excel/CSV 类型推断（整数、浮点、日期、时间戳、布尔、混合回退） |
 | `test_crypto_service.py` | 加密/解密往返 + 密钥缺失处理 |
 | `test_validators.py` | intended_actions 校验（有效值、无效值） |
 | `test_completeness.py` | 完整性校验（7 项条件的各种组合） |
-| `test_auto_infer.py` | display_name → id/api_name 自动推断 + 冲突后缀 |
+| `test_type_compatibility.py` | 类型兼容性校验（兼容矩阵、不兼容报错含 details） |
+| `test_auto_infer.py` | display_name → id/api_name 自动推断 + 冲突后缀 + 占位名生成 |
+| `test_active_delete.py` | active 状态 ObjectType 拒绝删除（已发布 + Working State 草稿场景） |
 
 ### 集成测试
 
 | 测试 | 覆盖 |
 |------|------|
-| `test_dataset_api.py` | Dataset CRUD API（创建、列表含 in-use、预览、删除、in-use 拒绝删除） |
-| `test_mysql_import_api.py` | MySQL 连接保存/测试/浏览表/导入流程（需 MySQL test fixture） |
-| `test_file_upload_api.py` | Excel/CSV 上传预览 + 确认导入流程 |
-| `test_incomplete_object_type.py` | 不完整创建 + 补全 + 发布完整性校验 |
+| `test_dataset_api.py` | Dataset CRUD API（创建、列表含 in-use 合并计算、预览、删除、in-use 拒绝删除） |
+| `test_mysql_import_api.py` | MySQL 连接保存/测试（422 错误格式）/浏览表（使用已保存连接）/导入流程（事务化） |
+| `test_file_upload_api.py` | Excel(.xlsx/.xls)/CSV 上传预览 + 确认导入流程（事务化） |
+| `test_incomplete_object_type.py` | 不完整创建（display_name 可空 + 占位名）+ 补全 + 发布完整性校验 + 类型兼容性校验 |
 | `test_import_task_api.py` | 任务创建 + 轮询状态转换 |
+
+---
+
+## 评审意见处理记录
+
+> 评审文档：`features/v0.1.0/003-object-type-crud/review.md`（2026-03-02）
+
+### Blocker（3 条，全部采纳）
+
+| # | 评审意见 | 处理结果 | 涉及章节 |
+|---|----------|----------|----------|
+| 1 | Working State 与 Dataset 关联状态冲突 | **采纳**：移除 `datasets.linked_object_type_rid` 列；Dataset in-use 状态改为运行时合并计算（扫描已发布 ObjectType + Working State 草稿）；移除 `link_to_object_type`/`unlink_from_object_type` 方法；publish 时随 ObjectType 自然落库，discard 无需补偿 | AD-8、数据库设计、ORM、Domain、DatasetService |
+| 2 | 导入失败无事务化保证 | **采纳**：Dataset 新增 `status` 字段（`importing` → `ready`）；导入在独立 session 以单事务执行，失败时 rollback 全部；列表查询默认过滤 `status='ready'` | 数据库设计、ORM、Domain、MySQLImportService、FileImportService |
+| 3 | 数据库主键违反仓库硬约束 | **采纳**：`dataset_columns` 改为 `rid TEXT PRIMARY KEY`（格式 `ri.ontology.dataset-column.<uuid>`）；`dataset_rows` 改为复合主键 `(dataset_rid, row_index)`，移除自增 id | 数据库设计、ORM |
+
+### Major（5 条，4 采纳 1 部分采纳）
+
+| # | 评审意见 | 处理结果 | 涉及章节 |
+|---|----------|----------|----------|
+| 4 | Save Location（Project 选择）未覆盖 | **部分采纳**：ObjectTypeCreateRequest 新增可选字段 `project_rid`，默认回退 AD-5 默认值。不新增 Project 列表接口（属于 Space/Project 管理模块）。MVP 单 Project 场景下前端自动选中 | AD-11、Domain ObjectTypeCreateRequest、API 示例 |
+| 5 | 任意步骤退出与 display_name 必填冲突 | **采纳**：`display_name` 改为可选，为空时服务端自动生成占位名 `"Untitled Object Type xxxx"`（4 位随机后缀），`id` 和 `api_name` 从占位名推断 | AD-11、Domain ObjectTypeCreateRequest、ObjectTypeService、API 示例 |
+| 6 | 类型兼容性校验（AC-V6）缺失 | **采纳**：publish 校验新增 Property baseType 与 Dataset 列 inferredType 兼容性检查；定义兼容矩阵；新增错误码 `FIELD_TYPE_INCOMPATIBLE` | WorkingStateService、错误码表 |
+| 7 | .xls 支持声明与实现不一致 | **采纳**：新增 `python-calamine` 依赖（Rust 实现），解析策略：.xlsx → openpyxl、.xls → python-calamine、.csv → csv 标准库 | FileImportService、依赖列表 |
+| 8 | active 状态不可删除未落地 | **采纳**：ObjectTypeService.delete() 新增 status 校验（已发布检查主表、未发布检查 Working State）；active 拒绝删除；新增错误码 `OBJECT_TYPE_ACTIVE_CANNOT_DELETE` | ObjectTypeService、错误码表 |
+
+### Medium（3 条，全部采纳）
+
+| # | 评审意见 | 处理结果 | 涉及章节 |
+|---|----------|----------|----------|
+| 9 | MySQL 测试连接返回格式不统一 | **采纳**：失败改为 `422 { "error": { "code": "MYSQL_CONNECTION_FAILED", "message": "..." } }`，与全局错误格式统一 | API 端点、错误码表 |
+| 10 | 明文密码通过 Header 传递 | **采纳**：移除 `X-MySQL-Password` Header。browse/preview/import 端点统一使用已保存连接的加密密码（服务端解密）。用户流程：test → save → browse/preview/import | API 端点、Router 层、MySQLImportService |
+| 11 | MySQL 类型映射与 PRD 不一致 | **采纳**：按 PRD §8.7 统一：BIGINT/INT/TINYINT → `integer`、DECIMAL/FLOAT/DOUBLE → `double`、BOOLEAN/BIT(1) → `boolean`。精度损失（BIGINT 超 32 位、DECIMAL 高精度）记为已知限制 | 类型映射规则（MYSQL_TYPE_MAP） |
