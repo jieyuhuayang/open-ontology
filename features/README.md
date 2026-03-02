@@ -87,7 +87,7 @@ A well-scoped task:
 1. **Create spec.md** — derive from PRD and architecture docs
 2. **Review spec.md** — confirm acceptance criteria are testable
 3. **Create design.md** — design data structures, API contracts, component trees
-4. **Create tasks.md** — break plan into atomic file-level tasks
+4. **Create tasks.md** — break design into atomic file-level tasks
 5. **Execute tasks** — one per session, checking off as complete
 6. **Mark deviations** — if implementation differs from plan, note in tasks.md
 
