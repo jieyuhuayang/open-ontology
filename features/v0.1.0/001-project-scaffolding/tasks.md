@@ -1,6 +1,6 @@
 # Tasks: Project Scaffolding（原子任务清单）
 
-**关联 Plan**: [plan.md](./plan.md)
+**关联 Plan**: [design.md](./design.md)
 **状态**: Done（回溯记录，所有任务已完成）
 
 > ⚠️ **注意**：本文件为事后补写（retroactive）。实际实施顺序可能与列出顺序略有不同。
