@@ -79,7 +79,9 @@ Phase 1 的已实现代码位于 `apps/server/app/` 各层，详见下方"Phase 
 - 新建 `datasets`、`dataset_columns`、`dataset_rows` 三张表存储导入的数据快照
 - Dataset 不进入 Working State（是实际数据，非 schema 元数据）
 - ObjectType 通过现有 `backing_datasource` JSONB 字段引用 Dataset RID：`{"rid": "<dataset_rid>", "name": "...", "type": "mysql|excel|csv"}`
-- `datasets.linked_object_type_rid` 实现唯一性约束：同一 Dataset 只能关联一个 ObjectType（AC-V3, KD-5）
+- **Dataset in-use 判定通过合并计算实现**：扫描已发布 ObjectType 的 `backing_datasource` + Working State 中 CREATE/UPDATE 变更的 `backingDatasource.rid`（排除 DELETE），运行时合并得出哪些 Dataset 正在被使用（AC-V3, KD-5）
+- 同一 Dataset 只能关联一个 ObjectType 的约束改为**运行时校验**：创建/更新 ObjectType 绑定 Dataset 时，检查合并计算结果中是否已有其他 ObjectType 引用该 Dataset
+- Publish 时 `backing_datasource` 随 ObjectType 自然落库；Discard 时无需补偿写——草稿丢弃后合并计算自动排除未发布的引用
 
 ### AD-9: MySQL 连接管理
 
