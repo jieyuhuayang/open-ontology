@@ -24,6 +24,31 @@ from app.storage.ontology_storage import OntologyStorage
 from app.storage.property_storage import PropertyStorage
 from app.storage.working_state_storage import WorkingStateStorage
 
+# Property baseType vs Dataset column inferredType compatibility matrix (AC-V6)
+TYPE_COMPATIBILITY: dict[str, set[str]] = {
+    "string": {
+        "string",
+        "integer",
+        "short",
+        "long",
+        "float",
+        "double",
+        "decimal",
+        "boolean",
+        "date",
+        "timestamp",
+    },
+    "integer": {"integer", "short"},
+    "long": {"integer", "short", "long"},
+    "short": {"short"},
+    "float": {"float"},
+    "double": {"float", "double"},
+    "decimal": {"float", "double", "decimal"},
+    "boolean": {"boolean"},
+    "date": {"date"},
+    "timestamp": {"timestamp", "date"},
+}
+
 
 class WorkingStateService:
     def __init__(self, session: AsyncSession):
