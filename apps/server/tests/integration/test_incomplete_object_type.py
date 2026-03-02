@@ -166,4 +166,4 @@ class TestCompletenessValidationIntegration:
 
         # Publish should succeed
         resp = await seeded_client.post("/api/v1/ontologies/ri.ontology.ontology.default/save")
-        assert resp.status_code == 200
+        assert resp.status_code == 200, f"Publish failed: {resp.json()}"
