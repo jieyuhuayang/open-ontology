@@ -21,6 +21,7 @@ from app.exceptions import AppError
 from app.storage.link_type_storage import LinkTypeStorage
 from app.storage.object_type_storage import ObjectTypeStorage
 from app.storage.ontology_storage import OntologyStorage
+from app.storage.property_storage import PropertyStorage
 from app.storage.working_state_storage import WorkingStateStorage
 
 
