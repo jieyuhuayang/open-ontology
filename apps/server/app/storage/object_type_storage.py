@@ -35,7 +35,11 @@ class ObjectTypeStorage:
 
     @staticmethod
     def _to_dict(model: ObjectType) -> dict:
-        return model.model_dump(mode="json")
+        data = model.model_dump()
+        # JSONB fields need dict/list, not Pydantic model instances
+        if model.icon:
+            data["icon"] = model.icon.model_dump(mode="json")
+        return data
 
     @staticmethod
     async def list_by_ontology(
