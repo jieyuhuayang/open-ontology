@@ -178,6 +178,8 @@ class WorkingStateService:
                 await self._apply_object_type_change(change)
             elif change.resource_type == ResourceType.LINK_TYPE:
                 await self._apply_link_type_change(change)
+            elif change.resource_type == ResourceType.PROPERTY:
+                await self._apply_property_change(change)
 
         # Create change record
         new_version = await OntologyStorage.increment_version(self._session, ontology_rid)
