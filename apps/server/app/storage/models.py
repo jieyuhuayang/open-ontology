@@ -322,7 +322,7 @@ class WorkingStateModel(Base):
         ForeignKey("ontologies.rid", ondelete="CASCADE"),
         nullable=False,
     )
-    changes = Column(JSONB, nullable=False, server_default=func.cast("[]", JSONB))
+    changes = Column(JSONB, nullable=False, server_default=text("'[]'::jsonb"))
     base_version = Column(Integer, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     last_modified_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
