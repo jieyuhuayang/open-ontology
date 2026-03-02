@@ -19,13 +19,18 @@ _import_task_service = ImportTaskService()
 # --- Request models ---
 
 
+def _to_camel(s: str) -> str:
+    parts = s.split("_")
+    return parts[0] + "".join(p.capitalize() for p in parts[1:])
+
+
 class MySQLImportRequest(BaseModel):
     connection_rid: str
     table: str
     dataset_name: str
     selected_columns: list[str] | None = None
 
-    model_config = {"populate_by_name": True, "alias_generator": lambda s: _to_camel(s)}
+    model_config = {"populate_by_name": True, "alias_generator": _to_camel}
 
 
 class FileConfirmRequest(BaseModel):
@@ -36,12 +41,7 @@ class FileConfirmRequest(BaseModel):
     selected_columns: list[str] | None = None
     column_type_overrides: dict[str, str] | None = None
 
-    model_config = {"populate_by_name": True, "alias_generator": lambda s: _to_camel(s)}
-
-
-def _to_camel(s: str) -> str:
-    parts = s.split("_")
-    return parts[0] + "".join(p.capitalize() for p in parts[1:])
+    model_config = {"populate_by_name": True, "alias_generator": _to_camel}
 
 
 # --- Dependencies ---
