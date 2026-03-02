@@ -2,6 +2,11 @@
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.storage.dataset_storage import DatasetStorage
+
+ONTOLOGY_RID = "ri.ontology.ontology.default"
 
 
 async def _create_object_types(client: AsyncClient) -> tuple[str, str]:
@@ -25,6 +30,83 @@ async def _create_object_types(client: AsyncClient) -> tuple[str, str]:
         },
     )
     return resp_a.json()["rid"], resp_b.json()["rid"]
+
+
+async def _create_complete_object_types(
+    client: AsyncClient, db_session: AsyncSession
+) -> tuple[str, str]:
+    """Helper: create two complete OTs (with dataset, properties, PK, TK)."""
+    for name, ds_suffix in [("employee", "emp"), ("company", "comp")]:
+        ds_rid = f"ri.ontology.dataset.{ds_suffix}"
+        await DatasetStorage.create(
+            db_session,
+            dataset_rid=ds_rid,
+            name=f"{name} DS",
+            source_type="csv",
+            source_metadata={},
+            ontology_rid=ONTOLOGY_RID,
+            created_by="default",
+            columns=[
+                {"name": "id", "inferred_type": "integer"},
+                {"name": "name", "inferred_type": "string"},
+            ],
+            rows=[{"id": "1", "name": "A"}],
+        )
+
+    resp_a = await client.post(
+        "/api/v1/object-types",
+        json={
+            "id": "employee",
+            "apiName": "Employee",
+            "displayName": "Employee",
+            "icon": {"name": "user", "color": "#1890ff"},
+            "backingDatasourceRid": "ri.ontology.dataset.emp",
+        },
+    )
+    resp_b = await client.post(
+        "/api/v1/object-types",
+        json={
+            "id": "company",
+            "apiName": "Company",
+            "displayName": "Company",
+            "icon": {"name": "bank", "color": "#1890ff"},
+            "backingDatasourceRid": "ri.ontology.dataset.comp",
+        },
+    )
+    ot_a_rid = resp_a.json()["rid"]
+    ot_b_rid = resp_b.json()["rid"]
+
+    # Add properties and set PK/TK for both OTs
+    for ot_rid, prefix in [(ot_a_rid, "emp"), (ot_b_rid, "comp")]:
+        await client.post(
+            f"/api/v1/object-types/{ot_rid}/properties",
+            json={
+                "id": f"{prefix}-pk",
+                "apiName": f"{prefix}Pk",
+                "displayName": "PK",
+                "baseType": "integer",
+                "backingColumn": "id",
+            },
+        )
+        await client.post(
+            f"/api/v1/object-types/{ot_rid}/properties",
+            json={
+                "id": f"{prefix}-name",
+                "apiName": f"{prefix}Name",
+                "displayName": "Name",
+                "baseType": "string",
+                "backingColumn": "name",
+            },
+        )
+        await client.put(
+            f"/api/v1/object-types/{ot_rid}",
+            json={
+                "primaryKeyPropertyId": f"{prefix}-pk",
+                "titleKeyPropertyId": f"{prefix}-name",
+            },
+        )
+
+    return ot_a_rid, ot_b_rid
 
 
 @pytest.mark.asyncio
