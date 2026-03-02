@@ -92,7 +92,6 @@ class ObjectTypeStorage:
     @staticmethod
     async def create(session: AsyncSession, model: ObjectType) -> ObjectType:
         data = ObjectTypeStorage._to_dict(model)
-        data["icon"] = model.icon.model_dump(mode="json")
         data.pop("aliases", None)
         orm = ObjectTypeModel(**data)
         session.add(orm)
