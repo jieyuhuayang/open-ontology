@@ -363,7 +363,7 @@ class TestLinkTypeCRUD:
 
         from app.storage.models import LinkTypeEndpointModel, LinkTypeModel
 
-        ot_a, ot_b = await _create_object_types(seeded_client)
+        ot_a, ot_b = await _create_complete_object_types(seeded_client, db_session)
 
         await seeded_client.post(
             "/api/v1/link-types",
@@ -375,8 +375,7 @@ class TestLinkTypeCRUD:
             },
         )
 
-        # Also publish OTs first (they're still in draft)
-        pub_resp = await seeded_client.post("/api/v1/ontologies/ri.ontology.ontology.default/save")
+        pub_resp = await seeded_client.post(f"/api/v1/ontologies/{ONTOLOGY_RID}/save")
         assert pub_resp.status_code == 200
 
         # Verify main table
