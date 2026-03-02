@@ -9,6 +9,7 @@ import NotFoundPage from '@/pages/NotFoundPage';
 import ObjectTypeListPage from '@/pages/object-types/ObjectTypeListPage';
 import ObjectTypeDetailLayout from '@/pages/object-types/ObjectTypeDetailLayout';
 import ObjectTypeOverviewPage from '@/pages/object-types/ObjectTypeOverviewPage';
+import ObjectTypePropertiesPage from '@/pages/object-types/ObjectTypePropertiesPage';
 import LinkTypeListPage from '@/pages/link-types/LinkTypeListPage';
 export const routeConfig: RouteObject[] = [
   {
