@@ -353,3 +353,70 @@ class ChangeRecordModel(Base):
     __table_args__ = (
         UniqueConstraint("ontology_rid", "version", name="uq_change_records_ontology_version"),
     )
+
+
+class DatasetModel(Base):
+    __tablename__ = "datasets"
+
+    rid = Column(String, primary_key=True)
+    name = Column(String(255), nullable=False)
+    source_type = Column(String(20), nullable=False)  # mysql | excel | csv
+    source_metadata = Column(JSONB, nullable=False, server_default="'{}'::jsonb")
+    row_count = Column(Integer, nullable=False, server_default="0")
+    column_count = Column(Integer, nullable=False, server_default="0")
+    status = Column(String(20), nullable=False, server_default="'ready'")  # importing | ready
+    imported_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    ontology_rid = Column(String, ForeignKey("ontologies.rid", ondelete="CASCADE"), nullable=False)
+    created_by = Column(String(255), nullable=False)
+
+    columns = relationship(
+        "DatasetColumnModel", back_populates="dataset", cascade="all, delete-orphan"
+    )
+    rows = relationship("DatasetRowModel", back_populates="dataset", cascade="all, delete-orphan")
+
+
+class DatasetColumnModel(Base):
+    __tablename__ = "dataset_columns"
+
+    rid = Column(String, primary_key=True)
+    dataset_rid = Column(String, ForeignKey("datasets.rid", ondelete="CASCADE"), nullable=False)
+    name = Column(String(255), nullable=False)
+    inferred_type = Column(String(50), nullable=False)
+    is_nullable = Column(Boolean, nullable=False, server_default="true")
+    is_primary_key = Column(Boolean, nullable=False, server_default="false")
+    sort_order = Column(Integer, nullable=False, server_default="0")
+
+    dataset = relationship("DatasetModel", back_populates="columns")
+
+    __table_args__ = (UniqueConstraint("dataset_rid", "name", name="uq_dataset_columns_name"),)
+
+
+class DatasetRowModel(Base):
+    __tablename__ = "dataset_rows"
+
+    dataset_rid = Column(
+        String, ForeignKey("datasets.rid", ondelete="CASCADE"), nullable=False, primary_key=True
+    )
+    row_index = Column(Integer, nullable=False, primary_key=True)
+    data = Column(JSONB, nullable=False)
+
+    dataset = relationship("DatasetModel", back_populates="rows")
+
+    __table_args__ = (Index("ix_dataset_rows_dataset", "dataset_rid"),)
+
+
+class MySQLConnectionModel(Base):
+    __tablename__ = "mysql_connections"
+
+    rid = Column(String, primary_key=True)
+    name = Column(String(255), nullable=False)
+    host = Column(String(255), nullable=False)
+    port = Column(Integer, nullable=False, server_default="3306")
+    database_name = Column(String(255), nullable=False)
+    username = Column(String(255), nullable=False)
+    encrypted_password = Column(Text, nullable=False)
+    ssl_enabled = Column(Boolean, nullable=False, server_default="false")
+    ontology_rid = Column(String, ForeignKey("ontologies.rid", ondelete="CASCADE"), nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    created_by = Column(String(255), nullable=False)
+    last_used_at = Column(DateTime(timezone=True), nullable=True)
