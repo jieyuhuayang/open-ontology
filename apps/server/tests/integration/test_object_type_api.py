@@ -27,8 +27,8 @@ class TestObjectTypeCRUD:
         assert data["id"] == "employee"
         assert data["apiName"] == "Employee"
 
-    async def test_create_duplicate_id_returns_409(self, seeded_client: AsyncClient):
-        """AC2: Duplicate id → 409."""
+    async def test_create_duplicate_id_auto_deduplicates(self, seeded_client: AsyncClient):
+        """AD-11: Duplicate id → auto-appends suffix for uniqueness."""
         payload = {
             "id": "dup-id",
             "apiName": "DupIdA",
@@ -40,11 +40,12 @@ class TestObjectTypeCRUD:
 
         payload["apiName"] = "DupIdB"  # different apiName, same id
         resp2 = await seeded_client.post("/api/v1/object-types", json=payload)
-        assert resp2.status_code == 409
-        assert resp2.json()["error"]["code"] == "OBJECT_TYPE_ID_CONFLICT"
+        assert resp2.status_code == 201
+        # ID should be auto-deduplicated with suffix
+        assert resp2.json()["id"] != resp1.json()["id"]
 
-    async def test_create_duplicate_api_name_returns_409(self, seeded_client: AsyncClient):
-        """AC2: Duplicate apiName → 409."""
+    async def test_create_duplicate_api_name_auto_deduplicates(self, seeded_client: AsyncClient):
+        """AD-11: Duplicate apiName → auto-appends suffix for uniqueness."""
         await seeded_client.post(
             "/api/v1/object-types",
             json={
@@ -63,8 +64,9 @@ class TestObjectTypeCRUD:
                 "icon": {"name": "box", "color": "#000"},
             },
         )
-        assert resp.status_code == 409
-        assert resp.json()["error"]["code"] == "OBJECT_TYPE_API_NAME_CONFLICT"
+        assert resp.status_code == 201
+        # apiName should be auto-deduplicated with suffix
+        assert resp.json()["apiName"] != "DupName"
 
     async def test_list_with_pagination(self, seeded_client: AsyncClient):
         """AC4: List + pagination."""
