@@ -49,7 +49,21 @@ _test_session_factory = async_sessionmaker(_test_engine, expire_on_commit=False)
 @pytest.fixture
 async def db_session() -> AsyncGenerator[AsyncSession]:
     """Real async DB session wrapped in a transaction that rolls back after each test."""
+    from sqlalchemy import text
+
     async with _test_engine.begin() as conn:
+        # Drop all tables first (clean slate)
+        await conn.run_sync(Base.metadata.drop_all)
+        # Drop ENUM types that SQLAlchemy create_all checks for
+        for enum_name in [
+            "resource_status",
+            "visibility",
+            "cardinality",
+            "join_method",
+            "link_side",
+            "property_base_type",
+        ]:
+            await conn.execute(text(f"DROP TYPE IF EXISTS {enum_name} CASCADE"))
         await conn.run_sync(Base.metadata.create_all)
 
     async with _test_session_factory() as session:
