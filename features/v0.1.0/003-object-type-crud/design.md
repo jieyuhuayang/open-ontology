@@ -599,7 +599,7 @@ class ObjectType(DomainModel):
 # --- 修改 ObjectTypeCreateRequest ---
 
 class ObjectTypeCreateRequest(DomainModel):
-    display_name: str                           # 唯一必填
+    display_name: str | None = None             # 可选，为空时生成占位名 "Untitled Object Type xxxx"
     id: str | None = None                       # 可选，为空时自动推断
     api_name: str | None = None                 # 可选，为空时自动推断
     plural_display_name: str | None = None
@@ -607,6 +607,7 @@ class ObjectTypeCreateRequest(DomainModel):
     icon: Icon | None = None                    # 可选，为空时使用默认图标
     intended_actions: list[str] | None = None   # 新增
     backing_datasource_rid: str | None = None   # 新增: 关联的 Dataset RID
+    project_rid: str | None = None              # 新增: 保存位置，为空回退 AD-5 默认值
 
 
 # --- 修改 ObjectTypeUpdateRequest ---
