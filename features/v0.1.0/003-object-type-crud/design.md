@@ -919,7 +919,11 @@ class ObjectTypeUpdateRequest(DomainModel):
 #### POST /api/v1/object-types — 不完整创建
 
 ```jsonc
-// 最小请求（仅 displayName）
+// 最小请求（空 body，displayName 自动生成占位名）
+{}
+// 服务端自动生成: displayName="Untitled Object Type a3b2", id="untitled-object-type-a3b2", apiName="UntitledObjectTypeA3b2"
+
+// 仅 displayName
 {
   "displayName": "Employee"
   // id, apiName 自动推断为 "employee" 和 "Employee"
@@ -934,7 +938,8 @@ class ObjectTypeUpdateRequest(DomainModel):
   "description": "Company employees",
   "icon": { "name": "person", "color": "#4A90D9" },
   "intendedActions": ["create", "modify", "delete"],
-  "backingDatasourceRid": "ri.ontology.dataset.xyz789"
+  "backingDatasourceRid": "ri.ontology.dataset.xyz789",
+  "projectRid": "ri.ontology.space.default"
 }
 ```
 
