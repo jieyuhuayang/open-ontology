@@ -52,7 +52,7 @@ async def _create_complete_ot(
             "backingColumn": "id",
         },
     )
-    assert pk_resp.status_code == 201
+    assert pk_resp.status_code == 201, f"Property create failed: {pk_resp.json()}"
 
     tk_resp = await client.post(
         f"/api/v1/object-types/{ot_rid}/properties",
