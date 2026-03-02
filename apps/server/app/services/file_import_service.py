@@ -21,11 +21,13 @@ _import_task_service = ImportTaskService()
 
 _ALLOWED_EXTENSIONS = {".csv", ".xlsx", ".xls"}
 
+# Module-level preview cache so file tokens persist across request instances
+_previews: dict[str, dict] = {}
+
 
 class FileImportService:
     def __init__(self, session: AsyncSession):
         self._session = session
-        self._previews: dict[str, dict] = {}  # file_token → preview data
 
     async def upload_and_preview(
         self,
