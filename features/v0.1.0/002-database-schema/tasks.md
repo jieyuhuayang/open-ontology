@@ -1,6 +1,6 @@
 # Tasks: Database Schema（原子任务清单）
 
-**关联 Plan**: [plan.md](./plan.md)
+**关联 Plan**: [design.md](./design.md)
 **状态**: Done
 
 > ⚠️ **注意**：本文件为事后补写（retroactive）。所有任务均已完成。
