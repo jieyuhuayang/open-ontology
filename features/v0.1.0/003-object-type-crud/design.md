@@ -194,14 +194,13 @@ CREATE TABLE dataset_columns (
 
 ```sql
 CREATE TABLE dataset_rows (
-    id          BIGSERIAL PRIMARY KEY,
     dataset_rid TEXT      NOT NULL REFERENCES datasets(rid) ON DELETE CASCADE,
     row_index   INTEGER   NOT NULL,
     data        JSONB     NOT NULL,  -- {"column_name": value, ...}
-    CONSTRAINT uq_dataset_rows_index UNIQUE (dataset_rid, row_index)
+    PRIMARY KEY (dataset_rid, row_index)
 );
 
-CREATE INDEX ix_dataset_rows_dataset ON dataset_rows(dataset_rid, row_index);
+CREATE INDEX ix_dataset_rows_dataset ON dataset_rows(dataset_rid);
 ```
 
 #### `mysql_connections` — MySQL 连接配置
