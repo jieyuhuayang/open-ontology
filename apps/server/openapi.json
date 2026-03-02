@@ -244,6 +244,514 @@
         }
       }
     },
+    "/api/v1/object-types/{object_type_rid}/properties": {
+      "get": {
+        "tags": [
+          "properties"
+        ],
+        "summary": "List Properties",
+        "operationId": "list_properties_api_v1_object_types__object_type_rid__properties_get",
+        "parameters": [
+          {
+            "name": "object_type_rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Object Type Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "properties"
+        ],
+        "summary": "Create Property",
+        "operationId": "create_property_api_v1_object_types__object_type_rid__properties_post",
+        "parameters": [
+          {
+            "name": "object_type_rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Object Type Rid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertyCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyWithChangeState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/object-types/{object_type_rid}/properties/sort-order": {
+      "put": {
+        "tags": [
+          "properties"
+        ],
+        "summary": "Reorder Properties",
+        "operationId": "reorder_properties_api_v1_object_types__object_type_rid__properties_sort_order_put",
+        "parameters": [
+          {
+            "name": "object_type_rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Object Type Rid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertySortOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/object-types/{object_type_rid}/properties/{rid}": {
+      "put": {
+        "tags": [
+          "properties"
+        ],
+        "summary": "Update Property",
+        "operationId": "update_property_api_v1_object_types__object_type_rid__properties__rid__put",
+        "parameters": [
+          {
+            "name": "object_type_rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Object Type Rid"
+            }
+          },
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertyUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyWithChangeState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "properties"
+        ],
+        "summary": "Delete Property",
+        "operationId": "delete_property_api_v1_object_types__object_type_rid__properties__rid__delete",
+        "parameters": [
+          {
+            "name": "object_type_rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Object Type Rid"
+            }
+          },
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/link-types": {
+      "get": {
+        "tags": [
+          "link-types"
+        ],
+        "summary": "List Link Types",
+        "operationId": "list_link_types_api_v1_link_types_get",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Pagesize"
+            }
+          },
+          {
+            "name": "objectTypeRid",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Objecttyperid"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "visibility",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Visibility"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkTypeListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "link-types"
+        ],
+        "summary": "Create Link Type",
+        "operationId": "create_link_type_api_v1_link_types_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkTypeCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkTypeWithChangeState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/link-types/{rid}": {
+      "get": {
+        "tags": [
+          "link-types"
+        ],
+        "summary": "Get Link Type",
+        "operationId": "get_link_type_api_v1_link_types__rid__get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkTypeWithChangeState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "link-types"
+        ],
+        "summary": "Update Link Type",
+        "operationId": "update_link_type_api_v1_link_types__rid__put",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkTypeUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkTypeWithChangeState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "link-types"
+        ],
+        "summary": "Delete Link Type",
+        "operationId": "delete_link_type_api_v1_link_types__rid__delete",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/ontologies/{rid}/save": {
       "post": {
         "tags": [
@@ -360,10 +868,629 @@
           }
         }
       }
+    },
+    "/api/v1/datasets": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "List Datasets",
+        "operationId": "list_datasets_api_v1_datasets_get",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{rid}": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Get Dataset",
+        "operationId": "get_dataset_api_v1_datasets__rid__get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dataset"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Delete Dataset",
+        "operationId": "delete_dataset_api_v1_datasets__rid__delete",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{rid}/preview": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Get Dataset Preview",
+        "operationId": "get_dataset_preview_api_v1_datasets__rid__preview_get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetPreviewResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mysql-connections": {
+      "get": {
+        "tags": [
+          "mysql-connections"
+        ],
+        "summary": "List Connections",
+        "operationId": "list_connections_api_v1_mysql_connections_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MySQLConnection"
+                  },
+                  "type": "array",
+                  "title": "Response List Connections Api V1 Mysql Connections Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "mysql-connections"
+        ],
+        "summary": "Save Connection",
+        "operationId": "save_connection_api_v1_mysql_connections_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MySQLConnectionCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MySQLConnection"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mysql-connections/test": {
+      "post": {
+        "tags": [
+          "mysql-connections"
+        ],
+        "summary": "Test Connection",
+        "operationId": "test_connection_api_v1_mysql_connections_test_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MySQLConnectionTestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mysql-connections/{rid}/tables": {
+      "get": {
+        "tags": [
+          "mysql-connections"
+        ],
+        "summary": "Browse Tables",
+        "operationId": "browse_tables_api_v1_mysql_connections__rid__tables_get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MySQLTableInfo"
+                  },
+                  "title": "Response Browse Tables Api V1 Mysql Connections  Rid  Tables Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mysql-connections/{rid}/tables/{table}/columns": {
+      "get": {
+        "tags": [
+          "mysql-connections"
+        ],
+        "summary": "Get Table Columns",
+        "operationId": "get_table_columns_api_v1_mysql_connections__rid__tables__table__columns_get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          },
+          {
+            "name": "table",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Table"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MySQLColumnInfo"
+                  },
+                  "title": "Response Get Table Columns Api V1 Mysql Connections  Rid  Tables  Table  Columns Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mysql-connections/{rid}/tables/{table}/preview": {
+      "get": {
+        "tags": [
+          "mysql-connections"
+        ],
+        "summary": "Preview Table",
+        "operationId": "preview_table_api_v1_mysql_connections__rid__tables__table__preview_get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          },
+          {
+            "name": "table",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Table"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MySQLTablePreview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/import/mysql": {
+      "post": {
+        "tags": [
+          "imports"
+        ],
+        "summary": "Start Mysql Import",
+        "operationId": "start_mysql_import_api_v1_datasets_import_mysql_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MySQLImportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportTask"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/upload/preview": {
+      "post": {
+        "tags": [
+          "imports"
+        ],
+        "summary": "Upload Preview",
+        "operationId": "upload_preview_api_v1_datasets_upload_preview_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_preview_api_v1_datasets_upload_preview_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/upload/confirm": {
+      "post": {
+        "tags": [
+          "imports"
+        ],
+        "summary": "Upload Confirm",
+        "operationId": "upload_confirm_api_v1_datasets_upload_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileConfirmRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportTask"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/import-tasks/{task_id}": {
+      "get": {
+        "tags": [
+          "imports"
+        ],
+        "summary": "Get Import Task",
+        "operationId": "get_import_task_api_v1_import_tasks__task_id__get",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportTask"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "Body_upload_preview_api_v1_datasets_upload_preview_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_preview_api_v1_datasets_upload_preview_post"
+      },
+      "Cardinality": {
+        "type": "string",
+        "enum": [
+          "one-to-one",
+          "one-to-many",
+          "many-to-one"
+        ],
+        "title": "Cardinality"
+      },
       "Change": {
         "properties": {
           "id": {
@@ -493,6 +1620,286 @@
         ],
         "title": "ChangeType"
       },
+      "Dataset": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "sourceType": {
+            "type": "string",
+            "title": "Sourcetype"
+          },
+          "sourceMetadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Sourcemetadata"
+          },
+          "rowCount": {
+            "type": "integer",
+            "title": "Rowcount",
+            "default": 0
+          },
+          "columnCount": {
+            "type": "integer",
+            "title": "Columncount",
+            "default": 0
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "ready"
+          },
+          "importedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Importedat"
+          },
+          "ontologyRid": {
+            "type": "string",
+            "title": "Ontologyrid"
+          },
+          "createdBy": {
+            "type": "string",
+            "title": "Createdby"
+          },
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetColumn"
+            },
+            "type": "array",
+            "title": "Columns",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "name",
+          "sourceType",
+          "sourceMetadata",
+          "importedAt",
+          "ontologyRid",
+          "createdBy"
+        ],
+        "title": "Dataset"
+      },
+      "DatasetColumn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "inferredType": {
+            "type": "string",
+            "title": "Inferredtype"
+          },
+          "isNullable": {
+            "type": "boolean",
+            "title": "Isnullable",
+            "default": true
+          },
+          "isPrimaryKey": {
+            "type": "boolean",
+            "title": "Isprimarykey",
+            "default": false
+          },
+          "sortOrder": {
+            "type": "integer",
+            "title": "Sortorder",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "inferredType"
+        ],
+        "title": "DatasetColumn"
+      },
+      "DatasetListItem": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "sourceType": {
+            "type": "string",
+            "title": "Sourcetype"
+          },
+          "rowCount": {
+            "type": "integer",
+            "title": "Rowcount"
+          },
+          "columnCount": {
+            "type": "integer",
+            "title": "Columncount"
+          },
+          "importedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Importedat"
+          },
+          "inUse": {
+            "type": "boolean",
+            "title": "Inuse",
+            "default": false
+          },
+          "linkedObjectTypeName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Linkedobjecttypename"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "name",
+          "sourceType",
+          "rowCount",
+          "columnCount",
+          "importedAt"
+        ],
+        "title": "DatasetListItem",
+        "description": "List item with in_use computed via merged calculation."
+      },
+      "DatasetListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetListItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "DatasetListResponse"
+      },
+      "DatasetPreviewResponse": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetColumn"
+            },
+            "type": "array",
+            "title": "Columns"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "totalRows": {
+            "type": "integer",
+            "title": "Totalrows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "name",
+          "columns",
+          "rows",
+          "totalRows"
+        ],
+        "title": "DatasetPreviewResponse"
+      },
+      "FileConfirmRequest": {
+        "properties": {
+          "fileToken": {
+            "type": "string",
+            "title": "Filetoken"
+          },
+          "datasetName": {
+            "type": "string",
+            "title": "Datasetname"
+          },
+          "sheetName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheetname"
+          },
+          "hasHeader": {
+            "type": "boolean",
+            "title": "Hasheader",
+            "default": true
+          },
+          "selectedColumns": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selectedcolumns"
+          },
+          "columnTypeOverrides": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Columntypeoverrides"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fileToken",
+          "datasetName"
+        ],
+        "title": "FileConfirmRequest"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -524,19 +1931,713 @@
         ],
         "title": "Icon"
       },
-      "ObjectTypeCreateRequest": {
+      "ImportTask": {
         "properties": {
-          "id": {
+          "taskId": {
             "type": "string",
-            "title": "Id"
+            "title": "Taskid"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ImportTaskStatus",
+            "default": "pending"
+          },
+          "datasetRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Datasetrid"
+          },
+          "rowCount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rowcount"
+          },
+          "columnCount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Columncount"
+          },
+          "durationMs": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Durationms"
+          },
+          "errorCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Errorcode"
+          },
+          "errorMessage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Errormessage"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "taskId",
+          "createdAt"
+        ],
+        "title": "ImportTask"
+      },
+      "ImportTaskStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "running",
+          "completed",
+          "failed"
+        ],
+        "title": "ImportTaskStatus"
+      },
+      "JoinMethod": {
+        "type": "string",
+        "enum": [
+          "foreign-key"
+        ],
+        "title": "JoinMethod"
+      },
+      "LinkSide": {
+        "properties": {
+          "objectTypeRid": {
+            "type": "string",
+            "title": "Objecttyperid"
+          },
+          "displayName": {
+            "type": "string",
+            "title": "Displayname"
           },
           "apiName": {
             "type": "string",
             "title": "Apiname"
           },
+          "visibility": {
+            "$ref": "#/components/schemas/Visibility",
+            "default": "normal"
+          },
+          "objectTypeDisplayName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Objecttypedisplayname"
+          }
+        },
+        "type": "object",
+        "required": [
+          "objectTypeRid",
+          "displayName",
+          "apiName"
+        ],
+        "title": "LinkSide"
+      },
+      "LinkSideCreateInput": {
+        "properties": {
+          "objectTypeRid": {
+            "type": "string",
+            "title": "Objecttyperid"
+          },
           "displayName": {
             "type": "string",
             "title": "Displayname"
+          },
+          "apiName": {
+            "type": "string",
+            "title": "Apiname"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/Visibility",
+            "default": "normal"
+          }
+        },
+        "type": "object",
+        "required": [
+          "objectTypeRid",
+          "displayName",
+          "apiName"
+        ],
+        "title": "LinkSideCreateInput"
+      },
+      "LinkSideUpdateInput": {
+        "properties": {
+          "displayName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Displayname"
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Visibility"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "LinkSideUpdateInput"
+      },
+      "LinkTypeCreateRequest": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "sideA": {
+            "$ref": "#/components/schemas/LinkSideCreateInput"
+          },
+          "sideB": {
+            "$ref": "#/components/schemas/LinkSideCreateInput"
+          },
+          "cardinality": {
+            "$ref": "#/components/schemas/Cardinality"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResourceStatus",
+            "default": "experimental"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "sideA",
+          "sideB",
+          "cardinality"
+        ],
+        "title": "LinkTypeCreateRequest"
+      },
+      "LinkTypeListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LinkTypeWithChangeState"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "pageSize": {
+            "type": "integer",
+            "title": "Pagesize"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
+        "title": "LinkTypeListResponse"
+      },
+      "LinkTypeUpdateRequest": {
+        "properties": {
+          "sideA": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LinkSideUpdateInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sideB": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LinkSideUpdateInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cardinality": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Cardinality"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResourceStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "LinkTypeUpdateRequest"
+      },
+      "LinkTypeWithChangeState": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "sideA": {
+            "$ref": "#/components/schemas/LinkSide"
+          },
+          "sideB": {
+            "$ref": "#/components/schemas/LinkSide"
+          },
+          "cardinality": {
+            "$ref": "#/components/schemas/Cardinality"
+          },
+          "joinMethod": {
+            "$ref": "#/components/schemas/JoinMethod",
+            "default": "foreign-key"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResourceStatus",
+            "default": "experimental"
+          },
+          "projectRid": {
+            "type": "string",
+            "title": "Projectrid"
+          },
+          "ontologyRid": {
+            "type": "string",
+            "title": "Ontologyrid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "createdBy": {
+            "type": "string",
+            "title": "Createdby"
+          },
+          "lastModifiedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Lastmodifiedat"
+          },
+          "lastModifiedBy": {
+            "type": "string",
+            "title": "Lastmodifiedby"
+          },
+          "changeState": {
+            "$ref": "#/components/schemas/ChangeState",
+            "default": "published"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "id",
+          "sideA",
+          "sideB",
+          "cardinality",
+          "projectRid",
+          "ontologyRid",
+          "createdAt",
+          "createdBy",
+          "lastModifiedAt",
+          "lastModifiedBy"
+        ],
+        "title": "LinkTypeWithChangeState",
+        "description": "LinkType with change state annotation for merged view."
+      },
+      "MySQLColumnInfo": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "dataType": {
+            "type": "string",
+            "title": "Datatype"
+          },
+          "isNullable": {
+            "type": "boolean",
+            "title": "Isnullable"
+          },
+          "isPrimaryKey": {
+            "type": "boolean",
+            "title": "Isprimarykey"
+          },
+          "inferredPropertyType": {
+            "type": "string",
+            "title": "Inferredpropertytype"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "dataType",
+          "isNullable",
+          "isPrimaryKey",
+          "inferredPropertyType"
+        ],
+        "title": "MySQLColumnInfo"
+      },
+      "MySQLConnection": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "host": {
+            "type": "string",
+            "title": "Host"
+          },
+          "port": {
+            "type": "integer",
+            "title": "Port",
+            "default": 3306
+          },
+          "databaseName": {
+            "type": "string",
+            "title": "Databasename"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "sslEnabled": {
+            "type": "boolean",
+            "title": "Sslenabled",
+            "default": false
+          },
+          "ontologyRid": {
+            "type": "string",
+            "title": "Ontologyrid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "createdBy": {
+            "type": "string",
+            "title": "Createdby"
+          },
+          "lastUsedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lastusedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "name",
+          "host",
+          "databaseName",
+          "username",
+          "ontologyRid",
+          "createdAt",
+          "createdBy"
+        ],
+        "title": "MySQLConnection"
+      },
+      "MySQLConnectionCreateRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "host": {
+            "type": "string",
+            "title": "Host"
+          },
+          "port": {
+            "type": "integer",
+            "title": "Port",
+            "default": 3306
+          },
+          "databaseName": {
+            "type": "string",
+            "title": "Databasename"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "sslEnabled": {
+            "type": "boolean",
+            "title": "Sslenabled",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "host",
+          "databaseName",
+          "username",
+          "password"
+        ],
+        "title": "MySQLConnectionCreateRequest"
+      },
+      "MySQLConnectionTestRequest": {
+        "properties": {
+          "host": {
+            "type": "string",
+            "title": "Host"
+          },
+          "port": {
+            "type": "integer",
+            "title": "Port",
+            "default": 3306
+          },
+          "databaseName": {
+            "type": "string",
+            "title": "Databasename"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "sslEnabled": {
+            "type": "boolean",
+            "title": "Sslenabled",
+            "default": false
+          },
+          "connectionRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connectionrid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "host",
+          "databaseName",
+          "username",
+          "password"
+        ],
+        "title": "MySQLConnectionTestRequest",
+        "description": "Test connection request (not saved)."
+      },
+      "MySQLImportRequest": {
+        "properties": {
+          "connectionRid": {
+            "type": "string",
+            "title": "Connectionrid"
+          },
+          "table": {
+            "type": "string",
+            "title": "Table"
+          },
+          "datasetName": {
+            "type": "string",
+            "title": "Datasetname"
+          },
+          "selectedColumns": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selectedcolumns"
+          }
+        },
+        "type": "object",
+        "required": [
+          "connectionRid",
+          "table",
+          "datasetName"
+        ],
+        "title": "MySQLImportRequest"
+      },
+      "MySQLTableInfo": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "rowCount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rowcount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "MySQLTableInfo"
+      },
+      "MySQLTablePreview": {
+        "properties": {
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/MySQLColumnInfo"
+            },
+            "type": "array",
+            "title": "Columns"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "totalRows": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Totalrows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "columns",
+          "rows"
+        ],
+        "title": "MySQLTablePreview"
+      },
+      "ObjectTypeCreateRequest": {
+        "properties": {
+          "displayName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Displayname"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "apiName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apiname"
           },
           "pluralDisplayName": {
             "anyOf": [
@@ -561,16 +2662,53 @@
             "title": "Description"
           },
           "icon": {
-            "$ref": "#/components/schemas/Icon"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Icon"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "intendedActions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intendedactions"
+          },
+          "backingDatasourceRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backingdatasourcerid"
+          },
+          "projectRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Projectrid"
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "apiName",
-          "displayName",
-          "icon"
-        ],
         "title": "ObjectTypeCreateRequest"
       },
       "ObjectTypeListResponse": {
@@ -679,6 +2817,53 @@
               }
             ],
             "title": "Apiname"
+          },
+          "intendedActions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intendedactions"
+          },
+          "backingDatasourceRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backingdatasourcerid"
+          },
+          "primaryKeyPropertyId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primarykeypropertyid"
+          },
+          "titleKeyPropertyId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Titlekeypropertyid"
           }
         },
         "type": "object",
@@ -769,6 +2954,20 @@
             ],
             "title": "Titlekeypropertyid"
           },
+          "intendedActions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intendedactions"
+          },
           "projectRid": {
             "type": "string",
             "title": "Projectrid"
@@ -817,6 +3016,371 @@
         "title": "ObjectTypeWithChangeState",
         "description": "ObjectType with change state annotation for merged view."
       },
+      "PropertyCreateRequest": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "apiName": {
+            "type": "string",
+            "title": "Apiname"
+          },
+          "displayName": {
+            "type": "string",
+            "title": "Displayname"
+          },
+          "baseType": {
+            "type": "string",
+            "title": "Basetype"
+          },
+          "arrayInnerType": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arrayinnertype"
+          },
+          "structSchema": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/StructField"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Structschema"
+          },
+          "backingColumn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backingcolumn"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResourceStatus",
+            "default": "experimental"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/Visibility",
+            "default": "normal"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "apiName",
+          "displayName",
+          "baseType"
+        ],
+        "title": "PropertyCreateRequest"
+      },
+      "PropertyListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PropertyWithChangeState"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "PropertyListResponse"
+      },
+      "PropertySortOrderItem": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "title": "Sortorder"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "sortOrder"
+        ],
+        "title": "PropertySortOrderItem"
+      },
+      "PropertySortOrderRequest": {
+        "properties": {
+          "propertyOrders": {
+            "items": {
+              "$ref": "#/components/schemas/PropertySortOrderItem"
+            },
+            "type": "array",
+            "title": "Propertyorders"
+          }
+        },
+        "type": "object",
+        "required": [
+          "propertyOrders"
+        ],
+        "title": "PropertySortOrderRequest"
+      },
+      "PropertyUpdateRequest": {
+        "properties": {
+          "displayName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Displayname"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "apiName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apiname"
+          },
+          "backingColumn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backingcolumn"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResourceStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Visibility"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isPrimaryKey": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Isprimarykey"
+          },
+          "isTitleKey": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Istitlekey"
+          }
+        },
+        "type": "object",
+        "title": "PropertyUpdateRequest"
+      },
+      "PropertyWithChangeState": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "apiName": {
+            "type": "string",
+            "title": "Apiname"
+          },
+          "objectTypeRid": {
+            "type": "string",
+            "title": "Objecttyperid"
+          },
+          "displayName": {
+            "type": "string",
+            "title": "Displayname"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "baseType": {
+            "type": "string",
+            "title": "Basetype"
+          },
+          "arrayInnerType": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arrayinnertype"
+          },
+          "structSchema": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/StructField"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Structschema"
+          },
+          "backingColumn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backingcolumn"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResourceStatus",
+            "default": "experimental"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/Visibility",
+            "default": "normal"
+          },
+          "isPrimaryKey": {
+            "type": "boolean",
+            "title": "Isprimarykey",
+            "default": false
+          },
+          "isTitleKey": {
+            "type": "boolean",
+            "title": "Istitlekey",
+            "default": false
+          },
+          "sortOrder": {
+            "type": "integer",
+            "title": "Sortorder",
+            "default": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "createdBy": {
+            "type": "string",
+            "title": "Createdby"
+          },
+          "lastModifiedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Lastmodifiedat"
+          },
+          "lastModifiedBy": {
+            "type": "string",
+            "title": "Lastmodifiedby"
+          },
+          "changeState": {
+            "$ref": "#/components/schemas/ChangeState",
+            "default": "published"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "id",
+          "apiName",
+          "objectTypeRid",
+          "displayName",
+          "baseType",
+          "createdAt",
+          "createdBy",
+          "lastModifiedAt",
+          "lastModifiedBy"
+        ],
+        "title": "PropertyWithChangeState",
+        "description": "Property with change state annotation for merged view."
+      },
       "ResourceStatus": {
         "type": "string",
         "enum": [
@@ -834,6 +3398,24 @@
           "LinkType"
         ],
         "title": "ResourceType"
+      },
+      "StructField": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "type"
+        ],
+        "title": "StructField"
       },
       "ValidationError": {
         "properties": {
