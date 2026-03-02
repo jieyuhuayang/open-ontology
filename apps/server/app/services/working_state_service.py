@@ -276,6 +276,35 @@ class WorkingStateService:
         elif change.change_type == ChangeType.DELETE:
             await LinkTypeStorage.delete(self._session, change.resource_rid)
 
+    async def _apply_property_change(self, change: Change) -> None:
+        if change.change_type == ChangeType.CREATE:
+            data = change.after or {}
+            prop = Property.model_validate(data)
+            await PropertyStorage.create(self._session, prop)
+        elif change.change_type == ChangeType.UPDATE:
+            after = change.after or {}
+            update_data: dict = {}
+            key_map = {
+                "displayName": "display_name",
+                "description": "description",
+                "apiName": "api_name",
+                "backingColumn": "backing_column",
+                "status": "status",
+                "visibility": "visibility",
+                "isPrimaryKey": "is_primary_key",
+                "isTitleKey": "is_title_key",
+                "sortOrder": "sort_order",
+                "lastModifiedAt": "last_modified_at",
+                "lastModifiedBy": "last_modified_by",
+            }
+            for camel_key, snake_key in key_map.items():
+                if camel_key in after:
+                    update_data[snake_key] = after[camel_key]
+            if update_data:
+                await PropertyStorage.update(self._session, change.resource_rid, update_data)
+        elif change.change_type == ChangeType.DELETE:
+            await PropertyStorage.delete(self._session, change.resource_rid)
+
     async def discard(self, ontology_rid: str) -> None:
         ws = await self._get_working_state(ontology_rid)
         if not ws:
