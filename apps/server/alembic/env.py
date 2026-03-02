@@ -30,7 +30,12 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection):
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        include_schemas=False,
+        render_as_batch=False,
+    )
     with context.begin_transaction():
         context.run_migrations()
 
