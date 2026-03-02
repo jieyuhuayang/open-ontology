@@ -78,7 +78,7 @@ class FileImportService:
             )
 
         # Store preview data for confirm step
-        self._previews[file_token] = {
+        _previews[file_token] = {
             "path": temp_path,
             "ext": ext,
             "filename": filename,
@@ -237,7 +237,7 @@ class FileImportService:
         selected_columns: list[str] | None = None,
         column_type_overrides: dict[str, str] | None = None,
     ) -> ImportTask:
-        preview_data = self._previews.get(file_token)
+        preview_data = _previews.get(file_token)
         if not preview_data:
             raise AppError(
                 code="FILE_TOKEN_EXPIRED",
