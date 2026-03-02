@@ -70,7 +70,7 @@ class WorkingStateService:
     async def get_merged_view(self, ontology_rid: str, resource_type: str) -> list
 ```
 
-> 此接口为概念性设计，具体参数和返回类型在 plan.md 中细化。
+> 此接口为概念性设计，具体参数和返回类型在 design.md 中细化。
 
 ---
 
