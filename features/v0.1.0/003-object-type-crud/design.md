@@ -141,10 +141,10 @@ CREATE TABLE datasets (
     source_metadata         JSONB        NOT NULL DEFAULT '{}'::jsonb,
     row_count               INTEGER      NOT NULL DEFAULT 0,
     column_count            INTEGER      NOT NULL DEFAULT 0,
+    status                  VARCHAR(20)  NOT NULL DEFAULT 'ready',  -- 'importing' | 'ready'
     imported_at             TIMESTAMPTZ  NOT NULL DEFAULT now(),
     ontology_rid            TEXT         NOT NULL REFERENCES ontologies(rid) ON DELETE CASCADE,
     created_by              VARCHAR(255) NOT NULL,
-    linked_object_type_rid  TEXT         UNIQUE,  -- 唯一性约束: 1 Dataset ↔ 1 ObjectType
     CONSTRAINT fk_datasets_ontology FOREIGN KEY (ontology_rid) REFERENCES ontologies(rid)
 );
 ```
