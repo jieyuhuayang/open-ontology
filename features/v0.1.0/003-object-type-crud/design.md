@@ -1,403 +1,1311 @@
-# Plan: Object Type CRUD（对象类型增删改查）
+# 技术方案: Object Type CRUD（对象类型增删改查）— 扩展版
 
 **关联 Spec**: `features/v0.1.0/003-object-type-crud/spec.md`
 **架构参考**: `docs/architecture/02-domain-model.md`, `docs/specs/object-type-metadata.md`
 
 ---
 
-## Context
+## 实施状态
 
-MVP 需要对象类型（ObjectType）的完整 CRUD 后端能力。所有写操作通过 WorkingState 草稿机制（F009）写入，查询返回已发布 + 草稿的合并视图。F009 尚无 plan/tasks，本方案将 F009 核心逻辑作为 Phase 1 一并实现，避免 stub 浪费。
+本方案分为两个阶段：
 
-**已就绪**: F002 数据库表结构（8 张表 + ORM 模型 + 种子数据）、FastAPI 脚手架（错误处理、session 管理、RID 生成）。
+| 阶段 | 内容 | 状态 |
+|------|------|------|
+| Phase 1 | ObjectType CRUD + WorkingState + 变更合并 | ✅ 已实现 |
+| Phase 2 | Dataset 管理 + MySQL 导入 + Excel/CSV 上传 + 不完整创建 + 完整性校验 + intended_actions | 🆕 待实现 |
 
----
-
-## 架构决策
-
-### AD-1: F009 与 F003a 合并实施
-
-WorkingStateService 作为 F003a 的前置 Phase 实现。实施顺序：
-1. Domain 模型（Change、WorkingState、ObjectType Pydantic 模型）
-2. Storage 层（working_state_storage、object_type_storage、ontology_storage）
-3. WorkingStateService（变更写入、合并视图、发布/丢弃）
-4. ObjectTypeService（CRUD 业务逻辑，调用 WorkingStateService）
-5. Router 层 + 注册
-
-### AD-2: 合并视图在应用层实现
-
-MVP 数据量 < 10,000 条，Python 层合并足够（< 200ms）。逻辑：
-1. 查询 `object_types` 主表获取已发布资源
-2. 从 `working_states.changes` 中过滤对应 `resourceType` 的变更
-3. 应用 CREATE（添加新资源）、UPDATE（覆盖字段）、DELETE（标记排除）
-4. 为每个资源标注 `changeState`: `published` | `created` | `modified` | `deleted`
-
-### AD-3: 变更合并（Change Collapsing）
-
-在 `add_change()` 中对同一 `resourceRid` 的变更进行合并：
-- CREATE + UPDATE → 合并为 CREATE（更新 after）
-- CREATE + DELETE → 抵消移除
-- UPDATE + UPDATE → 保留最早 before + 最新 after
-- UPDATE + DELETE → 变为 DELETE（保留原始 before）
-
-### AD-4: 级联删除策略
-
-删除 ObjectType 时，在草稿中为关联资源分别生成 DELETE 变更：
-1. 查询该 ObjectType 下的所有 Properties → 为每个 Property 生成 DELETE 变更
-2. 查询引用该 ObjectType 的 LinkTypes（通过 link_type_endpoints 表）→ 为每个 LinkType 生成 DELETE 变更
-3. 为 ObjectType 自身生成 DELETE 变更
-
-发布时按顺序执行：先删 LinkType（解除 `link_type_endpoints` 的 RESTRICT FK 约束）→ 再删 ObjectType（CASCADE 删除 Properties）。
-
-### AD-5: MVP 默认值
-
-单用户模型，以下值作为常量：
-- `user_id = "default"`
-- `ontology_rid = "ri.ontology.ontology.default"`
-- `project_rid = "ri.ontology.space.default"`
-
-### AD-6: 唯一性校验范围
-
-`id` 和 `api_name` 的唯一性需同时检查：
-1. `object_types` 主表（已发布资源）
-2. `working_states.changes` 中的 CREATE 变更（未发布的草稿资源）
-
-排除已被 DELETE 标记的资源。
-
-### AD-7: 保留关键字比较
-
-Spec 中保留字为小写形式（`ontology`, `object`, `property`, `link`, `relation`, `rid`, `primaryKey`, `typeId`, `ontologyObject`）。校验时将 apiName 转小写后与保留字列表比较。
+Phase 1 的已实现代码位于 `apps/server/app/` 各层，详见下方"Phase 1（已实现）"章节。
 
 ---
 
-## API 端点设计
+## Phase 1（已实现）
 
-### ObjectType CRUD
+> 以下内容记录已实现的架构决策和数据结构，作为 Phase 2 的基础参考。
 
-| Method | Path | 描述 | 请求体 | 响应 | 状态码 |
-|--------|------|------|--------|------|--------|
-| GET | `/api/v1/object-types` | 列表查询（合并视图，分页） | query: `page`, `pageSize` | `ObjectTypeListResponse` | 200 |
-| POST | `/api/v1/object-types` | 创建对象类型（写入草稿） | `ObjectTypeCreateRequest` | `ObjectTypeWithChangeState` | 201 |
-| GET | `/api/v1/object-types/{rid}` | 详情查询（合并视图） | — | `ObjectTypeDetailResponse` | 200 |
-| PUT | `/api/v1/object-types/{rid}` | 更新对象类型（写入草稿） | `ObjectTypeUpdateRequest` | `ObjectTypeWithChangeState` | 200 |
-| DELETE | `/api/v1/object-types/{rid}` | 删除对象类型（写入草稿） | — | — | 204 |
+### 架构决策
 
-### 变更管理（F009 AC18-AC20）
+**AD-1: F009 与 F003 合并实施** — WorkingStateService 作为 F003 的前置 Phase 实现。所有写操作先写入 WorkingState 草稿，不直接修改主表。
 
-| Method | Path | 描述 | 响应 | 状态码 |
-|--------|------|------|------|--------|
-| POST | `/api/v1/ontologies/{rid}/save` | 发布所有草稿变更 | `ChangeRecord` | 200 |
-| DELETE | `/api/v1/ontologies/{rid}/working-state` | 丢弃草稿 | — | 204 |
-| GET | `/api/v1/ontologies/{rid}/working-state` | 查看当前草稿状态 | `WorkingState` | 200/404 |
+**AD-2: 合并视图在应用层实现** — Python 层合并已发布资源与 WorkingState 中的变更，返回带 `changeState` 标注的合并视图。
+
+**AD-3: 变更合并（Change Collapsing）** — `_collapse_change()` 实现同一 `resourceRid` 的变更合并：CREATE+UPDATE→CREATE（更新 after）; CREATE+DELETE→抵消移除; UPDATE+UPDATE→保留最早 before + 最新 after; UPDATE+DELETE→DELETE（保留原始 before）。
+
+**AD-4: 级联删除策略** — 删除 ObjectType 时为关联 LinkTypes 生成 DELETE 变更。
+
+**AD-5: MVP 默认值** — `user_id="default"`, `ontology_rid="ri.ontology.ontology.default"`, `project_rid="ri.ontology.space.default"`。
+
+**AD-6: 唯一性校验范围** — `id` 和 `api_name` 同时检查主表和 WorkingState 中的 CREATE 变更。
+
+**AD-7: 保留关键字比较** — apiName 转小写后与保留字列表比较。
+
+### 已实现的 API 端点
+
+| Method | Path | 描述 |
+|--------|------|------|
+| GET | `/api/v1/object-types` | 列表查询（合并视图，分页） |
+| POST | `/api/v1/object-types` | 创建（写入草稿） |
+| GET | `/api/v1/object-types/{rid}` | 详情查询 |
+| PUT | `/api/v1/object-types/{rid}` | 更新（写入草稿） |
+| DELETE | `/api/v1/object-types/{rid}` | 删除（写入草稿） |
+| POST | `/api/v1/ontologies/{rid}/save` | 发布草稿 |
+| DELETE | `/api/v1/ontologies/{rid}/working-state` | 丢弃草稿 |
+| GET | `/api/v1/ontologies/{rid}/working-state` | 查看草稿状态 |
+
+### 已实现的文件清单
+
+| 文件 | 说明 |
+|------|------|
+| `app/domain/object_type.py` | ObjectType 模型 + 请求/响应 schema |
+| `app/domain/working_state.py` | Change、WorkingState、ChangeRecord 模型 |
+| `app/domain/constants.py` | 默认值常量 |
+| `app/domain/validators.py` | apiName/id 格式校验 + 保留字 |
+| `app/domain/common.py` | DomainModel 基类, generate_rid() |
+| `app/storage/models.py` | 全部 ORM 模型（单文件） |
+| `app/storage/object_type_storage.py` | ObjectType 数据访问 |
+| `app/storage/working_state_storage.py` | WorkingState 数据访问 |
+| `app/storage/ontology_storage.py` | Ontology 版本管理 |
+| `app/services/object_type_service.py` | ObjectType CRUD 业务逻辑 |
+| `app/services/working_state_service.py` | 变更管理核心逻辑 |
+| `app/routers/object_types.py` | ObjectType REST 端点 |
+| `app/routers/ontology.py` | 变更管理端点 |
+| `app/exceptions.py` | AppError + handler |
 
 ---
 
-## 数据结构设计
+## Phase 2（新增）— 架构决策
 
-### 通用变更管理模型（`app/domain/working_state.py`）
+### AD-8: Dataset 作为平台内部存储实体
 
-```python
-class ChangeType(str, enum.Enum):
-    CREATE = "CREATE"
-    UPDATE = "UPDATE"
-    DELETE = "DELETE"
+- 新建 `datasets`、`dataset_columns`、`dataset_rows` 三张表存储导入的数据快照
+- Dataset 不进入 Working State（是实际数据，非 schema 元数据）
+- ObjectType 通过现有 `backing_datasource` JSONB 字段引用 Dataset RID：`{"rid": "<dataset_rid>", "name": "...", "type": "mysql|excel|csv"}`
+- `datasets.linked_object_type_rid` 实现唯一性约束：同一 Dataset 只能关联一个 ObjectType（AC-V3, KD-5）
 
-class ResourceType(str, enum.Enum):
-    OBJECT_TYPE = "ObjectType"
-    PROPERTY = "Property"
-    LINK_TYPE = "LinkType"
+### AD-9: MySQL 连接管理
 
-class ChangeState(str, enum.Enum):
-    """合并视图中资源的变更状态标注"""
-    PUBLISHED = "published"
-    CREATED = "created"
-    MODIFIED = "modified"
-    DELETED = "deleted"
+- 新建 `mysql_connections` 表存储连接配置，可跨导入复用
+- 密码使用 AES-256-GCM 加密存储（`cryptography` 库的 Fernet），密钥从环境变量 `ENCRYPTION_KEY` 读取
+- 使用 `aiomysql` 异步连接 MySQL
+- 连接配置不绑定特定 ObjectType
 
-class Change(DomainModel):
-    id: str
-    resource_type: ResourceType
-    resource_rid: str
-    change_type: ChangeType
-    before: dict | None = None   # CREATE 时为 None
-    after: dict | None = None    # DELETE 时为 None
-    timestamp: datetime
+### AD-10: 文件上传两阶段处理
 
-class WorkingState(DomainModel):
-    rid: str
-    user_id: str
-    ontology_rid: str
-    changes: list[Change] = Field(default_factory=list)
-    base_version: int
-    created_at: datetime
-    last_modified_at: datetime
+- **第一阶段**：`POST /upload/preview` — 上传文件 → 存临时目录 → 解析返回预览（列名、推断类型、前 50 行、Sheet 列表）→ 返回 `file_token`（UUID）
+- **第二阶段**：`POST /upload/confirm` — 携带 `file_token` + 用户配置（选中 Sheet、首行表头、列选择、类型修改、Dataset 名称）→ 触发后台导入任务
+- 临时文件存储在 `{UPLOAD_TEMP_DIR}/{file_token}/` 目录，TTL 30 分钟
+- 清理机制：后台 asyncio 定时任务每 10 分钟扫描过期文件
 
-class ChangeRecord(DomainModel):
-    rid: str
-    ontology_rid: str
-    version: int
-    changes: list[Change]
-    saved_at: datetime
-    saved_by: str
-    description: str | None = None
+### AD-11: 不完整 ObjectType 支持
+
+- `ObjectTypeCreateRequest` 调整为仅 `display_name` 必填；`id` 和 `api_name` 可选，为空时自动推断：
+  - `id` ← display_name 转 kebab-case 小写（`slugify`）
+  - `api_name` ← display_name 转 PascalCase
+- 若自动推断值与已有资源冲突，追加随机后缀（如 `employee-2a3b`）
+- 完整性校验仅在 **publish 时** 执行（AC-V4），不在创建时拦截
+- 创建请求新增可选字段 `backing_datasource_rid` 和 `intended_actions`
+
+### AD-12: intended_actions 元数据字段
+
+- ObjectType 新增 `intended_actions: list[str] | None` 字段
+- ORM 层为 JSONB 列
+- 有效值为 `["create", "modify", "delete"]` 的子集
+- 不创建 ActionType 实体（KD-3），仅记录勾选意图
+
+### AD-13: 后台任务 + 轮询（导入模式）
+
+- MySQL 导入和 Excel/CSV 导入均采用**后台任务**模式
+- POST 导入请求立即返回 `{ taskId, status: "pending" }`（HTTP 202 Accepted）
+- 前端通过 `GET /api/v1/import-tasks/{taskId}` 轮询任务状态
+- 任务状态机：`pending → running → completed | failed`
+- 任务完成后携带结果：`{ status: "completed", datasetRid, rowCount, columnCount, duration }`
+- 任务失败后携带错误：`{ status: "failed", error: { code, message } }`
+- 内部使用 `asyncio.create_task()` 在后台执行导入逻辑
+- 任务状态存储在内存 dict（MVP 单进程足够）；后续版本可迁移到 Redis
+- 任务 TTL 1 小时，过期后自动从内存清理
+
+---
+
+## Phase 2 — 数据库设计
+
+### 新增表
+
+#### `datasets` — 数据集快照
+
+```sql
+CREATE TABLE datasets (
+    rid                     TEXT PRIMARY KEY,
+    name                    VARCHAR(255) NOT NULL,
+    source_type             VARCHAR(20)  NOT NULL,  -- 'mysql' | 'excel' | 'csv'
+    source_metadata         JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    row_count               INTEGER      NOT NULL DEFAULT 0,
+    column_count            INTEGER      NOT NULL DEFAULT 0,
+    imported_at             TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    ontology_rid            TEXT         NOT NULL REFERENCES ontologies(rid) ON DELETE CASCADE,
+    created_by              VARCHAR(255) NOT NULL,
+    linked_object_type_rid  TEXT         UNIQUE,  -- 唯一性约束: 1 Dataset ↔ 1 ObjectType
+    CONSTRAINT fk_datasets_ontology FOREIGN KEY (ontology_rid) REFERENCES ontologies(rid)
+);
 ```
 
-### ObjectType 模型（`app/domain/object_type.py`）
+`source_metadata` JSONB 格式示例：
+
+```jsonc
+// MySQL 导入
+{
+  "connectionRid": "ri.ontology.mysql-connection.abc123",
+  "connectionName": "Production DB",
+  "host": "db.example.com",
+  "database": "sales",
+  "table": "orders"
+}
+
+// Excel 上传
+{
+  "sourceFilename": "employees.xlsx",
+  "sheetName": "Sheet1",
+  "hasHeader": true
+}
+
+// CSV 上传
+{
+  "sourceFilename": "transactions.csv",
+  "hasHeader": true
+}
+```
+
+#### `dataset_columns` — 数据集列定义
+
+```sql
+CREATE TABLE dataset_columns (
+    id              SERIAL  PRIMARY KEY,
+    dataset_rid     TEXT    NOT NULL REFERENCES datasets(rid) ON DELETE CASCADE,
+    name            VARCHAR(255) NOT NULL,
+    inferred_type   VARCHAR(50)  NOT NULL,  -- 推断的 PropertyBaseType 值
+    is_nullable     BOOLEAN NOT NULL DEFAULT true,
+    is_primary_key  BOOLEAN NOT NULL DEFAULT false,
+    sort_order      INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT uq_dataset_columns_name UNIQUE (dataset_rid, name)
+);
+```
+
+#### `dataset_rows` — 数据集行数据
+
+```sql
+CREATE TABLE dataset_rows (
+    id          BIGSERIAL PRIMARY KEY,
+    dataset_rid TEXT      NOT NULL REFERENCES datasets(rid) ON DELETE CASCADE,
+    row_index   INTEGER   NOT NULL,
+    data        JSONB     NOT NULL,  -- {"column_name": value, ...}
+    CONSTRAINT uq_dataset_rows_index UNIQUE (dataset_rid, row_index)
+);
+
+CREATE INDEX ix_dataset_rows_dataset ON dataset_rows(dataset_rid, row_index);
+```
+
+#### `mysql_connections` — MySQL 连接配置
+
+```sql
+CREATE TABLE mysql_connections (
+    rid                 TEXT PRIMARY KEY,
+    name                VARCHAR(255) NOT NULL,
+    host                VARCHAR(255) NOT NULL,
+    port                INTEGER      NOT NULL DEFAULT 3306,
+    database_name       VARCHAR(255) NOT NULL,
+    username            VARCHAR(255) NOT NULL,
+    encrypted_password  TEXT         NOT NULL,  -- AES-256-GCM 加密
+    ssl_enabled         BOOLEAN      NOT NULL DEFAULT false,
+    ontology_rid        TEXT         NOT NULL REFERENCES ontologies(rid) ON DELETE CASCADE,
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    created_by          VARCHAR(255) NOT NULL,
+    last_used_at        TIMESTAMPTZ
+);
+```
+
+### 修改现有表
+
+#### `object_types` — 新增 `intended_actions` 列
+
+```sql
+ALTER TABLE object_types ADD COLUMN intended_actions JSONB;
+-- 值示例: ["create", "modify", "delete"] 或 null
+```
+
+---
+
+## Phase 2 — ORM 模型（`app/storage/models.py` 新增）
 
 ```python
-class ResourceStatus(str, enum.Enum):
-    ACTIVE = "active"
-    EXPERIMENTAL = "experimental"
-    DEPRECATED = "deprecated"
+class DatasetModel(Base):
+    __tablename__ = "datasets"
 
-class Visibility(str, enum.Enum):
-    PROMINENT = "prominent"
-    NORMAL = "normal"
-    HIDDEN = "hidden"
+    rid = Column(String, primary_key=True)
+    name = Column(String(255), nullable=False)
+    source_type = Column(String(20), nullable=False)  # mysql | excel | csv
+    source_metadata = Column(JSONB, nullable=False, server_default="'{}'::jsonb")
+    row_count = Column(Integer, nullable=False, server_default="0")
+    column_count = Column(Integer, nullable=False, server_default="0")
+    imported_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    ontology_rid = Column(
+        String, ForeignKey("ontologies.rid", ondelete="CASCADE"), nullable=False
+    )
+    created_by = Column(String(255), nullable=False)
+    linked_object_type_rid = Column(String, unique=True, nullable=True)
 
-class Icon(DomainModel):
+    columns = relationship(
+        "DatasetColumnModel", back_populates="dataset", cascade="all, delete-orphan"
+    )
+    rows = relationship(
+        "DatasetRowModel", back_populates="dataset", cascade="all, delete-orphan"
+    )
+
+
+class DatasetColumnModel(Base):
+    __tablename__ = "dataset_columns"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    dataset_rid = Column(
+        String, ForeignKey("datasets.rid", ondelete="CASCADE"), nullable=False
+    )
+    name = Column(String(255), nullable=False)
+    inferred_type = Column(String(50), nullable=False)
+    is_nullable = Column(Boolean, nullable=False, server_default="true")
+    is_primary_key = Column(Boolean, nullable=False, server_default="false")
+    sort_order = Column(Integer, nullable=False, server_default="0")
+
+    dataset = relationship("DatasetModel", back_populates="columns")
+
+    __table_args__ = (
+        UniqueConstraint("dataset_rid", "name", name="uq_dataset_columns_name"),
+    )
+
+
+class DatasetRowModel(Base):
+    __tablename__ = "dataset_rows"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)  # BIGSERIAL
+    dataset_rid = Column(
+        String, ForeignKey("datasets.rid", ondelete="CASCADE"), nullable=False
+    )
+    row_index = Column(Integer, nullable=False)
+    data = Column(JSONB, nullable=False)
+
+    dataset = relationship("DatasetModel", back_populates="rows")
+
+    __table_args__ = (
+        UniqueConstraint("dataset_rid", "row_index", name="uq_dataset_rows_index"),
+        Index("ix_dataset_rows_dataset", "dataset_rid", "row_index"),
+    )
+
+
+class MySQLConnectionModel(Base):
+    __tablename__ = "mysql_connections"
+
+    rid = Column(String, primary_key=True)
+    name = Column(String(255), nullable=False)
+    host = Column(String(255), nullable=False)
+    port = Column(Integer, nullable=False, server_default="3306")
+    database_name = Column(String(255), nullable=False)
+    username = Column(String(255), nullable=False)
+    encrypted_password = Column(Text, nullable=False)
+    ssl_enabled = Column(Boolean, nullable=False, server_default="false")
+    ontology_rid = Column(
+        String, ForeignKey("ontologies.rid", ondelete="CASCADE"), nullable=False
+    )
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    created_by = Column(String(255), nullable=False)
+    last_used_at = Column(DateTime(timezone=True), nullable=True)
+```
+
+### ObjectTypeModel 修改
+
+```python
+# 在 ObjectTypeModel 中新增:
+intended_actions = Column(JSONB, nullable=True)
+```
+
+---
+
+## Phase 2 — Domain 模型
+
+### Dataset 领域模型（`app/domain/dataset.py`）
+
+```python
+from datetime import datetime
+from app.domain.common import DomainModel
+
+
+class DatasetColumn(DomainModel):
     name: str
-    color: str
+    inferred_type: str
+    is_nullable: bool = True
+    is_primary_key: bool = False
+    sort_order: int = 0
 
-class ObjectType(DomainModel):
+
+class Dataset(DomainModel):
     rid: str
-    id: str
-    api_name: str
-    display_name: str
-    plural_display_name: str | None = None
-    description: str | None = None
-    icon: Icon
-    status: ResourceStatus = ResourceStatus.EXPERIMENTAL
-    visibility: Visibility = Visibility.NORMAL
-    backing_datasource: dict | None = None
-    primary_key_property_id: str | None = None
-    title_key_property_id: str | None = None
-    project_rid: str
+    name: str
+    source_type: str  # "mysql" | "excel" | "csv"
+    source_metadata: dict
+    row_count: int = 0
+    column_count: int = 0
+    imported_at: datetime
+    ontology_rid: str
+    created_by: str
+    linked_object_type_rid: str | None = None
+    columns: list[DatasetColumn] = []
+
+
+class DatasetListItem(DomainModel):
+    """列表项，包含 in-use 状态"""
+    rid: str
+    name: str
+    source_type: str
+    row_count: int
+    column_count: int
+    imported_at: datetime
+    in_use: bool = False
+    linked_object_type_name: str | None = None
+
+
+class DatasetListResponse(DomainModel):
+    items: list[DatasetListItem]
+    total: int
+
+
+class DatasetPreviewResponse(DomainModel):
+    """数据集预览：列定义 + 前 N 行"""
+    rid: str
+    name: str
+    columns: list[DatasetColumn]
+    rows: list[dict]  # [{"col_name": value, ...}, ...]
+    total_rows: int
+```
+
+### MySQL 连接模型（`app/domain/mysql_connection.py`）
+
+```python
+from datetime import datetime
+from app.domain.common import DomainModel
+
+
+class MySQLConnection(DomainModel):
+    rid: str
+    name: str
+    host: str
+    port: int = 3306
+    database_name: str
+    username: str
+    ssl_enabled: bool = False
     ontology_rid: str
     created_at: datetime
     created_by: str
-    last_modified_at: datetime
-    last_modified_by: str
+    last_used_at: datetime | None = None
+    # 注意: encrypted_password 不出现在 domain 模型中（安全）
 
-class ObjectTypeWithChangeState(ObjectType):
-    """合并视图返回的 ObjectType，附带变更状态"""
-    change_state: ChangeState = ChangeState.PUBLISHED
+
+class MySQLConnectionCreateRequest(DomainModel):
+    name: str
+    host: str
+    port: int = 3306
+    database_name: str
+    username: str
+    password: str  # 明文，仅在请求中，写入前加密
+    ssl_enabled: bool = False
+
+
+class MySQLConnectionTestRequest(DomainModel):
+    """测试连接请求，不保存"""
+    host: str
+    port: int = 3306
+    database_name: str
+    username: str
+    password: str
+    ssl_enabled: bool = False
+    # 可选：复用已保存连接（此时 password 可选）
+    connection_rid: str | None = None
+
+
+class MySQLTableInfo(DomainModel):
+    name: str
+    row_count: int | None = None  # 预估行数，可能为 None
+
+
+class MySQLColumnInfo(DomainModel):
+    name: str
+    data_type: str           # MySQL 原始类型，如 "varchar(255)", "int"
+    is_nullable: bool
+    is_primary_key: bool
+    inferred_property_type: str  # 映射后的 PropertyBaseType 值
+
+
+class MySQLTablePreview(DomainModel):
+    columns: list[MySQLColumnInfo]
+    rows: list[dict]
+    total_rows: int | None = None
 ```
 
-### 请求/响应 Schema
+### 导入任务模型（`app/domain/import_task.py`）
 
 ```python
+import enum
+from datetime import datetime
+from app.domain.common import DomainModel
+
+
+class ImportTaskStatus(str, enum.Enum):
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class ImportTask(DomainModel):
+    task_id: str
+    status: ImportTaskStatus = ImportTaskStatus.PENDING
+    dataset_rid: str | None = None    # 成功后填充
+    row_count: int | None = None
+    column_count: int | None = None
+    duration_ms: int | None = None
+    error_code: str | None = None
+    error_message: str | None = None
+    created_at: datetime
+```
+
+### 类型映射规则（`app/domain/type_mapping.py`）
+
+```python
+"""MySQL 和 Excel/CSV 数据类型到 PropertyBaseType 的映射规则。"""
+
+# --- MySQL → PropertyBaseType ---
+MYSQL_TYPE_MAP: dict[str, str] = {
+    # 整数类型
+    "tinyint":    "integer",
+    "smallint":   "short",
+    "mediumint":  "integer",
+    "int":        "integer",
+    "integer":    "integer",
+    "bigint":     "long",
+    # 浮点 / 定点
+    "float":      "float",
+    "double":     "double",
+    "decimal":    "decimal",
+    "numeric":    "decimal",
+    # 字符串
+    "char":       "string",
+    "varchar":    "string",
+    "tinytext":   "string",
+    "text":       "string",
+    "mediumtext": "string",
+    "longtext":   "string",
+    "enum":       "string",
+    "set":        "string",
+    # 二进制
+    "binary":     "string",
+    "varbinary":  "string",
+    "blob":       "string",
+    "tinyblob":   "string",
+    "mediumblob": "string",
+    "longblob":   "string",
+    # 日期时间
+    "date":       "date",
+    "datetime":   "timestamp",
+    "timestamp":  "timestamp",
+    "time":       "string",
+    "year":       "integer",
+    # 布尔
+    "bit":        "boolean",
+    # JSON
+    "json":       "string",
+}
+
+
+def mysql_type_to_property_type(mysql_type: str) -> str:
+    """将 MySQL 列类型映射为 PropertyBaseType。
+
+    mysql_type 为 INFORMATION_SCHEMA.COLUMNS.DATA_TYPE 的值（小写）。
+    未知类型回退为 "string"。
+    """
+    return MYSQL_TYPE_MAP.get(mysql_type.lower().split("(")[0].strip(), "string")
+
+
+# --- Excel/CSV 值推断 ---
+# 扫描前 1000 行，按优先级匹配（AC-EX7）:
+#   全整数 → integer
+#   含小数 → double
+#   ISO 日期 (YYYY-MM-DD) → date
+#   ISO 时间戳 (YYYY-MM-DDTHH:MM:SS) → timestamp
+#   true/false (不区分大小写) → boolean
+#   其他 → string
+# 某列超过 5% 值不匹配推断类型时回退为 string
+
+import re
+from datetime import date as date_type, datetime as datetime_type
+
+_INTEGER_RE = re.compile(r"^-?\d+$")
+_FLOAT_RE = re.compile(r"^-?\d+\.\d+$")
+_ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_ISO_TIMESTAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2})?")
+_BOOLEAN_VALUES = frozenset({"true", "false", "1", "0"})
+
+INFER_SAMPLE_SIZE = 1000
+INFER_MISMATCH_THRESHOLD = 0.05  # 5%
+
+
+def infer_column_type(values: list[str | None]) -> str:
+    """从一列值（字符串形式）推断 PropertyBaseType。
+
+    跳过 None 和空字符串。若有效值为空，返回 "string"。
+    """
+    non_empty = [v for v in values[:INFER_SAMPLE_SIZE] if v is not None and v.strip() != ""]
+    if not non_empty:
+        return "string"
+
+    total = len(non_empty)
+    threshold = int(total * INFER_MISMATCH_THRESHOLD)
+
+    # 尝试各类型，按优先级
+    checks: list[tuple[str, re.Pattern]] = [
+        ("integer", _INTEGER_RE),
+        ("double", _FLOAT_RE),
+        ("date", _ISO_DATE_RE),
+        ("timestamp", _ISO_TIMESTAMP_RE),
+    ]
+
+    for prop_type, pattern in checks:
+        mismatches = sum(1 for v in non_empty if not pattern.match(v.strip()))
+        if mismatches <= threshold:
+            return prop_type
+
+    # Boolean 检查
+    bool_mismatches = sum(1 for v in non_empty if v.strip().lower() not in _BOOLEAN_VALUES)
+    if bool_mismatches <= threshold:
+        return "boolean"
+
+    return "string"
+```
+
+### ObjectType 模型修改（`app/domain/object_type.py`）
+
+```python
+# --- 修改 ObjectType 类，新增字段 ---
+
+class ObjectType(DomainModel):
+    # ... 现有字段 ...
+    intended_actions: list[str] | None = None  # 新增: ["create", "modify", "delete"] 的子集
+
+
+# --- 修改 ObjectTypeCreateRequest ---
+
 class ObjectTypeCreateRequest(DomainModel):
-    id: str
-    api_name: str
-    display_name: str
+    display_name: str                           # 唯一必填
+    id: str | None = None                       # 可选，为空时自动推断
+    api_name: str | None = None                 # 可选，为空时自动推断
     plural_display_name: str | None = None
     description: str | None = None
-    icon: Icon
+    icon: Icon | None = None                    # 可选，为空时使用默认图标
+    intended_actions: list[str] | None = None   # 新增
+    backing_datasource_rid: str | None = None   # 新增: 关联的 Dataset RID
+
+
+# --- 修改 ObjectTypeUpdateRequest ---
 
 class ObjectTypeUpdateRequest(DomainModel):
-    display_name: str | None = None
-    plural_display_name: str | None = None
-    description: str | None = None
-    icon: Icon | None = None
-    status: ResourceStatus | None = None
-    visibility: Visibility | None = None
-    api_name: str | None = None  # 仅 non-active 状态可改
-
-class ObjectTypeListResponse(DomainModel):
-    items: list[ObjectTypeWithChangeState]
-    total: int
-    page: int
-    page_size: int
+    # ... 现有字段 ...
+    intended_actions: list[str] | None = None           # 新增
+    backing_datasource_rid: str | None = None           # 新增
+    primary_key_property_id: str | None = None          # 新增
+    title_key_property_id: str | None = None            # 新增
 ```
 
-### 校验器（`app/domain/validators.py`）
+---
+
+## Phase 2 — API 端点
+
+### Dataset 管理
+
+| Method | Path | 描述 | 状态码 |
+|--------|------|------|--------|
+| GET | `/api/v1/datasets` | 列表（含 in-use 状态 + `?search=` 搜索） | 200 |
+| GET | `/api/v1/datasets/{rid}` | 详情（metadata + columns） | 200 |
+| GET | `/api/v1/datasets/{rid}/preview` | 预览（前 N 行，`?limit=50`） | 200 |
+| DELETE | `/api/v1/datasets/{rid}` | 删除（in-use 则 403） | 204 |
+
+#### GET /api/v1/datasets
+
+```jsonc
+// Response 200
+{
+  "items": [
+    {
+      "rid": "ri.ontology.dataset.abc123",
+      "name": "orders",
+      "sourceType": "mysql",
+      "rowCount": 5432,
+      "columnCount": 12,
+      "importedAt": "2026-03-01T10:00:00Z",
+      "inUse": true,
+      "linkedObjectTypeName": "Order"
+    }
+  ],
+  "total": 1
+}
+```
+
+#### GET /api/v1/datasets/{rid}
+
+```jsonc
+// Response 200
+{
+  "rid": "ri.ontology.dataset.abc123",
+  "name": "orders",
+  "sourceType": "mysql",
+  "sourceMetadata": { "connectionName": "Prod DB", "host": "...", "database": "sales", "table": "orders" },
+  "rowCount": 5432,
+  "columnCount": 12,
+  "importedAt": "2026-03-01T10:00:00Z",
+  "columns": [
+    { "name": "id", "inferredType": "integer", "isNullable": false, "isPrimaryKey": true, "sortOrder": 0 },
+    { "name": "customer_name", "inferredType": "string", "isNullable": true, "isPrimaryKey": false, "sortOrder": 1 }
+  ]
+}
+```
+
+#### GET /api/v1/datasets/{rid}/preview
+
+```jsonc
+// Response 200
+{
+  "rid": "ri.ontology.dataset.abc123",
+  "name": "orders",
+  "columns": [...],
+  "rows": [
+    { "id": 1, "customer_name": "Alice" },
+    { "id": 2, "customer_name": "Bob" }
+  ],
+  "totalRows": 5432
+}
+```
+
+### MySQL 连接管理
+
+| Method | Path | 描述 | 状态码 |
+|--------|------|------|--------|
+| GET | `/api/v1/mysql-connections` | 列表已保存连接 | 200 |
+| POST | `/api/v1/mysql-connections` | 保存连接 | 201 |
+| POST | `/api/v1/mysql-connections/test` | 测试连接（不保存） | 200 |
+| GET | `/api/v1/mysql-connections/{rid}/tables` | 浏览表列表 | 200 |
+| GET | `/api/v1/mysql-connections/{rid}/tables/{table}/columns` | 表列结构 | 200 |
+| GET | `/api/v1/mysql-connections/{rid}/tables/{table}/preview` | 表数据预览（前 50 行） | 200 |
+
+#### POST /api/v1/mysql-connections
+
+```jsonc
+// Request
+{
+  "name": "Production DB",
+  "host": "db.example.com",
+  "port": 3306,
+  "databaseName": "sales",
+  "username": "reader",
+  "password": "s3cret",
+  "sslEnabled": false
+}
+
+// Response 201
+{
+  "rid": "ri.ontology.mysql-connection.def456",
+  "name": "Production DB",
+  "host": "db.example.com",
+  "port": 3306,
+  "databaseName": "sales",
+  "username": "reader",
+  "sslEnabled": false,
+  "createdAt": "2026-03-01T10:00:00Z"
+  // 注意: password 不在响应中返回
+}
+```
+
+#### POST /api/v1/mysql-connections/test
+
+```jsonc
+// Request
+{
+  "host": "db.example.com",
+  "port": 3306,
+  "databaseName": "sales",
+  "username": "reader",
+  "password": "s3cret",
+  "sslEnabled": false
+}
+
+// Response 200 — 成功
+{ "success": true }
+
+// Response 200 — 失败（不用 4xx，因为是"测试"操作）
+{ "success": false, "error": "Access denied for user 'reader'@'...' (using password: YES)" }
+```
+
+#### GET /api/v1/mysql-connections/{rid}/tables
+
+```jsonc
+// Response 200
+{
+  "tables": [
+    { "name": "orders", "rowCount": 5432 },
+    { "name": "customers", "rowCount": 1200 }
+  ]
+}
+```
+
+#### GET /api/v1/mysql-connections/{rid}/tables/{table}/columns
+
+```jsonc
+// Response 200
+{
+  "columns": [
+    {
+      "name": "id",
+      "dataType": "int",
+      "isNullable": false,
+      "isPrimaryKey": true,
+      "inferredPropertyType": "integer"
+    },
+    {
+      "name": "created_at",
+      "dataType": "datetime",
+      "isNullable": true,
+      "isPrimaryKey": false,
+      "inferredPropertyType": "timestamp"
+    }
+  ]
+}
+```
+
+#### GET /api/v1/mysql-connections/{rid}/tables/{table}/preview
+
+```jsonc
+// Response 200
+{
+  "columns": [...],
+  "rows": [ { "id": 1, "created_at": "2026-01-01 00:00:00" }, ... ],
+  "totalRows": 5432
+}
+```
+
+### MySQL 导入
+
+| Method | Path | 描述 | 状态码 |
+|--------|------|------|--------|
+| POST | `/api/v1/datasets/import/mysql` | 触发 MySQL 导入 → 后台任务 | 202 |
+
+#### POST /api/v1/datasets/import/mysql
+
+```jsonc
+// Request
+{
+  "connectionRid": "ri.ontology.mysql-connection.def456",
+  "table": "orders",
+  "datasetName": "orders_snapshot_2026",
+  "selectedColumns": ["id", "customer_name", "amount", "created_at"],  // null = 全选
+  "password": "s3cret"  // 需要再次提供密码（不从服务端读取明文）
+}
+
+// Response 202
+{
+  "taskId": "import-a1b2c3d4",
+  "status": "pending"
+}
+```
+
+### 文件上传
+
+| Method | Path | 描述 | 状态码 |
+|--------|------|------|--------|
+| POST | `/api/v1/datasets/upload/preview` | 上传文件 → 解析预览 | 200 |
+| POST | `/api/v1/datasets/upload/confirm` | 确认导入 → 后台任务 | 202 |
+
+#### POST /api/v1/datasets/upload/preview
+
+```jsonc
+// Request: multipart/form-data
+// file: <binary>
+
+// Response 200
+{
+  "fileToken": "uuid-token-here",
+  "filename": "employees.xlsx",
+  "fileSize": 1048576,
+  "sheets": ["Sheet1", "Sheet2"],       // Excel 才有; CSV 为 null
+  "defaultSheet": "Sheet1",
+  "preview": {
+    "columns": [
+      { "name": "name", "inferredType": "string", "sampleValues": ["Alice", "Bob", "Charlie"] },
+      { "name": "age", "inferredType": "integer", "sampleValues": ["30", "25", "35"] }
+    ],
+    "rows": [ { "name": "Alice", "age": "30" }, ... ],
+    "totalRows": 1000,
+    "hasHeader": true
+  }
+}
+```
+
+#### POST /api/v1/datasets/upload/confirm
+
+```jsonc
+// Request
+{
+  "fileToken": "uuid-token-here",
+  "datasetName": "Employees",
+  "sheetName": "Sheet1",         // Excel 才需要; CSV 可省略
+  "hasHeader": true,
+  "selectedColumns": ["name", "age"],  // null = 全选
+  "columnTypeOverrides": {       // 用户手动修改的类型
+    "age": "string"
+  }
+}
+
+// Response 202
+{
+  "taskId": "import-e5f6g7h8",
+  "status": "pending"
+}
+```
+
+### 导入任务轮询
+
+| Method | Path | 描述 | 状态码 |
+|--------|------|------|--------|
+| GET | `/api/v1/import-tasks/{taskId}` | 查询任务状态 | 200 |
+
+#### GET /api/v1/import-tasks/{taskId}
+
+```jsonc
+// pending
+{ "taskId": "import-a1b2c3d4", "status": "pending" }
+
+// running
+{ "taskId": "import-a1b2c3d4", "status": "running" }
+
+// completed
+{
+  "taskId": "import-a1b2c3d4",
+  "status": "completed",
+  "datasetRid": "ri.ontology.dataset.xyz789",
+  "rowCount": 5432,
+  "columnCount": 12,
+  "durationMs": 3200
+}
+
+// failed
+{
+  "taskId": "import-a1b2c3d4",
+  "status": "failed",
+  "error": {
+    "code": "MYSQL_IMPORT_CONNECTION_LOST",
+    "message": "Connection lost during import at row 3200"
+  }
+}
+```
+
+### ObjectType CRUD 修改
+
+#### POST /api/v1/object-types — 不完整创建
+
+```jsonc
+// 最小请求（仅 displayName）
+{
+  "displayName": "Employee"
+  // id, apiName 自动推断为 "employee" 和 "Employee"
+  // icon 使用默认值
+}
+
+// 完整请求（含新字段）
+{
+  "displayName": "Employee",
+  "id": "employee",
+  "apiName": "Employee",
+  "description": "Company employees",
+  "icon": { "name": "person", "color": "#4A90D9" },
+  "intendedActions": ["create", "modify", "delete"],
+  "backingDatasourceRid": "ri.ontology.dataset.xyz789"
+}
+```
+
+#### PUT /api/v1/object-types/{rid} — 新增字段
+
+```jsonc
+// 新增可更新字段
+{
+  "intendedActions": ["create", "modify"],
+  "backingDatasourceRid": "ri.ontology.dataset.new123",
+  "primaryKeyPropertyId": "id",
+  "titleKeyPropertyId": "name"
+}
+```
+
+#### POST /api/v1/ontologies/{rid}/save — 完整性校验
+
+发布时对每个 CREATE/UPDATE 的 ObjectType 执行完整性校验（AC-V4）。不完整的 ObjectType 阻止发布。
+
+```jsonc
+// 校验失败响应 400
+{
+  "error": {
+    "code": "INCOMPLETE_OBJECT_TYPE",
+    "message": "Object type 'Employee' is incomplete and cannot be published",
+    "details": {
+      "objectTypeRid": "ri.ontology.object-type.abc123",
+      "missingFields": ["backingDatasource", "primaryKeyPropertyId", "titleKeyPropertyId"]
+    }
+  }
+}
+```
+
+完整性条件：
+1. `display_name` 非空
+2. `id` 非空
+3. `api_name` 非空
+4. `backing_datasource` 非空
+5. 至少一个已映射属性（`backingColumn` 非空的 Property）
+6. `primary_key_property_id` 非空
+7. `title_key_property_id` 非空
+
+---
+
+## Phase 2 — Service 层设计
+
+### DatasetService（`app/services/dataset_service.py`）
+
+| 方法 | 说明 |
+|------|------|
+| `list(ontology_rid, search?)` | 列表查询（含 in-use 判断 + 搜索过滤） |
+| `get_by_rid(rid)` | 详情（含 columns） |
+| `get_preview(rid, limit=50)` | 前 N 行数据预览 |
+| `create(name, source_type, source_metadata, columns, rows, ontology_rid)` | 创建 Dataset（内部方法，由 import service 调用） |
+| `delete(rid)` | 删除（in-use 检查：`linked_object_type_rid IS NOT NULL → 403`） |
+| `link_to_object_type(dataset_rid, object_type_rid)` | 关联 Dataset 和 ObjectType |
+| `unlink_from_object_type(dataset_rid)` | 解除关联 |
+
+### MySQLImportService（`app/services/mysql_import_service.py`）
+
+| 方法 | 说明 |
+|------|------|
+| `test_connection(req)` | 测试 MySQL 连接（不保存），返回 `{success, error?}` |
+| `save_connection(req)` | 保存连接配置（密码加密后存储） |
+| `list_connections(ontology_rid)` | 列表已保存连接 |
+| `browse_tables(connection_rid, password)` | 连接 MySQL 获取表列表 |
+| `get_table_columns(connection_rid, table, password)` | 获取表列结构 + 类型映射 |
+| `preview_table(connection_rid, table, password, limit=50)` | 预览表数据 |
+| `start_import(connection_rid, table, dataset_name, selected_columns, password)` | 启动后台导入任务，返回 task_id |
+
+导入逻辑（后台执行）：
+1. 连接 MySQL，执行 `SELECT {columns} FROM {table}` 游标查询
+2. 批量 INSERT 到 `dataset_rows`（每批 1000 行）
+3. 创建 `dataset_columns` 记录（类型通过 `mysql_type_to_property_type` 映射）
+4. 更新 `datasets.row_count` 和 `column_count`
+5. 更新 `mysql_connections.last_used_at`
+
+### FileImportService（`app/services/file_import_service.py`）
+
+| 方法 | 说明 |
+|------|------|
+| `upload_and_preview(file)` | 保存临时文件 → 解析预览 → 返回 file_token + 预览数据 |
+| `confirm_import(file_token, config)` | 启动后台导入任务，返回 task_id |
+
+解析逻辑：
+- **Excel**：使用 `openpyxl`（只读模式）读取指定 Sheet
+- **CSV**：使用 Python 标准库 `csv` 读取
+- 类型推断调用 `infer_column_type()` 处理前 1000 行
+
+导入逻辑（后台执行）：
+1. 从临时文件重新读取完整数据（按用户选择的 Sheet、列、类型）
+2. 批量 INSERT 到 `dataset_rows`（每批 1000 行）
+3. 创建 `dataset_columns`（使用用户确认/修改后的类型）
+4. 更新 `datasets.row_count` 和 `column_count`
+5. 删除临时文件
+
+### ImportTaskService（`app/services/import_task_service.py`）
+
+| 方法 | 说明 |
+|------|------|
+| `create_task()` | 创建任务，返回 task_id |
+| `get_task(task_id)` | 查询任务状态 |
+| `update_status(task_id, status, **kwargs)` | 更新任务状态（running/completed/failed） |
+| `_cleanup_expired()` | 清理过期任务（TTL 1 小时） |
+
+内部存储：
 
 ```python
-PASCAL_CASE_PATTERN = re.compile(r"^[A-Z][a-zA-Z0-9_]*$")
-ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]*$")
-
-RESERVED_API_NAMES = frozenset({
-    "ontology", "object", "property", "link", "relation",
-    "rid", "primarykey", "typeid", "ontologyobject",
-})
-
-def validate_api_name(api_name: str) -> None:
-    """PascalCase 格式 + 保留字检查（小写比较）"""
-
-def validate_object_type_id(id_value: str) -> None:
-    """小写字母开头，仅含小写字母、数字、连字符"""
+# 内存存储（MVP 单进程足够）
+_tasks: dict[str, ImportTask] = {}
 ```
 
-### 常量（`app/domain/constants.py`）
+### CryptoService（`app/services/crypto_service.py`）
+
+| 方法 | 说明 |
+|------|------|
+| `encrypt(plaintext)` | AES-256-GCM 加密，返回 Base64 密文 |
+| `decrypt(ciphertext)` | 解密，返回明文 |
+
+实现：
 
 ```python
-DEFAULT_USER_ID = "default"
-DEFAULT_ONTOLOGY_RID = "ri.ontology.ontology.default"
-DEFAULT_PROJECT_RID = "ri.ontology.space.default"
-DEFAULT_PAGE_SIZE = 20
-MAX_PAGE_SIZE = 100
+from cryptography.fernet import Fernet
+import os
+
+# 密钥从环境变量读取；Fernet 要求 32 字节 URL-safe base64 编码
+_KEY = os.environ.get("ENCRYPTION_KEY", Fernet.generate_key().decode())
+_fernet = Fernet(_KEY)
+
+
+class CryptoService:
+    @staticmethod
+    def encrypt(plaintext: str) -> str:
+        return _fernet.encrypt(plaintext.encode()).decode()
+
+    @staticmethod
+    def decrypt(ciphertext: str) -> str:
+        return _fernet.decrypt(ciphertext.encode()).decode()
 ```
 
----
+### ObjectTypeService 修改（`app/services/object_type_service.py`）
 
-## Storage 层设计
+新增/修改的方法：
 
-### WorkingStateStorage（`app/storage/working_state_storage.py`）
+| 方法 | 修改说明 |
+|------|----------|
+| `create(req)` | 支持不完整创建：仅 `display_name` 必填，`id`/`api_name`/`icon` 自动推断；处理 `backing_datasource_rid`（查询 Dataset → 构建 `backing_datasource` JSONB）；处理 `intended_actions` |
+| `update(rid, req)` | 新增 `intended_actions`、`backing_datasource_rid`、`primary_key_property_id`、`title_key_property_id` 字段更新逻辑；更换 datasource 时更新 Dataset 关联 |
+| `_auto_infer_id(display_name)` | 新增：将 display_name 转为 kebab-case 小写 ID |
+| `_auto_infer_api_name(display_name)` | 新增：将 display_name 转为 PascalCase API name |
+| `_ensure_unique(ontology_rid, id, api_name)` | 新增：检查唯一性，冲突时追加随机后缀 |
 
-| 方法 | 说明 |
-|------|------|
-| `get_by_ontology(ontology_rid, user_id)` | 查询指定 ontology + user 的 WorkingState |
-| `create(model)` | 创建新 WorkingState |
-| `update_changes(rid, changes, last_modified_at)` | 更新 changes JSONB |
-| `delete(rid)` | 删除 WorkingState |
-
-### ObjectTypeStorage（`app/storage/object_type_storage.py`）
-
-| 方法 | 说明 |
-|------|------|
-| `list_by_ontology(ontology_rid, page, page_size)` | 分页查询已发布 ObjectTypes，返回 (list, total) |
-| `get_by_rid(rid)` | 按 RID 查询 |
-| `get_by_id(ontology_rid, id)` | 按用户 ID 查询（唯一性校验） |
-| `get_by_api_name(ontology_rid, api_name)` | 按 API name 查询（唯一性校验） |
-| `create(model)` | 插入主表（发布时调用） |
-| `update(rid, data)` | 更新主表（发布时调用） |
-| `delete(rid)` | 删除主表记录（发布时调用，CASCADE 删 properties） |
-| `get_related_link_type_rids(object_type_rid)` | 查询引用该 ObjectType 的 LinkType RIDs |
-| `_to_dict(model)` / `_to_domain(model)` | ORM ↔ Domain 转换辅助方法 |
-
-### OntologyStorage（`app/storage/ontology_storage.py`）
-
-| 方法 | 说明 |
-|------|------|
-| `get_by_rid(rid)` | 查询 Ontology |
-| `increment_version(rid)` | 原子递增 version 并返回新版本号 |
-
----
-
-## Service 层设计
-
-### WorkingStateService（`app/services/working_state_service.py`）
-
-核心职责：管理 WorkingState 生命周期，提供变更写入和合并视图查询。
-
-| 方法 | 说明 |
-|------|------|
-| `get_or_create(ontology_rid)` | 获取现有 WS，若不存在则自动创建（base_version = ontology.version） |
-| `add_change(ontology_rid, change)` | 追加变更 + 执行变更合并（AD-3） |
-| `get_merged_view(ontology_rid, resource_type)` | 返回 list[tuple[dict, ChangeState]]，资源类型无关 |
-| `publish(ontology_rid)` | 原子事务：应用变更 → 创建 ChangeRecord → 递增 version → 删除 WS |
-| `discard(ontology_rid)` | 删除 WorkingState |
-
-**`get_merged_view` 设计**: 返回通用的 `list[tuple[dict, ChangeState]]`。调用方（ObjectTypeService 等）负责将 dict 转换为具体 domain 模型。这样 WorkingStateService 保持资源类型无关，可被 F004（LinkType）、F005（Property）复用。
-
-### ObjectTypeService（`app/services/object_type_service.py`）
-
-| 方法 | 说明 |
-|------|------|
-| `create(req)` | 校验 id/apiName → 唯一性检查 → 生成 rid → add_change(CREATE) |
-| `list(page, page_size)` | get_merged_view → 分页 → 返回 ObjectTypeListResponse |
-| `get_by_rid(rid)` | 从合并视图查找 → 404 if not found |
-| `update(rid, req)` | 校验 active 限制 → 校验 apiName → add_change(UPDATE) |
-| `delete(rid)` | 校验 active 不可删 → 级联生成子资源 DELETE → add_change(DELETE) |
-| `_check_uniqueness(ontology_rid, id, api_name, exclude_rid?)` | 主表 + 草稿 CREATE 双重检查 |
-
----
-
-## Router 层设计
-
-### ObjectType Router（`app/routers/object_types.py`）
-
-遵循 `health.py` 的模式：`APIRouter(prefix="/api/v1", tags=["object-types"])`。
-
-通过 `Depends` 注入 `ObjectTypeService`：
+自动推断逻辑：
 
 ```python
-def get_service(session: AsyncSession = Depends(get_db_session)) -> ObjectTypeService:
-    return ObjectTypeService(session)
+import re
+
+def _auto_infer_id(self, display_name: str) -> str:
+    """将 display_name 转为 kebab-case 小写 ID。"""
+    # 移除非字母数字字符，用连字符分隔
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", display_name).strip("-").lower()
+    if not slug or not slug[0].isalpha():
+        slug = "obj-" + slug
+    return slug
+
+def _auto_infer_api_name(self, display_name: str) -> str:
+    """将 display_name 转为 PascalCase API name。"""
+    words = re.sub(r"[^a-zA-Z0-9]+", " ", display_name).split()
+    if not words:
+        return "UnnamedObject"
+    return "".join(w.capitalize() for w in words)
 ```
 
-Router 层仅做 HTTP 解析 + 委托，不含业务逻辑。Query 参数 `pageSize` 使用 `alias="pageSize"` 映射到 snake_case。
+### WorkingStateService 修改（`app/services/working_state_service.py`）
 
-### Ontology Router（`app/routers/ontology.py`）
+| 方法 | 修改说明 |
+|------|----------|
+| `publish(ontology_rid)` | 新增完整性校验：遍历变更中的 ObjectType CREATE/UPDATE，检查 7 项完整性条件（AC-V4）；不完整则抛出 `INCOMPLETE_OBJECT_TYPE` 错误 |
+| `_apply_object_type_change(change)` | `key_map` 新增 `intendedActions → intended_actions`、`backingDatasource → backing_datasource`、`primaryKeyPropertyId → primary_key_property_id`、`titleKeyPropertyId → title_key_property_id` |
 
-变更管理端点，注入 `WorkingStateService`。
+完整性校验逻辑（在 `publish()` 中调用）：
+
+```python
+async def _validate_completeness(self, changes: list[Change]) -> None:
+    """校验所有将被创建或更新的 ObjectType 是否完整。"""
+    for change in changes:
+        if change.resource_type != ResourceType.OBJECT_TYPE:
+            continue
+        if change.change_type == ChangeType.DELETE:
+            continue
+
+        data = change.after or {}
+        missing = []
+
+        if not data.get("displayName"):
+            missing.append("displayName")
+        if not data.get("id"):
+            missing.append("id")
+        if not data.get("apiName"):
+            missing.append("apiName")
+        if not data.get("backingDatasource"):
+            missing.append("backingDatasource")
+        if not data.get("primaryKeyPropertyId"):
+            missing.append("primaryKeyPropertyId")
+        if not data.get("titleKeyPropertyId"):
+            missing.append("titleKeyPropertyId")
+
+        # 检查至少一个已映射属性
+        ot_rid = change.resource_rid
+        has_mapped = await self._has_mapped_properties(ot_rid, changes)
+        if not has_mapped:
+            missing.append("mappedProperties")
+
+        if missing:
+            raise AppError(
+                code="INCOMPLETE_OBJECT_TYPE",
+                message=f"Object type '{data.get('displayName', ot_rid)}' is incomplete",
+                status_code=400,
+                details={
+                    "objectTypeRid": ot_rid,
+                    "missingFields": missing,
+                },
+            )
+```
 
 ---
 
-## 错误码
+## Phase 2 — Router 层设计
+
+### Dataset Router（`app/routers/datasets.py`）
+
+```python
+router = APIRouter(prefix="/api/v1", tags=["datasets"])
+
+# GET  /datasets           → DatasetService.list()
+# GET  /datasets/{rid}     → DatasetService.get_by_rid()
+# GET  /datasets/{rid}/preview → DatasetService.get_preview()
+# DELETE /datasets/{rid}   → DatasetService.delete()
+```
+
+### MySQL Connection Router（`app/routers/mysql_connections.py`）
+
+```python
+router = APIRouter(prefix="/api/v1", tags=["mysql-connections"])
+
+# GET  /mysql-connections         → MySQLImportService.list_connections()
+# POST /mysql-connections         → MySQLImportService.save_connection()
+# POST /mysql-connections/test    → MySQLImportService.test_connection()
+# GET  /mysql-connections/{rid}/tables  → MySQLImportService.browse_tables()
+# GET  /mysql-connections/{rid}/tables/{table}/columns → MySQLImportService.get_table_columns()
+# GET  /mysql-connections/{rid}/tables/{table}/preview → MySQLImportService.preview_table()
+```
+
+### Import Router（`app/routers/imports.py`）
+
+```python
+router = APIRouter(prefix="/api/v1", tags=["imports"])
+
+# POST /datasets/import/mysql      → MySQLImportService.start_import()    → 202
+# POST /datasets/upload/preview    → FileImportService.upload_and_preview()
+# POST /datasets/upload/confirm    → FileImportService.confirm_import()    → 202
+# GET  /import-tasks/{task_id}     → ImportTaskService.get_task()
+```
+
+**注意**：浏览/预览 MySQL 表的端点需要密码参数。考虑到 GET 不应有请求体，密码通过 `X-MySQL-Password` 自定义 Header 传递：
+
+```python
+@router.get("/mysql-connections/{rid}/tables")
+async def browse_tables(
+    rid: str,
+    x_mysql_password: str = Header(alias="X-MySQL-Password"),
+):
+    ...
+```
+
+---
+
+## Phase 2 — 错误码
 
 | HTTP | Code | 触发场景 |
 |------|------|----------|
-| 400 | `OBJECT_TYPE_INVALID_ID` | id 格式不符合 `^[a-z][a-z0-9-]*$` |
-| 400 | `OBJECT_TYPE_INVALID_API_NAME` | apiName 非 PascalCase |
-| 400 | `OBJECT_TYPE_RESERVED_API_NAME` | apiName 为保留关键字 |
-| 400 | `OBJECT_TYPE_ACTIVE_CANNOT_MODIFY_API_NAME` | active 状态下修改 apiName |
-| 400 | `OBJECT_TYPE_ACTIVE_CANNOT_DELETE` | 删除 active 状态的 ObjectType |
-| 404 | `OBJECT_TYPE_NOT_FOUND` | 指定 RID 不存在 |
-| 409 | `OBJECT_TYPE_ID_CONFLICT` | id 在本体内重复 |
-| 409 | `OBJECT_TYPE_API_NAME_CONFLICT` | apiName 在本体内重复 |
-| 400 | `WORKING_STATE_EMPTY` | 发布空的 WorkingState |
-| 404 | `WORKING_STATE_NOT_FOUND` | 无活跃的 WorkingState |
+| 400 | `INCOMPLETE_OBJECT_TYPE` | 发布时 ObjectType 不满足完整性条件 |
+| 400 | `DATASET_ALREADY_REGISTERED` | Dataset 已被其他 ObjectType 关联（AC-V3） |
+| 400 | `INVALID_INTENDED_ACTIONS` | intended_actions 包含无效值 |
+| 400 | `UPLOAD_FILE_TOO_LARGE` | 上传文件超过 50MB |
+| 400 | `UPLOAD_INVALID_FORMAT` | 上传文件格式不支持 |
+| 400 | `UPLOAD_TOKEN_EXPIRED` | file_token 已过期（30 分钟） |
+| 400 | `MYSQL_IMPORT_NO_COLUMNS` | 未选择任何列 |
+| 403 | `DATASET_IN_USE` | 删除已关联 ObjectType 的 Dataset |
+| 404 | `DATASET_NOT_FOUND` | Dataset RID 不存在 |
+| 404 | `MYSQL_CONNECTION_NOT_FOUND` | MySQL 连接 RID 不存在 |
+| 404 | `IMPORT_TASK_NOT_FOUND` | 任务 ID 不存在 |
+| 500 | `MYSQL_IMPORT_CONNECTION_LOST` | 导入过程中连接断开 |
+| 500 | `MYSQL_IMPORT_FAILED` | MySQL 导入失败（通用） |
+| 500 | `FILE_IMPORT_FAILED` | 文件导入失败（通用） |
 
 ---
 
-## 文件变更清单
+## Phase 2 — 配置项
 
-### 新建文件（16 个）
+新增环境变量（`app/config.py`）：
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `ENCRYPTION_KEY` | 自动生成（仅开发） | Fernet 对称加密密钥（32 字节 base64） |
+| `UPLOAD_TEMP_DIR` | `/tmp/open-ontology-uploads` | 临时文件存储路径 |
+| `UPLOAD_MAX_SIZE_MB` | `50` | 上传文件最大大小（MB） |
+| `UPLOAD_TOKEN_TTL_MINUTES` | `30` | 临时文件过期时间 |
+
+---
+
+## Phase 2 — 新增 Python 依赖
+
+| 包 | 用途 |
+|----|------|
+| `aiomysql` | 异步 MySQL 连接 |
+| `openpyxl` | 读取 .xlsx/.xls 文件 |
+| `cryptography` | Fernet 对称加密（密码存储） |
+| `python-multipart` | FastAPI 文件上传支持 |
+
+---
+
+## Phase 2 — 文件变更清单
+
+### 新建文件（~16 个）
 
 | 文件路径 | 说明 |
 |----------|------|
-| `apps/server/app/domain/constants.py` | 默认值常量 |
-| `apps/server/app/domain/validators.py` | apiName/id 格式校验 + 保留字 |
-| `apps/server/app/domain/working_state.py` | Change、WorkingState、ChangeRecord 模型 |
-| `apps/server/app/domain/object_type.py` | ObjectType 模型 + 请求/响应 schema |
-| `apps/server/app/storage/working_state_storage.py` | WorkingState 数据访问 |
-| `apps/server/app/storage/object_type_storage.py` | ObjectType 数据访问 |
-| `apps/server/app/storage/ontology_storage.py` | Ontology 版本管理 |
-| `apps/server/app/services/working_state_service.py` | 变更管理核心逻辑 |
-| `apps/server/app/services/object_type_service.py` | ObjectType CRUD 业务逻辑 |
-| `apps/server/app/routers/object_types.py` | ObjectType REST 端点 |
-| `apps/server/app/routers/ontology.py` | 变更管理端点 |
-| `apps/server/tests/conftest.py` | 测试 fixtures（test db session, test client） |
-| `apps/server/tests/unit/test_validators.py` | 校验器单元测试 |
-| `apps/server/tests/unit/test_change_collapsing.py` | 变更合并逻辑单元测试 |
-| `apps/server/tests/integration/test_object_type_api.py` | ObjectType CRUD API 集成测试 |
-| `apps/server/tests/integration/test_working_state_api.py` | 变更管理 API 集成测试 |
+| `apps/server/app/domain/dataset.py` | Dataset 领域模型 + 请求/响应 |
+| `apps/server/app/domain/mysql_connection.py` | MySQLConnection 模型 + 请求/响应 |
+| `apps/server/app/domain/import_task.py` | ImportTask 模型（状态、结果） |
+| `apps/server/app/domain/type_mapping.py` | MySQL 类型映射 + Excel/CSV 类型推断 |
+| `apps/server/app/storage/dataset_storage.py` | Dataset 数据访问 |
+| `apps/server/app/storage/mysql_connection_storage.py` | MySQL 连接数据访问 |
+| `apps/server/app/services/dataset_service.py` | Dataset 业务逻辑 |
+| `apps/server/app/services/mysql_import_service.py` | MySQL 导入逻辑 |
+| `apps/server/app/services/file_import_service.py` | 文件上传/解析/导入 |
+| `apps/server/app/services/import_task_service.py` | 后台任务管理 |
+| `apps/server/app/services/crypto_service.py` | AES-256 加解密 |
+| `apps/server/app/routers/datasets.py` | Dataset 路由 |
+| `apps/server/app/routers/mysql_connections.py` | MySQL 连接路由 |
+| `apps/server/app/routers/imports.py` | 导入任务路由（MySQL 导入 + 文件上传 + 任务轮询） |
+| `apps/server/alembic/versions/0004_add_dataset_and_import_tables.py` | 数据库迁移 |
+| `apps/server/tests/unit/test_type_mapping.py` | 类型映射 + 推断单元测试 |
 
-### 修改文件（1 个）
+### 修改文件（~5 个）
 
 | 文件路径 | 修改内容 |
 |----------|----------|
-| `apps/server/app/main.py` | 注册 `object_types.router` 和 `ontology.router` |
-
-### 复用（不修改）
-
-| 文件路径 | 复用内容 |
-|----------|----------|
-| `app/storage/models.py` | ORM 模型（ObjectTypeModel, WorkingStateModel 等） |
-| `app/domain/common.py` | DomainModel 基类, generate_rid() |
-| `app/exceptions.py` | AppError + handler |
-| `app/database.py` | async session 管理 |
+| `apps/server/app/storage/models.py` | 新增 DatasetModel、DatasetColumnModel、DatasetRowModel、MySQLConnectionModel；ObjectTypeModel 新增 `intended_actions` 列 |
+| `apps/server/app/domain/object_type.py` | ObjectType 新增 `intended_actions` 字段；ObjectTypeCreateRequest 改为 `display_name` 唯一必填 + 新增 `intended_actions`/`backing_datasource_rid`；ObjectTypeUpdateRequest 新增字段 |
+| `apps/server/app/services/object_type_service.py` | `create()` 支持不完整创建 + 自动推断；`update()` 新增字段处理 + Dataset 关联 |
+| `apps/server/app/services/working_state_service.py` | `publish()` 新增完整性校验；`_apply_object_type_change()` 的 key_map 新增字段 |
+| `apps/server/app/main.py` | 注册 datasets、mysql_connections、imports 三个新 router |
+| `apps/server/app/config.py` | 新增 ENCRYPTION_KEY、UPLOAD_TEMP_DIR、UPLOAD_MAX_SIZE_MB、UPLOAD_TOKEN_TTL_MINUTES |
 
 ---
 
 ## 验证方式
 
-| AC | 验证方法 |
-|----|----------|
-| AC1 | 集成测试：POST 创建后，GET 列表确认 status=experimental, visibility=normal |
-| AC2 | 集成测试：创建两个同 id 或同 apiName 的 ObjectType，确认返回 409 |
-| AC3a | 单元测试：验证 PascalCase 正则 + 保留字拒绝 |
-| AC3b | 单元测试：验证 id 正则 |
-| AC4 | 集成测试：创建 25 条，GET page=1&pageSize=20 返回 20 条，total=25 |
-| AC5 | 集成测试：GET /{rid} 返回完整元数据字段 |
-| AC6 | 集成测试：PUT 修改 displayName/description/icon/status/visibility，确认成功 |
-| AC7 | 集成测试：status=active 时修改 apiName 返回 400；id 不可修改（请求 schema 不含 id） |
-| AC8 | 集成测试：PUT 后 GET 返回最新值（合并视图即时反映） |
-| AC9 | 前端测试（F003b 覆盖） |
-| AC10 | 集成测试：active 状态 DELETE 返回 400 |
-| AC10a | 集成测试：删除 ObjectType 后发布，确认 properties 和 link_types 也被删除 |
-| AC11 | 集成测试：创建后检查 working_states 表有记录，object_types 主表无记录 |
-| AC12 | 集成测试：创建后 GET 列表包含新资源（未发布），changeState=created |
-| AC13 | 集成测试：验证 created/modified/deleted/published 四种 changeState 标注正确 |
+### 单元测试
+
+| 测试 | 覆盖 |
+|------|------|
+| `test_type_mapping.py` | MySQL 类型映射（全部 MySQL 类型 → PropertyBaseType）|
+| `test_type_mapping.py` | Excel/CSV 类型推断（整数、浮点、日期、时间戳、布尔、混合回退） |
+| `test_crypto_service.py` | 加密/解密往返 + 密钥缺失处理 |
+| `test_validators.py` | intended_actions 校验（有效值、无效值） |
+| `test_completeness.py` | 完整性校验（7 项条件的各种组合） |
+| `test_auto_infer.py` | display_name → id/api_name 自动推断 + 冲突后缀 |
+
+### 集成测试
+
+| 测试 | 覆盖 |
+|------|------|
+| `test_dataset_api.py` | Dataset CRUD API（创建、列表含 in-use、预览、删除、in-use 拒绝删除） |
+| `test_mysql_import_api.py` | MySQL 连接保存/测试/浏览表/导入流程（需 MySQL test fixture） |
+| `test_file_upload_api.py` | Excel/CSV 上传预览 + 确认导入流程 |
+| `test_incomplete_object_type.py` | 不完整创建 + 补全 + 发布完整性校验 |
+| `test_import_task_api.py` | 任务创建 + 轮询状态转换 |
