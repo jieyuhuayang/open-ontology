@@ -362,7 +362,7 @@ class DatasetModel(Base):
     rid = Column(String, primary_key=True)
     name = Column(String(255), nullable=False)
     source_type = Column(String(20), nullable=False)  # mysql | excel | csv
-    source_metadata = Column(JSONB, nullable=False, server_default=func.cast("{}", JSONB))
+    source_metadata = Column(JSONB, nullable=False, server_default=text("'{}'::jsonb"))
     row_count = Column(Integer, nullable=False, server_default="0")
     column_count = Column(Integer, nullable=False, server_default="0")
     status = Column(String(20), nullable=False, server_default="ready")  # importing | ready
