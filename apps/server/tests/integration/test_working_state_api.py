@@ -42,11 +42,12 @@ async def _create_complete_ot(
     assert ot_resp.status_code == 201
     ot_rid = ot_resp.json()["rid"]
 
+    api_prefix = ot_id.replace("-", "")
     pk_resp = await client.post(
         f"/api/v1/object-types/{ot_rid}/properties",
         json={
             "id": f"{ot_id}-pk",
-            "apiName": f"{ot_id}Pk",
+            "apiName": f"{api_prefix}Pk",
             "displayName": "PK",
             "baseType": "integer",
             "backingColumn": "id",
@@ -58,7 +59,7 @@ async def _create_complete_ot(
         f"/api/v1/object-types/{ot_rid}/properties",
         json={
             "id": f"{ot_id}-name",
-            "apiName": f"{ot_id}Name",
+            "apiName": f"{api_prefix}Name",
             "displayName": "Name",
             "baseType": "string",
             "backingColumn": "name",
