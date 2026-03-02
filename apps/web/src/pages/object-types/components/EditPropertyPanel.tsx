@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import InlineEditText from '@/components/InlineEditText';
 import BackingColumnSection from './BackingColumnSection';
 import { useUpdateProperty, useDeleteProperty } from '@/api/properties';
-import type { Property, ResourceStatus } from '@/api/types';
+import type { Property } from '@/api/types';
 
 const { Text } = Typography;
 
