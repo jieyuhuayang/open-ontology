@@ -1,6 +1,6 @@
 # Tasks: App Shell & UI 基础框架
 
-**关联 Plan**: `features/v0.1.0/004-app-shell/plan.md`
+**关联 Plan**: `features/v0.1.0/004-app-shell/design.md`
 **规则**: 奇数任务写测试，偶数任务写实现
 
 ---
