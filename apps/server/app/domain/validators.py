@@ -95,6 +95,28 @@ def validate_property_api_name(api_name: str) -> None:
         )
 
 
+VALID_INTENDED_ACTIONS = frozenset({"create", "modify", "delete"})
+
+
+def validate_intended_actions(actions: list[str] | None) -> None:
+    """Validate intended_actions: must be subset of {create, modify, delete}, no duplicates."""
+    if actions is None:
+        return
+    if len(actions) != len(set(actions)):
+        raise AppError(
+            code="INVALID_INTENDED_ACTION",
+            message="intended_actions contains duplicates",
+            status_code=400,
+        )
+    for action in actions:
+        if action not in VALID_INTENDED_ACTIONS:
+            raise AppError(
+                code="INVALID_INTENDED_ACTION",
+                message=f"Invalid intended action: {action!r}. Must be one of: create, modify, delete",
+                status_code=400,
+            )
+
+
 def validate_link_side_api_name(api_name: str, side: str) -> None:
     """Validate link side apiName: camelCase, 1-100 chars, NFKC, no reserved words."""
     normalized = unicodedata.normalize("NFKC", api_name)
