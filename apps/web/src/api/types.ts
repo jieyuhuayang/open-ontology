@@ -15,3 +15,12 @@ export type LinkTypeCreateRequest = components['schemas']['LinkTypeCreateRequest
 export type LinkTypeUpdateRequest = components['schemas']['LinkTypeUpdateRequest'];
 export type LinkTypeListResponse = components['schemas']['LinkTypeListResponse'];
 export type Cardinality = components['schemas']['Cardinality'];
+
+export type Property = components['schemas']['PropertyWithChangeState'];
+export type PropertyCreateRequest = components['schemas']['PropertyCreateRequest'];
+export type PropertyUpdateRequest = components['schemas']['PropertyUpdateRequest'];
+export type PropertyListResponse = components['schemas']['PropertyListResponse'];
+export type PropertySortOrderRequest = components['schemas']['PropertySortOrderRequest'];
+export type PropertySortOrderItem = components['schemas']['PropertySortOrderItem'];
+export type PropertyBaseType = components['schemas']['PropertyBaseType'];
+export type StructField = components['schemas']['StructField'];
