@@ -1378,9 +1378,9 @@ async def browse_tables(rid: str):
 | 文件路径 | 修改内容 |
 |----------|----------|
 | `apps/server/app/storage/models.py` | 新增 DatasetModel、DatasetColumnModel、DatasetRowModel、MySQLConnectionModel；ObjectTypeModel 新增 `intended_actions` 列 |
-| `apps/server/app/domain/object_type.py` | ObjectType 新增 `intended_actions` 字段；ObjectTypeCreateRequest 改为 `display_name` 唯一必填 + 新增 `intended_actions`/`backing_datasource_rid`；ObjectTypeUpdateRequest 新增字段 |
-| `apps/server/app/services/object_type_service.py` | `create()` 支持不完整创建 + 自动推断；`update()` 新增字段处理 + Dataset 关联 |
-| `apps/server/app/services/working_state_service.py` | `publish()` 新增完整性校验；`_apply_object_type_change()` 的 key_map 新增字段 |
+| `apps/server/app/domain/object_type.py` | ObjectType 新增 `intended_actions` 字段；ObjectTypeCreateRequest 改为全部可选 + 新增 `intended_actions`/`backing_datasource_rid`/`project_rid`；ObjectTypeUpdateRequest 新增字段 |
+| `apps/server/app/services/object_type_service.py` | `create()` 支持不完整创建（display_name 可选 + 占位名）+ 自动推断 + project_rid；`update()` 新增字段处理；`delete()` 新增 active 状态校验 |
+| `apps/server/app/services/working_state_service.py` | `publish()` 新增完整性校验 + 类型兼容性校验；`_apply_object_type_change()` 的 key_map 新增字段 |
 | `apps/server/app/main.py` | 注册 datasets、mysql_connections、imports 三个新 router |
 | `apps/server/app/config.py` | 新增 ENCRYPTION_KEY、UPLOAD_TEMP_DIR、UPLOAD_MAX_SIZE_MB、UPLOAD_TOKEN_TTL_MINUTES |
 
