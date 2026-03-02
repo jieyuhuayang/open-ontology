@@ -21,31 +21,49 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # ------------------------------------------------------------------
-    # 1. Create PostgreSQL ENUM types
+    # 1. Create PostgreSQL ENUM types (idempotent)
     # ------------------------------------------------------------------
     op.execute("""
-        CREATE TYPE resource_status AS ENUM ('active', 'experimental', 'deprecated');
+        DO $$ BEGIN
+            CREATE TYPE resource_status AS ENUM ('active', 'experimental', 'deprecated');
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$;
     """)
     op.execute("""
-        CREATE TYPE visibility AS ENUM ('prominent', 'normal', 'hidden');
+        DO $$ BEGIN
+            CREATE TYPE visibility AS ENUM ('prominent', 'normal', 'hidden');
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$;
     """)
     op.execute("""
-        CREATE TYPE cardinality AS ENUM ('one-to-one', 'one-to-many', 'many-to-one', 'many-to-many');
+        DO $$ BEGIN
+            CREATE TYPE cardinality AS ENUM ('one-to-one', 'one-to-many', 'many-to-one', 'many-to-many');
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$;
     """)
     op.execute("""
-        CREATE TYPE join_method AS ENUM ('foreign-key', 'join-table', 'backing-object');
+        DO $$ BEGIN
+            CREATE TYPE join_method AS ENUM ('foreign-key', 'join-table', 'backing-object');
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$;
     """)
     op.execute("""
-        CREATE TYPE link_side AS ENUM ('A', 'B');
+        DO $$ BEGIN
+            CREATE TYPE link_side AS ENUM ('A', 'B');
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$;
     """)
     op.execute("""
-        CREATE TYPE property_base_type AS ENUM (
-            'string', 'integer', 'long', 'float', 'double', 'decimal',
-            'boolean', 'date', 'timestamp', 'byte', 'short',
-            'array', 'struct', 'vector',
-            'geopoint', 'geoshape', 'attachment',
-            'time-series', 'media-reference', 'marking', 'cipher'
-        );
+        DO $$ BEGIN
+            CREATE TYPE property_base_type AS ENUM (
+                'string', 'integer', 'long', 'float', 'double', 'decimal',
+                'boolean', 'date', 'timestamp', 'byte', 'short',
+                'array', 'struct', 'vector',
+                'geopoint', 'geoshape', 'attachment',
+                'time-series', 'media-reference', 'marking', 'cipher'
+            );
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$;
     """)
 
     # ------------------------------------------------------------------
