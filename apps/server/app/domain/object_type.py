@@ -53,12 +53,15 @@ class ObjectTypeWithChangeState(ObjectType):
 
 
 class ObjectTypeCreateRequest(DomainModel):
-    id: str
-    api_name: str
-    display_name: str
+    display_name: str | None = None
+    id: str | None = None
+    api_name: str | None = None
     plural_display_name: str | None = None
     description: str | None = None
-    icon: Icon
+    icon: Icon | None = None
+    intended_actions: list[str] | None = None
+    backing_datasource_rid: str | None = None
+    project_rid: str | None = None
 
 
 class ObjectTypeUpdateRequest(DomainModel):
