@@ -1,6 +1,6 @@
 # F005 Object Type CRUD Frontend — 任务清单 (tasks.md)
 
-> 基于 plan.md 拆解的原子任务，每个任务一次 AI 会话可完成。
+> 基于 design.md 拆解的原子任务，每个任务一次 AI 会话可完成。
 
 ---
 
