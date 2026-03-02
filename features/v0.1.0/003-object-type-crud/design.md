@@ -99,12 +99,14 @@ Phase 1 的已实现代码位于 `apps/server/app/` 各层，详见下方"Phase 
 
 ### AD-11: 不完整 ObjectType 支持
 
-- `ObjectTypeCreateRequest` 调整为仅 `display_name` 必填；`id` 和 `api_name` 可选，为空时自动推断：
+- `ObjectTypeCreateRequest` **所有字段均为可选**；`display_name` 为空时服务端自动生成占位名 `"Untitled Object Type"`，追加 4 位随机后缀避免冲突（如 `"Untitled Object Type a3b2"`）
+- `id` 和 `api_name` 可选，为空时从 `display_name`（含占位名）自动推断：
   - `id` ← display_name 转 kebab-case 小写（`slugify`）
   - `api_name` ← display_name 转 PascalCase
 - 若自动推断值与已有资源冲突，追加随机后缀（如 `employee-2a3b`）
 - 完整性校验仅在 **publish 时** 执行（AC-V4），不在创建时拦截
-- 创建请求新增可选字段 `backing_datasource_rid` 和 `intended_actions`
+- 创建请求新增可选字段 `backing_datasource_rid`、`intended_actions`、`project_rid`
+- `project_rid` 可选，为空时回退 AD-5 默认值（`ri.ontology.space.default`）；MVP 单 Project 场景下前端自动选中默认 Project，后续多 Project 时扩展校验即可
 
 ### AD-12: intended_actions 元数据字段
 
