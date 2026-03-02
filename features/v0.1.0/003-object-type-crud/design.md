@@ -283,18 +283,16 @@ class DatasetColumnModel(Base):
 class DatasetRowModel(Base):
     __tablename__ = "dataset_rows"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)  # BIGSERIAL
     dataset_rid = Column(
-        String, ForeignKey("datasets.rid", ondelete="CASCADE"), nullable=False
+        String, ForeignKey("datasets.rid", ondelete="CASCADE"), nullable=False, primary_key=True
     )
-    row_index = Column(Integer, nullable=False)
+    row_index = Column(Integer, nullable=False, primary_key=True)
     data = Column(JSONB, nullable=False)
 
     dataset = relationship("DatasetModel", back_populates="rows")
 
     __table_args__ = (
-        UniqueConstraint("dataset_rid", "row_index", name="uq_dataset_rows_index"),
-        Index("ix_dataset_rows_dataset", "dataset_rid", "row_index"),
+        Index("ix_dataset_rows_dataset", "dataset_rid"),
     )
 
 
