@@ -1442,3 +1442,111 @@ async def browse_tables(rid: str):
 | 9 | MySQL 测试连接返回格式不统一 | **采纳**：失败改为 `422 { "error": { "code": "MYSQL_CONNECTION_FAILED", "message": "..." } }`，与全局错误格式统一 | API 端点、错误码表 |
 | 10 | 明文密码通过 Header 传递 | **采纳**：移除 `X-MySQL-Password` Header。browse/preview/import 端点统一使用已保存连接的加密密码（服务端解密）。用户流程：test → save → browse/preview/import | API 端点、Router 层、MySQLImportService |
 | 11 | MySQL 类型映射与 PRD 不一致 | **采纳**：按 PRD §8.7 统一：BIGINT/INT/TINYINT → `integer`、DECIMAL/FLOAT/DOUBLE → `double`、BOOLEAN/BIT(1) → `boolean`。精度损失（BIGINT 超 32 位、DECIMAL 高精度）记为已知限制 | 类型映射规则（MYSQL_TYPE_MAP） |
+
+---
+
+## Phase 2 — 前端设计
+
+### 前端组件树
+
+```
+CreateObjectTypeWizard (Modal + Steps，替代现有 CreateObjectTypeModal)
+├── WizardStepDatasource (Step 1)
+│   ├── DatasetList (已有 Dataset 列表 + 搜索 + in-use 标记)
+│   ├── DatasetPreview (选中后展开：列结构 + 前 5 行)
+│   ├── MySQLImportWizard (4 步子向导 Modal)
+│   │   ├── MySQLConnectionForm (连接配置 + 复用已有连接)
+│   │   ├── MySQLTableBrowser (浏览选表 + 列结构预览)
+│   │   ├── MySQLImportConfig (Dataset 名称 + 列选择 + 预估行数)
+│   │   └── ImportResult (进度 + 成功摘要/失败重试)
+│   └── FileUploadWizard (3 步子向导 Modal)
+│       ├── FileUploader (拖拽上传 + 格式校验 + Sheet 选择)
+│       ├── FilePreviewConfig (首行表头 Toggle + 列选择 + 类型修改 + 前 50 行)
+│       └── ImportResult (复用同一组件)
+├── WizardStepMetadata (Step 2)
+│   ├── IconSelector (复用已有)
+│   ├── DisplayName 输入框（必填）
+│   ├── Description 文本域
+│   └── ID 输入框（自动推断 kebab-case，可编辑，带校验）
+├── WizardStepProperties (Step 3)
+│   ├── DatasourceColumnPane (左侧：数据源列，映射状态，操作按钮)
+│   └── PropertyPane (右侧：属性列表，手动添加，PK/TK 设置)
+├── WizardStepActions (Step 4)
+│   └── ActionCheckboxGroup (Create/Modify/Delete 3 个 Checkbox + 说明文案)
+└── WizardStepSaveLocation (Step 5)
+    └── ProjectSelector (下拉选择，单 Project 自动选中)
+```
+
+### 前端状态管理
+
+```typescript
+// stores/create-wizard-store.ts — 替代 create-object-type-modal-store.ts
+interface WizardProperty {
+  id: string;
+  displayName: string;
+  baseType: string;
+  backingColumn?: string;
+  isPrimaryKey: boolean;
+  isTitleKey: boolean;
+}
+
+interface CreateWizardState {
+  isOpen: boolean;
+  currentStep: number; // 0-4
+  // Step 1
+  selectedDatasetRid: string | null;
+  // Step 2
+  displayName: string;
+  description: string;
+  icon: Icon;
+  objectTypeId: string;
+  // Step 3
+  properties: WizardProperty[];
+  // Step 4
+  intendedActions: string[];
+  // Step 5
+  projectRid: string;
+  // Actions
+  open: () => void;
+  close: () => void;
+  reset: () => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  // ... field setters
+}
+```
+
+### 新增 API Hooks
+
+| 文件 | Hook | 用途 |
+|------|------|------|
+| `api/datasets.ts` | `useDatasets(search?)` | Dataset 列表（含 inUse） |
+| | `useDataset(rid)` | Dataset 详情 |
+| | `useDatasetPreview(rid, limit?)` | 数据预览 |
+| | `useDeleteDataset()` | 删除 |
+| `api/mysql-connections.ts` | `useMySQLConnections()` | 连接列表 |
+| | `useCreateMySQLConnection()` | 保存连接 |
+| | `useTestMySQLConnection()` | 测试连接 |
+| | `useMySQLTables(rid)` | 浏览表 |
+| | `useMySQLTableColumns(rid, table)` | 表列结构 |
+| | `useMySQLTablePreview(rid, table)` | 表数据预览 |
+| `api/imports.ts` | `useMySQLImport()` | 触发 MySQL 导入 |
+| | `useFileUploadPreview()` | 上传文件预览 |
+| | `useFileImportConfirm()` | 确认文件导入 |
+| | `useImportTask(taskId)` | 轮询任务状态 |
+
+### 修改现有组件
+
+| 组件 | 变更 |
+|------|------|
+| `CreateObjectTypeModal.tsx` | 删除，替换为 `CreateObjectTypeWizard.tsx` |
+| `create-object-type-modal-store.ts` | 删除，替换为 `create-wizard-store.ts` |
+| `ObjectTypeOverviewPage.tsx` | 新增 backing datasource 区域、incomplete 提示 |
+| `MetadataSection.tsx` | 新增 Status/Visibility 下拉、intended_actions 展示 |
+| `ObjectTypeDetailLayout.tsx` | Active 状态删除置灰 |
+| `CreateMenu.tsx` | 更新引用 |
+| `HomeLayout.tsx` | 更新引用 |
+
+### i18n 新增 keys
+
+wizard.*、dataset.*、mysqlConnection.*、import.*、step.* 命名空间
