@@ -22,6 +22,7 @@ import StatusBadge from '@/components/StatusBadge';
 import ChangeStateBadge from '@/components/ChangeStateBadge';
 import type { Property, ResourceStatus, ChangeState } from '@/api/types';
 
+
 const PRIMARY_KEY_TYPES = new Set([
   'string', 'integer', 'short', 'date', 'timestamp', 'boolean', 'byte', 'long',
 ]);
