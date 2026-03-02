@@ -1134,7 +1134,7 @@ def _auto_infer_api_name(self, display_name: str) -> str:
 
 | 方法 | 修改说明 |
 |------|----------|
-| `publish(ontology_rid)` | 新增完整性校验：遍历变更中的 ObjectType CREATE/UPDATE，检查 7 项完整性条件（AC-V4）；不完整则抛出 `INCOMPLETE_OBJECT_TYPE` 错误 |
+| `publish(ontology_rid)` | 新增完整性校验 + **类型兼容性校验**：遍历变更中的 ObjectType CREATE/UPDATE，检查 7 项完整性条件（AC-V4）+ Property baseType 与 Dataset 列 inferredType 的兼容性（AC-V6）；不完整则抛出 `INCOMPLETE_OBJECT_TYPE`，类型不兼容则抛出 `FIELD_TYPE_INCOMPATIBLE` |
 | `_apply_object_type_change(change)` | `key_map` 新增 `intendedActions → intended_actions`、`backingDatasource → backing_datasource`、`primaryKeyPropertyId → primary_key_property_id`、`titleKeyPropertyId → title_key_property_id` |
 
 完整性校验逻辑（在 `publish()` 中调用）：
@@ -1180,6 +1180,69 @@ async def _validate_completeness(self, changes: list[Change]) -> None:
                     "missingFields": missing,
                 },
             )
+```
+
+类型兼容性校验逻辑（在 `publish()` 中、完整性校验之后调用）：
+
+```python
+# Property baseType 与 Dataset 列 inferredType 的兼容矩阵
+TYPE_COMPATIBILITY: dict[str, set[str]] = {
+    "string":    {"string", "integer", "short", "long", "float", "double", "decimal", "boolean", "date", "timestamp"},  # string 兼容所有
+    "integer":   {"integer", "short"},
+    "long":      {"integer", "short", "long"},
+    "short":     {"short"},
+    "float":     {"float"},
+    "double":    {"float", "double"},
+    "decimal":   {"float", "double", "decimal"},
+    "boolean":   {"boolean"},
+    "date":      {"date"},
+    "timestamp": {"timestamp", "date"},
+}
+
+
+async def _validate_type_compatibility(self, changes: list[Change]) -> None:
+    """校验 Property baseType 与 Dataset 列 inferredType 是否兼容（AC-V6）。"""
+    for change in changes:
+        if change.resource_type != ResourceType.OBJECT_TYPE:
+            continue
+        if change.change_type == ChangeType.DELETE:
+            continue
+
+        data = change.after or {}
+        backing = data.get("backingDatasource")
+        if not backing or not backing.get("rid"):
+            continue
+
+        dataset = await self._dataset_storage.get_by_rid(backing["rid"])
+        if not dataset:
+            continue
+
+        # 构建列名→推断类型映射
+        col_type_map = {col.name: col.inferred_type for col in dataset.columns}
+
+        # 检查每个已映射 Property 的类型兼容性
+        properties = await self._get_properties_for_object_type(change.resource_rid, changes)
+        for prop in properties:
+            if not prop.get("backingColumn"):
+                continue
+            col_name = prop["backingColumn"]
+            col_type = col_type_map.get(col_name)
+            if col_type is None:
+                continue
+
+            prop_type = prop.get("baseType", "string")
+            compatible_types = TYPE_COMPATIBILITY.get(prop_type, {prop_type})
+            if col_type not in compatible_types:
+                raise AppError(
+                    code="FIELD_TYPE_INCOMPATIBLE",
+                    message=f"Property '{prop.get('id')}' type '{prop_type}' is incompatible with column '{col_name}' type '{col_type}'",
+                    status_code=400,
+                    details={
+                        "propertyId": prop.get("id"),
+                        "propertyType": prop_type,
+                        "columnType": col_type,
+                    },
+                )
 ```
 
 ---
