@@ -106,9 +106,10 @@ class WorkingStateService:
 
         if existing.change_type == ChangeType.CREATE:
             if new_change.change_type == ChangeType.UPDATE:
-                # CREATE + UPDATE → CREATE with latest after
+                # CREATE + UPDATE → CREATE with merged after
+                merged_after = {**(existing.after or {}), **(new_change.after or {})}
                 merged = existing.model_copy(
-                    update={"after": new_change.after, "timestamp": new_change.timestamp}
+                    update={"after": merged_after, "timestamp": new_change.timestamp}
                 )
                 return [*rest, merged]
             elif new_change.change_type == ChangeType.DELETE:
