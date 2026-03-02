@@ -990,13 +990,13 @@ class ObjectTypeUpdateRequest(DomainModel):
 
 | 方法 | 说明 |
 |------|------|
-| `list(ontology_rid, search?)` | 列表查询（含 in-use 判断 + 搜索过滤） |
+| `list(ontology_rid, search?)` | 列表查询，默认过滤 `status='ready'`（不展示 importing 中的 Dataset）；in-use 通过 `is_in_use()` 合并计算 |
 | `get_by_rid(rid)` | 详情（含 columns） |
 | `get_preview(rid, limit=50)` | 前 N 行数据预览 |
-| `create(name, source_type, source_metadata, columns, rows, ontology_rid)` | 创建 Dataset（内部方法，由 import service 调用） |
-| `delete(rid)` | 删除（in-use 检查：`linked_object_type_rid IS NOT NULL → 403`） |
-| `link_to_object_type(dataset_rid, object_type_rid)` | 关联 Dataset 和 ObjectType |
-| `unlink_from_object_type(dataset_rid)` | 解除关联 |
+| `create(name, source_type, source_metadata, columns, rows, ontology_rid)` | 创建 Dataset（内部方法，由 import service 调用）；在独立事务中执行 |
+| `delete(rid)` | 删除（in-use 检查：通过 `is_in_use()` 合并计算 → 403） |
+| `is_in_use(dataset_rid, ontology_rid)` | **合并计算** Dataset 是否被占用：扫描已发布 ObjectType 的 `backing_datasource` + Working State 中 CREATE/UPDATE 变更的 `backingDatasource.rid`（排除 DELETE） |
+| `get_in_use_map(ontology_rid)` | 批量版本：返回 `{dataset_rid: object_type_display_name}` 映射，供列表查询使用 |
 
 ### MySQLImportService（`app/services/mysql_import_service.py`）
 
