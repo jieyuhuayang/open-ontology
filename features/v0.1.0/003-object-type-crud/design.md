@@ -179,7 +179,7 @@ CREATE TABLE datasets (
 
 ```sql
 CREATE TABLE dataset_columns (
-    id              SERIAL  PRIMARY KEY,
+    rid             TEXT    PRIMARY KEY,  -- 格式: ri.ontology.dataset-column.<uuid>
     dataset_rid     TEXT    NOT NULL REFERENCES datasets(rid) ON DELETE CASCADE,
     name            VARCHAR(255) NOT NULL,
     inferred_type   VARCHAR(50)  NOT NULL,  -- 推断的 PropertyBaseType 值
