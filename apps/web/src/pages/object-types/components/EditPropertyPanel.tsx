@@ -1,10 +1,9 @@
 import { Drawer, Descriptions, Select, Typography, Space, Button, Popconfirm, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import InlineEditText from '@/components/InlineEditText';
-import StatusBadge from '@/components/StatusBadge';
 import BackingColumnSection from './BackingColumnSection';
 import { useUpdateProperty, useDeleteProperty } from '@/api/properties';
-import type { Property, ResourceStatus, Visibility } from '@/api/types';
+import type { Property, ResourceStatus } from '@/api/types';
 
 const { Text } = Typography;
 
@@ -17,24 +16,20 @@ const TITLE_KEY_TYPES = new Set([
   'float', 'double', 'decimal', 'geopoint', 'cipher', 'array',
 ]);
 
-interface EditPropertyPanelProps {
-  property: Property | null;
+interface EditPropertyPanelInnerProps {
+  property: Property;
   objectTypeStatus?: string;
   onClose: () => void;
 }
 
-export default function EditPropertyPanel({
+function EditPropertyPanelInner({
   property,
   objectTypeStatus,
   onClose,
-}: EditPropertyPanelProps) {
+}: EditPropertyPanelInnerProps) {
   const { t } = useTranslation();
-  const updateMutation = property
-    ? useUpdateProperty(property.objectTypeRid, property.rid)
-    : null;
-  const deleteMutation = property ? useDeleteProperty(property.objectTypeRid) : null;
-
-  if (!property) return null;
+  const updateMutation = useUpdateProperty(property.objectTypeRid, property.rid);
+  const deleteMutation = useDeleteProperty(property.objectTypeRid);
 
   const isActive = property.status === 'active';
   const canBePK = PRIMARY_KEY_TYPES.has(property.baseType);
@@ -42,9 +37,8 @@ export default function EditPropertyPanel({
   const otIsActive = objectTypeStatus === 'active';
 
   const handleUpdate = async (update: Record<string, unknown>) => {
-    if (!updateMutation) return;
     try {
-      await updateMutation.mutateAsync(update);
+      await updateMutation.mutateAsync(update as Parameters<typeof updateMutation.mutateAsync>[0]);
       void message.success(t('property.updateSuccess'));
     } catch (err: unknown) {
       const apiErr = err as { response?: { data?: { error?: { message?: string } } } };
@@ -54,7 +48,6 @@ export default function EditPropertyPanel({
   };
 
   const handleDelete = async () => {
-    if (!deleteMutation) return;
     try {
       await deleteMutation.mutateAsync(property.rid);
       void message.success(t('property.deleteSuccess'));
@@ -69,7 +62,7 @@ export default function EditPropertyPanel({
   return (
     <Drawer
       title={property.displayName}
-      open={!!property}
+      open
       onClose={onClose}
       width={480}
       extra={
@@ -200,7 +193,7 @@ export default function EditPropertyPanel({
           </Text>
           <div style={{ marginTop: 4 }}>
             <Space>
-              <StatusBadge status={property.isPrimaryKey ? 'active' : ('experimental' as ResourceStatus)} />
+              <Text>{property.isPrimaryKey ? '✓' : '—'}</Text>
               {canBePK && !property.isPrimaryKey && (
                 <Button
                   size="small"
@@ -209,6 +202,15 @@ export default function EditPropertyPanel({
                   onClick={() => void handleUpdate({ isPrimaryKey: true })}
                 >
                   {t('property.primaryKey.set')}
+                </Button>
+              )}
+              {property.isPrimaryKey && (
+                <Button
+                  size="small"
+                  danger
+                  onClick={() => void handleUpdate({ isPrimaryKey: false })}
+                >
+                  {t('property.primaryKey.unset')}
                 </Button>
               )}
               {!canBePK && (
@@ -226,13 +228,22 @@ export default function EditPropertyPanel({
           </Text>
           <div style={{ marginTop: 4 }}>
             <Space>
-              <StatusBadge status={property.isTitleKey ? 'active' : ('experimental' as ResourceStatus)} />
+              <Text>{property.isTitleKey ? '✓' : '—'}</Text>
               {canBeTK && !property.isTitleKey && (
                 <Button
                   size="small"
                   onClick={() => void handleUpdate({ isTitleKey: true })}
                 >
                   {t('property.titleKey.set')}
+                </Button>
+              )}
+              {property.isTitleKey && (
+                <Button
+                  size="small"
+                  danger
+                  onClick={() => void handleUpdate({ isTitleKey: false })}
+                >
+                  {t('property.titleKey.unset')}
                 </Button>
               )}
               {!canBeTK && (
@@ -245,5 +256,26 @@ export default function EditPropertyPanel({
         </div>
       </Space>
     </Drawer>
+  );
+}
+
+interface EditPropertyPanelProps {
+  property: Property | null;
+  objectTypeStatus?: string;
+  onClose: () => void;
+}
+
+export default function EditPropertyPanel({
+  property,
+  objectTypeStatus,
+  onClose,
+}: EditPropertyPanelProps) {
+  if (!property) return null;
+  return (
+    <EditPropertyPanelInner
+      property={property}
+      objectTypeStatus={objectTypeStatus}
+      onClose={onClose}
+    />
   );
 }
