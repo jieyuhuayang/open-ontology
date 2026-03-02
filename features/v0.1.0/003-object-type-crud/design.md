@@ -744,8 +744,13 @@ class ObjectTypeUpdateRequest(DomainModel):
 // Response 200 — 成功
 { "success": true }
 
-// Response 200 — 失败（不用 4xx，因为是"测试"操作）
-{ "success": false, "error": "Access denied for user 'reader'@'...' (using password: YES)" }
+// Response 422 — 连接失败（统一错误格式）
+{
+  "error": {
+    "code": "MYSQL_CONNECTION_FAILED",
+    "message": "Access denied for user 'reader'@'...' (using password: YES)"
+  }
+}
 ```
 
 #### GET /api/v1/mysql-connections/{rid}/tables
