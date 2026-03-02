@@ -245,12 +245,12 @@ class DatasetModel(Base):
     source_metadata = Column(JSONB, nullable=False, server_default="'{}'::jsonb")
     row_count = Column(Integer, nullable=False, server_default="0")
     column_count = Column(Integer, nullable=False, server_default="0")
+    status = Column(String(20), nullable=False, server_default="'ready'")  # importing | ready
     imported_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     ontology_rid = Column(
         String, ForeignKey("ontologies.rid", ondelete="CASCADE"), nullable=False
     )
     created_by = Column(String(255), nullable=False)
-    linked_object_type_rid = Column(String, unique=True, nullable=True)
 
     columns = relationship(
         "DatasetColumnModel", back_populates="dataset", cascade="all, delete-orphan"
