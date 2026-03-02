@@ -1,7 +1,7 @@
 # Tasks: Object Type CRUD（对象类型增删改查）
 
 **关联规范**: [spec.md](./spec.md)
-**技术方案**: [plan.md](./plan.md)
+**技术方案**: [design.md](./design.md)
 **版本**: v0.1.0
 **开始日期**: 2026-02-28
 **完成日期**: 2026-02-28
@@ -39,7 +39,7 @@
     - `apps/server/app/domain/validators.py` — `validate_api_name()`, `validate_object_type_id()`, `RESERVED_API_NAMES`, 正则常量
     - `apps/server/app/domain/working_state.py` — `ChangeType`, `ResourceType`, `ChangeState`, `Change`, `WorkingState`, `ChangeRecord` 模型
     - `apps/server/app/domain/object_type.py` — `ResourceStatus`, `Visibility`, `Icon`, `ObjectType`, `ObjectTypeWithChangeState`, `ObjectTypeCreateRequest`, `ObjectTypeUpdateRequest`, `ObjectTypeListResponse`
-  - 内容: 见 [plan.md §数据结构设计](./plan.md#数据结构设计)。所有模型继承 `DomainModel`，使用 `alias_generator=to_camel` + `populate_by_name=True`。校验器抛出 `AppError`，错误码见 plan.md §错误码
+  - 内容: 见 [design.md §数据结构设计](./design.md#数据结构设计)。所有模型继承 `DomainModel`，使用 `alias_generator=to_camel` + `populate_by_name=True`。校验器抛出 `AppError`，错误码见 design.md §错误码
   - 依赖: 无（复用 F001 的 `app/domain/common.py` 和 `app/exceptions.py`）
   - AC 覆盖: AC3a, AC3b
   - 验证: T001 全部测试通过
@@ -63,7 +63,7 @@
     - `apps/server/app/storage/working_state_storage.py` — `get_by_ontology()`, `create()`, `update_changes()`, `delete()`
     - `apps/server/app/storage/object_type_storage.py` — `list_by_ontology()`, `get_by_rid()`, `get_by_id()`, `get_by_api_name()`, `create()`, `update()`, `delete()`, `get_related_link_type_rids()`
     - `apps/server/app/storage/ontology_storage.py` — `get_by_rid()`, `increment_version()`
-  - 内容: 见 [plan.md §Storage 层设计](./plan.md#storage-层设计)。全部使用 async SQLAlchemy 2.0 + asyncpg，接收 `AsyncSession` 参数，返回 Domain 模型
+  - 内容: 见 [design.md §Storage 层设计](./design.md#storage-层设计)。全部使用 async SQLAlchemy 2.0 + asyncpg，接收 `AsyncSession` 参数，返回 Domain 模型
   - 依赖: T002（Domain 模型）、F002（ORM 模型 `app/storage/models.py`）
   - AC 覆盖: 间接支持所有 AC
   - 验证: T003 全部测试通过
@@ -97,7 +97,7 @@
     - `get_merged_view(ontology_rid, resource_type)` — 返回 `list[tuple[dict, ChangeState]]`，资源类型无关
     - `publish(ontology_rid)` — 原子事务：应用变更到主表 → 创建 ChangeRecord → 递增 version → 删除 WS
     - `discard(ontology_rid)` — 删除 WorkingState
-  - 内容: 见 [plan.md §Service 层设计 - WorkingStateService](./plan.md#service-层设计)
+  - 内容: 见 [design.md §Service 层设计 - WorkingStateService](./design.md#service-层设计)
   - 依赖: T004（Storage 层）
   - AC 覆盖: AC11, AC12, AC13
   - 验证: T005 全部测试通过
@@ -127,7 +127,7 @@
     - `update(rid, req)` — 校验 active 限制 → 校验 apiName 唯一性 → add_change(UPDATE)
     - `delete(rid)` — 校验 active 不可删 → 查询关联 Properties/LinkTypes → 级联生成 DELETE 变更 → add_change(DELETE)
     - `_check_uniqueness(ontology_rid, id, api_name, exclude_rid?)` — 辅助方法
-  - 内容: 见 [plan.md §Service 层设计 - ObjectTypeService](./plan.md#service-层设计)
+  - 内容: 见 [design.md §Service 层设计 - ObjectTypeService](./design.md#service-层设计)
   - 依赖: T006（WorkingStateService）、T004（Storage 层）
   - AC 覆盖: AC1, AC2, AC4, AC6, AC7, AC10, AC10a, AC12
   - 验证: T007 全部测试通过
@@ -170,7 +170,7 @@
     - `apps/server/app/routers/object_types.py` — ObjectType CRUD 五个端点（GET list, POST create, GET detail, PUT update, DELETE）
     - `apps/server/app/routers/ontology.py` — 变更管理三个端点（POST save, DELETE discard, GET working-state）
     - `apps/server/app/main.py` — 注册 `object_types.router` 和 `ontology.router`
-  - 内容: 见 [plan.md §Router 层设计](./plan.md#router-层设计)。Router 层仅做 HTTP 解析 + 委托 Service，不含业务逻辑。使用 `Depends` 注入 Service。Query 参数 `pageSize` 使用 `alias="pageSize"` 映射
+  - 内容: 见 [design.md §Router 层设计](./design.md#router-层设计)。Router 层仅做 HTTP 解析 + 委托 Service，不含业务逻辑。使用 `Depends` 注入 Service。Query 参数 `pageSize` 使用 `alias="pageSize"` 映射
   - 依赖: T008（ObjectTypeService）、T006（WorkingStateService）
   - AC 覆盖: 所有 AC（HTTP 层入口）
   - 验证: T009 全部集成测试通过
@@ -209,7 +209,7 @@
 
 ## 实际偏差记录
 
-> 完成后，在此记录实现与 plan.md 的偏差，供后续参考。
+> 完成后，在此记录实现与 design.md 的偏差，供后续参考。
 
 - `ObjectTypeStorage.list_by_ontology()` 返回全部列表而非分页元组，分页在 Service 层通过合并视图后截取实现（因为需要合并草稿数据后才能确定 total）
 - `ObjectTypeStorage._to_dict()` 使用 `model.model_dump(mode="json")` 而非手动字段映射
