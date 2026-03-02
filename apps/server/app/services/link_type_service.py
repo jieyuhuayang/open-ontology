@@ -316,6 +316,11 @@ class LinkTypeService:
         await self._ws_service.add_change(DEFAULT_ONTOLOGY_RID, change)
 
         merged_data = {**data, **update_fields}
+        # Deep merge nested side dicts so partial sideA/sideB updates
+        # don't lose required fields like objectTypeRid/apiName
+        for side_key in ("sideA", "sideB"):
+            if side_key in update_fields and side_key in data and isinstance(data[side_key], dict):
+                merged_data[side_key] = {**data[side_key], **update_fields[side_key]}
         new_state = (
             ChangeState.MODIFIED if current_state == ChangeState.PUBLISHED else current_state
         )
