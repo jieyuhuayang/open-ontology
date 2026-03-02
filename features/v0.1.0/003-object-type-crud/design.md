@@ -263,7 +263,7 @@ class DatasetModel(Base):
 class DatasetColumnModel(Base):
     __tablename__ = "dataset_columns"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    rid = Column(String, primary_key=True)  # ri.ontology.dataset-column.<uuid>
     dataset_rid = Column(
         String, ForeignKey("datasets.rid", ondelete="CASCADE"), nullable=False
     )
