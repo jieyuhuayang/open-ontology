@@ -1,4 +1,4 @@
-# F005 Object Type CRUD Frontend — 技术方案 (plan.md)
+# F005 Object Type CRUD Frontend — 技术方案 (design.md)
 
 ## Context
 
