@@ -117,9 +117,10 @@ class WorkingStateService:
                 return rest
         elif existing.change_type == ChangeType.UPDATE:
             if new_change.change_type == ChangeType.UPDATE:
-                # UPDATE + UPDATE → keep earliest before + latest after
+                # UPDATE + UPDATE → keep earliest before + merged after
+                merged_after = {**(existing.after or {}), **(new_change.after or {})}
                 merged = existing.model_copy(
-                    update={"after": new_change.after, "timestamp": new_change.timestamp}
+                    update={"after": merged_after, "timestamp": new_change.timestamp}
                 )
                 return [*rest, merged]
             elif new_change.change_type == ChangeType.DELETE:
