@@ -72,6 +72,10 @@ class ObjectTypeUpdateRequest(DomainModel):
     status: ResourceStatus | None = None
     visibility: Visibility | None = None
     api_name: str | None = None
+    intended_actions: list[str] | None = None
+    backing_datasource_rid: str | None = None
+    primary_key_property_id: str | None = None
+    title_key_property_id: str | None = None
 
 
 class ObjectTypeListResponse(DomainModel):
