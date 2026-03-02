@@ -222,7 +222,12 @@ class PropertyModel(Base):
     conditional_formatting = Column(JSONB, nullable=True)
     is_primary_key = Column(Boolean, nullable=False, server_default="false")
     is_title_key = Column(Boolean, nullable=False, server_default="false")
+    sort_order = Column(Integer, nullable=False, server_default="0")
     shared_property_rid = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    created_by = Column(String(255), nullable=False, server_default="system")
+    last_modified_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    last_modified_by = Column(String(255), nullable=False, server_default="system")
     search_vector = Column(TSVECTOR)
 
     object_type = relationship("ObjectTypeModel", back_populates="properties")
