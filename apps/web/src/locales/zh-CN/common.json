@@ -113,6 +113,104 @@
       "selfLinkNotAllowed": "A 端和 B 端不能引用同一个对象类型"
     }
   },
+  "property": {
+    "addProperty": "添加属性",
+    "fields": {
+      "displayName": "显示名称",
+      "id": "ID",
+      "apiName": "API Name",
+      "baseType": "基础类型",
+      "backingColumn": "底层列",
+      "status": "状态",
+      "visibility": "可见性",
+      "isPrimaryKey": "主键",
+      "isTitleKey": "标题键",
+      "description": "描述",
+      "rid": "RID"
+    },
+    "baseTypes": {
+      "string": "字符串",
+      "integer": "整数",
+      "long": "长整数",
+      "float": "浮点数",
+      "double": "双精度",
+      "decimal": "精确小数",
+      "boolean": "布尔值",
+      "date": "日期",
+      "timestamp": "时间戳",
+      "byte": "字节",
+      "short": "短整数",
+      "array": "数组",
+      "struct": "结构体",
+      "vector": "向量",
+      "geopoint": "地理点",
+      "geoshape": "地理形状",
+      "attachment": "附件",
+      "time-series": "时间序列",
+      "media-reference": "媒体引用",
+      "marking": "标记",
+      "cipher": "密文"
+    },
+    "comingSoon": "即将推出",
+    "backingColumn": {
+      "mapped": "已映射到 {{column}}",
+      "unmapped": "未映射",
+      "setMapping": "映射到列",
+      "changeMapping": "更改映射",
+      "removeMapping": "移除映射",
+      "confirmRemove": "移除 \"{{name}}\" 的列映射？",
+      "columnPlaceholder": "例如 employee_id"
+    },
+    "primaryKey": {
+      "set": "设为主键",
+      "unset": "取消主键",
+      "replaceConfirm": "此操作将替换现有主键 \"{{name}}\"。",
+      "invalidType": "{{type}} 不能用作主键",
+      "activeObjectType": "对象类型为 Active 时不可更换主键"
+    },
+    "titleKey": {
+      "set": "设为标题键",
+      "unset": "取消标题键",
+      "replaceConfirm": "此操作将替换现有标题键 \"{{name}}\"。"
+    },
+    "structField": {
+      "addField": "添加字段",
+      "fieldName": "字段名",
+      "fieldType": "字段类型",
+      "removeField": "删除"
+    },
+    "arrayInnerType": "数组元素类型",
+    "validation": {
+      "idRequired": "ID 为必填项",
+      "idFormat": "ID 必须以字母开头，只能包含字母、数字、连字符或下划线",
+      "apiNameRequired": "API Name 为必填项",
+      "apiNameFormat": "API Name 必须以小写字母开头，只能包含字母和数字（1-100 个字符）",
+      "displayNameRequired": "显示名称为必填项",
+      "baseTypeRequired": "基础类型为必填项",
+      "idConflict": "此 ID 在该对象类型下已存在",
+      "apiNameConflict": "此 API Name 在该对象类型下已存在",
+      "typeCannotChange": "创建后不可修改属性类型",
+      "limitExceeded": "每个对象类型最多支持 200 个属性",
+      "arrayInnerTypeRequired": "数组属性必须指定元素类型"
+    },
+    "deleteConfirm": "删除属性 \"{{name}}\"？此操作不可撤销。",
+    "deleteActiveError": "无法删除状态为 Active 的属性，请先将其状态改为 Deprecated。",
+    "deletePrimaryKeyError": "无法删除主键属性，请先重新指定主键。",
+    "empty": "暂无属性，点击「添加属性」开始创建。",
+    "filterEmpty": "没有匹配的属性",
+    "createSuccess": "属性创建成功",
+    "updateSuccess": "属性更新成功",
+    "deleteSuccess": "属性删除成功",
+    "reorderSuccess": "属性排序已更新",
+    "filters": {
+      "status": "状态",
+      "visibility": "可见性",
+      "baseType": "基础类型",
+      "allStatuses": "全部状态",
+      "allVisibilities": "全部可见性",
+      "allTypes": "全部类型"
+    }
+  },
   "objectType": {
     "listTitle": "对象类型",
     "newObjectType": "新建对象类型",
