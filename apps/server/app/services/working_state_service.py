@@ -364,6 +364,10 @@ class WorkingStateService:
                 "status": "status",
                 "visibility": "visibility",
                 "apiName": "api_name",
+                "intendedActions": "intended_actions",
+                "backingDatasource": "backing_datasource",
+                "primaryKeyPropertyId": "primary_key_property_id",
+                "titleKeyPropertyId": "title_key_property_id",
                 "lastModifiedAt": "last_modified_at",
                 "lastModifiedBy": "last_modified_by",
             }
