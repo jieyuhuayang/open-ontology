@@ -1300,16 +1300,19 @@ async def browse_tables(rid: str):
 | HTTP | Code | 触发场景 |
 |------|------|----------|
 | 400 | `INCOMPLETE_OBJECT_TYPE` | 发布时 ObjectType 不满足完整性条件 |
-| 400 | `DATASET_ALREADY_REGISTERED` | Dataset 已被其他 ObjectType 关联（AC-V3） |
+| 400 | `FIELD_TYPE_INCOMPATIBLE` | 发布时 Property baseType 与 Dataset 列 inferredType 不兼容（AC-V6）；details 含 propertyId、propertyType、columnType |
+| 400 | `OBJECT_TYPE_ACTIVE_CANNOT_DELETE` | 删除 active 状态的 ObjectType（已发布或 Working State 中 status=active） |
+| 400 | `DATASET_ALREADY_IN_USE` | Dataset 已被其他 ObjectType 引用（合并计算：已发布 + Working State 草稿）（AC-V3） |
 | 400 | `INVALID_INTENDED_ACTIONS` | intended_actions 包含无效值 |
 | 400 | `UPLOAD_FILE_TOO_LARGE` | 上传文件超过 50MB |
 | 400 | `UPLOAD_INVALID_FORMAT` | 上传文件格式不支持 |
 | 400 | `UPLOAD_TOKEN_EXPIRED` | file_token 已过期（30 分钟） |
 | 400 | `MYSQL_IMPORT_NO_COLUMNS` | 未选择任何列 |
-| 403 | `DATASET_IN_USE` | 删除已关联 ObjectType 的 Dataset |
+| 403 | `DATASET_IN_USE` | 删除已被 ObjectType 引用的 Dataset（合并计算判定） |
 | 404 | `DATASET_NOT_FOUND` | Dataset RID 不存在 |
 | 404 | `MYSQL_CONNECTION_NOT_FOUND` | MySQL 连接 RID 不存在 |
 | 404 | `IMPORT_TASK_NOT_FOUND` | 任务 ID 不存在 |
+| 422 | `MYSQL_CONNECTION_FAILED` | MySQL 测试连接失败（统一错误格式） |
 | 500 | `MYSQL_IMPORT_CONNECTION_LOST` | 导入过程中连接断开 |
 | 500 | `MYSQL_IMPORT_FAILED` | MySQL 导入失败（通用） |
 | 500 | `FILE_IMPORT_FAILED` | 文件导入失败（通用） |
