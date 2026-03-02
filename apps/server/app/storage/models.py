@@ -162,6 +162,7 @@ class ObjectTypeModel(Base):
     backing_datasource = Column(JSONB, nullable=True)
     primary_key_property_id = Column(String(255), nullable=True)
     title_key_property_id = Column(String(255), nullable=True)
+    intended_actions = Column(JSONB, nullable=True)
     project_rid = Column(String, nullable=False)
     ontology_rid = Column(
         String,
