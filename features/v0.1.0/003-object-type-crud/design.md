@@ -356,7 +356,7 @@ class Dataset(DomainModel):
 
 
 class DatasetListItem(DomainModel):
-    """列表项，包含 in-use 状态"""
+    """列表项，in_use 通过合并计算得出（扫描已发布 ObjectType + Working State 草稿）"""
     rid: str
     name: str
     source_type: str
@@ -364,7 +364,7 @@ class DatasetListItem(DomainModel):
     column_count: int
     imported_at: datetime
     in_use: bool = False
-    linked_object_type_name: str | None = None
+    linked_object_type_name: str | None = None  # 合并计算时同时获取关联的 ObjectType 名称
 
 
 class DatasetListResponse(DomainModel):
