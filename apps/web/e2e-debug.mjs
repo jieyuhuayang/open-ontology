@@ -17,130 +17,147 @@ async function main() {
   await page.waitForTimeout(500);
   console.log('✅ Wizard opened');
 
-  const modal = page.locator('.ant-modal');
+  const modal = page.locator('.ant-modal-content');
 
-  // Step 1 → Step 2: Click Next (skip dataset selection for now)
-  const nextBtn = modal.locator('button:has-text("Next")');
-  // Next button might be disabled if no dataset is selected — let's check
-  const isNextDisabled = await nextBtn.isDisabled();
-  console.log(`Next button disabled: ${isNextDisabled}`);
+  // Step 1: Click the first non-disabled table row to select a dataset
+  const rows = modal.locator('.ant-table-row');
+  const rowCount = await rows.count();
+  console.log(`Dataset rows: ${rowCount}`);
 
-  if (isNextDisabled) {
-    // Try to select the first available (non-in-use) dataset
-    // Or try the "Use This Dataset" button that's enabled
-    const useButtons = modal.locator('button:has-text("Use This Dataset")');
-    const count = await useButtons.count();
-    console.log(`"Use This Dataset" buttons found: ${count}`);
-    for (let i = 0; i < count; i++) {
-      const btn = useButtons.nth(i);
-      const disabled = await btn.isDisabled();
-      console.log(`  Button ${i}: disabled=${disabled}`);
-      if (!disabled) {
-        await btn.click();
-        await page.waitForTimeout(300);
-        console.log('✅ Selected dataset');
-        break;
-      }
+  for (let i = 0; i < rowCount; i++) {
+    const row = rows.nth(i);
+    const opacity = await row.evaluate((el) => getComputedStyle(el).opacity);
+    const text = await row.textContent();
+    console.log(`  Row[${i}]: opacity=${opacity}, text="${text?.slice(0, 60)}"`);
+    if (opacity !== '0.5') {
+      await row.click();
+      await page.waitForTimeout(300);
+      console.log(`  ✅ Selected row ${i}`);
+      break;
     }
   }
 
-  // Click Next to step 2
-  if (!(await nextBtn.isDisabled())) {
-    await nextBtn.click();
-    await page.waitForTimeout(300);
-    console.log('✅ Step 2 (Metadata)');
+  // Click Next → Step 2
+  const nextBtn = modal.locator('button:has-text("Next")');
+  if (await nextBtn.isDisabled()) {
+    console.log('❌ Next still disabled after selecting dataset');
+    await page.screenshot({ path: 'apps/web/e2e-step1.png' });
+    await browser.close();
+    return;
+  }
 
-    // Check step 2 fields
-    const labels = await modal.locator('.ant-form-item-label').allTextContents();
-    console.log('Step 2 form labels:', labels);
+  await nextBtn.click();
+  await page.waitForTimeout(500);
+  console.log('✅ Step 2 (Metadata)');
 
-    // Fill name
-    const nameInput = modal.locator('#displayName, input[id="displayName"]');
-    if (await nameInput.isVisible().catch(() => false)) {
-      await nameInput.fill('Test Aircraft');
-    } else {
-      // Try finding input by label
-      const inputs = modal.locator('.ant-form-item input[type="text"]');
-      const inputCount = await inputs.count();
-      console.log(`  Text inputs found: ${inputCount}`);
-      if (inputCount > 0) {
-        await inputs.first().fill('Test Aircraft');
-      }
-    }
+  // Check step 2 fields
+  const labels = await modal.locator('.ant-form-item-label label').allTextContents();
+  console.log('Step 2 labels:', labels);
 
-    // Click Next to step 3
-    await nextBtn.click();
-    await page.waitForTimeout(1000);
-    console.log('✅ Step 3 (Properties)');
+  // Fill display name
+  const inputs = modal.locator('.ant-form-item input[type="text"]');
+  const inputCount = await inputs.count();
+  for (let i = 0; i < inputCount; i++) {
+    const id = await inputs.nth(i).getAttribute('id');
+    console.log(`  Input[${i}]: id="${id}"`);
+  }
+  // Find the displayName input
+  const nameInput = modal.locator('#displayName');
+  if (await nameInput.isVisible()) {
+    await nameInput.fill('Test Aircraft');
+  } else {
+    // Fallback to first text input
+    if (inputCount > 0) await inputs.first().fill('Test Aircraft');
+  }
 
-    // Screenshot step 3
-    await page.screenshot({ path: '/Users/lilu/Projects/OpenOntology/apps/web/e2e-step3.png', fullPage: true });
-    console.log('📸 Screenshot saved to apps/web/e2e-step3.png');
+  // Click Next → Step 3
+  await nextBtn.click();
+  await page.waitForTimeout(1000);
+  console.log('✅ Step 3 (Properties)');
 
-    // Analyze step 3 content
-    const step3Text = await modal.textContent();
-    console.log('\nStep 3 text (first 500 chars):');
-    console.log(step3Text?.slice(0, 500));
+  // Screenshot
+  await page.screenshot({ path: 'apps/web/e2e-step3.png' });
+  console.log('📸 e2e-step3.png saved');
 
-    // Check for Add All button
-    const hasAddAll = await modal.locator('text=Add All').isVisible().catch(() => false);
-    console.log(`\nHas "Add All" button: ${hasAddAll}`);
+  // ==========================================
+  // CRITICAL: Test PK/TK Select dropdowns
+  // ==========================================
+  console.log('\n=== Testing PK/TK Select dropdowns ===');
 
-    // Count selects
-    const selects = modal.locator('.ant-select');
-    const selectCount = await selects.count();
-    console.log(`Total Selects in step 3: ${selectCount}`);
+  const allSelects = modal.locator('.ant-select');
+  const selectCount = await allSelects.count();
+  console.log(`Total Selects: ${selectCount}`);
 
-    // Try to interact with each select
-    for (let i = 0; i < selectCount; i++) {
-      const sel = selects.nth(i);
-      const box = await sel.boundingBox();
-      const className = await sel.getAttribute('class') || '';
-      const isOpen = className.includes('ant-select-open');
-      const isDisabled = className.includes('ant-select-disabled');
-      const selectorText = await sel.locator('.ant-select-selection-item, .ant-select-selection-placeholder').textContent().catch(() => 'N/A');
-      console.log(`\n  Select[${i}]: text="${selectorText}", disabled=${isDisabled}, open=${isOpen}, box=${JSON.stringify(box)}`);
+  for (let i = 0; i < selectCount; i++) {
+    const sel = allSelects.nth(i);
+    const cls = await sel.getAttribute('class') || '';
+    const isDisabled = cls.includes('ant-select-disabled');
+    const isOpen = cls.includes('ant-select-open');
+    const placeholderEl = sel.locator('.ant-select-selection-placeholder');
+    const selectedEl = sel.locator('.ant-select-selection-item');
+    const placeholder = await placeholderEl.textContent().catch(() => '');
+    const selected = await selectedEl.textContent().catch(() => '');
+    const box = await sel.boundingBox();
 
-      if (!isDisabled && box) {
-        try {
-          // Click on the selector
-          await sel.locator('.ant-select-selector').click({ timeout: 3000 });
-          await page.waitForTimeout(500);
+    console.log(`\nSelect[${i}]:`);
+    console.log(`  class: ${cls.split(' ').filter(c => c.startsWith('ant-select')).join(' ')}`);
+    console.log(`  disabled: ${isDisabled}, open: ${isOpen}`);
+    console.log(`  placeholder: "${placeholder}", selected: "${selected}"`);
+    console.log(`  box: ${JSON.stringify(box)}`);
 
-          // Check if dropdown appeared
-          const dropdowns = page.locator('.ant-select-dropdown:visible');
-          const dropdownCount = await dropdowns.count();
-          console.log(`    Visible dropdowns after click: ${dropdownCount}`);
+    // Only test the first 2 selects (PK and TK)
+    if (i < 2 && !isDisabled && box) {
+      console.log('  → Attempting to click...');
+      const selector = sel.locator('.ant-select-selector');
+      await selector.click({ timeout: 5000 });
+      await page.waitForTimeout(500);
 
-          if (dropdownCount > 0) {
-            const dd = dropdowns.first();
-            const items = dd.locator('.ant-select-item');
-            const itemCount = await items.count();
-            console.log(`    Dropdown items: ${itemCount}`);
-            for (let j = 0; j < Math.min(itemCount, 5); j++) {
-              const itemText = await items.nth(j).textContent();
-              console.log(`      Item[${j}]: "${itemText}"`);
-            }
+      // Check for dropdown
+      const visibleDropdowns = page.locator('.ant-select-dropdown');
+      const ddCount = await visibleDropdowns.count();
+      console.log(`  → Dropdown count: ${ddCount}`);
+
+      for (let d = 0; d < ddCount; d++) {
+        const dd = visibleDropdowns.nth(d);
+        const visible = await dd.isVisible();
+        const ddBox = await dd.boundingBox();
+        if (visible) {
+          console.log(`  → Dropdown[${d}]: visible=true, box=${JSON.stringify(ddBox)}`);
+          const items = dd.locator('.ant-select-item-option');
+          const itemCount = await items.count();
+          console.log(`  → Items: ${itemCount}`);
+          for (let j = 0; j < Math.min(itemCount, 5); j++) {
+            console.log(`    Item[${j}]: "${await items.nth(j).textContent()}"`);
           }
 
-          // Close by pressing Escape
-          await page.keyboard.press('Escape');
-          await page.waitForTimeout(200);
-        } catch (err) {
-          console.log(`    Error: ${err.message?.slice(0, 100)}`);
+          // Try clicking first item
+          if (itemCount > 0) {
+            await items.first().click();
+            await page.waitForTimeout(300);
+            console.log('  → Clicked first item');
+
+            // Check if selection changed
+            const newSelected = await sel.locator('.ant-select-selection-item').textContent().catch(() => 'N/A');
+            console.log(`  → After click, selected: "${newSelected}"`);
+          }
         }
       }
-    }
 
-    // Take final screenshot
-    await page.screenshot({ path: '/Users/lilu/Projects/OpenOntology/apps/web/e2e-step3-final.png' });
-  } else {
-    console.log('❌ Cannot proceed: Next button still disabled (no dataset selected)');
-    await page.screenshot({ path: '/Users/lilu/Projects/OpenOntology/apps/web/e2e-step1.png' });
+      // Take screenshot after interaction
+      await page.screenshot({ path: `apps/web/e2e-select-${i}.png` });
+
+      // Press Escape to close any open dropdown
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(200);
+    }
   }
 
+  // Final screenshot
+  await page.screenshot({ path: 'apps/web/e2e-step3-final.png' });
+  console.log('\n📸 Final screenshots saved');
+
   await browser.close();
-  console.log('\nDone');
+  console.log('Done');
 }
 
 main().catch(console.error);
