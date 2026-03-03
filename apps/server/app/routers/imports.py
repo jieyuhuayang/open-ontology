@@ -8,12 +8,10 @@ from app.database import get_db_session
 from app.domain.import_task import ImportTask
 from app.exceptions import AppError
 from app.services.file_import_service import FileImportService
-from app.services.import_task_service import ImportTaskService
+from app.services.import_task_service import shared_import_task_service as _import_task_service
 from app.services.mysql_import_service import MySQLImportService
 
 router = APIRouter(prefix="/api/v1", tags=["imports"])
-
-_import_task_service = ImportTaskService()
 
 
 # --- Request models ---
