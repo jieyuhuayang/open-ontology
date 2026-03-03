@@ -19,14 +19,29 @@ export function toCamelCase(str: string): string {
 
 export function sanitizePropertyId(raw: string): string {
   const kebab = toKebabCase(raw);
-  if (!kebab) return 'property';
+  if (!kebab) return 'unnamed';
   if (/^\d/.test(kebab)) return `p-${kebab}`;
   return kebab;
 }
 
 export function sanitizePropertyApiName(raw: string): string {
   const camel = toCamelCase(raw);
-  if (!camel) return 'property';
+  if (!camel) return 'unnamed';
   if (/^\d/.test(camel)) return `p${camel.charAt(0).toUpperCase() + camel.slice(1)}`;
   return camel;
+}
+
+export const RESERVED_PROPERTY_API_NAMES = new Set([
+  'ontology', 'object', 'property', 'link', 'relation',
+  'rid', 'primarykey', 'typeid', 'ontologyobject',
+]);
+
+export function isReservedPropertyApiName(apiName: string): boolean {
+  return RESERVED_PROPERTY_API_NAMES.has(apiName.toLowerCase());
+}
+
+const PROPERTY_API_NAME_PATTERN = /^[a-z][a-zA-Z0-9]{0,99}$/;
+
+export function isValidPropertyApiName(apiName: string): boolean {
+  return PROPERTY_API_NAME_PATTERN.test(apiName);
 }
