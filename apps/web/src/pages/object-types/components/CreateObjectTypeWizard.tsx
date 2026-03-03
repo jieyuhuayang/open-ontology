@@ -25,7 +25,6 @@ export default function CreateObjectTypeWizard() {
     currentStep,
     selectedDatasetRid,
     displayName,
-    pluralDisplayName,
     description,
     icon,
     properties,
