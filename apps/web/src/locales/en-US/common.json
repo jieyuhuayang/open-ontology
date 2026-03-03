@@ -375,6 +375,17 @@
     "importSuccess": "Import successful",
     "importFailed": "Import failed"
   },
+  "apiErrors": {
+    "PROPERTY_INVALID_ID": "Property name cannot generate a valid ID. Name must start with a letter and only contain letters, digits, hyphens, or underscores",
+    "PROPERTY_INVALID_API_NAME": "Property name cannot generate a valid API Name. Name must start with a letter and only contain letters and digits (1-100 chars)",
+    "PROPERTY_RESERVED_API_NAME": "This property name is a reserved system name. Please use a different name",
+    "OBJECT_TYPE_INVALID_API_NAME": "API Name format is invalid. Must be PascalCase (starts with uppercase letter, letters/digits/underscores only)",
+    "OBJECT_TYPE_RESERVED_API_NAME": "This API Name is a reserved system name. Please use a different name",
+    "OBJECT_TYPE_INVALID_ID": "Object type ID format is invalid. Must start with a lowercase letter and only contain lowercase letters, digits, and hyphens",
+    "LINK_TYPE_INVALID_ID": "Link type ID format is invalid. Must start with a lowercase letter and only contain lowercase letters, digits, and hyphens",
+    "LINK_TYPE_INVALID_API_NAME": "Link type API Name format is invalid. Must start with a lowercase letter and only contain letters and digits (1-100 chars)",
+    "LINK_TYPE_RESERVED_API_NAME": "This API Name is a reserved system name. Please use a different name"
+  },
   "import": {
     "status": {
       "pending": "Pending",
