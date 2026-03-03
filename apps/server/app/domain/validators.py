@@ -47,7 +47,7 @@ def validate_object_type_id(id_value: str) -> None:
     if not ID_PATTERN.match(id_value):
         raise AppError(
             code="OBJECT_TYPE_INVALID_ID",
-            message=f"id must match ^[a-z][a-z0-9-]*$: {id_value!r}",
+            message=f"ID must start with a lowercase letter and only contain lowercase letters, digits, and hyphens: {id_value!r}",
             status_code=400,
         )
 
