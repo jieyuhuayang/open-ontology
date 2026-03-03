@@ -47,7 +47,6 @@ const DEFAULT_STATE = {
   currentStep: 0,
   selectedDatasetRid: null,
   displayName: '',
-  pluralDisplayName: '',
   description: '',
   icon: { name: 'AppstoreOutlined', color: '#1677ff' },
   properties: [] as WizardProperty[],
