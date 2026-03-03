@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCreateWizardStore } from '@/stores/create-wizard-store';
 import { useCreateObjectType } from '@/api/object-types';
 import { createPropertyDirect, updatePropertyDirect } from '@/api/properties';
-import { toKebabCase, toCamelCase } from '@/utils/naming';
+import { sanitizePropertyId, sanitizePropertyApiName } from '@/utils/naming';
 import WizardStepDatasource from './WizardStepDatasource';
 import WizardStepMetadata from './WizardStepMetadata';
 import WizardStepProperties from './WizardStepProperties';
