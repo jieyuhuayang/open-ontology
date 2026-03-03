@@ -23,6 +23,6 @@ class CryptoService:
         except InvalidToken:
             raise AppError(
                 code="ENCRYPTION_KEY_MISMATCH",
-                message="无法解密凭据，加密密钥已变更。请删除该连接并重新创建。",
+                message="Cannot decrypt credential. Encryption key has changed. Please delete this connection and create a new one.",
                 status_code=422,
             )
