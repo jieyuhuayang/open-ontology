@@ -7,7 +7,7 @@ import type { MenuProps } from 'antd';
 
 export default function CreateMenu() {
   const { t } = useTranslation();
-  const openCreateObjectType = useCreateObjectTypeModalStore((s) => s.open);
+  const openCreateObjectType = useCreateWizardStore((s) => s.open);
   const openCreateLinkType = useCreateLinkTypeModalStore((s) => s.open);
 
   const items: MenuProps['items'] = [
