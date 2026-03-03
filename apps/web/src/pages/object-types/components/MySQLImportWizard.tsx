@@ -44,10 +44,10 @@ interface ConnectionFormValues {
   name: string;
   host: string;
   port: number;
-  database: string;
+  databaseName: string;
   username: string;
   password: string;
-  ssl: boolean;
+  sslEnabled: boolean;
 }
 
 export default function MySQLImportWizard({ open, onClose, onSuccess }: MySQLImportWizardProps) {
