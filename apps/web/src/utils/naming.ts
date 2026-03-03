@@ -1,12 +1,26 @@
+import { pinyin } from 'pinyin-pro';
+
+/**
+ * Convert Chinese characters in the input to pinyin (space-separated),
+ * leaving non-Chinese characters unchanged.
+ */
+function convertChineseToPinyin(str: string): string {
+  // If no Chinese characters, return as-is
+  if (!/[\u4e00-\u9fff]/.test(str)) return str;
+  return pinyin(str, { toneType: 'none', type: 'array' }).join(' ');
+}
+
 export function toKebabCase(str: string): string {
-  return str
+  const converted = convertChineseToPinyin(str);
+  return converted
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
 
 export function toCamelCase(str: string): string {
-  const parts = str.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+  const converted = convertChineseToPinyin(str);
+  const parts = converted.split(/[^a-zA-Z0-9]+/).filter(Boolean);
   if (parts.length === 0) return '';
   return (
     parts[0]!.toLowerCase() +
