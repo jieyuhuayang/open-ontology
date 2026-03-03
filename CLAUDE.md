@@ -158,8 +158,10 @@ justfile                              # Monorepo 任务运行器
 
 所有新特性必须按以下顺序执行（详见 `features/README.md`）：
 
+0. **（版本开始时执行一次）release-contract.md** — 在第一个 feature spec 动笔前，创建版本级领域归属表和不变量表（模板：`features/_templates/release-contract.md`）
 1. **spec.md** — 定义用户故事、验收标准、边界
    - 验收标准必须用表格格式：`| ID | 角色 | 操作 | 预期结果 |`，AC-ID 在特性内唯一
+   - 写 spec 前必须先阅读版本的 `release-contract.md`
 2. **评审 spec** — 用户明确说"可以写 design 了"后，将 tasks.md 状态表中 spec.md 行更新为 ✅ 已评审
 3. **design.md** — 只写架构决策（Why）和 API/数据契约（What），不写实现步骤（How）
    - 禁止在 design.md 中写测试策略（由本文件 §测试要求统一管理）
@@ -170,7 +172,7 @@ justfile                              # Monorepo 任务运行器
 6. **评审 tasks** — 用户明确说"可以开始实现了"后，更新 tasks.md 状态表中 tasks.md 行为 ✅ 已拆解
 7. **执行** — 逐任务实施，完成后在 tasks.md 打勾
 
-**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。`design.md` 和 `tasks.md` 未完成前禁止写代码。只有用户明确要求"执行任务"或"开始实现"时，才可编写源代码。
+**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。`design.md` 和 `tasks.md` 未完成前禁止写代码。只有用户明确要求"执行任务"或"开始实现"时，才可编写源代码。`spec.md` 只描述业务能力，UI 细节写在 `design.md`；写 spec 前必须先阅读版本的 `release-contract.md`。
 
 ## 外部 MySQL 策略
 
