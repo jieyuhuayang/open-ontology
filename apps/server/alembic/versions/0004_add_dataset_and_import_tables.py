@@ -115,9 +115,12 @@ def upgrade() -> None:
     )
 
     # ------------------------------------------------------------------
-    # 5. object_types: add intended_actions JSONB column
+    # 5. object_types: add Phase 2 columns
     # ------------------------------------------------------------------
     op.add_column("object_types", sa.Column("intended_actions", JSONB, nullable=True))
+    op.add_column("object_types", sa.Column("backing_datasource", JSONB, nullable=True))
+    op.add_column("object_types", sa.Column("primary_key_property_id", sa.String(), nullable=True))
+    op.add_column("object_types", sa.Column("title_key_property_id", sa.String(), nullable=True))
 
 
 def downgrade() -> None:
