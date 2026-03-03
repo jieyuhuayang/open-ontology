@@ -29,10 +29,10 @@ def upgrade() -> None:
         sa.Column("rid", sa.String(), primary_key=True),
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("source_type", sa.String(20), nullable=False),
-        sa.Column("source_metadata", JSONB, nullable=False, server_default="'{}'::jsonb"),
+        sa.Column("source_metadata", JSONB, nullable=False, server_default=sa.text("'{}'::jsonb")),
         sa.Column("row_count", sa.Integer(), nullable=False, server_default="0"),
         sa.Column("column_count", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column("status", sa.String(20), nullable=False, server_default="'ready'"),
+        sa.Column("status", sa.String(20), nullable=False, server_default="ready"),
         sa.Column(
             "imported_at",
             sa.DateTime(timezone=True),
