@@ -15,7 +15,6 @@ interface CreateWizardStore {
   currentStep: number;
   selectedDatasetRid: string | null;
   displayName: string;
-  pluralDisplayName: string;
   description: string;
   icon: { name: string; color: string };
   properties: WizardProperty[];
