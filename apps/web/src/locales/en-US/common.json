@@ -227,6 +227,7 @@
     "emptyDescription": "Object types represent real-world entities in your ontology.",
     "fields": {
       "displayName": "Name",
+      "pluralDisplayName": "Plural Name",
       "description": "Description",
       "id": "ID",
       "apiName": "API Name",
