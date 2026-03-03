@@ -1,7 +1,7 @@
 import { Layout } from 'antd';
 import { Outlet } from 'react-router-dom';
 import HomeSidebar from './HomeSidebar';
-import CreateObjectTypeModal from '@/pages/object-types/components/CreateObjectTypeModal';
+import CreateObjectTypeWizard from '@/pages/object-types/components/CreateObjectTypeWizard';
 
 export default function HomeLayout() {
   return (
