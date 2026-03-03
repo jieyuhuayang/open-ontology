@@ -6,145 +6,141 @@ async function main() {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  // Navigate to the app
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   console.log('✅ Page loaded');
 
-  // Click "New" button to open dropdown menu
-  const newBtn = page.locator('text=New').first();
-  if (await newBtn.isVisible()) {
-    await newBtn.click();
-    await page.waitForTimeout(500);
+  // Open wizard
+  await page.locator('text=New').first().click();
+  await page.waitForTimeout(300);
+  await page.locator('text=Create Object Type').first().click();
+  await page.waitForTimeout(500);
+  console.log('✅ Wizard opened');
 
-    // Click "Create Object Type"
-    const createOT = page.locator('text=Create Object Type').first();
-    if (await createOT.isVisible()) {
-      await createOT.click();
-      await page.waitForTimeout(500);
-      console.log('✅ Create Object Type wizard opened');
+  const modal = page.locator('.ant-modal');
+
+  // Step 1 → Step 2: Click Next (skip dataset selection for now)
+  const nextBtn = modal.locator('button:has-text("Next")');
+  // Next button might be disabled if no dataset is selected — let's check
+  const isNextDisabled = await nextBtn.isDisabled();
+  console.log(`Next button disabled: ${isNextDisabled}`);
+
+  if (isNextDisabled) {
+    // Try to select the first available (non-in-use) dataset
+    // Or try the "Use This Dataset" button that's enabled
+    const useButtons = modal.locator('button:has-text("Use This Dataset")');
+    const count = await useButtons.count();
+    console.log(`"Use This Dataset" buttons found: ${count}`);
+    for (let i = 0; i < count; i++) {
+      const btn = useButtons.nth(i);
+      const disabled = await btn.isDisabled();
+      console.log(`  Button ${i}: disabled=${disabled}`);
+      if (!disabled) {
+        await btn.click();
+        await page.waitForTimeout(300);
+        console.log('✅ Selected dataset');
+        break;
+      }
     }
   }
 
-  // Check if the wizard modal is visible
-  const modal = page.locator('.ant-modal');
-  const isModalVisible = await modal.isVisible();
-  console.log(`Modal visible: ${isModalVisible}`);
-
-  if (!isModalVisible) {
-    console.log('❌ Modal not visible, trying alternate approach');
-    await browser.close();
-    return;
-  }
-
-  // We need to get to step 3 (Properties)
-  // First, we need to select a datasource (step 1) or skip
-  // Check current step
-  const stepContent = await modal.textContent();
-  console.log('Current modal content preview:', stepContent?.slice(0, 200));
-
-  // Select a dataset if available
-  const datasetBtn = modal.locator('text=Use This Dataset').first();
-  if (await datasetBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await datasetBtn.click();
-    await page.waitForTimeout(300);
-    console.log('✅ Selected dataset');
-  }
-
-  // Click Next to go to step 2 (Metadata)
-  const nextBtn = modal.locator('button:has-text("Next")');
-  if (await nextBtn.isVisible()) {
+  // Click Next to step 2
+  if (!(await nextBtn.isDisabled())) {
     await nextBtn.click();
     await page.waitForTimeout(300);
     console.log('✅ Step 2 (Metadata)');
 
-    // Check what fields are in step 2
-    const step2Content = await modal.textContent();
-    const hasPlural = step2Content?.includes('Plural');
-    const hasID = step2Content?.includes('e.g. my-object-type');
-    const hasApiName = step2Content?.includes('e.g. MyObjectType');
-    console.log(`  Has Plural Name: ${hasPlural}`);
-    console.log(`  Has ID field: ${hasID}`);
-    console.log(`  Has API Name: ${hasApiName}`);
+    // Check step 2 fields
+    const labels = await modal.locator('.ant-form-item-label').allTextContents();
+    console.log('Step 2 form labels:', labels);
 
-    // Fill in name
-    const nameInput = modal.locator('input').nth(1); // first input after icon selector
-    await nameInput.fill('Test Aircraft');
-    await page.waitForTimeout(200);
+    // Fill name
+    const nameInput = modal.locator('#displayName, input[id="displayName"]');
+    if (await nameInput.isVisible().catch(() => false)) {
+      await nameInput.fill('Test Aircraft');
+    } else {
+      // Try finding input by label
+      const inputs = modal.locator('.ant-form-item input[type="text"]');
+      const inputCount = await inputs.count();
+      console.log(`  Text inputs found: ${inputCount}`);
+      if (inputCount > 0) {
+        await inputs.first().fill('Test Aircraft');
+      }
+    }
 
-    // Click Next to go to step 3 (Properties)
+    // Click Next to step 3
     await nextBtn.click();
     await page.waitForTimeout(1000);
     console.log('✅ Step 3 (Properties)');
 
-    // Check step 3 content
-    const step3Content = await modal.textContent();
-    console.log('Step 3 content preview:', step3Content?.slice(0, 300));
+    // Screenshot step 3
+    await page.screenshot({ path: '/Users/lilu/Projects/OpenOntology/apps/web/e2e-step3.png', fullPage: true });
+    console.log('📸 Screenshot saved to apps/web/e2e-step3.png');
 
-    // Check for "Add All" button (should NOT exist)
-    const addAllBtn = modal.locator('text=Add All');
-    const hasAddAll = await addAllBtn.isVisible().catch(() => false);
-    console.log(`  Has "Add All" button: ${hasAddAll}`);
+    // Analyze step 3 content
+    const step3Text = await modal.textContent();
+    console.log('\nStep 3 text (first 500 chars):');
+    console.log(step3Text?.slice(0, 500));
 
-    // Check for "Add Property" button
-    const addPropBtn = modal.locator('text=Add Property');
-    const hasAddProp = await addPropBtn.isVisible().catch(() => false);
-    console.log(`  Has "Add Property" button: ${hasAddProp}`);
+    // Check for Add All button
+    const hasAddAll = await modal.locator('text=Add All').isVisible().catch(() => false);
+    console.log(`\nHas "Add All" button: ${hasAddAll}`);
 
-    // Check for PK/TK labels
-    const hasPK = step3Content?.includes('Primary Key');
-    const hasTK = step3Content?.includes('Title');
-    console.log(`  Has Primary Key selector: ${hasPK}`);
-    console.log(`  Has Title Key selector: ${hasTK}`);
+    // Count selects
+    const selects = modal.locator('.ant-select');
+    const selectCount = await selects.count();
+    console.log(`Total Selects in step 3: ${selectCount}`);
 
-    // Try to find and interact with PK Select
-    const allSelects = modal.locator('.ant-select');
-    const selectCount = await allSelects.count();
-    console.log(`  Total Select components: ${selectCount}`);
+    // Try to interact with each select
+    for (let i = 0; i < selectCount; i++) {
+      const sel = selects.nth(i);
+      const box = await sel.boundingBox();
+      const className = await sel.getAttribute('class') || '';
+      const isOpen = className.includes('ant-select-open');
+      const isDisabled = className.includes('ant-select-disabled');
+      const selectorText = await sel.locator('.ant-select-selection-item, .ant-select-selection-placeholder').textContent().catch(() => 'N/A');
+      console.log(`\n  Select[${i}]: text="${selectorText}", disabled=${isDisabled}, open=${isOpen}, box=${JSON.stringify(box)}`);
 
-    // Try each select to see if it opens
-    for (let i = 0; i < Math.min(selectCount, 4); i++) {
-      const sel = allSelects.nth(i);
-      const selText = await sel.textContent();
-      const selClass = await sel.getAttribute('class');
-      const isDisabled = selClass?.includes('ant-select-disabled');
-      console.log(`  Select[${i}]: text="${selText?.trim()}", disabled=${isDisabled}`);
+      if (!isDisabled && box) {
+        try {
+          // Click on the selector
+          await sel.locator('.ant-select-selector').click({ timeout: 3000 });
+          await page.waitForTimeout(500);
 
-      // Try to open it
-      try {
-        await sel.locator('.ant-select-selector').click();
-        await page.waitForTimeout(500);
+          // Check if dropdown appeared
+          const dropdowns = page.locator('.ant-select-dropdown:visible');
+          const dropdownCount = await dropdowns.count();
+          console.log(`    Visible dropdowns after click: ${dropdownCount}`);
 
-        // Check if dropdown appeared
-        const dropdown = page.locator('.ant-select-dropdown');
-        const dropdownVisible = await dropdown.isVisible().catch(() => false);
-        console.log(`    Dropdown opened: ${dropdownVisible}`);
-
-        if (dropdownVisible) {
-          const options = dropdown.locator('.ant-select-item-option');
-          const optCount = await options.count();
-          console.log(`    Options count: ${optCount}`);
-          for (let j = 0; j < Math.min(optCount, 5); j++) {
-            const optText = await options.nth(j).textContent();
-            console.log(`      Option[${j}]: "${optText}"`);
+          if (dropdownCount > 0) {
+            const dd = dropdowns.first();
+            const items = dd.locator('.ant-select-item');
+            const itemCount = await items.count();
+            console.log(`    Dropdown items: ${itemCount}`);
+            for (let j = 0; j < Math.min(itemCount, 5); j++) {
+              const itemText = await items.nth(j).textContent();
+              console.log(`      Item[${j}]: "${itemText}"`);
+            }
           }
-        }
 
-        // Click elsewhere to close
-        await modal.locator('.ant-steps').click();
-        await page.waitForTimeout(300);
-      } catch (err) {
-        console.log(`    Error interacting: ${err.message}`);
+          // Close by pressing Escape
+          await page.keyboard.press('Escape');
+          await page.waitForTimeout(200);
+        } catch (err) {
+          console.log(`    Error: ${err.message?.slice(0, 100)}`);
+        }
       }
     }
 
-    // Take a screenshot for debugging
-    await page.screenshot({ path: '/Users/lilu/Projects/OpenOntology/apps/web/e2e-debug-step3.png' });
-    console.log('📸 Screenshot saved to e2e-debug-step3.png');
+    // Take final screenshot
+    await page.screenshot({ path: '/Users/lilu/Projects/OpenOntology/apps/web/e2e-step3-final.png' });
+  } else {
+    console.log('❌ Cannot proceed: Next button still disabled (no dataset selected)');
+    await page.screenshot({ path: '/Users/lilu/Projects/OpenOntology/apps/web/e2e-step1.png' });
   }
 
   await browser.close();
-  console.log('Done');
+  console.log('\nDone');
 }
 
 main().catch(console.error);
