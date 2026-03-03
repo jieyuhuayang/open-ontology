@@ -14,7 +14,7 @@ export default function HomeLayout() {
           <Outlet />
         </main>
       </Layout.Content>
-      <CreateObjectTypeModal />
+      <CreateObjectTypeWizard />
     </Layout>
   );
 }
