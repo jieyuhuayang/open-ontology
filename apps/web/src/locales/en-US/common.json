@@ -269,6 +269,133 @@
       "linkTypesEmpty": "No link types defined yet",
       "data": "Data",
       "dataEmpty": "No data sources configured yet"
+    },
+    "backingDatasource": "Backing Datasource",
+    "addDatasource": "Add Backing Datasource",
+    "noDatasource": "No datasource linked",
+    "intendedActions": "Intended Actions",
+    "incomplete": "Incomplete",
+    "incompleteWarning": "This object type has not been fully configured",
+    "properties": {
+      "primaryKey": "Primary Key",
+      "titleKey": "Title Key",
+      "mappedColumn": "Mapped Column",
+      "unmapped": "Unmapped",
+      "addAsNew": "Add as New Property",
+      "addAll": "Add All Unmapped Columns as New Properties",
+      "mapToColumn": "Map to Column"
+    },
+    "actions": {
+      "create": "Create {{name}}",
+      "modify": "Modify {{name}}",
+      "delete": "Delete {{name}}",
+      "createDesc": "Allow creating new objects of this type",
+      "modifyDesc": "Allow modifying non-primary-key properties of objects of this type",
+      "deleteDesc": "Allow deleting instances of this object type"
+    },
+    "saveLocation": {
+      "project": "Project",
+      "selectProject": "Select a project",
+      "createNote": "Creating will only stage your changes, not save them. Once back in Ontology Manager, select Save in the top right corner."
+    }
+  },
+  "wizard": {
+    "title": "Create Object Type",
+    "next": "Next",
+    "back": "Back",
+    "create": "Create",
+    "createLater": "Finish Later",
+    "steps": {
+      "datasource": "Datasource",
+      "metadata": "Metadata",
+      "properties": "Properties",
+      "actions": "Actions",
+      "saveLocation": "Save Location"
+    }
+  },
+  "dataset": {
+    "listTitle": "Datasets",
+    "source": {
+      "mysql": "MySQL",
+      "excel": "Excel",
+      "csv": "CSV"
+    },
+    "columns": {
+      "name": "Name",
+      "source": "Source",
+      "rows": "Rows",
+      "columns": "Columns",
+      "importedAt": "Imported At"
+    },
+    "inUse": "In Use",
+    "inUseTooltip": "This dataset is linked to {{name}}",
+    "useThisDataset": "Use This Dataset",
+    "importFromMySQL": "Import from MySQL",
+    "uploadFile": "Upload Excel/CSV",
+    "selectDataset": "Select Datasource",
+    "noDatasets": "No datasets yet",
+    "deleteSuccess": "Dataset deleted",
+    "deleteInUse": "This dataset is linked and cannot be deleted"
+  },
+  "mysqlConnection": {
+    "title": "Import from MySQL",
+    "steps": {
+      "connection": "Connection",
+      "tables": "Select Table",
+      "config": "Configure Import",
+      "result": "Import Result"
+    },
+    "fields": {
+      "name": "Connection Name",
+      "host": "Host",
+      "port": "Port",
+      "database": "Database",
+      "username": "Username",
+      "password": "Password",
+      "ssl": "SSL Encryption"
+    },
+    "testConnection": "Test Connection",
+    "testSuccess": "Connection successful",
+    "testFailed": "Connection failed: {{error}}",
+    "useExisting": "Use Existing Connection",
+    "browseTable": "Select Table",
+    "snapshotExists": "Snapshot exists",
+    "configTitle": "Configure Import",
+    "datasetName": "Dataset Name",
+    "selectColumns": "Select Columns",
+    "estimatedRows": "Estimated Rows",
+    "snapshotNote": "This will create a data snapshot",
+    "confirmImport": "Confirm Import",
+    "importSuccess": "Import successful",
+    "importFailed": "Import failed"
+  },
+  "import": {
+    "status": {
+      "pending": "Pending",
+      "running": "Importing",
+      "completed": "Completed",
+      "failed": "Failed"
+    },
+    "rows": "rows",
+    "columns": "columns",
+    "duration": "Duration",
+    "retry": "Retry",
+    "useDataset": "Use This Dataset",
+    "fileUpload": {
+      "title": "Upload Excel/CSV",
+      "steps": {
+        "upload": "Upload File",
+        "preview": "Preview & Configure",
+        "result": "Import Result"
+      },
+      "dragHint": "Click or drag file to this area",
+      "formatHint": "Supports .xlsx, .xls, .csv formats, max 50MB",
+      "tooLarge": "File exceeds 50MB limit",
+      "unsupportedFormat": "Unsupported file format",
+      "selectSheet": "Select Sheet",
+      "hasHeader": "First row is header",
+      "atLeastOneColumn": "Select at least one column",
+      "confirmImport": "Confirm Import"
     }
   }
 }
