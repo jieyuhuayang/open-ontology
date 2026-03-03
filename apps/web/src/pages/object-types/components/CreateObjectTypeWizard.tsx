@@ -25,8 +25,6 @@ export default function CreateObjectTypeWizard() {
     description,
     icon,
     objectTypeId,
-    intendedActions,
-    projectRid,
     nextStep,
     prevStep,
     close,
