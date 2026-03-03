@@ -11,7 +11,7 @@ import StatusBadge from '@/components/StatusBadge';
 import type { LinkType, ResourceStatus } from '@/api/types';
 import type { ColumnsType } from 'antd/es/table';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 export default function ObjectTypeOverviewPage() {
   const { rid } = useParams<{ rid: string }>();
