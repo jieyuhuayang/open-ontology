@@ -49,8 +49,8 @@ export default function CreatePropertyDrawer({
     const val = e.target.value;
     const apiName = form.getFieldValue('apiName') as string;
     // Only auto-fill apiName if it hasn't been manually edited
-    if (!apiName || apiName === toApiName(form.getFieldValue('displayName') ?? '')) {
-      form.setFieldValue('apiName', toApiName(val));
+    if (!apiName || apiName === sanitizePropertyApiName(form.getFieldValue('displayName') ?? '')) {
+      form.setFieldValue('apiName', sanitizePropertyApiName(val));
     }
   };
 
