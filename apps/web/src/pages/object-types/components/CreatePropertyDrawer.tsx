@@ -72,9 +72,13 @@ export default function CreatePropertyDrawer({
       void message.success(t('property.createSuccess'));
       onClose();
     } catch (err: unknown) {
-      const apiErr = err as { response?: { data?: { error?: { message?: string } } } };
-      const msg = apiErr?.response?.data?.error?.message;
-      if (msg) void message.error(msg);
+      const apiErr = err as { response?: { data?: { error?: { code?: string; message?: string } } } };
+      const errorCode = apiErr?.response?.data?.error?.code;
+      const serverMessage = apiErr?.response?.data?.error?.message;
+      const display = errorCode
+        ? t(`apiErrors.${errorCode}`, { defaultValue: serverMessage ?? t('error.somethingWentWrong') })
+        : (serverMessage ?? t('error.somethingWentWrong'));
+      void message.error(display);
     }
   };
 
