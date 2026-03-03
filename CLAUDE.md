@@ -63,11 +63,9 @@ justfile                              # Monorepo 任务运行器
 | 属性 | Property | 对象类型的特征、状态或度量 |
 | 链接类型 | Link Type | 对象类型之间的语义关系 |
 | 动作类型 | Action Type | 带写回能力的事务操作 |
-| 函数 | Function | 自定义业务逻辑（Python/ML） |
-| 接口 | Interface | 对象类型的多态形状描述符 |
-| 共享属性 | Shared Property | 可跨多个对象类型复用的属性 |
-| 对象集 | Object Set | 对象实例的集合 |
-| 空间 | Space | 共享一个本体的顶层项目容器 |
+| 函数 / 接口 | Function / Interface | 自定义逻辑 / 多态形状描述符 |
+| 共享属性 | Shared Property | 可跨对象类型复用的属性 |
+| 对象集 / 空间 | Object Set / Space | 对象实例集合 / 顶层项目容器 |
 
 ## MVP 优先级（v0.1.0）
 
