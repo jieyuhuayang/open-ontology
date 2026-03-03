@@ -74,10 +74,9 @@ describe('WizardStepProperties', () => {
 
   it('PK/TK select options use displayName as aria-label', () => {
     renderComponent();
-    // Open PK select
+    // Open PK select using mouseDown (rc-select uses mouseDown to open)
     const comboboxes = screen.getAllByRole('combobox');
-    comboboxes[0]!.focus();
-    comboboxes[0]!.click();
+    fireEvent.mouseDown(comboboxes[0]!);
     // Check that options have correct aria-labels (displayNames)
     const options = screen.getAllByRole('option');
     const ariaLabels = options.map((o) => o.getAttribute('aria-label'));
