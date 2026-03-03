@@ -222,7 +222,8 @@ ORDER BY FIELD(
 "
     )
 
-    for col in "${candidates[@]}"; do
+    for col in "${candidates[@]-}"; do
+        [[ -z "${col}" ]] && continue
         order_cols+=("${col}")
     done
 
@@ -240,8 +241,9 @@ ORDER BY ORDINAL_POSITION
 "
     )
 
-    for col in "${pk_cols[@]}"; do
-        if [[ ! " ${order_cols[*]} " =~ [[:space:]]${col}[[:space:]] ]]; then
+    for col in "${pk_cols[@]-}"; do
+        [[ -z "${col}" ]] && continue
+        if [[ ! " ${order_cols[*]-} " =~ [[:space:]]${col}[[:space:]] ]]; then
             order_cols+=("${col}")
         fi
     done
