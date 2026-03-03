@@ -135,6 +135,17 @@ export default function CreateObjectTypeWizard() {
   };
 
   const handleNext = () => {
+    if (currentStep === 2 && properties.length > 0) {
+      const invalidProps = properties.filter((prop) => {
+        const apiName = sanitizePropertyApiName(prop.displayName);
+        return isReservedPropertyApiName(apiName) || !isValidPropertyApiName(apiName);
+      });
+      if (invalidProps.length > 0) {
+        const names = invalidProps.map((p) => p.displayName).join(', ');
+        message.error(t('wizard.properties.apiNameConflict', { names }));
+        return;
+      }
+    }
     if (currentStep < 4) {
       nextStep();
     }
