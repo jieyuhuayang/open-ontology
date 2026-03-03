@@ -1,7 +1,7 @@
 import { Button, Dropdown } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useCreateObjectTypeModalStore } from '@/stores/create-object-type-modal-store';
+import { useCreateWizardStore } from '@/stores/create-wizard-store';
 import { useCreateLinkTypeModalStore } from '@/stores/create-link-type-modal-store';
 import type { MenuProps } from 'antd';
 
