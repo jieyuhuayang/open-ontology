@@ -8,6 +8,10 @@ from app.domain.import_task import ImportTask, ImportTaskStatus
 _TASK_TTL = timedelta(hours=1)
 
 
+# Shared singleton — all modules must import this instance, not create their own
+import_task_service: "ImportTaskService"
+
+
 class ImportTaskService:
     def __init__(self) -> None:
         self._tasks: dict[str, ImportTask] = {}
