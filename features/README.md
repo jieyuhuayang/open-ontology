@@ -90,12 +90,14 @@ A well-scoped task:
 
 ## Workflow
 
-1. **Create spec.md** — derive from PRD and architecture docs
-2. **Review spec.md** — confirm acceptance criteria are testable
-3. **Create design.md** — design data structures, API contracts, component trees
-4. **Create tasks.md** — break design into atomic file-level tasks
-5. **Execute tasks** — one per session, checking off as complete
-6. **Mark deviations** — if implementation differs from plan, note in tasks.md
+1. **Create spec.md** — derive from PRD and architecture docs; write AC as a structured table with unique IDs
+2. **Review spec.md** — user confirms "可以写 design 了"（AC is testable, boundaries are clear）→ mark spec.md row as ✅ 已评审 in tasks.md 状态表
+3. **Create design.md** — write architecture decisions (Why) and API/data contracts (What) only; no implementation steps, no test strategy
+4. **Review design.md** — user confirms "可以写 tasks 了"（contracts are complete, decisions are sound）→ mark design.md row as ✅ 已评审
+5. **Create tasks.md** — break design into test-implementation pairs; each test task must reference `覆盖 AC: AC-NN`
+6. **Review tasks.md** — user confirms "可以开始实现了" → mark tasks.md row as ✅ 已拆解
+7. **Execute tasks** — one per session, checking off as complete; run tests and show output before marking done
+8. **Mark deviations** — if implementation differs from plan, note in tasks.md §实际偏差记录
 
 ---
 
