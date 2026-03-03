@@ -312,6 +312,12 @@
       "properties": "属性",
       "actions": "动作类型",
       "saveLocation": "保存位置"
+    },
+    "properties": {
+      "source": "来源",
+      "property": "属性",
+      "userInput": "用户输入 / 动作",
+      "selectProperty": "选择属性"
     }
   },
   "dataset": {
