@@ -1,5 +1,5 @@
 """Add dataset, dataset_columns, dataset_rows, mysql_connections tables
-and intended_actions column to object_types.
+and Phase 2 columns to object_types.
 
 Revision ID: 0004
 Revises: 0003
@@ -11,7 +11,6 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import JSONB
 
 # revision identifiers, used by Alembic.
 revision: str = "0004"
@@ -21,115 +20,97 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    # Use raw SQL with IF NOT EXISTS to make this migration idempotent.
+    # This handles dev DBs that may have been partially altered manually.
+
     # ------------------------------------------------------------------
     # 1. datasets table
     # ------------------------------------------------------------------
-    op.create_table(
-        "datasets",
-        sa.Column("rid", sa.String(), primary_key=True),
-        sa.Column("name", sa.String(255), nullable=False),
-        sa.Column("source_type", sa.String(20), nullable=False),
-        sa.Column("source_metadata", JSONB, nullable=False, server_default=sa.text("'{}'::jsonb")),
-        sa.Column("row_count", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column("column_count", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column("status", sa.String(20), nullable=False, server_default="ready"),
-        sa.Column(
-            "imported_at",
-            sa.DateTime(timezone=True),
-            nullable=False,
-            server_default=sa.func.now(),
-        ),
-        sa.Column(
-            "ontology_rid",
-            sa.String(),
-            sa.ForeignKey("ontologies.rid", ondelete="CASCADE"),
-            nullable=False,
-        ),
-        sa.Column("created_by", sa.String(255), nullable=False),
-    )
+    op.execute("""
+        CREATE TABLE IF NOT EXISTS datasets (
+            rid VARCHAR PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            source_type VARCHAR(20) NOT NULL,
+            source_metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+            row_count INTEGER NOT NULL DEFAULT 0,
+            column_count INTEGER NOT NULL DEFAULT 0,
+            status VARCHAR(20) NOT NULL DEFAULT 'ready',
+            imported_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+            ontology_rid VARCHAR NOT NULL REFERENCES ontologies(rid) ON DELETE CASCADE,
+            created_by VARCHAR(255) NOT NULL
+        )
+    """)
 
     # ------------------------------------------------------------------
     # 2. dataset_columns table
     # ------------------------------------------------------------------
-    op.create_table(
-        "dataset_columns",
-        sa.Column("rid", sa.String(), primary_key=True),
-        sa.Column(
-            "dataset_rid",
-            sa.String(),
-            sa.ForeignKey("datasets.rid", ondelete="CASCADE"),
-            nullable=False,
-        ),
-        sa.Column("name", sa.String(255), nullable=False),
-        sa.Column("inferred_type", sa.String(50), nullable=False),
-        sa.Column("is_nullable", sa.Boolean(), nullable=False, server_default="true"),
-        sa.Column("is_primary_key", sa.Boolean(), nullable=False, server_default="false"),
-        sa.Column("sort_order", sa.Integer(), nullable=False, server_default="0"),
-        sa.UniqueConstraint("dataset_rid", "name", name="uq_dataset_columns_name"),
-    )
+    op.execute("""
+        CREATE TABLE IF NOT EXISTS dataset_columns (
+            rid VARCHAR PRIMARY KEY,
+            dataset_rid VARCHAR NOT NULL REFERENCES datasets(rid) ON DELETE CASCADE,
+            name VARCHAR(255) NOT NULL,
+            inferred_type VARCHAR(50) NOT NULL,
+            is_nullable BOOLEAN NOT NULL DEFAULT true,
+            is_primary_key BOOLEAN NOT NULL DEFAULT false,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            CONSTRAINT uq_dataset_columns_name UNIQUE (dataset_rid, name)
+        )
+    """)
 
     # ------------------------------------------------------------------
     # 3. dataset_rows table
     # ------------------------------------------------------------------
-    op.create_table(
-        "dataset_rows",
-        sa.Column(
-            "dataset_rid",
-            sa.String(),
-            sa.ForeignKey("datasets.rid", ondelete="CASCADE"),
-            nullable=False,
-        ),
-        sa.Column("row_index", sa.Integer(), nullable=False),
-        sa.Column("data", JSONB, nullable=False),
-        sa.PrimaryKeyConstraint("dataset_rid", "row_index"),
-    )
-    op.create_index("ix_dataset_rows_dataset", "dataset_rows", ["dataset_rid"])
+    op.execute("""
+        CREATE TABLE IF NOT EXISTS dataset_rows (
+            dataset_rid VARCHAR NOT NULL REFERENCES datasets(rid) ON DELETE CASCADE,
+            row_index INTEGER NOT NULL,
+            data JSONB NOT NULL,
+            PRIMARY KEY (dataset_rid, row_index)
+        )
+    """)
+    op.execute("""
+        CREATE INDEX IF NOT EXISTS ix_dataset_rows_dataset ON dataset_rows (dataset_rid)
+    """)
 
     # ------------------------------------------------------------------
     # 4. mysql_connections table
     # ------------------------------------------------------------------
-    op.create_table(
-        "mysql_connections",
-        sa.Column("rid", sa.String(), primary_key=True),
-        sa.Column("name", sa.String(255), nullable=False),
-        sa.Column("host", sa.String(255), nullable=False),
-        sa.Column("port", sa.Integer(), nullable=False, server_default="3306"),
-        sa.Column("database_name", sa.String(255), nullable=False),
-        sa.Column("username", sa.String(255), nullable=False),
-        sa.Column("encrypted_password", sa.Text(), nullable=False),
-        sa.Column("ssl_enabled", sa.Boolean(), nullable=False, server_default="false"),
-        sa.Column(
-            "ontology_rid",
-            sa.String(),
-            sa.ForeignKey("ontologies.rid", ondelete="CASCADE"),
-            nullable=False,
-        ),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            nullable=False,
-            server_default=sa.func.now(),
-        ),
-        sa.Column("created_by", sa.String(255), nullable=False),
-        sa.Column("last_used_at", sa.DateTime(timezone=True), nullable=True),
-    )
+    op.execute("""
+        CREATE TABLE IF NOT EXISTS mysql_connections (
+            rid VARCHAR PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            host VARCHAR(255) NOT NULL,
+            port INTEGER NOT NULL DEFAULT 3306,
+            database_name VARCHAR(255) NOT NULL,
+            username VARCHAR(255) NOT NULL,
+            encrypted_password TEXT NOT NULL,
+            ssl_enabled BOOLEAN NOT NULL DEFAULT false,
+            ontology_rid VARCHAR NOT NULL REFERENCES ontologies(rid) ON DELETE CASCADE,
+            created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+            created_by VARCHAR(255) NOT NULL,
+            last_used_at TIMESTAMP WITH TIME ZONE
+        )
+    """)
 
     # ------------------------------------------------------------------
-    # 5. object_types: add Phase 2 columns
+    # 5. object_types: add Phase 2 columns (idempotent)
     # ------------------------------------------------------------------
-    op.add_column("object_types", sa.Column("intended_actions", JSONB, nullable=True))
-    op.add_column("object_types", sa.Column("backing_datasource", JSONB, nullable=True))
-    op.add_column("object_types", sa.Column("primary_key_property_id", sa.String(), nullable=True))
-    op.add_column("object_types", sa.Column("title_key_property_id", sa.String(), nullable=True))
+    op.execute("""
+        ALTER TABLE object_types
+            ADD COLUMN IF NOT EXISTS intended_actions JSONB,
+            ADD COLUMN IF NOT EXISTS backing_datasource JSONB,
+            ADD COLUMN IF NOT EXISTS primary_key_property_id VARCHAR,
+            ADD COLUMN IF NOT EXISTS title_key_property_id VARCHAR
+    """)
 
 
 def downgrade() -> None:
-    op.drop_column("object_types", "title_key_property_id")
-    op.drop_column("object_types", "primary_key_property_id")
-    op.drop_column("object_types", "backing_datasource")
-    op.drop_column("object_types", "intended_actions")
-    op.drop_table("mysql_connections")
-    op.drop_index("ix_dataset_rows_dataset", table_name="dataset_rows")
-    op.drop_table("dataset_rows")
-    op.drop_table("dataset_columns")
-    op.drop_table("datasets")
+    op.execute("ALTER TABLE object_types DROP COLUMN IF EXISTS title_key_property_id")
+    op.execute("ALTER TABLE object_types DROP COLUMN IF EXISTS primary_key_property_id")
+    op.execute("ALTER TABLE object_types DROP COLUMN IF EXISTS backing_datasource")
+    op.execute("ALTER TABLE object_types DROP COLUMN IF EXISTS intended_actions")
+    op.execute("DROP TABLE IF EXISTS mysql_connections")
+    op.execute("DROP INDEX IF EXISTS ix_dataset_rows_dataset")
+    op.execute("DROP TABLE IF EXISTS dataset_rows")
+    op.execute("DROP TABLE IF EXISTS dataset_columns")
+    op.execute("DROP TABLE IF EXISTS datasets")
