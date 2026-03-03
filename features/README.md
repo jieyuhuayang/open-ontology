@@ -90,14 +90,38 @@ A well-scoped task:
 
 ## Workflow
 
-1. **Create spec.md** — derive from PRD and architecture docs; write AC as a structured table with unique IDs
-2. **Review spec.md** — user confirms "可以写 design 了"（AC is testable, boundaries are clear）→ mark spec.md row as ✅ 已评审 in tasks.md 状态表
+0. **（版本开始时执行一次）Create release-contract.md** — 在第一个 feature spec 动笔前，写版本级领域归属表（表1）和不变量表（表2）。此后每个 spec 评审时，必须对照 release-contract.md 检查一致性。
+1. **Create spec.md** — derive from PRD and architecture docs; write AC as a structured table with unique IDs. 写 spec 前必须先阅读 release-contract.md；spec 只描述业务能力，UI 细节写在 design.md。
+2. **Review spec.md** — user confirms "可以写 design 了"，检查列表：
+   - AC 是否可测试、边界是否清晰？
+   - 所有 AC 是否与 release-contract.md 的不变量一致？
+   - 是否越界进入了其他 feature 的归属领域（表1）？
+
+   → mark spec.md row as ✅ 已评审 in tasks.md 状态表
 3. **Create design.md** — write architecture decisions (Why) and API/data contracts (What) only; no implementation steps, no test strategy
-4. **Review design.md** — user confirms "可以写 tasks 了"（contracts are complete, decisions are sound）→ mark design.md row as ✅ 已评审
+4. **Review design.md** — user confirms "可以写 tasks 了"，检查列表：
+   - 技术契约是否完整、架构决策是否合理？
+   - 是否越界进入了其他 feature 的归属领域（表1）？
+
+   → mark design.md row as ✅ 已评审
 5. **Create tasks.md** — break design into test-implementation pairs; each test task must reference `覆盖 AC: AC-NN`
 6. **Review tasks.md** — user confirms "可以开始实现了" → mark tasks.md row as ✅ 已拆解
 7. **Execute tasks** — one per session, checking off as complete; run tests and show output before marking done
 8. **Mark deviations** — if implementation differs from plan, note in tasks.md §实际偏差记录
+
+---
+
+## 范围变更传播规则
+
+当一个 feature 的范围决策影响另一个 feature 时（例如：F007 决定"不支持属性向导"，而 F003 的 AC 已包含属性向导逻辑），**必须**按以下顺序处理，禁止仅更新当前 spec 而忽略已有 spec：
+
+1. **先更新 release-contract.md 不变量表**（新增或修改 INV-N）
+2. **列出 Impacted Specs 清单**（哪些 feature 的哪些 AC 受影响）
+3. **逐一回写受影响的 spec.md**，修改矛盾的 AC
+4. **重新评审所有受影响的 spec**（走步骤 2 的评审流程）
+5. **全部完成后**才能进入实现
+
+> 违反此规则（仅更新当前 spec、跳过回写）会导致 feature 间 AC 矛盾，产生实现断裂。
 
 ---
 
