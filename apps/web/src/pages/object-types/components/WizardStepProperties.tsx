@@ -153,30 +153,6 @@ export default function WizardStepProperties() {
       ),
     },
     {
-      title: t('wizard.properties.apiNamePreview'),
-      key: 'apiName',
-      render: (_: unknown, record: WizardProperty) => {
-        const apiName = sanitizePropertyApiName(record.displayName);
-        const isReserved = isReservedPropertyApiName(apiName);
-        const isInvalid = !isValidPropertyApiName(apiName);
-        if (isReserved) {
-          return (
-            <Tooltip title={apiName}>
-              <Tag color="error">{t('wizard.properties.apiNameReserved')}</Tag>
-            </Tooltip>
-          );
-        }
-        if (isInvalid) {
-          return (
-            <Tooltip title={apiName}>
-              <Tag color="warning">{t('wizard.properties.apiNameInvalid')}</Tag>
-            </Tooltip>
-          );
-        }
-        return <Text type="secondary" style={{ fontSize: 12, fontFamily: 'monospace' }}>{apiName}</Text>;
-      },
-    },
-    {
       title: '',
       width: 40,
       render: (_: unknown, record: WizardProperty) => (
