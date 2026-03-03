@@ -3,61 +3,85 @@
 **关联规范**: [spec.md](./spec.md)
 **技术方案**: [design.md](./design.md)
 **版本**: v0.1.0
-**开始日期**: YYYY-MM-DD
-**完成日期**: -
 
 ---
 
-## 进度概览
+## 状态
 
-- 总任务数: N
-- 已完成: 0 / N
-- 状态: 🔲 未开始 / 🔄 进行中 / ✅ 完成
+| 步骤 | 状态 | 备注 |
+|------|------|------|
+| spec.md | 🔲 草稿 | 用户明确说"可以写 design 了"后改为 ✅ 已评审 |
+| design.md | 🔲 草稿 | 用户明确说"可以写 tasks 了"后改为 ✅ 已评审 |
+| tasks.md | 🔲 草稿 | 用户明确说"可以开始实现了"后改为 ✅ 已拆解 |
+| 实现 | 🔲 未开始 | X / N 完成 |
+
+---
+
+## 开发模式
+
+**Test-First（奇数=测试，偶数=实现）**：先写测试（红），再写实现（绿）。
+基础设施任务（数据库迁移、ORM 模型、配置）无测试配对，单独编号。
 
 ---
 
 ## Tasks
 
-### 后端
+### 基础设施
 
-- [ ] **T01**: <任务描述>
-  - 文件: `apps/server/path/to/file.py`
-  - 内容: <简要说明要做什么，引用 design.md 章节>
+- [ ] **T001**: <数据库迁移 / ORM 模型 / 配置>
+  - 文件: `apps/server/alembic/versions/NNN_xxx.py`
+  - 内容: 见 [design.md §数据结构](./design.md#数据结构)
   - 依赖: 无
 
-- [ ] **T02**: <任务描述>
-  - 文件: `apps/server/path/to/another_file.py`
-  - 内容: 见 [design.md §数据结构](./design.md#数据结构)
-  - 依赖: T01
+### 后端服务层
 
-- [ ] **T03**: <任务描述>
-  - 文件: `apps/server/path/to/router.py`
-  - 内容: 见 [design.md §API 定义](./design.md#api-定义)
-  - 依赖: T02
+- [ ] **T002**: <模块>单元测试
+  - 文件: `apps/server/tests/unit/test_xxx_service.py`
+  - 覆盖 AC: AC-01, AC-02, AC-03
+  - 测试函数:
+    - `test_xxx_success` → AC-01
+    - `test_xxx_not_found` → AC-02
+    - `test_xxx_conflict` → AC-03
+  - 依赖: T001
+
+- [ ] **T003**: <模块>服务层实现
+  - 文件: `apps/server/app/services/xxx_service.py`
+  - 内容: 见 [design.md §架构决策](./design.md#架构决策)
+  - 依赖: T001
+  - 验证: T002 全部通过
+
+### 后端 API 层
+
+- [ ] **T004**: API 路由集成测试
+  - 文件: `apps/server/tests/integration/test_xxx_router.py`
+  - 覆盖 AC: AC-01, AC-02, AC-03
+  - 测试函数:
+    - `test_create_xxx_success` → AC-01
+    - `test_get_xxx_not_found` → AC-02
+    - `test_create_xxx_conflict` → AC-03
+  - 依赖: T003
+
+- [ ] **T005**: API 路由实现
+  - 文件: `apps/server/app/routers/xxx.py`
+  - 内容: 见 [design.md §API 契约](./design.md#api-契约)
+  - 依赖: T003
+  - 验证: T004 全部通过
 
 ### 前端
 
-- [ ] **T04**: <任务描述>
-  - 文件: `apps/web/src/api/<resource>.ts`
-  - 内容: API 客户端函数，对应 design.md 中的端点定义
-  - 依赖: T03（API 端点已实现）
+- [ ] **T006**: 前端组件测试
+  - 文件: `apps/web/src/pages/<Resource>Page/__tests__/`
+  - 覆盖 AC: AC-01, AC-02
+  - 测试函数:
+    - `renders list correctly` → AC-01
+    - `shows error state on failure` → AC-02
+  - 依赖: T005（API 已实现）
 
-- [ ] **T05**: <任务描述>
+- [ ] **T007**: 前端页面实现
   - 文件: `apps/web/src/pages/<Resource>Page/index.tsx`
   - 内容: 见 [design.md §前端组件](./design.md#前端组件)
-  - 依赖: T04
-
-### 测试
-
-- [ ] **T06**: 编写后端集成测试
-  - 文件: `apps/server/tests/test_<resource>.py`
-  - 内容: 覆盖 spec.md 中的所有验收标准
-  - 依赖: T03
-
-- [ ] **T07**: 编写前端组件测试
-  - 文件: `apps/web/src/pages/<Resource>Page/__tests__/`
-  - 内容: 表单验证、列表渲染、错误状态
-  - 依赖: T05
+  - 依赖: T005
+  - 验证: T006 全部通过
 
 ---
 
@@ -66,13 +90,3 @@
 > 完成后，在此记录实现与 design.md 的偏差，供后续参考。
 
 - **偏差 1**: <描述实际做了什么，以及为何偏离原计划>
-
----
-
-## 会话记录
-
-> 每次 AI 协作会话完成哪些 tasks，可简要记录。
-
-| 日期 | 完成任务 | 备注 |
-|------|---------|------|
-| YYYY-MM-DD | T01, T02 | - |
