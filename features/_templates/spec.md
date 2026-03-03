@@ -51,3 +51,4 @@
 - 架构参考: [docs/architecture/XX-name.md §章节]
 - 领域术语: [docs/specs/terminology.md]
 - 依赖特性: [features/v0.1.0/NNN-name]
+- 版本契约: [features/vX.X.X/release-contract.md]（写 spec 前必须先阅读）
