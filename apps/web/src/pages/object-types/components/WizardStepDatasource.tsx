@@ -124,20 +124,17 @@ export default function WizardStepDatasource() {
         size="small"
         pagination={false}
         locale={{ emptyText: t('dataset.noDatasets') }}
-        rowClassName={(record: DatasetListItem) =>
-          record.inUseByObjectTypeRid ? 'ant-table-row-disabled' : ''
-        }
         onRow={(record: DatasetListItem) => ({
           onClick: () => {
-            if (!record.inUseByObjectTypeRid) {
+            if (!record.inUse) {
               handleSelectDataset(record.rid);
             }
           },
           onMouseEnter: () => setHoveredRid(record.rid),
           onMouseLeave: () => setHoveredRid(undefined),
           style: {
-            cursor: record.inUseByObjectTypeRid ? 'not-allowed' : 'pointer',
-            opacity: record.inUseByObjectTypeRid ? 0.5 : 1,
+            cursor: record.inUse ? 'not-allowed' : 'pointer',
+            opacity: record.inUse ? 0.5 : 1,
             background: selectedDatasetRid === record.rid ? '#e6f4ff' : undefined,
           },
         })}
