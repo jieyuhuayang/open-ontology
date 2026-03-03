@@ -30,7 +30,6 @@ interface CreateWizardStore {
   setMetadata: (
     data: Partial<{
       displayName: string;
-      pluralDisplayName: string;
       description: string;
       icon: { name: string; color: string };
     }>,
