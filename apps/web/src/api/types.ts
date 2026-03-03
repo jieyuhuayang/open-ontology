@@ -38,6 +38,5 @@ export type MySQLColumnInfo = components['schemas']['MySQLColumnInfo'];
 export type MySQLTablePreview = components['schemas']['MySQLTablePreview'];
 export type ImportTask = components['schemas']['ImportTask'];
 export type ImportTaskStatus = components['schemas']['ImportTaskStatus'];
-export type UploadPreviewResponse = components['schemas']['UploadPreviewResponse'];
 export type MySQLImportRequest = components['schemas']['MySQLImportRequest'];
 export type FileConfirmRequest = components['schemas']['FileConfirmRequest'];
