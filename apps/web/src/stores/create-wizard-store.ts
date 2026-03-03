@@ -15,9 +15,9 @@ interface CreateWizardStore {
   currentStep: number;
   selectedDatasetRid: string | null;
   displayName: string;
+  pluralDisplayName: string;
   description: string;
   icon: { name: string; color: string };
-  objectTypeId: string;
   properties: WizardProperty[];
   intendedActions: string[];
   projectRid: string;
@@ -31,14 +31,15 @@ interface CreateWizardStore {
   setMetadata: (
     data: Partial<{
       displayName: string;
+      pluralDisplayName: string;
       description: string;
       icon: { name: string; color: string };
-      objectTypeId: string;
     }>,
   ) => void;
   addProperty: (property: WizardProperty) => void;
   removeProperty: (propertyId: string) => void;
   updateProperty: (propertyId: string, updates: Partial<WizardProperty>) => void;
+  setProperties: (properties: WizardProperty[]) => void;
   setIntendedActions: (actions: string[]) => void;
   setProjectRid: (rid: string) => void;
 }
@@ -48,9 +49,9 @@ const DEFAULT_STATE = {
   currentStep: 0,
   selectedDatasetRid: null,
   displayName: '',
+  pluralDisplayName: '',
   description: '',
   icon: { name: 'AppstoreOutlined', color: '#1677ff' },
-  objectTypeId: '',
   properties: [] as WizardProperty[],
   intendedActions: [] as string[],
   projectRid: 'ri.ontology.space.default',
@@ -78,9 +79,9 @@ export const useCreateWizardStore = create<CreateWizardStore>()((set) => ({
   setMetadata: (data) =>
     set((state) => ({
       displayName: data.displayName ?? state.displayName,
+      pluralDisplayName: data.pluralDisplayName ?? state.pluralDisplayName,
       description: data.description ?? state.description,
       icon: data.icon ?? state.icon,
-      objectTypeId: data.objectTypeId ?? state.objectTypeId,
     })),
 
   addProperty: (property) =>
@@ -99,6 +100,8 @@ export const useCreateWizardStore = create<CreateWizardStore>()((set) => ({
         p.id === propertyId ? { ...p, ...updates } : p,
       ),
     })),
+
+  setProperties: (properties) => set({ properties }),
 
   setIntendedActions: (actions) => set({ intendedActions: actions }),
 
