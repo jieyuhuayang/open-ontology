@@ -76,7 +76,6 @@ export const useCreateWizardStore = create<CreateWizardStore>()((set) => ({
   setMetadata: (data) =>
     set((state) => ({
       displayName: data.displayName ?? state.displayName,
-      pluralDisplayName: data.pluralDisplayName ?? state.pluralDisplayName,
       description: data.description ?? state.description,
       icon: data.icon ?? state.icon,
     })),
