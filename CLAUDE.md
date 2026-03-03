@@ -166,6 +166,27 @@ These rules are **non-negotiable**. Violating them creates tech debt that compou
 - Primary keys use `rid` (text, format: `ri.<namespace>.<type>.<uuid4>`) — no auto-increment IDs
 - Error response format: `{ "error": { "code": "...", "message": "...", "details": {} } }`
 
+### Testing
+
+These rules apply whenever you write or modify backend/frontend source code.
+
+**Backend**
+
+- **New service function → unit test required**: Every new function added to `services/` must have a corresponding unit test in `tests/unit/`. Mock the DB session via `mock_db_session`.
+- **New API route → integration test required**: Every new route added to `routers/` must be covered by an integration test in `tests/integration/` using `seeded_client`. Cover at minimum: happy path + primary error path (e.g., 404 or 409).
+- **Run and verify before marking done**: After writing tests, execute `cd apps/server && uv run pytest <test_file> -v` and paste the passing output. A task is **not complete** until tests are green.
+
+**Frontend**
+
+- **New Zustand store → unit test required**: Every new store in `stores/` must have a test in `stores/__tests__/` covering state transitions.
+- **New reusable component → unit test required**: Every new component in `components/` must have a render test in `components/__tests__/` (use Testing Library).
+- **Run and verify before marking done**: Execute `cd apps/web && pnpm test --run` and confirm no failures.
+
+**Forbidden**
+
+- **NO marking a task complete without running tests** — "I believe it should work" is not acceptable; run the tests and show the output.
+- **NO writing tests after the fact as a separate follow-up task** — tests are part of the same task as the implementation, not a separate step.
+
 ### 外部 MySQL 测试副本策略
 
 - Open Ontology 主存储仍为 PostgreSQL；MVP 阶段 MySQL 仅作为外部导入源。
