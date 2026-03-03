@@ -22,7 +22,7 @@ export type PropertyUpdateRequest = components['schemas']['PropertyUpdateRequest
 export type PropertyListResponse = components['schemas']['PropertyListResponse'];
 export type PropertySortOrderRequest = components['schemas']['PropertySortOrderRequest'];
 export type PropertySortOrderItem = components['schemas']['PropertySortOrderItem'];
-export type PropertyBaseType = components['schemas']['PropertyBaseType'];
+export type PropertyBaseType = string;
 export type StructField = components['schemas']['StructField'];
 
 export type Dataset = components['schemas']['Dataset'];
