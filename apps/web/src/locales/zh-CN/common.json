@@ -316,7 +316,11 @@
       "source": "来源",
       "property": "属性",
       "userInput": "用户输入 / 动作",
-      "selectProperty": "选择属性"
+      "selectProperty": "选择属性",
+      "apiNamePreview": "API 名称（预览）",
+      "apiNameConflict": "以下属性的 API 名称不合法，请修改后再继续：{{names}}",
+      "apiNameReserved": "保留名称",
+      "apiNameInvalid": "格式非法"
     }
   },
   "dataset": {
