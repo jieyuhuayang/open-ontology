@@ -77,21 +77,21 @@ export default function WizardStepProperties() {
   };
 
   // PK / TK selection
-  const primaryKeyId = properties.find((p) => p.isPrimaryKey)?.id ?? null;
-  const titleKeyId = properties.find((p) => p.isTitleKey)?.id ?? null;
+  const primaryKeyId = properties.find((p) => p.isPrimaryKey)?.id;
+  const titleKeyId = properties.find((p) => p.isTitleKey)?.id;
 
-  const handlePrimaryKeyChange = (propId: string | null) => {
+  const handlePrimaryKeyChange = (propId?: string) => {
     const updated = properties.map((p) => ({
       ...p,
-      isPrimaryKey: p.id === propId,
+      isPrimaryKey: !!propId && p.id === propId,
     }));
     setProperties(updated);
   };
 
-  const handleTitleKeyChange = (propId: string | null) => {
+  const handleTitleKeyChange = (propId?: string) => {
     const updated = properties.map((p) => ({
       ...p,
-      isTitleKey: p.id === propId,
+      isTitleKey: !!propId && p.id === propId,
     }));
     setProperties(updated);
   };
