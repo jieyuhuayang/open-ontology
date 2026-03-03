@@ -1,14 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Button,
   Flex,
+  Input,
   Select,
   Table,
   Tag,
-  Tooltip,
   Typography,
-  Input,
-  Modal,
 } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -30,138 +28,124 @@ function generateId(): string {
 
 export default function WizardStepProperties() {
   const { t } = useTranslation();
-  const { selectedDatasetRid, properties, addProperty, removeProperty, updateProperty } =
-    useCreateWizardStore();
+  const {
+    selectedDatasetRid,
+    properties,
+    addProperty,
+    removeProperty,
+    updateProperty,
+    setProperties,
+  } = useCreateWizardStore();
 
   const { data: dataset } = useDataset(selectedDatasetRid ?? '');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newPropName, setNewPropName] = useState('');
-  const [newPropType, setNewPropType] = useState<PropertyBaseType>('string');
-  const [newPropColumn, setNewPropColumn] = useState<string | undefined>(undefined);
-
   const datasetColumns = dataset?.columns ?? [];
 
-  const handleAddAll = () => {
-    const mapped = new Set(properties.map((p) => p.columnName).filter(Boolean));
-    const unmapped = datasetColumns.filter((col) => !mapped.has(col.name));
-    unmapped.forEach((col) => {
-      addProperty({
+  // Auto-map dataset columns to properties on first load
+  const autoMappedRef = useRef(false);
+  useEffect(() => {
+    if (
+      datasetColumns.length > 0 &&
+      properties.length === 0 &&
+      !autoMappedRef.current
+    ) {
+      autoMappedRef.current = true;
+      const mapped: WizardProperty[] = datasetColumns.map((col) => ({
         id: generateId(),
         displayName: col.name,
-        baseType: 'string',
+        baseType: col.inferredType || 'string',
         columnName: col.name,
-      });
-    });
-  };
+      }));
+      setProperties(mapped);
+    }
+  }, [datasetColumns, properties.length, setProperties]);
 
-  const handleAddManual = () => {
+  // Inline add row state
+  const [isAdding, setIsAdding] = useState(false);
+  const [newPropName, setNewPropName] = useState('');
+  const [newPropType, setNewPropType] = useState<PropertyBaseType>('string');
+
+  const handleAddInline = () => {
     if (!newPropName.trim()) return;
     addProperty({
       id: generateId(),
       displayName: newPropName.trim(),
       baseType: newPropType,
-      columnName: newPropColumn,
     });
     setNewPropName('');
     setNewPropType('string');
-    setNewPropColumn(undefined);
-    setIsAddModalOpen(false);
+    setIsAdding(false);
   };
+
+  // PK / TK selection
+  const primaryKeyId = properties.find((p) => p.isPrimaryKey)?.id ?? null;
+  const titleKeyId = properties.find((p) => p.isTitleKey)?.id ?? null;
+
+  const handlePrimaryKeyChange = (propId: string | null) => {
+    const updated = properties.map((p) => ({
+      ...p,
+      isPrimaryKey: p.id === propId,
+    }));
+    setProperties(updated);
+  };
+
+  const handleTitleKeyChange = (propId: string | null) => {
+    const updated = properties.map((p) => ({
+      ...p,
+      isTitleKey: p.id === propId,
+    }));
+    setProperties(updated);
+  };
+
+  const propertyOptions = properties.map((p) => ({
+    value: p.id,
+    label: p.displayName,
+  }));
 
   const columns = [
     {
-      title: t('objectType.fields.displayName'),
-      dataIndex: 'displayName',
-      key: 'displayName',
-      render: (val: string, record: WizardProperty) => (
-        <Flex align="center" gap={4}>
-          <Text>{val}</Text>
-          {record.isPrimaryKey && <Tag color="blue">{t('objectType.properties.primaryKey')}</Tag>}
-          {record.isTitleKey && <Tag color="green">{t('objectType.properties.titleKey')}</Tag>}
-        </Flex>
+      title: t('wizard.properties.source'),
+      key: 'source',
+      width: 180,
+      render: (_: unknown, record: WizardProperty) => (
+        <Text type="secondary" style={{ fontSize: 13 }}>
+          {record.columnName ?? t('wizard.properties.userInput')}
+        </Text>
       ),
     },
     {
-      title: t('property.fields.baseType'),
-      dataIndex: 'baseType',
+      title: '',
       key: 'baseType',
       width: 140,
-      render: (val: PropertyBaseType, record: WizardProperty) => (
+      render: (_: unknown, record: WizardProperty) => (
         <Select
           size="small"
-          value={val}
+          value={record.baseType}
           onChange={(v) => updateProperty(record.id, { baseType: v })}
-          options={BASE_TYPE_OPTIONS.map((t) => ({ value: t, label: t }))}
+          options={BASE_TYPE_OPTIONS.map((bt) => ({ value: bt, label: bt }))}
           style={{ width: '100%' }}
         />
       ),
     },
     {
-      title: t('objectType.properties.mappedColumn'),
-      dataIndex: 'columnName',
-      key: 'columnName',
-      width: 160,
-      render: (val: string | undefined, record: WizardProperty) => {
-        if (datasetColumns.length === 0) {
-          return (
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              {t('objectType.properties.unmapped')}
-            </Text>
-          );
-        }
-        return (
-          <Select
+      title: t('wizard.properties.property'),
+      key: 'displayName',
+      render: (_: unknown, record: WizardProperty) => (
+        <Flex align="center" gap={4}>
+          <Input
             size="small"
-            value={val}
-            onChange={(v) => updateProperty(record.id, { columnName: v })}
-            placeholder={t('objectType.properties.mapToColumn')}
-            options={datasetColumns.map((c) => ({ value: c.name, label: c.name }))}
-            style={{ width: '100%' }}
-            allowClear
+            value={record.displayName}
+            onChange={(e) =>
+              updateProperty(record.id, { displayName: e.target.value })
+            }
+            style={{ width: 180 }}
           />
-        );
-      },
-    },
-    {
-      title: 'PK',
-      width: 50,
-      render: (_: unknown, record: WizardProperty) => (
-        <Tooltip title={t('objectType.properties.primaryKey')}>
-          <input
-            type="radio"
-            name="primaryKey"
-            checked={!!record.isPrimaryKey}
-            onChange={() => {
-              properties.forEach((p) => {
-                if (p.id !== record.id && p.isPrimaryKey) {
-                  updateProperty(p.id, { isPrimaryKey: false });
-                }
-              });
-              updateProperty(record.id, { isPrimaryKey: true });
-            }}
-          />
-        </Tooltip>
-      ),
-    },
-    {
-      title: 'TK',
-      width: 50,
-      render: (_: unknown, record: WizardProperty) => (
-        <Tooltip title={t('objectType.properties.titleKey')}>
-          <input
-            type="radio"
-            name="titleKey"
-            checked={!!record.isTitleKey}
-            onChange={() => {
-              properties.forEach((p) => {
-                if (p.id !== record.id && p.isTitleKey) {
-                  updateProperty(p.id, { isTitleKey: false });
-                }
-              });
-              updateProperty(record.id, { isTitleKey: true });
-            }}
-          />
-        </Tooltip>
+          {record.isPrimaryKey && (
+            <Tag color="blue">{t('objectType.properties.primaryKey')}</Tag>
+          )}
+          {record.isTitleKey && (
+            <Tag color="green">{t('objectType.properties.titleKey')}</Tag>
+          )}
+        </Flex>
       ),
     },
     {
@@ -173,7 +157,6 @@ export default function WizardStepProperties() {
           size="small"
           danger
           icon={<DeleteOutlined />}
-          disabled={record.isPrimaryKey}
           onClick={() => removeProperty(record.id)}
         />
       ),
@@ -182,28 +165,39 @@ export default function WizardStepProperties() {
 
   return (
     <Flex vertical gap={12}>
-      <Flex justify="space-between" align="center">
-        <Text type="secondary" style={{ fontSize: 12 }}>
-          {properties.length > 0
-            ? `${properties.length} ${t('property.addProperty').toLowerCase()}`
-            : t('objectType.placeholders.propertiesEmpty')}
-        </Text>
-        <Flex gap={8}>
-          {datasetColumns.length > 0 && (
-            <Button size="small" onClick={handleAddAll}>
-              {t('objectType.properties.addAll')}
-            </Button>
-          )}
-          <Button
+      {/* PK / TK selectors */}
+      <Flex gap={24}>
+        <Flex align="center" gap={8}>
+          <Text strong style={{ whiteSpace: 'nowrap' }}>
+            {t('objectType.properties.primaryKey')}
+          </Text>
+          <Select
             size="small"
-            icon={<PlusOutlined />}
-            onClick={() => setIsAddModalOpen(true)}
-          >
-            {t('objectType.properties.addAsNew')}
-          </Button>
+            value={primaryKeyId}
+            onChange={handlePrimaryKeyChange}
+            options={propertyOptions}
+            placeholder={t('wizard.properties.selectProperty')}
+            style={{ width: 200 }}
+            allowClear
+          />
+        </Flex>
+        <Flex align="center" gap={8}>
+          <Text strong style={{ whiteSpace: 'nowrap' }}>
+            {t('objectType.properties.titleKey')}
+          </Text>
+          <Select
+            size="small"
+            value={titleKeyId}
+            onChange={handleTitleKeyChange}
+            options={propertyOptions}
+            placeholder={t('wizard.properties.selectProperty')}
+            style={{ width: 200 }}
+            allowClear
+          />
         </Flex>
       </Flex>
 
+      {/* Properties table */}
       <Table
         dataSource={properties}
         columns={columns}
@@ -213,53 +207,43 @@ export default function WizardStepProperties() {
         locale={{ emptyText: t('common.noData') }}
       />
 
-      <Modal
-        title={t('objectType.properties.addAsNew')}
-        open={isAddModalOpen}
-        onOk={handleAddManual}
-        onCancel={() => setIsAddModalOpen(false)}
-        okButtonProps={{ disabled: !newPropName.trim() }}
-        destroyOnClose
-      >
-        <Flex vertical gap={12} style={{ marginTop: 16 }}>
-          <div>
-            <Text strong style={{ display: 'block', marginBottom: 4 }}>
-              {t('objectType.fields.displayName')}
-            </Text>
-            <Input
-              value={newPropName}
-              onChange={(e) => setNewPropName(e.target.value)}
-              placeholder="Property Name"
-            />
-          </div>
-          <div>
-            <Text strong style={{ display: 'block', marginBottom: 4 }}>
-              {t('property.fields.baseType')}
-            </Text>
-            <Select
-              value={newPropType}
-              onChange={setNewPropType}
-              options={BASE_TYPE_OPTIONS.map((bt) => ({ value: bt, label: bt }))}
-              style={{ width: '100%' }}
-            />
-          </div>
-          {datasetColumns.length > 0 && (
-            <div>
-              <Text strong style={{ display: 'block', marginBottom: 4 }}>
-                {t('objectType.properties.mappedColumn')}
-              </Text>
-              <Select
-                value={newPropColumn}
-                onChange={setNewPropColumn}
-                placeholder={t('objectType.properties.mapToColumn')}
-                options={datasetColumns.map((c) => ({ value: c.name, label: c.name }))}
-                style={{ width: '100%' }}
-                allowClear
-              />
-            </div>
-          )}
+      {/* Inline add row */}
+      {isAdding ? (
+        <Flex gap={8} align="center" style={{ paddingLeft: 8 }}>
+          <Input
+            size="small"
+            value={newPropName}
+            onChange={(e) => setNewPropName(e.target.value)}
+            placeholder={t('objectType.fields.displayName')}
+            style={{ width: 180 }}
+            autoFocus
+            onPressEnter={handleAddInline}
+          />
+          <Select
+            size="small"
+            value={newPropType}
+            onChange={setNewPropType}
+            options={BASE_TYPE_OPTIONS.map((bt) => ({ value: bt, label: bt }))}
+            style={{ width: 120 }}
+          />
+          <Button size="small" type="primary" onClick={handleAddInline}>
+            {t('common.confirm')}
+          </Button>
+          <Button size="small" onClick={() => setIsAdding(false)}>
+            {t('common.cancel')}
+          </Button>
         </Flex>
-      </Modal>
+      ) : (
+        <Button
+          type="dashed"
+          size="small"
+          icon={<PlusOutlined />}
+          onClick={() => setIsAdding(true)}
+          style={{ alignSelf: 'flex-start' }}
+        >
+          {t('property.addProperty')}
+        </Button>
+      )}
     </Flex>
   );
 }
