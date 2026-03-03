@@ -1,5 +1,9 @@
 # Feature: <名称>
 
+> **spec 只描述业务能力（用户能做什么、验收边界）。**
+> UI 布局、交互细节、组件结构 → 写在 design.md。
+> 如有跨 feature 依赖，必须在"依赖与约束"节中声明，并对照 release-contract.md。
+
 **关联 PRD**: [docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md §章节名]
 **优先级**: P0 / P1 / P2
 **所属版本**: v0.1.0
