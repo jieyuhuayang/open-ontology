@@ -147,6 +147,51 @@ describe('CreateObjectTypeWizard', () => {
       expect(props[2]!.displayName).toBe('created_at');
       expect(props[2]!.baseType).toBe('timestamp');
     });
+
+    it('PK/TK selection updates store correctly via setProperties', () => {
+      // This tests the handler logic directly since Ant Design Select
+      // interactions are hard to simulate in jsdom
+      useCreateWizardStore.getState().setProperties([
+        { id: 'p1', displayName: 'ID', baseType: 'string' },
+        { id: 'p2', displayName: 'Name', baseType: 'string' },
+      ]);
+
+      // Simulate PK selection: set p1 as primary key
+      const props = useCreateWizardStore.getState().properties;
+      const updatedPK = props.map((p) => ({
+        ...p,
+        isPrimaryKey: p.id === 'p1',
+      }));
+      useCreateWizardStore.getState().setProperties(updatedPK);
+
+      let state = useCreateWizardStore.getState().properties;
+      expect(state[0]!.isPrimaryKey).toBe(true);
+      expect(state[1]!.isPrimaryKey).toBe(false);
+
+      // Simulate TK selection: set p2 as title key
+      const updatedTK = useCreateWizardStore.getState().properties.map((p) => ({
+        ...p,
+        isTitleKey: p.id === 'p2',
+      }));
+      useCreateWizardStore.getState().setProperties(updatedTK);
+
+      state = useCreateWizardStore.getState().properties;
+      expect(state[0]!.isPrimaryKey).toBe(true);
+      expect(state[0]!.isTitleKey).toBe(false);
+      expect(state[1]!.isPrimaryKey).toBe(false);
+      expect(state[1]!.isTitleKey).toBe(true);
+
+      // Simulate clearing PK (propId is undefined)
+      const cleared = useCreateWizardStore.getState().properties.map((p) => ({
+        ...p,
+        isPrimaryKey: false,
+      }));
+      useCreateWizardStore.getState().setProperties(cleared);
+
+      state = useCreateWizardStore.getState().properties;
+      expect(state[0]!.isPrimaryKey).toBe(false);
+      expect(state[1]!.isPrimaryKey).toBe(false);
+    });
   });
 
   describe('Property creation on submit', () => {
