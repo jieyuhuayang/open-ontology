@@ -30,6 +30,24 @@ down-volumes:
 db:
     docker compose up db
 
+# --- MySQL Sample Clone (for import testing) ---
+
+# Initialize local env file for MySQL sample clone workflow
+mysql-sample-init-env:
+    cp -n ops/mysql-sample/.env.mysql-sample.example ops/mysql-sample/.env.mysql-sample.local
+
+# Refresh local MySQL sample clone (schema + latest N rows per table)
+mysql-sample-refresh:
+    bash ops/mysql-sample/refresh.sh
+
+# Clean MySQL sample clone container and runtime artifacts
+mysql-sample-clean:
+    bash ops/mysql-sample/cleanup.sh
+
+# Clean MySQL sample clone container, runtime artifacts, and data volume
+mysql-sample-clean-purge:
+    bash ops/mysql-sample/cleanup.sh --purge-volume
+
 # --- Native Development ---
 
 # Start backend dev server (requires DB running)

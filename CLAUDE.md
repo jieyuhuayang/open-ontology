@@ -12,9 +12,12 @@ Current version: v0.1.0 (MVP), focused on Ontology Manager.
 
 ## Repository Status
 
-This repository is currently in the **specification/design phase**. It contains PRD documents only — no source code, build system, or tests yet.
+This repository is in the **implementation phase for MVP v0.1.0**.
 
-> **Note**: Update this section when transitioning from spec to implementation.
+- Specification documents are still the source of truth for intent.
+- Backend and frontend source code are present under `apps/`.
+- Tests, migrations, and build tooling are active and maintained.
+- New features must continue following SDD workflow in `features/`.
 
 ## Repository Structure
 
@@ -158,6 +161,14 @@ These rules are **non-negotiable**. Violating them creates tech debt that compou
 - Schema changes must go through **Alembic migrations** — never raw DDL
 - Primary keys use `rid` (text, format: `ri.<namespace>.<type>.<uuid4>`) — no auto-increment IDs
 - Error response format: `{ "error": { "code": "...", "message": "...", "details": {} } }`
+
+### External MySQL Test Snapshot Policy
+
+- Open Ontology primary storage remains PostgreSQL; MySQL in MVP is an external import source.
+- Do **not** run import tests directly against production-grade external databases.
+- Use local sample clone workflow: `ops/mysql-sample/refresh.sh` (via `just mysql-sample-refresh`).
+- Keep credentials only in local env file: `ops/mysql-sample/.env.mysql-sample.local` (never commit).
+- Sample artifacts under `ops/mysql-sample/runtime/` are local-only and must stay out of Git.
 
 ## When to Read Detailed Docs
 

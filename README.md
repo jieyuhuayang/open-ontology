@@ -66,6 +66,10 @@ Run `just` to see all available commands:
 | `just up-build` | Start with rebuild |
 | `just down` | Stop all services |
 | `just db` | Start only PostgreSQL |
+| `just mysql-sample-init-env` | Create local env template for MySQL sample clone workflow |
+| `just mysql-sample-refresh` | Rebuild local MySQL sample clone (schema + latest N rows/table) |
+| `just mysql-sample-clean` | Remove local MySQL sample clone container + runtime artifacts |
+| `just mysql-sample-clean-purge` | Same as above + remove MySQL data volume |
 | `just server-dev` | Run backend natively (requires DB) |
 | `just web-dev` | Run frontend natively |
 | `just test` | Run all tests |
@@ -75,6 +79,9 @@ Run `just` to see all available commands:
 | `just server-migrate` | Run database migrations |
 | `just server-openapi` | Generate openapi.json |
 | `just web-typegen` | Generate TS types from OpenAPI |
+
+MySQL sample clone workflow docs:
+- `docs/operations/mysql-sample-clone.md`
 
 ## Project Structure
 

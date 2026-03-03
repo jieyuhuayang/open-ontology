@@ -42,9 +42,11 @@ apps/web/dist/
 .env
 .env.local
 .env.*.local
+ops/mysql-sample/.env.mysql-sample.local
 
 # Database
 pgdata/
+ops/mysql-sample/runtime/
 
 # Generated (DO NOT EDIT manually)
 apps/web/src/generated/*.ts
