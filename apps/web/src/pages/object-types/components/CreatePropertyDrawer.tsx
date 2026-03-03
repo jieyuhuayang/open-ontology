@@ -4,23 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { useCreateProperty } from '@/api/properties';
 import PropertyTypeSelector from './PropertyTypeSelector';
 import StructFieldEditor from './StructFieldEditor';
+import { sanitizePropertyApiName } from '@/utils/naming';
 import type { StructField } from '@/api/types';
 
 const PROPERTY_ID_PATTERN = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
 const PROPERTY_API_NAME_PATTERN = /^[a-z][a-zA-Z0-9]{0,99}$/;
-
-function toApiName(displayName: string): string {
-  return displayName
-    .trim()
-    .split(/\s+/)
-    .map((word, i) =>
-      i === 0
-        ? word.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
-        : word.replace(/[^a-zA-Z0-9]/g, '').replace(/^./, (c) => c.toUpperCase()),
-    )
-    .join('')
-    .replace(/^[^a-z]/, (c) => c.toLowerCase()) || '';
-}
 
 interface CreatePropertyDrawerProps {
   open: boolean;
