@@ -28,7 +28,8 @@
   },
   "discover": {
     "recentlyViewed": "Recently viewed object types",
-    "noRecentlyViewed": "No recently viewed object types"
+    "noRecentlyViewed": "No recently viewed object types",
+    "objectTypeDeleted": "Object type \"{{name}}\" has been deleted"
   },
   "common": {
     "save": "Save",
