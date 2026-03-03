@@ -269,6 +269,133 @@
       "linkTypesEmpty": "暂未定义链接类型",
       "data": "数据",
       "dataEmpty": "暂未配置数据源"
+    },
+    "backingDatasource": "底层数据源",
+    "addDatasource": "添加底层数据源",
+    "noDatasource": "暂未关联数据源",
+    "intendedActions": "可用动作",
+    "incomplete": "待补全",
+    "incompleteWarning": "此对象类型尚未完成配置",
+    "properties": {
+      "primaryKey": "主键",
+      "titleKey": "标题键",
+      "mappedColumn": "映射列",
+      "unmapped": "未映射",
+      "addAsNew": "添加为新属性",
+      "addAll": "将所有未映射列添加为新属性",
+      "mapToColumn": "映射到列"
+    },
+    "actions": {
+      "create": "创建 {{name}}",
+      "modify": "修改 {{name}}",
+      "delete": "删除 {{name}}",
+      "createDesc": "允许创建该类型的新对象",
+      "modifyDesc": "允许修改该类型对象的非主键属性",
+      "deleteDesc": "允许删除该类型的对象实例"
+    },
+    "saveLocation": {
+      "project": "项目",
+      "selectProject": "选择项目",
+      "createNote": "创建只会暂存你的变更，不会真正保存。回到 Ontology Manager 后，请在右上角选择保存。"
+    }
+  },
+  "wizard": {
+    "title": "创建对象类型",
+    "next": "下一步",
+    "back": "上一步",
+    "create": "创建",
+    "createLater": "稍后完成",
+    "steps": {
+      "datasource": "数据源",
+      "metadata": "元数据",
+      "properties": "属性",
+      "actions": "动作类型",
+      "saveLocation": "保存位置"
+    }
+  },
+  "dataset": {
+    "listTitle": "数据集",
+    "source": {
+      "mysql": "MySQL",
+      "excel": "Excel",
+      "csv": "CSV"
+    },
+    "columns": {
+      "name": "名称",
+      "source": "来源",
+      "rows": "行数",
+      "columns": "列数",
+      "importedAt": "导入时间"
+    },
+    "inUse": "已使用",
+    "inUseTooltip": "该数据集已被 {{name}} 关联",
+    "useThisDataset": "使用此数据集",
+    "importFromMySQL": "从 MySQL 导入",
+    "uploadFile": "上传 Excel/CSV",
+    "selectDataset": "选择数据源",
+    "noDatasets": "暂无数据集",
+    "deleteSuccess": "数据集已删除",
+    "deleteInUse": "该数据集已被关联，无法删除"
+  },
+  "mysqlConnection": {
+    "title": "从 MySQL 导入",
+    "steps": {
+      "connection": "连接配置",
+      "tables": "选择表",
+      "config": "配置导入",
+      "result": "导入结果"
+    },
+    "fields": {
+      "name": "连接名称",
+      "host": "主机",
+      "port": "端口",
+      "database": "数据库",
+      "username": "用户名",
+      "password": "密码",
+      "ssl": "SSL 加密"
+    },
+    "testConnection": "测试连接",
+    "testSuccess": "连接成功",
+    "testFailed": "连接失败：{{error}}",
+    "useExisting": "使用已有连接",
+    "browseTable": "选择表",
+    "snapshotExists": "已有快照",
+    "configTitle": "配置导入",
+    "datasetName": "数据集名称",
+    "selectColumns": "选择列",
+    "estimatedRows": "预估行数",
+    "snapshotNote": "此操作将创建一份数据快照",
+    "confirmImport": "确认导入",
+    "importSuccess": "导入成功",
+    "importFailed": "导入失败"
+  },
+  "import": {
+    "status": {
+      "pending": "等待中",
+      "running": "导入中",
+      "completed": "已完成",
+      "failed": "失败"
+    },
+    "rows": "行",
+    "columns": "列",
+    "duration": "耗时",
+    "retry": "重试",
+    "useDataset": "使用此数据集",
+    "fileUpload": {
+      "title": "上传 Excel/CSV",
+      "steps": {
+        "upload": "上传文件",
+        "preview": "预览配置",
+        "result": "导入结果"
+      },
+      "dragHint": "点击或拖拽文件到此区域",
+      "formatHint": "支持 .xlsx、.xls、.csv 格式，最大 50MB",
+      "tooLarge": "文件超过 50MB 限制",
+      "unsupportedFormat": "不支持的文件格式",
+      "selectSheet": "选择 Sheet",
+      "hasHeader": "首行为表头",
+      "atLeastOneColumn": "至少选择一列",
+      "confirmImport": "确认导入"
     }
   }
 }
