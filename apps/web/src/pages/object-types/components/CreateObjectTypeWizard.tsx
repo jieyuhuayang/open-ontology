@@ -52,8 +52,8 @@ export default function CreateObjectTypeWizard() {
 
   const createPropertiesForObjectType = async (objectTypeRid: string) => {
     for (const prop of properties) {
-      const id = toKebabCase(prop.displayName);
-      const apiName = toCamelCase(prop.displayName);
+      const id = sanitizePropertyId(prop.displayName);
+      const apiName = sanitizePropertyApiName(prop.displayName);
       const created = await createPropertyDirect(objectTypeRid, {
         id,
         apiName,
