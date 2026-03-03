@@ -47,6 +47,8 @@ docs/
 │   ├── 03-agent-context-architecture.md  # Agent context architecture
 │   ├── 04-tech-stack-recommendations.md  # Tech stack recommendations
 │   └── README.md
+├── operations/                       # Operations runbooks
+│   └── mysql-sample-clone.md         # Local MySQL sample clone workflow
 ├── prd/                              # Product Requirements Documents
 │   ├── 0 概念定义/                   # Foundational domain concepts
 │   │   └── 0 概念定义.md             # Data layer, object layer, security model
@@ -61,6 +63,8 @@ docs/
 │   └── property-value-formatting.md  # Value formatting and conditional formatting
 └── research/                         # Technical research notes
     └── unstructured-data-in-ontology.md
+ops/
+└── mysql-sample/                     # Local MySQL sample clone scripts
 justfile                              # Monorepo task runner
 ```
 
@@ -162,13 +166,13 @@ These rules are **non-negotiable**. Violating them creates tech debt that compou
 - Primary keys use `rid` (text, format: `ri.<namespace>.<type>.<uuid4>`) — no auto-increment IDs
 - Error response format: `{ "error": { "code": "...", "message": "...", "details": {} } }`
 
-### External MySQL Test Snapshot Policy
+### 外部 MySQL 测试副本策略
 
-- Open Ontology primary storage remains PostgreSQL; MySQL in MVP is an external import source.
-- Do **not** run import tests directly against production-grade external databases.
-- Use local sample clone workflow: `ops/mysql-sample/refresh.sh` (via `just mysql-sample-refresh`).
-- Keep credentials only in local env file: `ops/mysql-sample/.env.mysql-sample.local` (never commit).
-- Sample artifacts under `ops/mysql-sample/runtime/` are local-only and must stay out of Git.
+- Open Ontology 主存储仍为 PostgreSQL；MVP 阶段 MySQL 仅作为外部导入源。
+- **禁止**直接对生产级外部数据库执行导入测试。
+- 统一使用本地样本副本流程：`ops/mysql-sample/refresh.sh`（或 `just mysql-sample-refresh`）。
+- 凭据仅允许存放在本地环境文件 `ops/mysql-sample/.env.mysql-sample.local`，不得提交到仓库。
+- `ops/mysql-sample/runtime/` 下产物仅用于本地调试，必须保持不入 Git。
 
 ## When to Read Detailed Docs
 
