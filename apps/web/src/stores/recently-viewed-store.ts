@@ -14,6 +14,7 @@ export interface RecentlyViewedItem {
 interface RecentlyViewedStore {
   items: RecentlyViewedItem[];
   addItem: (item: Omit<RecentlyViewedItem, 'viewedAt'>) => void;
+  removeItem: (rid: string) => void;
 }
 
 export const useRecentlyViewedStore = create<RecentlyViewedStore>()(
