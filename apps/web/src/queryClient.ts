@@ -2,6 +2,7 @@ import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import type { Mutation } from '@tanstack/react-query';
 import { message } from 'antd';
 import type { AxiosError } from 'axios';
+import i18n from '@/locales/i18n';
 
 interface ApiErrorBody {
   error?: { code?: string; message?: string };
@@ -9,10 +10,15 @@ interface ApiErrorBody {
 
 function extractErrorMessage(error: unknown): string {
   const axiosErr = error as AxiosError<ApiErrorBody>;
+  const errorCode = axiosErr.response?.data?.error?.code;
   const serverMessage = axiosErr.response?.data?.error?.message;
+  if (errorCode) {
+    const translated = i18n.t(`apiErrors.${errorCode}`, { defaultValue: '' });
+    if (translated) return translated;
+  }
   if (serverMessage) return serverMessage;
   if (error instanceof Error) return error.message;
-  return 'An unexpected error occurred';
+  return i18n.t('error.somethingWentWrong');
 }
 
 function handleGlobalError(error: unknown) {
