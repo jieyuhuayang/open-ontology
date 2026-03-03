@@ -28,6 +28,10 @@ export const useRecentlyViewedStore = create<RecentlyViewedStore>()(
           const updated = [{ ...item, viewedAt: now }, ...filtered];
           return { items: updated.slice(0, MAX_ITEMS) };
         }),
+      removeItem: (rid) =>
+        set((state) => ({
+          items: state.items.filter((i) => i.rid !== rid),
+        })),
     }),
     { name: 'recently-viewed' },
   ),
