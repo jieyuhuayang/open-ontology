@@ -390,7 +390,13 @@
     "LINK_TYPE_INVALID_ID": "链接类型 ID 格式不正确，必须以小写字母开头，只能包含小写字母、数字和连字符",
     "LINK_TYPE_INVALID_API_NAME": "链接类型 API Name 格式不正确，必须以小写字母开头，只能包含字母和数字（1-100 个字符）",
     "LINK_TYPE_RESERVED_API_NAME": "该 API Name 是系统保留名称，请使用其他名称",
-    "ENCRYPTION_KEY_MISMATCH": "无法解密凭据，加密密钥已变更。请删除该连接并重新创建。"
+    "ENCRYPTION_KEY_MISMATCH": "无法解密凭据，加密密钥已变更。请删除该连接并重新创建。",
+    "PROPERTY_ID_CONFLICT": "此属性 ID 在该对象类型下已存在",
+    "PROPERTY_API_NAME_CONFLICT": "此属性 API Name 在该对象类型下已存在",
+    "OBJECT_TYPE_ID_CONFLICT": "已存在相同 ID 的对象类型",
+    "OBJECT_TYPE_API_NAME_CONFLICT": "已存在相同 API Name 的对象类型",
+    "LINK_TYPE_ID_CONFLICT": "已存在相同 ID 的链接类型",
+    "LINK_TYPE_API_NAME_CONFLICT": "此 API Name 在关联的对象类型下已存在"
   },
   "import": {
     "status": {
