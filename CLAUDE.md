@@ -168,24 +168,24 @@ These rules are **non-negotiable**. Violating them creates tech debt that compou
 
 ### Testing
 
-These rules apply whenever you write or modify backend/frontend source code.
+以下规则在你编写或修改任何 backend/frontend 源代码时强制生效。
 
 **Backend**
 
-- **New service function → unit test required**: Every new function added to `services/` must have a corresponding unit test in `tests/unit/`. Mock the DB session via `mock_db_session`.
-- **New API route → integration test required**: Every new route added to `routers/` must be covered by an integration test in `tests/integration/` using `seeded_client`. Cover at minimum: happy path + primary error path (e.g., 404 or 409).
-- **Run and verify before marking done**: After writing tests, execute `cd apps/server && uv run pytest <test_file> -v` and paste the passing output. A task is **not complete** until tests are green.
+- **新增 service function → 必须有 unit test**：`services/` 下新增的函数，必须在 `tests/unit/` 中有对应的单元测试，通过 `mock_db_session` mock 数据库。
+- **新增 API route → 必须有 integration test**：`routers/` 下新增的路由，必须在 `tests/integration/` 中用 `seeded_client` 覆盖，至少包含 happy path 和主要 error path（如 404、409）。
+- **完成前必须运行并验证**：写完测试后执行 `cd apps/server && uv run pytest <test_file> -v`，并贴出通过的输出。测试未绿，任务不算完成。
 
 **Frontend**
 
-- **New Zustand store → unit test required**: Every new store in `stores/` must have a test in `stores/__tests__/` covering state transitions.
-- **New reusable component → unit test required**: Every new component in `components/` must have a render test in `components/__tests__/` (use Testing Library).
-- **Run and verify before marking done**: Execute `cd apps/web && pnpm test --run` and confirm no failures.
+- **新增 Zustand store → 必须有 unit test**：`stores/` 下新增的 store，必须在 `stores/__tests__/` 中覆盖核心状态转换。
+- **新增可复用 component → 必须有 unit test**：`components/` 下新增的组件，必须在 `components/__tests__/` 中有渲染测试（使用 Testing Library）。
+- **完成前必须运行并验证**：执行 `cd apps/web && pnpm test --run`，确认无失败。
 
-**Forbidden**
+**禁止行为**
 
-- **NO marking a task complete without running tests** — "I believe it should work" is not acceptable; run the tests and show the output.
-- **NO writing tests after the fact as a separate follow-up task** — tests are part of the same task as the implementation, not a separate step.
+- **禁止在未运行测试的情况下将任务标记为完成** — "应该能跑通"不可接受，必须运行并展示输出。
+- **禁止将测试拆分为独立的后续任务** — 测试与实现是同一个任务的一部分，不得分开。
 
 ### 外部 MySQL 测试副本策略
 
