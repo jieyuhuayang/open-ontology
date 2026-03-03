@@ -389,7 +389,13 @@
     "OBJECT_TYPE_INVALID_ID": "Object type ID format is invalid. Must start with a lowercase letter and only contain lowercase letters, digits, and hyphens",
     "LINK_TYPE_INVALID_ID": "Link type ID format is invalid. Must start with a lowercase letter and only contain lowercase letters, digits, and hyphens",
     "LINK_TYPE_INVALID_API_NAME": "Link type API Name format is invalid. Must start with a lowercase letter and only contain letters and digits (1-100 chars)",
-    "LINK_TYPE_RESERVED_API_NAME": "This API Name is a reserved system name. Please use a different name"
+    "LINK_TYPE_RESERVED_API_NAME": "This API Name is a reserved system name. Please use a different name",
+    "PROPERTY_ID_CONFLICT": "This property ID already exists in this object type",
+    "PROPERTY_API_NAME_CONFLICT": "This property API Name already exists in this object type",
+    "OBJECT_TYPE_ID_CONFLICT": "An object type with this ID already exists",
+    "OBJECT_TYPE_API_NAME_CONFLICT": "An object type with this API Name already exists",
+    "LINK_TYPE_ID_CONFLICT": "A link type with this ID already exists",
+    "LINK_TYPE_API_NAME_CONFLICT": "This API Name already exists for the associated object type"
   },
   "import": {
     "status": {
