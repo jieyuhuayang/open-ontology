@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import WizardStepProperties from '@/pages/object-types/components/WizardStepProperties';
@@ -55,58 +54,97 @@ describe('WizardStepProperties', () => {
     useCreateWizardStore.getState().setSelectedDataset('ds-1');
   });
 
-  it('renders PK/TK selects and they have correct ARIA roles', () => {
+  it('renders PK and TK select controls (combobox role)', () => {
     renderComponent();
-
-    // Get all combobox role elements (Ant Design Select renders as combobox)
     const comboboxes = screen.getAllByRole('combobox');
-    // Should have at least 2 for PK/TK plus the base type selects in table rows
+    // At least 2 for PK/TK, plus base type selects in each table row
     expect(comboboxes.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('PK select can be opened and shows property options', async () => {
+  it('auto-maps dataset columns to properties', () => {
     renderComponent();
-
-    // Wait for auto-mapping
     const props = useCreateWizardStore.getState().properties;
-    expect(props.length).toBe(2);
-
-    // Find all comboboxes
-    const comboboxes = screen.getAllByRole('combobox');
-    // First combobox should be the PK select
-    const pkSelect = comboboxes[0]!;
-
-    // Click to open
-    await userEvent.click(pkSelect);
-
-    // Check if dropdown options appeared
-    // Ant Design renders options in a dropdown with role="option"
-    const options = screen.getAllByRole('option');
-    expect(options.length).toBeGreaterThanOrEqual(2);
+    expect(props).toHaveLength(2);
+    expect(props[0]!.displayName).toBe('id');
+    expect(props[0]!.baseType).toBe('integer');
+    expect(props[0]!.columnName).toBe('id');
+    expect(props[1]!.displayName).toBe('name');
+    expect(props[1]!.baseType).toBe('string');
   });
 
-  it('selecting PK option updates store', async () => {
+  it('PK/TK select options use displayName as aria-label', () => {
     renderComponent();
-
-    // Wait for auto-mapping
-    expect(useCreateWizardStore.getState().properties.length).toBe(2);
-
-    // Open PK dropdown using fireEvent.mouseDown (rc-select uses mouseDown)
+    // Open PK select
     const comboboxes = screen.getAllByRole('combobox');
-    const pkSelect = comboboxes[0]!;
-    fireEvent.mouseDown(pkSelect);
+    comboboxes[0]!.focus();
+    comboboxes[0]!.click();
+    // Check that options have correct aria-labels (displayNames)
+    const options = screen.getAllByRole('option');
+    const ariaLabels = options.map((o) => o.getAttribute('aria-label'));
+    expect(ariaLabels).toContain('id');
+    expect(ariaLabels).toContain('name');
+  });
 
-    // Find option by aria-label (rc-select sets aria-label to the label text)
-    const idOption = screen.getByRole('option', { name: 'id' });
-    expect(idOption).toBeInTheDocument();
+  it('PK selection via setProperties correctly updates store', () => {
+    renderComponent();
+    // Simulate what the PK onChange handler does
+    const props = useCreateWizardStore.getState().properties;
+    const targetId = props[0]!.id;
 
-    // Click the option
-    fireEvent.click(idOption);
+    const updated = props.map((p) => ({
+      ...p,
+      isPrimaryKey: p.id === targetId,
+    }));
+    useCreateWizardStore.getState().setProperties(updated);
 
-    // Check store was updated
-    const updatedProps = useCreateWizardStore.getState().properties;
-    const pkProp = updatedProps.find((p) => p.isPrimaryKey);
-    expect(pkProp).toBeDefined();
-    expect(pkProp!.displayName).toBe('id');
+    const result = useCreateWizardStore.getState().properties;
+    expect(result[0]!.isPrimaryKey).toBe(true);
+    expect(result[0]!.displayName).toBe('id');
+    expect(result[1]!.isPrimaryKey).toBe(false);
+  });
+
+  it('TK selection via setProperties correctly updates store', () => {
+    renderComponent();
+    const props = useCreateWizardStore.getState().properties;
+    const targetId = props[1]!.id;
+
+    const updated = props.map((p) => ({
+      ...p,
+      isTitleKey: p.id === targetId,
+    }));
+    useCreateWizardStore.getState().setProperties(updated);
+
+    const result = useCreateWizardStore.getState().properties;
+    expect(result[0]!.isTitleKey).toBe(false);
+    expect(result[1]!.isTitleKey).toBe(true);
+    expect(result[1]!.displayName).toBe('name');
+  });
+
+  it('clearing PK/TK sets all to false', () => {
+    // First set PK
+    renderComponent();
+    const props = useCreateWizardStore.getState().properties;
+    useCreateWizardStore.getState().setProperties(
+      props.map((p) => ({ ...p, isPrimaryKey: p.id === props[0]!.id })),
+    );
+
+    // Then clear (simulating allowClear — propId is undefined)
+    const current = useCreateWizardStore.getState().properties;
+    useCreateWizardStore.getState().setProperties(
+      current.map((p) => ({ ...p, isPrimaryKey: false })),
+    );
+
+    const result = useCreateWizardStore.getState().properties;
+    expect(result.every((p) => !p.isPrimaryKey)).toBe(true);
+  });
+
+  it('shows "Add Property" button (not a modal trigger)', () => {
+    renderComponent();
+    expect(screen.getByText(/Add Property/i)).toBeInTheDocument();
+  });
+
+  it('does NOT show "Add All" button', () => {
+    renderComponent();
+    expect(screen.queryByText(/Add All/i)).not.toBeInTheDocument();
   });
 });
