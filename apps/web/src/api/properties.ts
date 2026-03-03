@@ -81,6 +81,29 @@ export function useDeleteProperty(objectTypeRid: string) {
   });
 }
 
+export async function createPropertyDirect(
+  objectTypeRid: string,
+  req: PropertyCreateRequest,
+): Promise<Property> {
+  const { data } = await apiClient.post<Property>(
+    `/object-types/${objectTypeRid}/properties`,
+    req,
+  );
+  return data;
+}
+
+export async function updatePropertyDirect(
+  objectTypeRid: string,
+  propertyRid: string,
+  req: PropertyUpdateRequest,
+): Promise<Property> {
+  const { data } = await apiClient.put<Property>(
+    `/object-types/${objectTypeRid}/properties/${propertyRid}`,
+    req,
+  );
+  return data;
+}
+
 export function useReorderProperties(objectTypeRid: string) {
   const queryClient = useQueryClient();
   return useMutation({
