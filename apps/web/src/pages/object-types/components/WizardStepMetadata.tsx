@@ -7,21 +7,19 @@ import type { Icon } from '@/api/types';
 
 interface FormValues {
   displayName: string;
-  pluralDisplayName: string;
   description?: string;
   icon: Icon;
 }
 
 export default function WizardStepMetadata() {
   const { t } = useTranslation();
-  const { displayName, pluralDisplayName, description, icon, setMetadata } =
+  const { displayName, description, icon, setMetadata } =
     useCreateWizardStore();
   const [form] = Form.useForm<FormValues>();
 
   useEffect(() => {
     form.setFieldsValue({
       displayName,
-      pluralDisplayName,
       description,
       icon,
     });
@@ -30,7 +28,6 @@ export default function WizardStepMetadata() {
   const handleValuesChange = (_: Partial<FormValues>, all: FormValues) => {
     setMetadata({
       displayName: all.displayName,
-      pluralDisplayName: all.pluralDisplayName,
       description: all.description ?? '',
       icon: all.icon,
     });
@@ -42,7 +39,6 @@ export default function WizardStepMetadata() {
       layout="vertical"
       initialValues={{
         displayName,
-        pluralDisplayName,
         description,
         icon: icon ?? { name: 'AppstoreOutlined', color: '#1677ff' },
       }}
@@ -72,13 +68,6 @@ export default function WizardStepMetadata() {
             message: t('objectType.validation.displayNameRequired'),
           },
         ]}
-      >
-        <Input />
-      </Form.Item>
-
-      <Form.Item
-        name="pluralDisplayName"
-        label={t('objectType.fields.pluralDisplayName')}
       >
         <Input />
       </Form.Item>
