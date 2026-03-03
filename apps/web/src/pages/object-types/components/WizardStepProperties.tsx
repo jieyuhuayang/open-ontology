@@ -98,11 +98,6 @@ export default function WizardStepProperties() {
     setProperties(updated);
   };
 
-  const propertyOptions = properties.map((p) => ({
-    value: p.id,
-    label: p.displayName,
-  }));
-
   const columns = [
     {
       title: t('wizard.properties.source'),
