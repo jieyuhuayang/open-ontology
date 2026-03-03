@@ -1,5 +1,9 @@
 # 技术方案: <名称>
-**关联规范**: [features/v0.1.0/NNN-name/spec.md]  
+
+> **本文档只写契约和决策（Why + What），不写实现步骤（How）。**
+> 测试策略由 CLAUDE.md §测试要求统一管理，此处不重复。
+
+**关联规范**: [features/v0.1.0/NNN-name/spec.md]
 **架构参考**: [docs/architecture/01-system-architecture.md §章节]
 
 ---
@@ -19,7 +23,7 @@
 
 ```sql
 CREATE TABLE <table_name> (
-    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    rid         TEXT PRIMARY KEY,  -- 格式: ri.<namespace>.<type>.<uuid4>
     -- 字段定义
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -30,29 +34,21 @@ CREATE TABLE <table_name> (
 
 ```python
 class <ModelName>Base(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
     # 共享字段
 
 class <ModelName>Create(<ModelName>Base):
     # 创建时必填字段
 
 class <ModelName>Response(<ModelName>Base):
-    id: UUID
+    rid: str
     created_at: datetime
     # 响应字段
 ```
 
-### TypeScript 类型（前端）
-
-```typescript
-interface <TypeName> {
-  id: string;
-  // 字段定义
-}
-```
-
 ---
 
-## API 定义
+## API 契约
 
 ### 端点列表
 
@@ -60,9 +56,9 @@ interface <TypeName> {
 |--------|------|------|
 | GET | `/api/v1/<resource>` | 列表查询 |
 | POST | `/api/v1/<resource>` | 创建 |
-| GET | `/api/v1/<resource>/{id}` | 详情 |
-| PUT | `/api/v1/<resource>/{id}` | 更新 |
-| DELETE | `/api/v1/<resource>/{id}` | 删除 |
+| GET | `/api/v1/<resource>/{rid}` | 详情 |
+| PUT | `/api/v1/<resource>/{rid}` | 更新 |
+| DELETE | `/api/v1/<resource>/{rid}` | 删除 |
 
 ### 请求/响应示例
 
@@ -75,19 +71,19 @@ interface <TypeName> {
 
 // Response 201
 {
-  "id": "uuid",
+  "rid": "ri.namespace.type.uuid",
   "field": "value",
-  "created_at": "2026-01-01T00:00:00Z"
+  "createdAt": "2026-01-01T00:00:00Z"
 }
 ```
 
 ### 错误码
 
-| HTTP Status | Code | 场景 |
-|-------------|------|------|
-| 400 | `VALIDATION_ERROR` | 请求参数不合法 |
-| 404 | `NOT_FOUND` | 资源不存在 |
-| 409 | `CONFLICT` | 唯一性冲突（如 API name 重复） |
+| HTTP Status | Code | 场景 | 关联 AC |
+|-------------|------|------|---------|
+| 400 | `VALIDATION_ERROR` | 请求参数不合法 | AC-0X |
+| 404 | `NOT_FOUND` | 资源不存在 | AC-0X |
+| 409 | `CONFLICT` | 唯一性冲突（如 API name 重复） | AC-0X |
 
 ---
 
@@ -104,30 +100,12 @@ interface <TypeName> {
     └── <FormComponent>       # 表单字段
 ```
 
-### 关键状态
-
-```typescript
-// 页面级状态（使用 React Query / Zustand）
-const { data, isLoading, error } = useQuery(...)
-```
-
 ### 路由
 
 ```
 /ontology/<resource>           # 列表页
-/ontology/<resource>/:id       # 详情页（如需）
+/ontology/<resource>/:rid      # 详情页（如需）
 ```
-
----
-
-## 测试策略
-
-| 测试类型 | 范围 | 工具 |
-|---------|------|------|
-| 单元测试 | Pydantic 验证、业务逻辑函数 | pytest |
-| 集成测试 | API 端点（含数据库） | pytest + httpx |
-| 组件测试 | React 表单验证、交互 | Vitest + Testing Library |
-| E2E 测试 | 完整用户流程（P1，可延后） | Playwright |
 
 ---
 
@@ -140,7 +118,8 @@ apps/server/
 ├── alembic/versions/NNN_<migration>.py    # 新建
 ├── app/domain/models/<model>.py           # 新建
 ├── app/routers/<resource>.py              # 新建
-└── tests/test_<resource>.py               # 新建
+├── app/services/<resource>_service.py     # 新建
+└── app/storage/<resource>_storage.py      # 新建
 
 apps/web/
 ├── src/pages/<ResourcePage>/
