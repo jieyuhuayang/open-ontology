@@ -6,7 +6,6 @@ import {
   Select,
   Table,
   Tag,
-  Tooltip,
   Typography,
 } from 'antd';
 
@@ -17,11 +16,6 @@ import { useCreateWizardStore } from '@/stores/create-wizard-store';
 import { useDataset } from '@/api/datasets';
 import type { WizardProperty } from '@/stores/create-wizard-store';
 import type { PropertyBaseType } from '@/api/types';
-import {
-  sanitizePropertyApiName,
-  isReservedPropertyApiName,
-  isValidPropertyApiName,
-} from '@/utils/naming';
 
 const { Text } = Typography;
 
