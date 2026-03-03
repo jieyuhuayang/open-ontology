@@ -90,8 +90,6 @@ export default function CreateObjectTypeWizard() {
     }
   };
 
-  const _ = { intendedActions, projectRid }; // referenced in create payload eventually
-
   return (
     <Modal
       title={t('wizard.title')}
