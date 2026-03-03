@@ -1,5 +1,5 @@
-import { Button, Card, Empty, Flex, Table, Tag, Typography } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Button, Card, Empty, Flex, Table, Tag, Tooltip, Typography } from 'antd';
+import { PlusOutlined, DatabaseOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useObjectType } from '@/api/object-types';
