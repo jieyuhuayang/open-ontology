@@ -203,12 +203,17 @@ Before implementing a feature, **read the relevant doc first**:
 3. 将 design.md 和代码实现混在同一次会话中完成
 
 
-## Agent Working Guidelines
+## Workflow: Auto-format + Auto-commit on File Edit
 
-- Keep terminology consistent with `docs/specs/terminology.md`.
-- Prioritize updates to existing specs over adding new parallel documents.
-- When proposing architecture or feature changes, cross-check:
-  - `docs/architecture/`
-  - `docs/specs/`
-  - corresponding files in `features/v0.1.0/`
-- If implementation code is introduced later, update this file to add coding, testing, and CI conventions.
+A `PostToolUse` hook in `.claude/settings.json` automatically processes file edits made by Claude Code:
+
+- Triggers after `Write`, `Edit`, and `NotebookEdit`
+- Auto-formats edited files when applicable:
+  - JS/TS/JSON/CSS/HTML via Prettier (project-local first, then global fallback)
+  - Python via Ruff format (project-local first, then global fallback)
+- Stages all changes (`git add -A`) and auto-commits with:
+  - `chore: auto-save <filename> (HH:MM:SS)`
+- Skips commit when there are no staged changes
+- Runs asynchronously to avoid blocking responses
+
+This keeps each incremental change recoverable via `git log` while reducing manual formatting and commit overhead.
