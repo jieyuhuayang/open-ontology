@@ -28,7 +28,8 @@
   },
   "discover": {
     "recentlyViewed": "最近查看的对象类型",
-    "noRecentlyViewed": "暂无最近查看的对象类型"
+    "noRecentlyViewed": "暂无最近查看的对象类型",
+    "objectTypeDeleted": "对象类型「{{name}}」已被删除"
   },
   "common": {
     "save": "保存",
