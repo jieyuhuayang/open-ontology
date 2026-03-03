@@ -91,26 +91,17 @@ describe('WizardStepProperties', () => {
     // Wait for auto-mapping
     expect(useCreateWizardStore.getState().properties.length).toBe(2);
 
+    // Open PK dropdown using fireEvent.mouseDown (rc-select uses mouseDown)
     const comboboxes = screen.getAllByRole('combobox');
     const pkSelect = comboboxes[0]!;
+    fireEvent.mouseDown(pkSelect);
 
-    // Click to open PK dropdown
-    await userEvent.click(pkSelect);
+    // Find option by aria-label (rc-select sets aria-label to the label text)
+    const idOption = screen.getByRole('option', { name: 'id' });
+    expect(idOption).toBeInTheDocument();
 
-    // Click the first option (should be "id")
-    const options = screen.getAllByRole('option');
-    // Options should show displayName, not internal id
-    console.log('Option contents:', options.map((o) => ({
-      text: o.textContent,
-      ariaLabel: o.getAttribute('aria-label'),
-      title: o.getAttribute('title'),
-    })));
-
-    // Find option with displayName "id"
-    const idOption = options.find(
-      (o) => o.textContent === 'id' || o.getAttribute('title') === 'id',
-    );
-    await userEvent.click(idOption ?? options[0]!);
+    // Click the option
+    fireEvent.click(idOption);
 
     // Check store was updated
     const updatedProps = useCreateWizardStore.getState().properties;
