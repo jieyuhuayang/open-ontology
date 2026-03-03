@@ -99,7 +99,10 @@ describe('WizardStepProperties', () => {
 
     // Click the first option (should be "id")
     const options = screen.getAllByRole('option');
-    const idOption = options.find((o) => o.textContent === 'id');
+    // Debug: log option text contents
+    console.log('Options found:', options.map((o) => `"${o.textContent}"`));
+    // Find the option that contains "id" text
+    const idOption = options.find((o) => o.textContent?.includes('id'));
     expect(idOption).toBeDefined();
 
     await userEvent.click(idOption!);
