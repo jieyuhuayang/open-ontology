@@ -117,10 +117,10 @@ export default function MySQLImportWizard({ open, onClose, onSuccess }: MySQLImp
             name: values.name,
             host: values.host,
             port: values.port ?? 3306,
-            database: values.database,
+            databaseName: values.databaseName,
             username: values.username,
             password: values.password,
-            ssl: values.ssl ?? false,
+            sslEnabled: values.sslEnabled ?? false,
           } as MySQLConnectionCreateRequest);
           setSelectedConnectionRid(conn.rid);
         } catch {
