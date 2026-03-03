@@ -118,8 +118,12 @@ export default function CreateObjectTypeWizard() {
       navigate(`/object-types/${result.rid}`);
     } catch (err) {
       const axiosErr = err as AxiosError<ApiErrorResponse>;
+      const errorCode = axiosErr.response?.data?.error?.code;
       const serverMessage = axiosErr.response?.data?.error?.message;
-      message.error(serverMessage ?? t('error.somethingWentWrong'));
+      const display = errorCode
+        ? t(`apiErrors.${errorCode}`, { defaultValue: serverMessage ?? t('error.somethingWentWrong') })
+        : (serverMessage ?? t('error.somethingWentWrong'));
+      message.error(display);
     } finally {
       setIsCreating(false);
     }
