@@ -67,7 +67,7 @@ def validate_property_id(id_value: str) -> None:
     if not PROPERTY_ID_PATTERN.match(id_value):
         raise AppError(
             code="PROPERTY_INVALID_ID",
-            message=f"Property id must match ^[a-zA-Z][a-zA-Z0-9_-]*$: {id_value!r}",
+            message=f"Property ID must start with a letter and only contain letters, digits, hyphens, or underscores: {id_value!r}",
             status_code=400,
         )
 
