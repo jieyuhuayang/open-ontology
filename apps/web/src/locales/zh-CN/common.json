@@ -227,6 +227,7 @@
     "emptyDescription": "对象类型代表本体中的真实世界实体。",
     "fields": {
       "displayName": "名称",
+      "pluralDisplayName": "复数名称",
       "description": "描述",
       "id": "ID",
       "apiName": "API Name",
