@@ -37,7 +37,7 @@
 <li>对象支撑链接</li>
 <li>对象类型的复制</li>
 <li>本体导入和导出</li>
-<li>从 MySQL 导入数据集（在对象类型编辑流程内完成）</li>
+<li>数据连接管理（Data Connection）— 详见独立 PRD《数据连接（Data Connection）PRD.md》</li>
 </ol></td>
 </tr>
 <tr>
