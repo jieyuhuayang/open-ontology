@@ -80,6 +80,12 @@ A well-scoped task:
 - Has **explicit dependencies** listed (which prior tasks must complete first)
 - References the relevant section of `design.md` for technical details
 
+**Test-Implementation Pairing**:
+- Test tasks (odd numbers) come **before** their implementation tasks (even numbers)
+- Every test task must include `覆盖 AC: AC-NN, AC-NN` linking back to `spec.md`
+- Infrastructure tasks (migrations, ORM models, config) have no test pair
+- A missing AC annotation on a test task means the spec is incomplete — do not start the paired implementation task
+
 ---
 
 ## Workflow
