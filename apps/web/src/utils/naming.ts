@@ -16,3 +16,17 @@ export function toCamelCase(str: string): string {
       .join('')
   );
 }
+
+export function sanitizePropertyId(raw: string): string {
+  const kebab = toKebabCase(raw);
+  if (!kebab) return 'property';
+  if (/^\d/.test(kebab)) return `p-${kebab}`;
+  return kebab;
+}
+
+export function sanitizePropertyApiName(raw: string): string {
+  const camel = toCamelCase(raw);
+  if (!camel) return 'property';
+  if (/^\d/.test(camel)) return `p${camel.charAt(0).toUpperCase() + camel.slice(1)}`;
+  return camel;
+}

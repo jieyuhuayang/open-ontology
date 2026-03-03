@@ -107,7 +107,7 @@ wait_target_ready() {
         if docker exec \
             -e MYSQL_PWD="${TARGET_MYSQL_ROOT_PASSWORD}" \
             "${TARGET_CONTAINER_NAME}" \
-            mysqladmin ping -uroot --silent >/dev/null 2>&1; then
+            mysql -uroot -e "SELECT 1" >/dev/null 2>&1; then
             return 0
         fi
         sleep 1
@@ -172,6 +172,7 @@ setup_target_database() {
 dump_schema() {
     MYSQL_PWD="${SOURCE_MYSQL_PASSWORD}" mysqldump \
         --no-data \
+        --no-tablespaces \
         --single-transaction \
         --set-gtid-purged=OFF \
         --skip-comments \
@@ -193,12 +194,15 @@ build_order_clause() {
     table_q="$(sql_quote "${table_name}")"
 
     local -a order_cols=()
-    local -a candidates
-    local -a pk_cols
+    local -a candidates=()
+    local -a pk_cols=()
     local first_col
     local col
 
-    mapfile -t candidates < <(
+    while IFS= read -r col; do
+        [[ -z "${col}" ]] && continue
+        candidates+=("${col}")
+    done < <(
         mysql_source_query "
 SELECT COLUMN_NAME
 FROM information_schema.COLUMNS
@@ -219,11 +223,13 @@ ORDER BY FIELD(
     )
 
     for col in "${candidates[@]}"; do
-        [[ -z "${col}" ]] && continue
         order_cols+=("${col}")
     done
 
-    mapfile -t pk_cols < <(
+    while IFS= read -r col; do
+        [[ -z "${col}" ]] && continue
+        pk_cols+=("${col}")
+    done < <(
         mysql_source_query "
 SELECT COLUMN_NAME
 FROM information_schema.KEY_COLUMN_USAGE
@@ -235,7 +241,6 @@ ORDER BY ORDINAL_POSITION
     )
 
     for col in "${pk_cols[@]}"; do
-        [[ -z "${col}" ]] && continue
         if [[ ! " ${order_cols[*]} " =~ [[:space:]]${col}[[:space:]] ]]; then
             order_cols+=("${col}")
         fi
@@ -280,6 +285,7 @@ dump_and_import_table_sample() {
 
     MYSQL_PWD="${SOURCE_MYSQL_PASSWORD}" mysqldump \
         --no-create-info \
+        --no-tablespaces \
         --skip-triggers \
         --single-transaction \
         --set-gtid-purged=OFF \
@@ -322,7 +328,10 @@ main() {
     local source_db_q
     source_db_q="$(sql_quote "${SOURCE_MYSQL_DB}")"
     local -a tables
-    mapfile -t tables < <(
+    while IFS= read -r table_name; do
+        [[ -z "${table_name}" ]] && continue
+        tables+=("${table_name}")
+    done < <(
         mysql_source_query "
 SELECT TABLE_NAME
 FROM information_schema.TABLES
