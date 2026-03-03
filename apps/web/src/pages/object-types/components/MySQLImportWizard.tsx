@@ -253,7 +253,7 @@ export default function MySQLImportWizard({ open, onClose, onSuccess }: MySQLImp
                   <InputNumber min={1} max={65535} defaultValue={3306} style={{ width: '100%' }} />
                 </Form.Item>
               </Flex>
-              <Form.Item name="database" label={t('mysqlConnection.fields.database')} rules={[{ required: true }]}>
+              <Form.Item name="databaseName" label={t('mysqlConnection.fields.database')} rules={[{ required: true }]}>
                 <Input />
               </Form.Item>
               <Flex gap={12}>
@@ -264,7 +264,7 @@ export default function MySQLImportWizard({ open, onClose, onSuccess }: MySQLImp
                   <Input.Password />
                 </Form.Item>
               </Flex>
-              <Form.Item name="ssl" label={t('mysqlConnection.fields.ssl')} valuePropName="checked">
+              <Form.Item name="sslEnabled" label={t('mysqlConnection.fields.ssl')} valuePropName="checked">
                 <Switch />
               </Form.Item>
 
