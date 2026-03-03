@@ -43,7 +43,6 @@ export default function CreateObjectTypeWizard() {
 
   const buildCreateRequest = () => ({
     displayName,
-    pluralDisplayName: pluralDisplayName || null,
     description: description || null,
     icon: icon ?? { name: 'AppstoreOutlined', color: '#1677ff' },
     backingDatasourceRid: selectedDatasetRid ?? null,
