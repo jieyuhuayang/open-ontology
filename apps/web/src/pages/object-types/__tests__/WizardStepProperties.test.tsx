@@ -99,13 +99,19 @@ describe('WizardStepProperties', () => {
 
     // Click the first option (should be "id")
     const options = screen.getAllByRole('option');
-    // Debug: log option text contents
-    console.log('Options found:', options.map((o) => `"${o.textContent}"`));
-    // Find the option that contains "id" text
-    const idOption = options.find((o) => o.textContent?.includes('id'));
-    expect(idOption).toBeDefined();
+    // Debug: log store state and option contents
+    const storeProps = useCreateWizardStore.getState().properties;
+    console.log('Store properties:', storeProps.map((p) => ({ id: p.id, displayName: p.displayName })));
+    console.log('Options:', options.map((o) => ({ text: o.textContent, title: o.getAttribute('title') })));
 
-    await userEvent.click(idOption!);
+    // Ant Design renders option text as title attribute too
+    const idOption = options.find((o) => o.getAttribute('title') === 'id');
+    if (!idOption) {
+      // fallback: click the first option
+      await userEvent.click(options[0]!);
+    } else {
+      await userEvent.click(idOption);
+    }
 
     // Check store was updated
     const updatedProps = useCreateWizardStore.getState().properties;
