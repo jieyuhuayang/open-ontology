@@ -124,6 +124,9 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    op.drop_column("object_types", "title_key_property_id")
+    op.drop_column("object_types", "primary_key_property_id")
+    op.drop_column("object_types", "backing_datasource")
     op.drop_column("object_types", "intended_actions")
     op.drop_table("mysql_connections")
     op.drop_index("ix_dataset_rows_dataset", table_name="dataset_rows")
