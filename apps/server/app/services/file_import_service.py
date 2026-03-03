@@ -15,9 +15,7 @@ from app.domain.constants import DEFAULT_ONTOLOGY_RID, DEFAULT_USER_ID
 from app.domain.import_task import ImportTask, ImportTaskStatus
 from app.domain.type_mapping import infer_column_type
 from app.exceptions import AppError
-from app.services.import_task_service import ImportTaskService
-
-_import_task_service = ImportTaskService()
+from app.services.import_task_service import shared_import_task_service as _import_task_service
 
 _ALLOWED_EXTENSIONS = {".csv", ".xlsx", ".xls"}
 
