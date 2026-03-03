@@ -8,6 +8,8 @@ import {
   Tag,
   Typography,
 } from 'antd';
+
+const { Option } = Select;
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useCreateWizardStore } from '@/stores/create-wizard-store';
