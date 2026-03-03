@@ -36,3 +36,7 @@ class ImportTaskService:
         expired = [tid for tid, t in self._tasks.items() if now - t.created_at > _TASK_TTL]
         for tid in expired:
             del self._tasks[tid]
+
+
+# Shared singleton — all modules must import this instance, not create their own
+shared_import_task_service = ImportTaskService()
