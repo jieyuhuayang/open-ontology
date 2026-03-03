@@ -316,7 +316,11 @@
       "source": "Source",
       "property": "Property",
       "userInput": "User input / actions",
-      "selectProperty": "Select a property"
+      "selectProperty": "Select a property",
+      "apiNamePreview": "API Name (Preview)",
+      "apiNameConflict": "The following properties have invalid API names, please fix them before continuing: {{names}}",
+      "apiNameReserved": "Reserved",
+      "apiNameInvalid": "Invalid format"
     }
   },
   "dataset": {
