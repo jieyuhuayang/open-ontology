@@ -177,11 +177,14 @@ export default function WizardStepProperties() {
             size="small"
             value={primaryKeyId}
             onChange={handlePrimaryKeyChange}
-            options={propertyOptions}
             placeholder={t('wizard.properties.selectProperty')}
             style={{ width: 200 }}
             allowClear
-          />
+          >
+            {properties.map((p) => (
+              <Option key={p.id} value={p.id}>{p.displayName}</Option>
+            ))}
+          </Select>
         </Flex>
         <Flex align="center" gap={8}>
           <Text strong style={{ whiteSpace: 'nowrap' }}>
@@ -191,11 +194,14 @@ export default function WizardStepProperties() {
             size="small"
             value={titleKeyId}
             onChange={handleTitleKeyChange}
-            options={propertyOptions}
             placeholder={t('wizard.properties.selectProperty')}
             style={{ width: 200 }}
             allowClear
-          />
+          >
+            {properties.map((p) => (
+              <Option key={p.id} value={p.id}>{p.displayName}</Option>
+            ))}
+          </Select>
         </Flex>
       </Flex>
 
