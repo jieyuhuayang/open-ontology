@@ -388,7 +388,8 @@
     "OBJECT_TYPE_INVALID_ID": "对象类型 ID 格式不正确，必须以小写字母开头，只能包含小写字母、数字和连字符",
     "LINK_TYPE_INVALID_ID": "链接类型 ID 格式不正确，必须以小写字母开头，只能包含小写字母、数字和连字符",
     "LINK_TYPE_INVALID_API_NAME": "链接类型 API Name 格式不正确，必须以小写字母开头，只能包含字母和数字（1-100 个字符）",
-    "LINK_TYPE_RESERVED_API_NAME": "该 API Name 是系统保留名称，请使用其他名称"
+    "LINK_TYPE_RESERVED_API_NAME": "该 API Name 是系统保留名称，请使用其他名称",
+    "ENCRYPTION_KEY_MISMATCH": "无法解密凭据，加密密钥已变更。请删除该连接并重新创建。"
   },
   "import": {
     "status": {
