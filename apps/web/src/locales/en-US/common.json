@@ -312,6 +312,12 @@
       "properties": "Properties",
       "actions": "Actions",
       "saveLocation": "Save Location"
+    },
+    "properties": {
+      "source": "Source",
+      "property": "Property",
+      "userInput": "User input / actions",
+      "selectProperty": "Select a property"
     }
   },
   "dataset": {
