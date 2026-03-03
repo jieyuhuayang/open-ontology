@@ -99,12 +99,18 @@ describe('WizardStepProperties', () => {
 
     // Click the first option (should be "id")
     const options = screen.getAllByRole('option');
-    // Debug: log full option HTML
-    console.log('Option 0 outerHTML:', options[0]?.outerHTML.slice(0, 300));
-    console.log('Option 0 inner:', options[0]?.innerHTML.slice(0, 300));
+    // Options should show displayName, not internal id
+    console.log('Option contents:', options.map((o) => ({
+      text: o.textContent,
+      ariaLabel: o.getAttribute('aria-label'),
+      title: o.getAttribute('title'),
+    })));
 
-    // Click the first option regardless
-    await userEvent.click(options[0]!);
+    // Find option with displayName "id"
+    const idOption = options.find(
+      (o) => o.textContent === 'id' || o.getAttribute('title') === 'id',
+    );
+    await userEvent.click(idOption ?? options[0]!);
 
     // Check store was updated
     const updatedProps = useCreateWizardStore.getState().properties;
