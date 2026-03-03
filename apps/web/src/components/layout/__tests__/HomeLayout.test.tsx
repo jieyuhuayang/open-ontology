@@ -4,7 +4,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import AppShell from '@/components/layout/AppShell';
 import HomeLayout from '@/components/layout/HomeLayout';
 
-vi.mock('@/pages/object-types/components/CreateObjectTypeModal', () => ({
+vi.mock('@/pages/object-types/components/CreateObjectTypeWizard', () => ({
   default: () => null,
 }));
 
