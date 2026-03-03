@@ -141,9 +141,9 @@ export default function MySQLImportWizard({ open, onClose, onSuccess }: MySQLImp
       try {
         const task = await mysqlImport.mutateAsync({
           connectionRid: activeConnRid,
-          tableName: selectedTable,
+          table: selectedTable,
           datasetName,
-          selectedColumns: selectedColumns.length > 0 ? selectedColumns : undefined,
+          selectedColumns: selectedColumns.length > 0 ? selectedColumns : null,
         });
         setTaskId(task.taskId);
         setCurrentStep(3);
