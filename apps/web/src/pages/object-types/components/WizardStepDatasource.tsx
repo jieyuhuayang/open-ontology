@@ -60,10 +60,10 @@ export default function WizardStepDatasource() {
       render: (val: string, record: DatasetListItem) => (
         <Flex align="center" gap={8}>
           <Text>{val}</Text>
-          {record.inUseByObjectTypeRid && (
+          {record.inUse && (
             <Tooltip
               title={t('dataset.inUseTooltip', {
-                name: record.inUseByObjectTypeRid,
+                name: record.linkedObjectTypeName ?? '',
               })}
             >
               <Tag color="default">{t('dataset.inUse')}</Tag>
