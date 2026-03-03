@@ -502,7 +502,7 @@ Action Type 的“逻辑”是通过 **Rules（规则）** 来定义的；官方
 
 ![](<images/本体管理平台（Ontology Manager） PRD-OCoXb4EB0oG1BJxkSwLcxdyhnof.png>)
 
-##### 2.1.3 配置 API 名称（本期不做）
+##### 2.1.3 配置 API 名称
 
 ~~API 名称（API name）是指在代码中以编程方式引用对象类型或属性时使用的名称。所有新对象类型与属性都会自动获得从其显示名称推断生成的 API 名称。~~
 
