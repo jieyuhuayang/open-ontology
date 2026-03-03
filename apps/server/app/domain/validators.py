@@ -31,7 +31,7 @@ def validate_api_name(api_name: str) -> None:
     if not PASCAL_CASE_PATTERN.match(api_name):
         raise AppError(
             code="OBJECT_TYPE_INVALID_API_NAME",
-            message=f"apiName must be PascalCase: {api_name!r}",
+            message=f"API Name must start with an uppercase letter and only contain letters, digits, and underscores: {api_name!r}",
             status_code=400,
         )
     if api_name.lower() in RESERVED_API_NAMES:
