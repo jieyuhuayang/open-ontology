@@ -15,7 +15,7 @@ Open Ontology 采用**数据拷贝（Dataset Import）模型**：从外部数据
 ### 1.2 与 Ontology Manager 的关系
 
 - **Data Connection 生产 Dataset**：通过 MySQL 连接器导入或 Excel/CSV 上传，在平台内创建 Dataset 快照
-- **Ontology Manager 消费 Dataset**：OT 创建/编辑时，从 Dataset 列表中选择已有 Dataset 作为 backing datasource
+- **Ontology Manager 消费 Dataset**：OT 创建/编辑时，从 Dataset 列表中选择已有 Dataset 作为 backing dataset
 
 ### 1.3 架构参考
 
@@ -128,7 +128,7 @@ Open Ontology 采用**数据拷贝（Dataset Import）模型**：从外部数据
 | 行数（Rows） | 数据行数，超过 1000 时以 `K` 为单位缩写（如 `12K`） |
 | 列数（Columns） | 数据列数 |
 | 导入时间（Imported At） | 导入时间，展示相对时间（如 "3 天前"） |
-| 关联 OT 状态 | 是否已被 Object Type 关联为 backing datasource，显示 `In use` 或 `Available` |
+| 关联 OT 状态 | 是否已被 Object Type 关联为 backing dataset，显示 `In use` 或 `Available` |
 
 #### 3.3.2 Dataset 详情页
 
@@ -344,7 +344,7 @@ Open Ontology 采用**数据拷贝（Dataset Import）模型**：从外部数据
 
 ### 5.4 Dataset 约束
 
-- Dataset 与 Object Type **1:1 绑定**：同一个 Dataset 只能作为一个 Object Type 的 backing datasource
+- Dataset 与 Object Type **1:1 绑定**：同一个 Dataset 只能作为一个 Object Type 的 backing dataset
 - Dataset in-use 状态由 Object Type 发布状态 + Working State 合并计算决定
 
 ---
