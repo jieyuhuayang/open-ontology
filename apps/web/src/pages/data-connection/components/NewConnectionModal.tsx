@@ -43,7 +43,6 @@ export default function NewConnectionModal() {
         message.error(t('mysqlConnection.testFailed', { error: result.error }));
       }
     } catch (err) {
-      console.log('[handleTest] error:', err);
       // Show API errors (form validation errors are handled by Ant Design inline)
       if (err && typeof err === 'object' && 'errorFields' in err) return;
       message.error(t('mysqlConnection.testFailed', { error: String(err) }));
