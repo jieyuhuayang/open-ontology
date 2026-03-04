@@ -31,7 +31,7 @@ docs/
 ├── specs/                            # 领域模型规格（术语、属性类型、元数据等）
 └── research/                         # 技术调研笔记
 features/                             # SDD 特性目录
-├── _templates/                       # spec / design / tasks 模板
+├── _templates/                       # spec / tasks 模板
 └── v0.1.0/                           # 001 ~ 009 特性包
 ops/mysql-sample/                     # 本地 MySQL 样本副本脚本
 justfile                              # Monorepo 任务运行器
