@@ -100,13 +100,9 @@ A well-scoped task:
 
    → mark spec.md row as ✅ 已评审 in tasks.md 状态表
 3. **Create design.md** — write architecture decisions (Why) and API/data contracts (What) only; no implementation steps, no test strategy
-4. **Review design.md** — user confirms "可以写 tasks 了"，检查列表：
-   - 技术契约是否完整、架构决策是否合理？
-   - 是否越界进入了其他 feature 的归属领域（表1）？
-
-   → mark design.md row as ✅ 已评审
+4. **自动审查 design.md** — 写完 design.md 后，调用 `/sdd-review <feature_dir> design`；codex 自动检查架构合规性、AC 覆盖、API 契约完整性；有 high/medium 问题修复后重审（最多 2 轮）；通过后自动标为 ✅ 已评审，**无需用户确认**，直接进入步骤 5
 5. **Create tasks.md** — break design into test-implementation pairs; each test task must reference `覆盖 AC: AC-NN`
-6. **Review tasks.md** — user confirms "可以开始实现了" → mark tasks.md row as ✅ 已拆解
+6. **自动审查 tasks.md** — 写完 tasks.md 后，调用 `/sdd-review <feature_dir> tasks`；codex 自动检查 AC 追溯、Test-First 顺序、任务原子化；通过后自动标为 ✅ 已拆解，**无需用户确认**，立即开始执行
 7. **Execute tasks** — one per session, checking off as complete; run tests and show output before marking done
 8. **Mark deviations** — if implementation differs from plan, note in tasks.md §实际偏差记录
 
