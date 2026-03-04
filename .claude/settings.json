@@ -8,6 +8,11 @@
             "type": "command",
             "command": "bash -c 'INPUT=$(cat); FILE=$(echo \"$INPUT\" | jq -r \".tool_input.file_path // empty\" 2>/dev/null); LABEL=$([ -n \"$FILE\" ] && basename \"$FILE\" || echo \"files\"); EXT=\"${FILE##*.}\"; if [ -n \"$FILE\" ]; then case \"$EXT\" in ts|tsx|js|jsx|mts|mjs|cjs|json|css|html) LOCAL_PRETTIER=\"$CLAUDE_PROJECT_DIR/apps/web/node_modules/.bin/prettier\"; if [ -f \"$LOCAL_PRETTIER\" ]; then \"$LOCAL_PRETTIER\" --write \"$FILE\" 2>/dev/null || true; elif command -v prettier >/dev/null 2>&1; then prettier --write \"$FILE\" 2>/dev/null || true; fi ;; py) LOCAL_RUFF=\"$CLAUDE_PROJECT_DIR/apps/server/.venv/bin/ruff\"; if [ -f \"$LOCAL_RUFF\" ]; then \"$LOCAL_RUFF\" format \"$FILE\" 2>/dev/null || true; elif command -v ruff >/dev/null 2>&1; then ruff format \"$FILE\" 2>/dev/null || true; fi ;; esac; fi; cd \"$CLAUDE_PROJECT_DIR\" && git add -A && git diff --cached --quiet || git commit -m \"chore: auto-save $LABEL ($(date +%H:%M:%S))\"'",
             "async": true
+          },
+          {
+            "type": "command",
+            "command": "bash -c 'INPUT=$(cat); FILE=$(echo \"$INPUT\" | jq -r \".tool_input.file_path // empty\" 2>/dev/null); [ -n \"$FILE\" ] && \"$CLAUDE_PROJECT_DIR/scripts/arch-guard.sh\" \"$FILE\" || true'",
+            "async": false
           }
         ]
       }
