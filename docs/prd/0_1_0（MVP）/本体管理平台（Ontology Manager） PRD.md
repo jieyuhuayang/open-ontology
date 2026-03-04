@@ -340,9 +340,9 @@ Action Type 的“逻辑”是通过 **Rules（规则）** 来定义的；官方
 
    1. 在概览页面的 属性 区域选择 新建（Create new），进入属性编辑器；或在对象类型视图侧边栏的 属性 页面选择 编辑属性映射。
 
-   2. 然后选择下图所示的 添加底层数据源（Add a backing datasource）按钮，从平台内已有 Dataset 中选择作为底层数据源。如需导入新数据，请前往 **Data Connection** 模块。
+   2. 然后选择下图所示的 添加底层数据集（Add a backing dataset）按钮，从平台内已有 Dataset 中选择作为底层数据集。如需导入新数据，请前往 **Data Connection** 模块。
 
-      * 注意：同一个数据源只能用于底层一个对象类型。
+      * 注意：同一个数据集只能用于底层一个对象类型。
 
 ![](<images/本体管理平台（Ontology Manager） PRD-ZlfAb80UioOxhAxHssicBc9Xnwh.png>)
 
