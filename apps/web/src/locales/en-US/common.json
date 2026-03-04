@@ -364,7 +364,8 @@
     "selectDataset": "Select Datasource",
     "noDatasets": "No datasets yet",
     "deleteSuccess": "Dataset deleted",
-    "deleteInUse": "This dataset is linked and cannot be deleted"
+    "deleteInUse": "This dataset is linked and cannot be deleted",
+    "importHint": "Need to import new data? Go to"
   },
   "mysqlConnection": {
     "title": "Import from MySQL",
