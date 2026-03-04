@@ -825,7 +825,7 @@ Ontology 还支持**日期和时间格式化**，以及user ID 格式化、resou
 
       * **Object type foreign keys（对象类型外键）**：支持“一对一（one-to-one）”与“多对一（many-to-one）”基数关系（cardinality）的链接类型。该选项允许你选择用于表示外键与对应主键的属性。关于如何用外键定义链接资源，见下方“外键关系类型”。
 
-      * **Join table dataset（连接表数据集）**：用于“多对多（many-to-many）”基数关系的链接类型。该选项允许你使用一个连接表数据集（join table dataset）作为链接的底层数据源。关于如何用数据集定义链接资源，见下方“连接表数据集链接类型”。
+      * **Join table dataset（连接表数据集）**：用于“多对多（many-to-many）”基数关系的链接类型。该选项允许你使用一个连接表数据集（join table dataset）作为链接的底层数据集。关于如何用数据集定义链接资源，见下方”连接表数据集链接类型”。
 
       * **Backing object type（支撑对象类型）**：对象支撑的链接类型（object-backed link types）是在多对一链接类型之上扩展而来，提供将对象类型作为链接存储方案的一等支持（first class support）。关于如何定义由对象支撑的链接资源，见下方“支撑对象链接类型”。更多信息可参考“对象支撑链接（object-backed links）”章节。
 
