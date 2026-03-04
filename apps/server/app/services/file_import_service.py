@@ -3,9 +3,11 @@
 import asyncio
 import csv
 import io
+import logging
 import os
 import time
 import uuid
+from datetime import datetime, timezone
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,10 +19,25 @@ from app.domain.type_mapping import infer_column_type
 from app.exceptions import AppError
 from app.services.import_task_service import shared_import_task_service as _import_task_service
 
-_ALLOWED_EXTENSIONS = {".csv", ".xlsx", ".xls"}
+logger = logging.getLogger(__name__)
 
-# Module-level preview cache so file tokens persist across request instances
-_previews: dict[str, dict] = {}
+_ALLOWED_EXTENSIONS = {".csv", ".xlsx", ".xls"}
+_PREVIEW_TTL_SECONDS = 30 * 60  # 30 minutes
+
+# Module-level preview cache: {token: (data_dict, created_at)}
+_previews: dict[str, tuple[dict, datetime]] = {}
+
+
+def _cleanup_expired_previews() -> None:
+    """Remove preview entries older than TTL."""
+    now = datetime.now(timezone.utc)
+    expired = [
+        token
+        for token, (_, created_at) in _previews.items()
+        if (now - created_at).total_seconds() > _PREVIEW_TTL_SECONDS
+    ]
+    for token in expired:
+        _previews.pop(token, None)
 
 
 class FileImportService:
