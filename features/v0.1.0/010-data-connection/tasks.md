@@ -116,7 +116,7 @@
 
 ### T007: openapi.json 重新生成 + 后端全量验证
 
-- [ ] **T007**: 重新生成 openapi.json + 运行全量后端测试
+- [x] **T007**: 重新生成 openapi.json + 运行全量后端测试
   - 文件:
     - `apps/server/openapi.json` — 重新生成（反映新增的 response_model、DELETE 端点、请求模型迁移）
   - 内容:
