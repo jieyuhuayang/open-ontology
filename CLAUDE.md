@@ -158,21 +158,29 @@ justfile                              # Monorepo 任务运行器
 
 所有新特性必须按以下顺序执行（详见 `features/README.md`）：
 
-0. **（版本开始时执行一次）release-contract.md** — 在第一个 feature spec 动笔前，创建版本级领域归属表和不变量表（模板：`features/_templates/release-contract.md`）
-1. **spec.md** — 定义用户故事、验收标准、边界
-   - 验收标准必须用表格格式：`| ID | 角色 | 操作 | 预期结果 |`，AC-ID 在特性内唯一
-   - 写 spec 前必须先阅读版本的 `release-contract.md`
-2. **辅助审查 spec** — 写完 spec.md 后，调用 `/sdd-review <feature_dir> spec`；Claude 对比 PRD 生成 gap 报告并向用户展示；用户决定是否补充 AC 后说"可以写 design 了"确认，将 tasks.md 状态表中 spec.md 行更新为 ✅ 已评审（唯一手动暂停点）
-3. **design.md** — 只写架构决策（Why）和 API/数据契约（What），不写实现步骤（How）
-   - 禁止在 design.md 中写测试策略（由本文件 §测试要求统一管理）
-4. **自动审查 design** — 写完 design.md 后，调用 `/sdd-review <feature_dir> design`；有 high/medium 问题则修复后重审（最多 2 轮）；通过后将 design.md 行标为 ✅ 已评审并**自动继续写 tasks.md**，无需等待用户
-5. **tasks.md** — 将 design 拆解为测试-实现配对的原子任务（每个任务一次 AI 会话可完成）
-   - 每个测试任务必须标注 `覆盖 AC: AC-NN, AC-NN`，追溯到 spec.md 的表格行
-   - 缺少 AC 标注的测试任务视为规格不完整，禁止开始对应的实现任务
-6. **自动审查 tasks** — 写完 tasks.md 后，调用 `/sdd-review <feature_dir> tasks`；有 high/medium 问题则修复后重审；通过后将 tasks.md 行标为 ✅ 已拆解并**立即开始实现**，无需等待用户
-7. **执行** — 逐任务实施，完成后在 tasks.md 打勾
+> **⚠️ 前提条件（强制）**：写 spec.md 前，必须**完整准确理解 PRD**。
+> - 必须先读取 PRD 原文（`docs/prd/` 下对应文件）和 `release-contract.md`
+> - 对 PRD 中的功能点、用户场景、边界条件、UI 交互逐一理解，不能遗漏
+> - 如果 PRD 内容较长（如主 PRD 约 67KB），必须完整读取，不能只读部分
+> - AC 表格必须覆盖 PRD 中描述的所有功能点，遗漏会导致后续实现不完整
+> - 技术设计部分必须基于对 PRD 业务逻辑的准确理解，不能凭假设设计
 
-**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。`design.md` 和 `tasks.md` 经 `/sdd-review` 自动审查通过后，可直接开始实现，无需用户确认。`spec.md` 评审仍需用户最终确认（唯一手动暂停点，但 `/sdd-review spec` 的 gap 报告辅助决策）。`spec.md` 只描述业务能力，UI 细节写在 `design.md`；写 spec 前必须先阅读版本的 `release-contract.md`。
+0. **（版本开始时执行一次）release-contract.md** — 在第一个 feature spec 动笔前，创建版本级领域归属表和不变量表（模板：`features/_templates/release-contract.md`）
+1. **spec.md** — 合并需求规范与技术设计的完整规格文档
+   - **需求部分**：用户故事、验收标准（AC 表格）、边界情况
+   - **设计部分**：架构决策、数据库 & Domain 模型、API 契约、前端组件设计、错误码表
+   - 验收标准必须用表格格式：`| ID | 角色 | 操作 | 预期结果 |`，AC-ID 在特性内唯一
+   - 设计部分只写契约和决策（Why + What），不写实现步骤（How）
+   - 禁止在 spec.md 中写测试策略（由本文件 §测试要求统一管理）
+   - 写 spec 前必须先阅读版本的 `release-contract.md`
+2. **审查 spec** — 写完 spec.md 后，调用 `/sdd-review <feature_dir> spec`；Claude 同时检查 PRD gap 和架构合规性，生成报告供用户参考；用户确认后将 tasks.md 状态表中 spec.md 行更新为 ✅ 已评审（唯一手动暂停点）
+3. **tasks.md** — 将 spec 拆解为自包含的原子任务（每个任务一次 AI 会话可完成）
+   - 每个任务内联必要实现上下文（文件、逻辑、测试），实现阶段不需要回读 spec.md
+   - 每个测试任务必须标注 `覆盖 AC: AC-NN, AC-NN`，追溯到 spec.md 的 AC 表格
+   - 缺少 AC 标注的测试任务视为规格不完整，禁止开始对应的实现任务
+4. **执行** — 逐任务实施，完成后在 tasks.md 打勾
+
+**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。`spec.md` 评审需用户最终确认（唯一手动暂停点）。写 spec 前必须先阅读版本的 `release-contract.md` 和完整的 PRD 原文。
 
 ## 外部 MySQL 策略
 
