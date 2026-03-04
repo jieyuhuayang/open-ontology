@@ -77,7 +77,7 @@ Each task in `tasks.md` should be completable in a **single AI conversation sess
 A well-scoped task:
 - Targets **one file** (or at most two closely related files)
 - Has **explicit dependencies** listed (which prior tasks must complete first)
-- References the relevant section of `design.md` for technical details
+- Inlines necessary implementation context (file, logic, test) so no need to re-read spec.md
 
 **Test-Implementation Pairing**:
 - Test tasks (odd numbers) come **before** their implementation tasks (even numbers)
