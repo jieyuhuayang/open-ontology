@@ -37,7 +37,9 @@ export default function NewConnectionModal() {
         password: values.password ?? '',
         sslEnabled: values.sslEnabled ?? false,
       };
+      console.log('[handleTest] sending request:', JSON.stringify(req));
       const result = await testConnection.mutateAsync(req);
+      console.log('[handleTest] result:', JSON.stringify(result));
       if (result.success) {
         message.success(t('mysqlConnection.testSuccess'));
         setTested(true);
