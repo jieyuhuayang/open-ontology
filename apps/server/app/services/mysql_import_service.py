@@ -226,23 +226,15 @@ class MySQLImportService:
     ) -> ImportTask:
         await self._validate_table_exists(connection_rid, table)
 
-        conn_orm = await MySQLConnectionStorage.get_by_rid(self._session, connection_rid)
-        if not conn_orm:
-            raise AppError(
-                code="MYSQL_CONNECTION_NOT_FOUND",
-                message=f"Connection '{connection_rid}' not found",
-                status_code=404,
-            )
+        conn_orm, password = await self._get_conn_orm_and_password(connection_rid)
 
         # Check row count limit
-        password = self._crypto.decrypt(conn_orm.encrypted_password)
-
-        check_conn = await aiomysql.connect(
-            host=conn_orm.host,
-            port=conn_orm.port,
-            db=conn_orm.database_name,
-            user=conn_orm.username,
-            password=password,
+        check_conn = await self._open_mysql_conn(
+            conn_orm.host,
+            conn_orm.port,
+            conn_orm.database_name,
+            conn_orm.username,
+            password,
         )
         try:
             async with check_conn.cursor() as cur:
