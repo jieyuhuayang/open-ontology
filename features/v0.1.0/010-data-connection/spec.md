@@ -98,6 +98,7 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 | AC-MI06 | 管理员 | 导入完成后查看结果 | ImportTask status=completed，含 dataset_rid、row_count、column_count、duration_ms |
 | AC-MI07 | 管理员 | 导入同一张表两次 | 允许，每次创建独立的 Dataset 快照，互不影响 |
 | AC-MI08 | 管理员 | 查询不存在的 task_id | 返回 HTTP 404 |
+| AC-MI09 | 管理员 | 导入行数超过 10 万的表 | 返回 `ROW_LIMIT_EXCEEDED`，HTTP 422，提示"MVP 版本单次导入上限 10 万行" |
 
 ### 文件上传（File Upload）
 
