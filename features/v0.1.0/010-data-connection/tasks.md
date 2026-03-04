@@ -101,7 +101,7 @@
 
 ### T006: 连接删除端点 + DatasetStorage 简化
 
-- [ ] **T006**: 新增 DELETE /mysql-connections/{rid} + 简化 DatasetStorage.delete()
+- [x] **T006**: 新增 DELETE /mysql-connections/{rid} + 简化 DatasetStorage.delete()
   - 文件:
     - `apps/server/app/routers/mysql_connections.py` — 新增 `DELETE /api/v1/mysql-connections/{rid}`
     - `apps/server/app/storage/mysql_connection_storage.py` — 新增 `delete()` 方法
