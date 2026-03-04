@@ -182,6 +182,7 @@ class MySQLImportService:
     async def preview_table(
         self, connection_rid: str, table: str, limit: int = 50
     ) -> MySQLTablePreview:
+        self._validate_table_name_format(table)
         columns = await self.get_table_columns(connection_rid, table)
         conn_orm = await MySQLConnectionStorage.get_by_rid(self._session, connection_rid)
         if not conn_orm:
