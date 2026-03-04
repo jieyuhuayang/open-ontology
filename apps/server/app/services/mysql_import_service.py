@@ -68,8 +68,6 @@ class MySQLImportService:
 
         start = time.monotonic()
         try:
-            import aiomysql
-
             conn = await asyncio.wait_for(
                 aiomysql.connect(
                     host=req.host,
