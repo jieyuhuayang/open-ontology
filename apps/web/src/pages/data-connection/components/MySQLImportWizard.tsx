@@ -90,8 +90,18 @@ export default function MySQLImportWizard() {
   };
 
   const handleSelectExisting = (rid: string) => {
-    setConnectionRid(rid);
-    setStep(1);
+    const conn = existingConnections?.find((c) => c.rid === rid);
+    if (conn) {
+      form.setFieldsValue({
+        name: conn.name,
+        host: conn.host,
+        port: conn.port,
+        databaseName: conn.databaseName,
+        username: conn.username,
+        sslEnabled: conn.sslEnabled,
+      });
+      setConnectionRid(rid);
+    }
   };
 
   const handleSelectTable = (table: string) => {
