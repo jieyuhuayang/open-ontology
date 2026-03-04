@@ -59,3 +59,9 @@ class MySQLTablePreview(DomainModel):
     columns: list[MySQLColumnInfo]
     rows: list[dict]
     total_rows: int | None = None
+
+
+class ConnectionTestResponse(DomainModel):
+    success: bool
+    latency_ms: int | None = None
+    error: str | None = None
