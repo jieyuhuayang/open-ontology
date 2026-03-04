@@ -5,6 +5,7 @@ import {
   UnorderedListOutlined,
   LinkOutlined,
   ThunderboltOutlined,
+  DatabaseOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
