@@ -42,8 +42,10 @@ export default function NewConnectionModal() {
       } else {
         message.error(t('mysqlConnection.testFailed', { error: result.error }));
       }
-    } catch {
-      // form validation error
+    } catch (err) {
+      // Show API errors (form validation errors are handled by Ant Design inline)
+      if (err && typeof err === 'object' && 'errorFields' in err) return;
+      message.error(t('mysqlConnection.testFailed', { error: String(err) }));
     }
   };
 
@@ -61,8 +63,9 @@ export default function NewConnectionModal() {
       });
       message.success(t('dataConnection.saveSuccess'));
       handleClose();
-    } catch {
-      // API error
+    } catch (err) {
+      if (err && typeof err === 'object' && 'errorFields' in err) return;
+      message.error(t('dataConnection.saveFailed', { error: String(err) }));
     }
   };
 
