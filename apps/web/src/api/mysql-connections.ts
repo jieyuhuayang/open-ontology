@@ -7,6 +7,7 @@ import type {
   MySQLTableInfo,
   MySQLColumnInfo,
   MySQLTablePreview,
+  ConnectionTestResponse,
 } from '@/api/types';
 
 export const mysqlConnectionKeys = {
