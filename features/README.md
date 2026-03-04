@@ -41,12 +41,12 @@ features/
 
 ## When to Use Each Level
 
-Not every change requires all three artifacts. Use the table below to decide:
+Not every change requires all artifacts. Use the table below to decide:
 
 | Change Scale | Required Artifacts |
 |-------------|-------------------|
-| **Complex feature** — crosses multiple layers, introduces new domain concepts | `spec.md` + `design.md` + `tasks.md` |
-| **Medium feature** — single CRUD endpoint or isolated UI component | `spec.md` (with brief technical notes) + `tasks.md` |
+| **Complex feature** — crosses multiple layers, introduces new domain concepts | `spec.md`（含完整技术设计）+ `tasks.md` |
+| **Medium feature** — single CRUD endpoint or isolated UI component | `spec.md`（简要技术说明）+ `tasks.md` |
 | **Small change** — bug fix, style tweak, copy update | `tasks.md` only |
 
 ---
