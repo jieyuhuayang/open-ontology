@@ -138,9 +138,6 @@ class DatasetStorage:
 
     @staticmethod
     async def delete(session: AsyncSession, rid: str) -> None:
-        await session.execute(delete(DatasetRowModel).where(DatasetRowModel.dataset_rid == rid))
-        await session.execute(
-            delete(DatasetColumnModel).where(DatasetColumnModel.dataset_rid == rid)
-        )
+        # Rely on ON DELETE CASCADE for dataset_columns and dataset_rows
         await session.execute(delete(DatasetModel).where(DatasetModel.rid == rid))
         await session.flush()
