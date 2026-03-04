@@ -522,7 +522,7 @@ Action Type 的“逻辑”是通过 **Rules（规则）** 来定义的；官方
 
 * 错误：`DatasetAndBranchAlreadyRegistered`
 
-如果你收到错误 `DatasetAndBranchAlreadyRegistered`，表示你尝试保存的对象类型所使用的底层数据源，已经被 Ontology 中另一个对象类型占用，无法重复使用。
+如果你收到错误 `DatasetAndBranchAlreadyRegistered`，表示你尝试保存的对象类型所使用的底层数据集，已经被 Ontology 中另一个对象类型占用，无法重复使用。
 
 
 
