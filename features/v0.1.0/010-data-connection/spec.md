@@ -127,7 +127,7 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 | ID | 角色 | 操作 | 预期结果 |
 |----|------|------|---------|
 | AC-NV01 | 管理员 | 点击侧边栏"Data Connection"入口 | 导航到数据连接管理页面，默认展示 Connections Tab |
-| AC-NV02 | 管理员 | 在对象类型创建向导中查看 Dataset 列表 | 显示 status=ready 的 Dataset 列表，已被其他 OT 引用的标记为 `In use` 不可选 |
+| AC-NV02 | 管理员 | 在对象类型创建向导中查看 Dataset 列表 | 显示 status=ready 的 Dataset 列表，已被其他 OT 引用的标记为 `In use`（Tooltip 显示"该数据集已被 <ObjectTypeName> 关联"）不可选 |
 
 ---
 
