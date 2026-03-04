@@ -213,6 +213,10 @@ class MySQLImportService:
         finally:
             conn.close()
 
+    async def delete_connection(self, rid: str) -> None:
+        """Delete a saved MySQL connection."""
+        await MySQLConnectionStorage.delete(self._session, rid)
+
     async def start_import(
         self,
         connection_rid: str,
@@ -220,6 +224,8 @@ class MySQLImportService:
         dataset_name: str,
         selected_columns: list[str] | None = None,
     ) -> ImportTask:
+        await self._validate_table_exists(connection_rid, table)
+
         conn_orm = await MySQLConnectionStorage.get_by_rid(self._session, connection_rid)
         if not conn_orm:
             raise AppError(
@@ -228,8 +234,32 @@ class MySQLImportService:
                 status_code=404,
             )
 
-        task = _import_task_service.create_task()
+        # Check row count limit
         password = self._crypto.decrypt(conn_orm.encrypted_password)
+        import aiomysql
+
+        check_conn = await aiomysql.connect(
+            host=conn_orm.host,
+            port=conn_orm.port,
+            db=conn_orm.database_name,
+            user=conn_orm.username,
+            password=password,
+        )
+        try:
+            async with check_conn.cursor() as cur:
+                await cur.execute(f"SELECT COUNT(*) FROM `{table}`")
+                row = await cur.fetchone()
+                count = row[0] if row else 0
+            if count > _MAX_IMPORT_ROWS:
+                raise AppError(
+                    code="ROW_LIMIT_EXCEEDED",
+                    message=f"Table has {count:,} rows, exceeding MVP limit of {_MAX_IMPORT_ROWS:,}",
+                    status_code=422,
+                )
+        finally:
+            check_conn.close()
+
+        task = _import_task_service.create_task()
 
         # Launch background import
         asyncio.create_task(
