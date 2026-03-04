@@ -137,6 +137,7 @@ class MySQLImportService:
             conn.close()
 
     async def get_table_columns(self, connection_rid: str, table: str) -> list[MySQLColumnInfo]:
+        self._validate_table_name_format(table)
         conn_orm = await MySQLConnectionStorage.get_by_rid(self._session, connection_rid)
         if not conn_orm:
             raise AppError(
