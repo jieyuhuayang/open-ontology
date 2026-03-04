@@ -119,7 +119,7 @@ export default function ConnectionsTab() {
           <Popconfirm
             title={t('dataConnection.deleteConnection')}
             description={t('dataConnection.deleteConnectionConfirm', { name: record.name })}
-            onConfirm={() => handleDelete(record.rid, record.name)}
+            onConfirm={() => handleDelete(record.rid)}
             okText={t('common.confirm')}
             cancelText={t('common.cancel')}
           >
