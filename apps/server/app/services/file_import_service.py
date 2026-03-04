@@ -264,6 +264,7 @@ class FileImportService:
                 message="File token not found or expired",
                 status_code=400,
             )
+        preview_data = entry[0]
 
         task = _import_task_service.create_task()
 
