@@ -8,7 +8,8 @@
     "objectTypes": "对象类型",
     "properties": "属性",
     "linkTypes": "链接类型",
-    "actionTypes": "动作类型"
+    "actionTypes": "动作类型",
+    "dataConnection": "数据连接"
   },
   "topBar": {
     "searchPlaceholder": "按名称、RID、别名搜索...",
