@@ -3,6 +3,7 @@
 请自行读取以下文件：
 - {feature_dir}/spec.md（验收标准）
 - features/v0.1.0/release-contract.md（不变量和领域归属）
+- {prd_path}（从 spec.md"关联 PRD"字段获取）
 - docs/architecture/02-domain-model.md（领域模型规范）
 - docs/architecture/04-tech-stack-recommendations.md（技术栈规范）
 
