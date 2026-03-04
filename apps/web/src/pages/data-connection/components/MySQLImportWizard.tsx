@@ -77,7 +77,7 @@ export default function MySQLImportWizard() {
         name: values.name,
         host: values.host,
         port: values.port ?? 3306,
-        databaseName: values.databaseName ?? values.database_name,
+        databaseName: values.databaseName,
         username: values.username,
         password: values.password ?? '',
         sslEnabled: values.sslEnabled ?? false,
