@@ -50,9 +50,23 @@ export function useCreateMySQLConnection() {
 export function useTestMySQLConnection() {
   return useMutation({
     mutationFn: async (req: MySQLConnectionTestRequest) => {
-      await apiClient.post('/mysql-connections/test', req);
+      const { data } = await apiClient.post<ConnectionTestResponse>('/mysql-connections/test', req);
+      return data;
     },
     meta: { skipGlobalError: true },
+  });
+}
+
+export function useDeleteMySQLConnection() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (rid: string) => {
+      await apiClient.delete(`/mysql-connections/${rid}`);
+    },
+    meta: { skipGlobalError: true },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: mysqlConnectionKeys.lists() });
+    },
   });
 }
 
