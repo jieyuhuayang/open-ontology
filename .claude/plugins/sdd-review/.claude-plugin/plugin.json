@@ -1,0 +1,7 @@
+{
+  "name": "sdd-review",
+  "description": "SDD 文档自动审查工具，用于 Open Ontology 项目",
+  "author": {
+    "name": "OpenOntology Team"
+  }
+}
