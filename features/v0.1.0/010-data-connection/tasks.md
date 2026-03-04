@@ -89,7 +89,7 @@
 
 ### T005: 文件预览缓存 TTL 清理
 
-- [ ] **T005**: 文件预览缓存添加 TTL 过期清理
+- [x] **T005**: 文件预览缓存添加 TTL 过期清理
   - 文件:
     - `apps/server/app/services/file_import_service.py` — `_previews` 改为存储 `(data, created_at)` 元组；`upload_and_preview` 入口调用 `_cleanup_expired_previews()`（30 分钟过期）
     - `apps/server/tests/unit/test_file_import_service.py` — 补充：过期 token 被清理、未过期 token 保留
