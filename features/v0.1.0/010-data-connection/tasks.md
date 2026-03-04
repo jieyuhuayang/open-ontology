@@ -199,7 +199,7 @@
 
 ### T013: Excel/CSV 上传向导（3 步 Modal）
 
-- [ ] **T013**: FileUploadWizard 实现（3 步向导）
+- [x] **T013**: FileUploadWizard 实现（3 步向导）
   - 测试文件: `apps/web/src/pages/data-connection/__tests__/FileUploadWizard.test.tsx`
   - 实现文件: `apps/web/src/pages/data-connection/components/FileUploadWizard.tsx`
   - 测试内容:
