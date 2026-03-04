@@ -1,6 +1,6 @@
 # Feature: Object Type CRUD — 前端（对象类型前端界面）
 
-**关联 PRD**: [docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md §对象类型管理]
+**关联 PRD**: [docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md §对象类型管理]
 **优先级**: P0
 **所属版本**: v0.1.0
 **状态**: Final
@@ -207,7 +207,7 @@ F003（003-object-type-crud）的后端部分已完成，包含 API + Service + 
 | PRD-VgPQbsMBSomR9SxoGHUcZWE4neg.png | 元数据区编辑状态（图标选择器 + 内联编辑） |
 | PRD-ZoCHbIEuyoma8hxG3X5cMR06nkf.png | 三点菜单（Delete 选项） |
 
-> 截图路径: `docs/prd/0_1_0（MVP）/images/`
+> 截图路径: `docs/prd/0.1.0（MVP）/images/`
 
 ---
 
@@ -215,7 +215,7 @@ F003（003-object-type-crud）的后端部分已完成，包含 API + Service + 
 
 - 对象类型元数据规范: [docs/specs/object-type-metadata.md]
 - 领域模型: [docs/architecture/02-domain-model.md]
-- UI 设计截图: [docs/prd/0_1_0（MVP）/images/]
+- UI 设计截图: [docs/prd/0.1.0（MVP）/images/]
 - 依赖特性:
   - [features/v0.1.0/004-app-shell]（UI 框架、路由、布局）
   - [features/v0.1.0/003-object-type-crud]（后端 API 已就绪）

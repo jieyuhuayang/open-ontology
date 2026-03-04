@@ -1,6 +1,6 @@
 # Feature: Link Type CRUD（链接类型增删改查）
 
-**关联 PRD**: [docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md §3 链接类型管理]
+**关联 PRD**: [docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md §3 链接类型管理]
 **优先级**: P0
 **所属版本**: v0.1.0
 **状态**: Final
@@ -204,7 +204,7 @@
 
 - 链接类型元数据规范: `docs/specs/link-type-metadata.md`
 - 领域模型 LinkType 章节: `docs/architecture/02-domain-model.md` §6
-- PRD 链接类型管理: `docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md` §3
+- PRD 链接类型管理: `docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md` §3
 - PRD UI 截图（创建向导）: image-17 ~ image-23, image-32 ~ image-34
 - 依赖特性:
   - F002: `features/v0.1.0/002-database-schema`（link_types 表 Schema）

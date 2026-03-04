@@ -1,6 +1,6 @@
 # Feature: Project Scaffolding（项目脚手架）
 
-**关联 PRD**: [docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md §技术架构]
+**关联 PRD**: [docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md §技术架构]
 **优先级**: P0
 **所属版本**: v0.1.0
 **状态**: Done

@@ -1,6 +1,6 @@
 # Feature: App Shell & UI 基础框架
 
-**关联 PRD**: [docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md §1.1 本体管理平台导航, §1.2 发现页视图, §5 本体搜索, §6 变更管理]
+**关联 PRD**: [docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md §1.1 本体管理平台导航, §1.2 发现页视图, §5 本体搜索, §6 变更管理]
 **优先级**: P0
 **所属版本**: v0.1.0
 **状态**: Draft
@@ -145,6 +145,6 @@
 
 - 技术栈: [docs/architecture/04-tech-stack-recommendations.md]
 - 系统架构: [docs/architecture/01-system-architecture.md]
-- PRD 导航与布局: [docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md §1.1, §1.2]
+- PRD 导航与布局: [docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md §1.1, §1.2]
 - 依赖特性: [features/v0.1.0/001-project-scaffolding]
 - 被依赖: [features/v0.1.0/005-object-type-crud-frontend]、[features/v0.1.0/006-link-type-crud]、[features/v0.1.0/007-property-management]、[features/v0.1.0/009-change-management]

@@ -3,7 +3,7 @@
 **评审对象**: `features/v0.1.0/005-object-type-crud-frontend/design.md`  
 **交叉基线**:
 - `features/v0.1.0/005-object-type-crud-frontend/spec.md`
-- `docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md`
+- `docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md`
 
 **结论**: 当前方案存在 **2 个高优先级阻塞项**，建议先修订后再进入实现。
 

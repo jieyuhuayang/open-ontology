@@ -53,7 +53,7 @@ docs/
 ├── prd/                              # Product Requirements Documents
 │   ├── 0 概念定义/                   # Foundational domain concepts
 │   │   └── 0 概念定义.md             # Data layer, object layer, security model
-│   └── 0_1_0（MVP）/                 # MVP (v0.1.0) specifications
+│   └── 0.1.0（MVP）/                 # MVP (v0.1.0) specifications
 │       ├── 本体管理平台（Ontology Manager） PRD.md  # Main PRD (~67KB)
 │       └── images/                   # UI design screenshots (~78 images)
 ├── specs/                            # Domain model specifications
@@ -186,7 +186,7 @@ Before implementing a feature, **read the relevant doc first**:
 | Property types | `docs/specs/supported-property-types.md` |
 | Property formatting | `docs/specs/property-value-formatting.md` |
 | Change management / versioning | `docs/architecture/01-system-architecture.md` (AD-2, AD-3) |
-| UI design / interaction flows | PRD + `docs/prd/0_1_0（MVP）/images/` |
+| UI design / interaction flows | PRD + `docs/prd/0.1.0（MVP）/images/` |
 | Full tech stack rationale | `docs/architecture/04-tech-stack-recommendations.md` |
 
 ## Development Workflow (SDD — Spec-Driven Development)

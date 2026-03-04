@@ -24,7 +24,7 @@
 
 2. **导入失败"无残留"没有事务化保证**
 - 证据：
-  - `spec.md:302` 与 PRD `docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md:1519` 要求导入中断不产生残留部分数据。
+  - `spec.md:302` 与 PRD `docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md:1519` 要求导入中断不产生残留部分数据。
   - `design.md:1002`-`1007`、`design.md:1021`-`1026` 只有分步插入描述，没有事务边界/失败清理策略。
 - 风险：MySQL/文件导入中途失败后产生"半成品 Dataset"，后续重试和数据预览会异常。
 - 建议：导入流程必须事务化（或使用 `importing` 状态 + 失败时硬删除）；保证失败后 `datasets/dataset_columns/dataset_rows` 一致回滚。
@@ -45,7 +45,7 @@
 4. **Save Location（Project 选择）需求未被方案覆盖**
 - 证据：
   - `spec.md:162`、`spec.md:166` 要求 Step 5 项目选择和单项目自动选择。
-  - PRD `docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md:403`-`405` 明确最后一步要选择 project。
+  - PRD `docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md:403`-`405` 明确最后一步要选择 project。
   - `design.md:35` 仍是固定默认 `project_rid`，且全文无 `projectRid` 相关 API/字段设计。
 - 风险：AC-SL1/SL3 无法验收，后续前后端接口会返工。
 - 建议：补充 project 列表接口或复用现有项目查询；创建请求显式接收 `projectRid` 并校验可访问性。
@@ -69,7 +69,7 @@
 
 7. **`.xls` 支持声明与实现手段不一致**
 - 证据：
-  - `spec.md:202`、PRD `docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md:297` 要求支持 `.xls`。
+  - `spec.md:202`、PRD `docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md:297` 要求支持 `.xls`。
   - `design.md:1017`、`design.md:1248` 仅使用 `openpyxl`。
 - 风险：用户上传 `.xls` 将在运行时报错，直接不满足 AC-EX2。
 - 建议：要么补充 `.xls` 解析链路（如 `xlrd==1.2.0` + 安全限制），要么调整 spec/PRD 范围仅保留 `.xlsx/.csv`。
@@ -77,7 +77,7 @@
 
 8. **active 状态不可删除规则未在后端方案中落地**
 - 证据：
-  - `spec.md:262`、PRD `docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md:631` 要求 `active` ObjectType 不可删除。
+  - `spec.md:262`、PRD `docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md:631` 要求 `active` ObjectType 不可删除。
   - `design.md:1076`-`1082` 的 ObjectTypeService 变更未包含 delete 规则与错误码。
 - 风险：仅靠前端置灰无法防止越权调用，导致违规删除。
 - 建议：在 delete 服务端强校验 `status != active`，并补充统一错误码。
@@ -102,7 +102,7 @@
 
 11. **MySQL 类型映射与 PRD 8.7 推荐规则不一致**
 - 证据：
-  - PRD `docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md:1532`-`1535` 推荐 `BIGINT→Integer`、`DECIMAL/FLOAT/DOUBLE→Double`。
+  - PRD `docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md:1532`-`1535` 推荐 `BIGINT→Integer`、`DECIMAL/FLOAT/DOUBLE→Double`。
   - `design.md:488`、`design.md:490`、`design.md:492` 采用 `long/float/decimal`。
 - 风险：前后端默认行为与产品预期不一致，影响自动映射可解释性。
 - 建议：统一到 PRD 映射，或在 design 中显式写明"偏离 PRD 的理由 + 对应 UI 提示/校验策略"。

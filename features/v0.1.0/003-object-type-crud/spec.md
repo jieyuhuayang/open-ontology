@@ -1,6 +1,6 @@
 # Feature: Object Type CRUD（对象类型增删改查）
 
-**关联 PRD**: docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md §2.1–§2.2, §8
+**关联 PRD**: docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md §2.1–§2.2, §8
 **优先级**: P0
 **所属版本**: v0.1.0
 **状态**: Draft
@@ -268,7 +268,7 @@
 
 ## 相关文档
 
-- PRD 主文档: docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md
+- PRD 主文档: docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md
   - §2.1.1 向导创建、§2.1.1.1 数据源选择详细交互
   - §2.1.2 手动创建、§2.1.3 API 名称配置（本期不做）、§2.1.4 保存校验
   - §2.2 编辑对象类型

@@ -4,7 +4,7 @@
 > UI 布局、交互细节、组件结构 → 写在 design.md。
 > 如有跨 feature 依赖，必须在"依赖与约束"节中声明，并对照 release-contract.md。
 
-**关联 PRD**: [docs/prd/0_1_0（MVP）/数据连接（Data Connection）PRD.md]
+**关联 PRD**: [docs/prd/0.1.0（MVP）/数据连接（Data Connection）PRD.md]
 **优先级**: P0
 **所属版本**: v0.1.0
 
@@ -178,5 +178,5 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 ## 相关文档
 
 - 架构参考: [docs/architecture/05-data-connectivity.md]
-- PRD: [docs/prd/0_1_0（MVP）/数据连接（Data Connection）PRD.md]
+- PRD: [docs/prd/0.1.0（MVP）/数据连接（Data Connection）PRD.md]
 - 版本契约: [features/v0.1.0/release-contract.md]

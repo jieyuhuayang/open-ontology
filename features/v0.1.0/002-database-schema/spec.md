@@ -1,6 +1,6 @@
 # Feature: Database Schema（数据库表结构设计）
 
-**关联 PRD**: [docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md §数据模型]
+**关联 PRD**: [docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md §数据模型]
 **优先级**: P0
 **所属版本**: v0.1.0
 **状态**: Done

@@ -2,7 +2,7 @@
 
 ## 评审范围
 
-- PRD：`docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md` 第 2.1-2.4 节（重点：2.1.1.1 数据集选择交互）
+- PRD：`docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md` 第 2.1-2.4 节（重点：2.1.1.1 数据集选择交互）
 - 需求规格：`features/v0.1.0/010-data-connection/spec.md`
 - 技术方案：`features/v0.1.0/010-data-connection/design.md`
 

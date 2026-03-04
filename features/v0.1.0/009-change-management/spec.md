@@ -1,6 +1,6 @@
 # Feature: Change Management UI（变更管理界面）
 
-**关联 PRD**: [docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md §变更管理与版本控制]
+**关联 PRD**: [docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md §变更管理与版本控制]
 **优先级**: P0
 **所属版本**: v0.1.0
 **状态**: Draft

@@ -3,7 +3,7 @@
 **评审对象**: `features/v0.1.0/004-app-shell/design.md`  
 **交叉基线**: 
 - `features/v0.1.0/004-app-shell/spec.md`
-- `docs/prd/0_1_0（MVP）/本体管理平台（Ontology Manager） PRD.md`
+- `docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md`
 - `docs/architecture/01-system-architecture.md`
 - `docs/architecture/04-tech-stack-recommendations.md`
 
