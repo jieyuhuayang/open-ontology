@@ -340,7 +340,18 @@
     "status": "状态",
     "connected": "已连接",
     "failed": "连接失败",
-    "testing": "测试中..."
+    "testing": "测试中...",
+    "untested": "未测试",
+    "type": "类型",
+    "datasetCount": "数据集数",
+    "schemaDrawerTitle": "Schema 浏览器",
+    "searchTables": "搜索表...",
+    "tableStructure": "表结构",
+    "tablePreview": "数据预览",
+    "noTables": "未找到表",
+    "newConnectionTitle": "新建连接",
+    "saveConnection": "保存",
+    "saveSuccess": "连接已保存"
   },
   "dataset": {
     "listTitle": "数据集",
