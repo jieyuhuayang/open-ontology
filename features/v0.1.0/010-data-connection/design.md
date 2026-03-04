@@ -33,7 +33,7 @@
 | ID | 决策 | 理由 |
 |----|------|------|
 | AD-6 | CryptoService 改为模块级单例，自动生成的开发密钥缓存到模块变量 | 修复 C2：当前每次实例化生成不同密钥，导致加密的密码在下次请求时无法解密 |
-| AD-7 | MySQL 表名使用正则白名单校验（`^[a-zA-Z_][a-zA-Z0-9_]*$`） | 修复 C1：当前 SQL 拼接表名存在注入风险，表名来自用户 URL path parameter |
+| AD-7 | MySQL 表名安全校验：**必选方案** — 先通过 `SHOW TABLES` 获取连接内真实表名列表，验证用户输入的 table 参数存在于该列表中；辅助方案 — 正则格式校验 `^[a-zA-Z_][a-zA-Z0-9_]{0,63}$`。任何含 `table` 参数的 service 方法入口必须先完成白名单校验 | 修复 C1：当前 SQL 拼接表名存在注入风险，白名单校验比纯正则更可靠 |
 | AD-8 | 后台导入任务添加 `try/except` + `logger.exception()` 日志记录 | 修复：当前异常只更新任务状态，无日志输出，生产环境难以排查 |
 | AD-9 | 缺少类型化的 response_model 统一补齐 Pydantic 模型 | 修复 M3/M4：`upload/preview` 和 `test-connection` 端点返回无类型 dict，违反类型共享管道 |
 | AD-10 | 文件预览缓存添加 TTL 清理（30 分钟过期） | 修复 M2：当前 `_previews` dict 只增不减，存在内存泄漏风险 |
