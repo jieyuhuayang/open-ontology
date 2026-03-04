@@ -17,6 +17,7 @@ class MySQLConnection(DomainModel):
     created_at: datetime
     created_by: str
     last_used_at: datetime | None = None
+    dataset_count: int = 0
     # Note: encrypted_password is NOT in the domain model (security)
 
 
