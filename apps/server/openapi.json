@@ -1133,9 +1133,46 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionTestResponse"
+                }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mysql-connections/{rid}": {
+      "delete": {
+        "tags": [
+          "mysql-connections"
+        ],
+        "summary": "Delete Connection",
+        "operationId": "delete_connection_api_v1_mysql_connections__rid__delete",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -1365,7 +1402,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/FileUploadPreviewResponse"
+                }
               }
             }
           },
@@ -1619,6 +1658,41 @@
           "DELETE"
         ],
         "title": "ChangeType"
+      },
+      "ConnectionTestResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "latencyMs": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latencyms"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "title": "ConnectionTestResponse"
       },
       "Dataset": {
         "properties": {
@@ -1899,6 +1973,60 @@
           "datasetName"
         ],
         "title": "FileConfirmRequest"
+      },
+      "FileUploadPreviewResponse": {
+        "properties": {
+          "fileToken": {
+            "type": "string",
+            "title": "Filetoken"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "fileSize": {
+            "type": "integer",
+            "title": "Filesize"
+          },
+          "sheets": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheets"
+          },
+          "defaultSheet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Defaultsheet"
+          },
+          "preview": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Preview"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fileToken",
+          "filename",
+          "fileSize",
+          "preview"
+        ],
+        "title": "FileUploadPreviewResponse"
       },
       "HTTPValidationError": {
         "properties": {
