@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db_session
 from app.domain.mysql_connection import (
+    ConnectionTestResponse,
     MySQLConnection,
     MySQLConnectionCreateRequest,
     MySQLConnectionTestRequest,
@@ -12,6 +13,7 @@ from app.domain.mysql_connection import (
     MySQLTableInfo,
     MySQLTablePreview,
 )
+from app.exceptions import AppError
 from app.services.mysql_import_service import MySQLImportService
 
 router = APIRouter(prefix="/api/v1", tags=["mysql-connections"])
@@ -36,12 +38,20 @@ async def save_connection(
     return await service.save_connection(req)
 
 
-@router.post("/mysql-connections/test")
+@router.post("/mysql-connections/test", response_model=ConnectionTestResponse)
 async def test_connection(
     req: MySQLConnectionTestRequest,
     service: MySQLImportService = Depends(_get_service),
 ):
     return await service.test_connection(req)
+
+
+@router.delete("/mysql-connections/{rid}", status_code=204)
+async def delete_connection(
+    rid: str,
+    service: MySQLImportService = Depends(_get_service),
+):
+    await service.delete_connection(rid)
 
 
 @router.get(
