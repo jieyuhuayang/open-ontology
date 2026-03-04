@@ -33,6 +33,17 @@ export function useMySQLConnections() {
   });
 }
 
+export function useMySQLConnection(rid: string | null) {
+  return useQuery({
+    queryKey: mysqlConnectionKeys.detail(rid ?? ''),
+    queryFn: async () => {
+      const { data } = await apiClient.get<MySQLConnection>(`/mysql-connections/${rid}`);
+      return data;
+    },
+    enabled: !!rid,
+  });
+}
+
 export function useCreateMySQLConnection() {
   const queryClient = useQueryClient();
   return useMutation({
