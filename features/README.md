@@ -89,21 +89,29 @@ A well-scoped task:
 
 ## Workflow
 
+> **⚠️ 前提条件（强制）**：写 spec.md 前，必须**完整准确理解 PRD**。
+> - 必须先读取 PRD 原文（`docs/prd/` 下对应文件）和 `release-contract.md`
+> - 对 PRD 中的功能点、用户场景、边界条件、UI 交互逐一理解，不能遗漏
+> - 如果 PRD 内容较长（如主 PRD 约 67KB），必须完整读取，不能只读部分
+> - AC 表格必须覆盖 PRD 中描述的所有功能点，遗漏会导致后续实现不完整
+> - 技术设计部分必须基于对 PRD 业务逻辑的准确理解，不能凭假设设计
+
 0. **（版本开始时执行一次）Create release-contract.md** — 在第一个 feature spec 动笔前，写版本级领域归属表（表1）和不变量表（表2）。此后每个 spec 评审时，必须对照 release-contract.md 检查一致性。
-1. **Create spec.md** — derive from PRD and architecture docs; write AC as a structured table with unique IDs. 写 spec 前必须先阅读 release-contract.md；spec 只描述业务能力，UI 细节写在 design.md。
-2. **辅助审查 spec.md** — 写完后调用 `/sdd-review <feature_dir> spec`，Claude 对比 PRD 生成 gap 报告。检查列表：
+1. **Create spec.md** — 合并需求规范与技术设计的完整规格文档。写 spec 前必须先完整阅读 PRD 和 release-contract.md。包含：
+   - 需求部分：用户故事、验收标准（AC 表格，唯一 ID）、边界情况
+   - 设计部分：架构决策、数据库 & Domain 模型、API 契约、前端组件设计、错误码表
+   - 设计部分只写 Why + What，不写 How，不写测试策略
+2. **审查 spec.md** — 写完后调用 `/sdd-review <feature_dir> spec`，同时检查 PRD gap 和架构合规性。检查列表：
    - PRD 功能点 / 用户场景是否都有对应 AC？
    - AC 是否可测试、边界是否清晰？
    - 所有 AC 是否与 release-contract.md 的不变量一致？
    - 是否越界进入了其他 feature 的归属领域（表1）？
+   - 架构决策是否符合项目规范？API 契约是否完整？
 
-   用户看报告后决定是否补充 AC，说"可以写 design 了"后 → mark spec.md row as ✅ 已评审 in tasks.md 状态表（唯一手动暂停点）
-3. **Create design.md** — write architecture decisions (Why) and API/data contracts (What) only; no implementation steps, no test strategy
-4. **自动审查 design.md** — 写完 design.md 后，调用 `/sdd-review <feature_dir> design`；codex 自动检查架构合规性、AC 覆盖、API 契约完整性；有 high/medium 问题修复后重审（最多 2 轮）；通过后自动标为 ✅ 已评审，**无需用户确认**，直接进入步骤 5
-5. **Create tasks.md** — break design into test-implementation pairs; each test task must reference `覆盖 AC: AC-NN`
-6. **自动审查 tasks.md** — 写完 tasks.md 后，调用 `/sdd-review <feature_dir> tasks`；codex 自动检查 AC 追溯、Test-First 顺序、任务原子化；通过后自动标为 ✅ 已拆解，**无需用户确认**，立即开始执行
-7. **Execute tasks** — one per session, checking off as complete; run tests and show output before marking done
-8. **Mark deviations** — if implementation differs from plan, note in tasks.md §实际偏差记录
+   用户看报告后决定是否修改，确认后 → mark spec.md row as ✅ 已评审 in tasks.md 状态表（唯一手动暂停点）
+3. **Create tasks.md** — 将 spec 拆解为自包含的原子任务；每个任务内联文件、逻辑、测试上下文（实现阶段不需要回读 spec.md）；每个测试任务必须标注 `覆盖 AC: AC-NN`
+4. **Execute tasks** — one per session, checking off as complete; run tests and show output before marking done
+5. **Mark deviations** — if implementation differs from plan, note in tasks.md §实际偏差记录
 
 ---
 
