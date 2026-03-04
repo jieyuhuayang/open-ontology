@@ -288,7 +288,6 @@ class MySQLImportService:
         _import_task_service.update_status(task_id, ImportTaskStatus.RUNNING)
 
         try:
-            import aiomysql
             from app.database import async_session_factory
             from app.storage.dataset_storage import DatasetStorage
 
