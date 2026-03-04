@@ -156,7 +156,7 @@
 
 ### T010: DataConnectionPage 框架 + 路由注册
 
-- [ ] **T010**: DataConnectionPage 主页面（Tabs 框架）+ 路由 + 侧边栏入口
+- [x] **T010**: DataConnectionPage 主页面（Tabs 框架）+ 路由 + 侧边栏入口
   - 文件:
     - `apps/web/src/pages/data-connection/DataConnectionPage.tsx` — 新建：Ant Design Tabs（Connections / Datasets）
     - 路由配置文件 — 注册 `/ontology/data-connection` 路由
