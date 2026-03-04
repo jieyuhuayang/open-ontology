@@ -10,9 +10,9 @@
 
 | 步骤 | 状态 | 备注 |
 |------|------|------|
-| spec.md | 🔲 草稿 | 用户明确说"可以写 design 了"后改为 ✅ 已评审 |
-| design.md | 🔲 草稿 | 用户明确说"可以写 tasks 了"后改为 ✅ 已评审 |
-| tasks.md | 🔲 草稿 | 用户明确说"可以开始实现了"后改为 ✅ 已拆解 |
+| spec.md | 🔲 草稿 | 用户明确说"可以写 design 了"后改为 ✅ 已评审（唯一手动暂停点） |
+| design.md | 🔲 草稿 | `/sdd-review <feature_dir> design` 自动审查通过后改为 ✅ 已评审 |
+| tasks.md | 🔲 草稿 | `/sdd-review <feature_dir> tasks` 自动审查通过后改为 ✅ 已拆解 |
 | 实现 | 🔲 未开始 | X / N 完成 |
 
 ---
