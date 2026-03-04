@@ -172,7 +172,7 @@ justfile                              # Monorepo 任务运行器
 6. **自动审查 tasks** — 写完 tasks.md 后，调用 `/sdd-review <feature_dir> tasks`；有 high/medium 问题则修复后重审；通过后将 tasks.md 行标为 ✅ 已拆解并**立即开始实现**，无需等待用户
 7. **执行** — 逐任务实施，完成后在 tasks.md 打勾
 
-**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。`design.md` 和 `tasks.md` 经 `/sdd-review` 自动审查通过后，可直接开始实现，无需用户确认。`spec.md` 评审仍需用户明确确认（唯一的手动暂停点）。`spec.md` 只描述业务能力，UI 细节写在 `design.md`；写 spec 前必须先阅读版本的 `release-contract.md`。
+**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。`design.md` 和 `tasks.md` 经 `/sdd-review` 自动审查通过后，可直接开始实现，无需用户确认。`spec.md` 评审仍需用户最终确认（唯一手动暂停点，但 `/sdd-review spec` 的 gap 报告辅助决策）。`spec.md` 只描述业务能力，UI 细节写在 `design.md`；写 spec 前必须先阅读版本的 `release-contract.md`。
 
 ## 外部 MySQL 策略
 
