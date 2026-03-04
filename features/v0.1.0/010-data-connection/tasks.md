@@ -37,7 +37,7 @@
 
 ### T001: CryptoService 单例化
 
-- [ ] **T001**: CryptoService 单例化 + 测试补充
+- [x] **T001**: CryptoService 单例化 + 测试补充
   - 文件:
     - `apps/server/app/services/crypto_service.py` — 改为模块级单例（`get_crypto_service()` 工厂函数）
     - `apps/server/tests/unit/test_crypto_service.py` — 补充：多次调用 `get_crypto_service()` 返回同一实例；开发模式自动生成密钥在进程内保持一致
