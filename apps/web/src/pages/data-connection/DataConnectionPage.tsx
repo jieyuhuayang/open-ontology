@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useDataConnectionStore } from '@/stores/data-connection-store';
 import ConnectionsTab from './components/ConnectionsTab';
 import DatasetsTab from './components/DatasetsTab';
+import MySQLImportWizard from './components/MySQLImportWizard';
+import FileUploadWizard from './components/FileUploadWizard';
 
 const { Title } = Typography;
 
