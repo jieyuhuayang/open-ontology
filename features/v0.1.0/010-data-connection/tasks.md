@@ -61,7 +61,7 @@
 
 ### T003: 后台任务异常日志 + done_callback
 
-- [ ] **T003**: 后台任务异常处理增强
+- [x] **T003**: 后台任务异常处理增强
   - 文件:
     - `apps/server/app/services/mysql_import_service.py` — `_run_import()` except 块添加 `logger.exception()`
     - `apps/server/app/services/file_import_service.py` — `_run_import()` except 块添加 `logger.exception()`
