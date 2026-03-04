@@ -10,9 +10,15 @@
 
 ## 实施状态声明
 
-> 本特性后端核心已实现（MySQL 连接管理、Excel/CSV 上传、Dataset CRUD、导入任务、加密服务），代码评审发现 3 个 Critical + 5 个 Major 问题需修复。前端尚未开始。
+> 本特性后端核心已实现并已完成 Critical/Major 修复。前端已实现但存在与 PRD 的体验偏差需要重构。
 >
-> 本文档采用**追认 + 补充**风格：追认已有架构决策和 API 契约，补充修复方案和前端设计。
+> 本次更新聚焦：
+> 1. **Connections Tab 职责修正**：移除导入按钮，新增 New Connection 按钮、Dataset 数列、Schema 浏览器 Drawer
+> 2. **Datasets Tab 职责修正**：新增 Import Dataset 下拉入口
+> 3. **MySQL 向导修正**：选择已有连接时自动填充表单（密码除外）
+> 4. **连接状态修正**：默认显示 untested（非空 —）
+> 5. **Dataset 状态修正**：未关联时显示 Available（非空）
+> 6. **后端补充**：GET 单连接详情 + 连接列表增加 datasetCount
 
 ---
 
@@ -28,16 +34,25 @@
 | AD-4 | Dataset 行数据以 JSONB 存储在 `dataset_rows` 表（每行一条记录） | Schema-free 灵活性，避免为每个 Dataset 动态建表；MVP 数据量有限（对应 KD-4） |
 | AD-5 | 文件上传采用两步模式：preview（返回 fileToken）→ confirm（触发导入） | 用户需先预览列结构和数据类型再确认导入，两步模式提供更好的交互体验 |
 
-### 补充决策（修复方案）
+### 已完成的修复决策
+
+| ID | 决策 | 状态 |
+|----|------|------|
+| AD-6 | CryptoService 改为模块级单例 `get_crypto_service()` | ✅ 已修复 |
+| AD-7 | MySQL 表名白名单校验（`SHOW TABLES` + 正则） | ✅ 已修复 |
+| AD-8 | 后台任务 `logger.exception()` 日志记录 | ✅ 已修复 |
+| AD-9 | `ConnectionTestResponse`、`FileUploadPreviewResponse` 等 response_model 补齐 | ✅ 已修复 |
+| AD-10 | 文件预览缓存 TTL 30分钟清理 | ✅ 已修复 |
+| AD-11 | MySQL 导入 10万行上限 | ✅ 已修复 |
+
+### 新增决策（本次重构）
 
 | ID | 决策 | 理由 |
 |----|------|------|
-| AD-6 | CryptoService 改为模块级单例，自动生成的开发密钥缓存到模块变量 | 修复 C2：当前每次实例化生成不同密钥，导致加密的密码在下次请求时无法解密 |
-| AD-7 | MySQL 表名安全校验：**必选方案** — 先通过 `SHOW TABLES` 获取连接内真实表名列表，验证用户输入的 table 参数存在于该列表中；辅助方案 — 正则格式校验 `^[a-zA-Z_][a-zA-Z0-9_]{0,63}$`。任何含 `table` 参数的 service 方法入口必须先完成白名单校验 | 修复 C1：当前 SQL 拼接表名存在注入风险，白名单校验比纯正则更可靠 |
-| AD-8 | 后台导入任务添加 `try/except` + `logger.exception()` 日志记录 | 修复：当前异常只更新任务状态，无日志输出，生产环境难以排查 |
-| AD-9 | 缺少类型化的 response_model 统一补齐 Pydantic 模型 | 修复 M3/M4：`upload/preview` 和 `test-connection` 端点返回无类型 dict，违反类型共享管道 |
-| AD-10 | 文件预览缓存添加 TTL 清理（30 分钟过期） | 修复 M2：当前 `_previews` dict 只增不减，存在内存泄漏风险 |
-| AD-11 | MySQL 全表导入添加行数上限（MVP 10万行） | 修复 M6：当前 `SELECT * FROM table` 无限制，大表会导致 OOM |
+| AD-12 | Schema 浏览器使用 Drawer 侧抽屉（非路由页面）展示 | 无需新路由，保持 SPA 流畅体验；Drawer 宽度 900px+ 足以容纳左右分栏布局（表列表 + 列结构/预览） |
+| AD-13 | 连接列表 `datasetCount` 通过后端聚合查询返回（非前端计算） | 避免前端多次请求；通过 `SELECT source_metadata->>'connectionRid', COUNT(*) FROM datasets GROUP BY ...` 批量计算 |
+| AD-14 | 导入入口从 Connections Tab 迁移到 Datasets Tab | 对齐 PRD §3.2/§3.3 职责分离：Connections 管连接，Datasets 管数据导入 |
+| AD-15 | New Connection 使用独立 Modal（非向导 Step 1 复用） | 从 MySQLImportWizard Step 1 抽取连接表单为独立组件，仅包含连接配置 + Test + Save，不触发导入流程 |
 
 ---
 
@@ -105,97 +120,85 @@ ALTER TABLE object_types
     ADD COLUMN title_key_property_id    VARCHAR;
 ```
 
-### Pydantic Schema（追认 — 已实现）
+### Pydantic Schema
 
 **Domain 模型分布**：
 
 | 文件 | 模型 | 用途 |
 |------|------|------|
 | `domain/dataset.py` | `Dataset`, `DatasetColumn`, `DatasetListItem`, `DatasetListResponse`, `DatasetPreviewResponse` | Dataset 读取/列表/预览 |
-| `domain/mysql_connection.py` | `MySQLConnection`, `MySQLConnectionCreateRequest`, `MySQLConnectionTestRequest`, `MySQLTableInfo`, `MySQLColumnInfo`, `MySQLTablePreview` | MySQL 连接管理 |
-| `domain/import_task.py` | `ImportTask`, `ImportTaskStatus` | 导入任务状态跟踪 |
+| `domain/mysql_connection.py` | `MySQLConnection`, `MySQLConnectionCreateRequest`, `MySQLConnectionTestRequest`, `MySQLTableInfo`, `MySQLColumnInfo`, `MySQLTablePreview`, `ConnectionTestResponse` | MySQL 连接管理 |
+| `domain/import_task.py` | `ImportTask`, `ImportTaskStatus`, `FileUploadPreviewResponse`, `FilePreviewColumn`, `MySQLImportRequest`, `FileConfirmRequest` | 导入任务 |
 | `domain/type_mapping.py` | `MYSQL_TYPE_MAP`, `mysql_type_to_property_type()`, `infer_column_type()` | 类型映射 |
 
-**需新增的 Pydantic 模型**（修复 AD-9）：
+**本次新增字段**：
 
 ```python
-# domain/mysql_connection.py — 新增
-class ConnectionTestResponse(DomainModel):
-    success: bool
-    latency_ms: int | None = None
-    error: str | None = None
-
-# domain/import_task.py — 新增
-class FileUploadPreviewResponse(DomainModel):
-    file_token: str
-    file_name: str
-    file_size: int
-    sheet_names: list[str] | None = None  # Excel only
-    columns: list[FilePreviewColumn]
-    preview_rows: list[dict[str, Any]]
-    total_rows: int
-
-class FilePreviewColumn(DomainModel):
-    name: str
-    inferred_type: str
-    sample_values: list[str]
-
-# domain/import_task.py — 新增（从 router 移出）
-class MySQLImportRequest(DomainModel):
-    connection_rid: str
-    table: str
-    dataset_name: str
-    selected_columns: list[str] | None = None
-
-class FileConfirmRequest(DomainModel):
-    file_token: str
-    dataset_name: str
-    sheet_name: str | None = None
-    has_header: bool = True
-    selected_columns: list[str] | None = None
-    column_type_overrides: dict[str, str] | None = None
+# domain/mysql_connection.py — MySQLConnection 新增字段
+class MySQLConnection(DomainModel):
+    # ... 现有字段 ...
+    dataset_count: int = 0  # 关联 Dataset 数量（AC-CM04, AC-CM09）
 ```
 
 ---
 
 ## API 契约
 
-### 端点列表（追认 — 已实现）
+### 端点列表
 
 #### MySQL 连接管理
 
-| Method | Path | 描述 | 关联 AC |
-|--------|------|------|---------|
-| GET | `/api/v1/mysql-connections` | 列出所有 MySQL 连接 | AC-CM04 |
-| POST | `/api/v1/mysql-connections` | 保存新连接（密码加密） | AC-CM01 |
-| POST | `/api/v1/mysql-connections/test` | 测试连接（不保存） | AC-CM02, AC-CM03, AC-CM05 |
-| GET | `/api/v1/mysql-connections/{rid}/tables` | 浏览表列表 | AC-MI01 |
-| GET | `/api/v1/mysql-connections/{rid}/tables/{table}/columns` | 获取表列结构 | AC-MI02 |
-| GET | `/api/v1/mysql-connections/{rid}/tables/{table}/preview` | 预览表数据 | AC-MI03 |
+| Method | Path | 描述 | 关联 AC | 状态 |
+|--------|------|------|---------|------|
+| GET | `/api/v1/mysql-connections` | 列出所有连接（含 `datasetCount`） | AC-CM04, AC-CM09 | ✅ 需修改：增加 datasetCount |
+| POST | `/api/v1/mysql-connections` | 保存新连接（密码加密） | AC-CM01, AC-CM08 | ✅ 已实现 |
+| POST | `/api/v1/mysql-connections/test` | 测试连接（不保存） | AC-CM02, AC-CM03, AC-CM05 | ✅ 已实现 |
+| DELETE | `/api/v1/mysql-connections/{rid}` | 删除连接 | AC-CM06, AC-CM07 | ✅ 已实现 |
+| **GET** | **`/api/v1/mysql-connections/{rid}`** | **获取单个连接详情（含 datasetCount）** | **AC-CM14** | **🆕 新增** |
+| GET | `/api/v1/mysql-connections/{rid}/tables` | 浏览表列表 | AC-MI01, AC-CM10 | ✅ 已实现 |
+| GET | `/api/v1/mysql-connections/{rid}/tables/{table}/columns` | 获取表列结构 | AC-MI02, AC-CM11 | ✅ 已实现 |
+| GET | `/api/v1/mysql-connections/{rid}/tables/{table}/preview` | 预览表数据 | AC-MI03, AC-CM12 | ✅ 已实现 |
 
 #### 导入操作
 
-| Method | Path | 描述 | 关联 AC |
-|--------|------|------|---------|
-| POST | `/api/v1/datasets/import/mysql` | 发起 MySQL 导入 | AC-MI04 |
-| POST | `/api/v1/datasets/upload/preview` | 上传文件并预览 | AC-FU01 |
-| POST | `/api/v1/datasets/upload/confirm` | 确认文件导入 | AC-FU02 |
-| GET | `/api/v1/import-tasks/{task_id}` | 查询导入任务状态 | AC-MI05, AC-MI06, AC-MI08 |
+| Method | Path | 描述 | 关联 AC | 状态 |
+|--------|------|------|---------|------|
+| POST | `/api/v1/datasets/import/mysql` | 发起 MySQL 导入 | AC-MI04 | ✅ 已实现 |
+| POST | `/api/v1/datasets/upload/preview` | 上传文件并预览 | AC-FU01 | ✅ 已实现 |
+| POST | `/api/v1/datasets/upload/confirm` | 确认文件导入 | AC-FU02 | ✅ 已实现 |
+| GET | `/api/v1/import-tasks/{task_id}` | 查询导入任务状态 | AC-MI05, AC-MI06, AC-MI08 | ✅ 已实现 |
 
 #### Dataset 管理
 
-| Method | Path | 描述 | 关联 AC |
-|--------|------|------|---------|
-| GET | `/api/v1/datasets` | 列出 Dataset（支持搜索） | AC-DM01, AC-DM02 |
-| GET | `/api/v1/datasets/{rid}` | 获取 Dataset 详情 | AC-DM03 |
-| GET | `/api/v1/datasets/{rid}/preview` | 预览 Dataset 数据 | AC-DM04 |
-| DELETE | `/api/v1/datasets/{rid}` | 删除 Dataset | AC-DM05, AC-DM06, AC-DM07 |
+| Method | Path | 描述 | 关联 AC | 状态 |
+|--------|------|------|---------|------|
+| GET | `/api/v1/datasets` | 列出 Dataset（支持搜索） | AC-DM01, AC-DM02 | ✅ 已实现 |
+| GET | `/api/v1/datasets/{rid}` | 获取 Dataset 详情 | AC-DM03 | ✅ 已实现 |
+| GET | `/api/v1/datasets/{rid}/preview` | 预览 Dataset 数据 | AC-DM04 | ✅ 已实现 |
+| DELETE | `/api/v1/datasets/{rid}` | 删除 Dataset | AC-DM05, AC-DM06, AC-DM07 | ✅ 已实现 |
 
-#### 需新增的端点
+### GET `/api/v1/mysql-connections/{rid}` 响应契约
 
-| Method | Path | 描述 | 关联 AC |
-|--------|------|------|---------|
-| DELETE | `/api/v1/mysql-connections/{rid}` | 删除连接 | AC-CM06, AC-CM07 |
+```json
+{
+  "rid": "ri.ontology.mysql-connection.xxx",
+  "name": "Production DB",
+  "host": "localhost",
+  "port": 3306,
+  "databaseName": "mydb",
+  "username": "user",
+  "sslEnabled": false,
+  "ontologyRid": "ri.ontology.ontology.xxx",
+  "createdAt": "2024-01-01T00:00:00Z",
+  "createdBy": "default-user",
+  "lastUsedAt": null,
+  "datasetCount": 3
+}
+```
+
+### GET `/api/v1/mysql-connections` 响应变更
+
+每个连接对象新增 `datasetCount` 字段（int）。计算方式：`SELECT COUNT(*) FROM datasets WHERE source_metadata->>'connectionRid' = ? AND status = 'ready'`
 
 ### 错误码
 
@@ -204,7 +207,7 @@ class FileConfirmRequest(DomainModel):
 | 403 | `DATASET_IN_USE` | 删除已被 OT 引用的 Dataset | AC-DM06 |
 | 404 | `DATASET_NOT_FOUND` | Dataset RID 不存在 | AC-DM07 |
 | 404 | `IMPORT_TASK_NOT_FOUND` | 任务 ID 不存在 | AC-MI08 |
-| 404 | `CONNECTION_NOT_FOUND` | 连接 RID 不存在 | — |
+| 404 | `CONNECTION_NOT_FOUND` | 连接 RID 不存在 | AC-CM07, AC-CM14 |
 | 404 | `FILE_TOKEN_EXPIRED` | fileToken 无效或过期 | — |
 | 422 | `FILE_TOO_LARGE` | 上传文件超过 50MB | AC-FU03 |
 | 422 | `UNSUPPORTED_FILE_FORMAT` | 文件格式不支持 | AC-FU04 |
@@ -213,7 +216,7 @@ class FileConfirmRequest(DomainModel):
 
 ---
 
-## 服务依赖关系（追认）
+## 服务依赖关系
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -227,11 +230,11 @@ class FileConfirmRequest(DomainModel):
 │              │ │Service       │ │Service             │
 │- list        │ │- upload_and_ │ │- save_connection   │
 │- get_by_rid  │ │  preview     │ │- list_connections  │
-│- get_preview │ │- confirm_    │ │- test_connection   │
-│- delete      │ │  import      │ │- browse_tables     │
-└──────┬───────┘ └──────┬───────┘ │- start_import      │
+│- get_preview │ │- confirm_    │ │- get_connection ←新│
+│- delete      │ │  import      │ │- test_connection   │
+└──────┬───────┘ └──────┬───────┘ │- browse_tables     │
+       │                │         │- start_import      │
        │                │         └──────────┬─────────┘
-       │                │                    │
        │         ┌──────▼──────────┐         │
        │         │ImportTaskService│◄────────┘
        │         │(内存单例)       │
@@ -240,9 +243,9 @@ class FileConfirmRequest(DomainModel):
        ▼                ▼                    ▼
 ┌──────────────┐ ┌──────────────┐ ┌────────────────────┐
 │DatasetStorage│ │              │ │MySQLConnection     │
-│              │ │              │ │Storage             │
-└──────────────┘ │CryptoService │ └────────────────────┘
-                 └──────────────┘
+│+ count_by_   │ │              │ │Storage             │
+│  conn_rids ←新│ │CryptoService │ └────────────────────┘
+└──────────────┘ └──────────────┘
 ```
 
 ---
@@ -260,74 +263,101 @@ class FileConfirmRequest(DomainModel):
 
 ---
 
-## 后端修复方案
+## 后端补充方案
 
-### Critical 修复
+### B1: Domain model `MySQLConnection` 新增 `dataset_count` 字段
 
-**C1: SQL 注入 — 表名白名单校验（AD-7）**
-- 位置：`MySQLImportService.preview_table()`, `_run_import()`, `get_table_columns()`, `start_import()`
-- **必选方案**：新增 `_validate_table_name(connection_rid, table)` 方法 — 先 `SHOW TABLES` 获取连接内真实表名列表，验证 `table` 参数存在于列表中；不存在则抛出 422 `INVALID_TABLE_NAME`
-- **辅助方案**：入口处先做正则格式校验 `^[a-zA-Z_][a-zA-Z0-9_]{0,63}$`，快速拦截明显非法输入
-- **约束**：任何含 `table` 参数的 service 方法入口必须先调用 `_validate_table_name()`
+```python
+class MySQLConnection(DomainModel):
+    # ... 现有字段 ...
+    dataset_count: int = 0
+```
 
-**C2: CryptoService 密钥不稳定（AD-6）**
-- 位置：`CryptoService.__init__()`
-- 方案：添加模块级 `_shared_crypto_service: CryptoService | None` 缓存；首次实例化后缓存，后续复用同一实例
-- 或：改为 `get_crypto_service()` 工厂函数 + 模块级缓存
+### B2: `DatasetStorage.count_by_connection_rids()` 新增方法
 
-**C3: 后台任务异常无日志（AD-8）**
-- 位置：`MySQLImportService._run_import()`, `FileImportService._run_import()`
-- 方案：在 `except Exception as e` 块中添加 `logger.exception("Import task failed")`
+```python
+@staticmethod
+async def count_by_connection_rids(
+    session: AsyncSession, connection_rids: list[str]
+) -> dict[str, int]:
+    """返回 {connectionRid: count} 映射"""
+    # SELECT source_metadata->>'connectionRid' AS conn_rid, COUNT(*)
+    # FROM datasets
+    # WHERE status = 'ready'
+    #   AND source_metadata->>'connectionRid' IN (:rids)
+    # GROUP BY conn_rid
+```
 
-### Major 修复
+### B3: `MySQLImportService.list_connections()` 填充 dataset_count
 
-**M2: 文件预览缓存无 TTL（AD-10）**
-- 方案：在 `_previews` dict 中存储 `(data, created_at)` 元组；`upload_and_preview` 入口调用清理逻辑，删除超过 30 分钟的条目
+在查询连接列表后，调用 `DatasetStorage.count_by_connection_rids()` 批量计算每个连接的 Dataset 数量，填充到 `MySQLConnection.dataset_count`。
 
-**M3/M4: 缺少 response_model（AD-9）**
-- 方案：新增 `ConnectionTestResponse`、`FileUploadPreviewResponse` 等 Pydantic 模型，并在路由装饰器中声明 `response_model=`
+### B4: 新增 `MySQLImportService.get_connection()` 方法
 
-**M6: MySQL 全表导入无行数限制（AD-11）**
-- 方案：`start_import` 入口先查 `SELECT COUNT(*) FROM table`，超过 10 万行返回 422 `ROW_LIMIT_EXCEEDED`
+```python
+async def get_connection(self, rid: str) -> MySQLConnection:
+    """获取单个连接详情 + dataset_count"""
+```
 
-**M8: 冗余级联删除**
-- 方案：`DatasetStorage.delete()` 只删除 dataset 主记录，依赖 `ON DELETE CASCADE` 清理子表
+### B5: Router 新增 `GET /api/v1/mysql-connections/{rid}`
+
+```python
+@router.get("/mysql-connections/{rid}", response_model=MySQLConnection)
+async def get_connection(rid: str, service=Depends(_get_service)):
+    return await service.get_connection(rid)
+```
 
 ---
 
 ## 前端设计
 
-### 路由
+### 路由（不变）
 
 ```
 /ontology/data-connection              → DataConnectionPage（Connections Tab）
 /ontology/data-connection?tab=datasets → DataConnectionPage（Datasets Tab）
 ```
 
-### 页面结构
+### 页面结构（重构后）
 
 ```
 DataConnectionPage
 ├── PageHeader                         # "Data Connection" 标题
 ├── Tabs                               # Ant Design Tabs
 │   ├── Tab: "Connections"
-│   │   ├── ConnectionsToolbar         # [+ New Connection] 按钮
+│   │   ├── ConnectionsToolbar         # [+ New Connection] 按钮（AC-CM08）
 │   │   └── ConnectionsTable           # Ant Design Table
-│   │       └── 操作列                 # Test | Import | Delete
+│   │       ├── 名称（可点击→开 Drawer）  # AC-CM10
+│   │       ├── 类型（MySQL）
+│   │       ├── 状态（untested/connected/failed）# AC-CM13
+│   │       ├── Dataset 数              # AC-CM09
+│   │       ├── 最近使用
+│   │       └── 操作（Test | Delete）    # 无 Import 按钮（AD-14）
 │   └── Tab: "Datasets"
-│       ├── DatasetsToolbar            # 搜索框 + [Import Dataset ▼] 按钮（下拉：From MySQL / Upload File）
+│       ├── DatasetsToolbar            # 搜索框 + [Import Dataset ▼] 下拉按钮（AC-DM08）
+│       │   └── 菜单项: From MySQL / Upload File
 │       └── DatasetsTable              # Ant Design Table
-│           └── 操作列                 # Preview | Delete（in_use 时 Delete 置灰）
-├── MySQLImportWizard (Modal)          # 4 步向导
-│   ├── Step 1: ConfigureConnection    # 连接配置表单 + 测试连接
-│   ├── Step 2: SelectTable            # 表列表 + 列预览 + 数据预览
-│   ├── Step 3: ConfigureImport        # Dataset 名称 + 列选择
-│   └── Step 4: ImportResult           # 进度/结果
-├── FileUploadWizard (Modal)           # 3 步向导
-│   ├── Step F1: UploadFile            # Ant Design Upload（拖拽区）
-│   ├── Step F2: PreviewAndConfigure   # 列预览 + 类型选择 + 数据预览
-│   └── Step F3: ImportResult          # 进度/结果
-└── DatasetPreviewDrawer               # Dataset 数据预览抽屉
+│           ├── 状态列: In use / Available  # AC-DM01 修正
+│           └── 操作列: Preview | Delete
+├── NewConnectionModal (Modal)          # 新建（AD-15）—— 仅创建连接
+│   ├── 连接配置表单（复用 MySQLImportWizard Step 1 的字段）
+│   ├── Test Connection 按钮
+│   └── Save 按钮
+├── ConnectionDetailDrawer (Drawer)     # 新建（AD-12）—— Schema 浏览器
+│   ├── 连接基本信息
+│   └── 左右分栏布局
+│       ├── 左：表列表 + 搜索框
+│       └── 右：选中表后 → 列结构 Tab + 数据预览 Tab
+├── MySQLImportWizard (Modal)          # 从 Datasets Tab 触发
+│   ├── Step 1: ConfigureConnection    # 修正：选择已有连接→填充表单（AC-MI10）
+│   ├── Step 2: SelectTable
+│   ├── Step 3: ConfigureImport
+│   └── Step 4: ImportResult
+├── FileUploadWizard (Modal)           # 从 Datasets Tab 触发
+│   ├── Step F1: UploadFile
+│   ├── Step F2: PreviewAndConfigure
+│   └── Step F3: ImportResult
+└── DatasetPreviewDrawer               # 已有
 ```
 
 ### Zustand Store
@@ -335,128 +365,119 @@ DataConnectionPage
 ```typescript
 // stores/data-connection-store.ts — 仅 UI 状态
 interface DataConnectionStore {
-  // MySQL 导入向导
-  mysqlWizardOpen: boolean;
-  mysqlWizardStep: 0 | 1 | 2 | 3;
-  openMySQLWizard: () => void;
-  closeMySQLWizard: () => void;
-  setMySQLWizardStep: (step: number) => void;
+  // Tab 状态
+  activeTab: 'connections' | 'datasets';
+  setActiveTab: (tab: ActiveTab) => void;
 
-  // 文件上传向导
-  fileWizardOpen: boolean;
-  fileWizardStep: 0 | 1 | 2;
-  openFileWizard: () => void;
-  closeFileWizard: () => void;
-  setFileWizardStep: (step: number) => void;
+  // Modal 状态（统一管理）
+  openModal: 'mysqlImport' | 'fileUpload' | 'newConnection' | null;  // 新增 'newConnection'
+  setOpenModal: (modal: ModalType) => void;
+
+  // 连接选中状态
+  selectedConnectionRid: string | null;
+  setSelectedConnectionRid: (rid: string | null) => void;
+
+  // 连接详情 Drawer（新增）
+  detailConnectionRid: string | null;
+  setDetailConnectionRid: (rid: string | null) => void;
 
   // Dataset 预览抽屉
   previewDatasetRid: string | null;
-  openPreview: (rid: string) => void;
-  closePreview: () => void;
+  setPreviewDatasetRid: (rid: string | null) => void;
 }
 ```
 
 ### TanStack Query Hooks
 
 ```typescript
-// api/mysql-connections.ts
-useListMySQLConnections()                        // GET /mysql-connections
-useSaveMySQLConnection()                         // POST /mysql-connections
+// api/mysql-connections.ts — 新增
+useMySQLConnection(rid)                          // GET /mysql-connections/{rid}（AC-CM14）
+
+// 现有 hooks 不变
+useMySQLConnections()                            // GET /mysql-connections（响应含 datasetCount）
+useCreateMySQLConnection()                       // POST /mysql-connections
 useTestMySQLConnection()                         // POST /mysql-connections/test
 useDeleteMySQLConnection()                       // DELETE /mysql-connections/{rid}
-useBrowseTables(connectionRid)                   // GET /mysql-connections/{rid}/tables
-useTableColumns(connectionRid, table)            // GET /mysql-connections/{rid}/tables/{table}/columns
-useTablePreview(connectionRid, table)            // GET /mysql-connections/{rid}/tables/{table}/preview
+useMySQLTables(connectionRid)                    // GET /mysql-connections/{rid}/tables
+useMySQLTableColumns(connectionRid, table)       // GET /mysql-connections/{rid}/tables/{table}/columns
+useMySQLTablePreview(connectionRid, table)       // GET /mysql-connections/{rid}/tables/{table}/preview
 
-// api/imports.ts
-useMySQLImport()                                 // POST /datasets/import/mysql
-useFileUploadPreview()                           // POST /datasets/upload/preview
-useFileConfirmImport()                           // POST /datasets/upload/confirm
-useImportTaskStatus(taskId, { refetchInterval })  // GET /import-tasks/{task_id}（轮询）
+// api/imports.ts — 不变
+useMySQLImport()
+useFileUploadPreview()
+useFileConfirmImport()
+useImportTask(taskId)
 
-// api/datasets.ts
-useListDatasets(search?)                          // GET /datasets
-useDataset(rid)                                   // GET /datasets/{rid}
-useDatasetPreview(rid, limit?)                    // GET /datasets/{rid}/preview
-useDeleteDataset()                                // DELETE /datasets/{rid}
+// api/datasets.ts — 不变
+useDatasets(search?)
+useDatasetPreview(rid, limit?)
+useDeleteDataset()
 ```
 
-### i18n 命名空间
+### i18n 新增键
 
 ```
-dataConnection.page.title
-dataConnection.tabs.connections / .datasets
-dataConnection.connections.table.name / .host / .database / .createdAt / .actions
-dataConnection.connections.actions.test / .import / .delete
-dataConnection.connections.newConnection
-dataConnection.connections.testSuccess / .testFailed
-dataConnection.datasets.table.name / .sourceType / .rowCount / .columnCount / .importedAt / .status / .actions
-dataConnection.datasets.actions.preview / .delete
-dataConnection.datasets.inUse / .inUseTooltip
-dataConnection.datasets.importDataset / .fromMySQL / .uploadFile
-dataConnection.mysql.wizard.title
-dataConnection.mysql.step1.title / ... (每步标题 + 表单标签)
-dataConnection.mysql.step2.title / ...
-dataConnection.mysql.step3.title / ...
-dataConnection.mysql.step4.title / ...
-dataConnection.file.wizard.title
-dataConnection.file.step1.title / ...
-dataConnection.file.step2.title / ...
-dataConnection.file.step3.title / ...
-dataConnection.common.snapshotWarning  # "此操作为快照，不自动同步"
-dataConnection.common.importing / .ready / .failed
-dataConnection.errors.datasetInUse / .fileTooLarge / .unsupportedFormat / ...
+# Connections Tab 新增
+dataConnection.newConnection          # "New Connection" 按钮
+dataConnection.type                   # "Type" 列标题
+dataConnection.datasetCount           # "Datasets" 列标题
+dataConnection.untested               # "Untested" 状态标签
+dataConnection.schemaDrawerTitle      # "Schema Browser" Drawer 标题
+dataConnection.searchTables           # "Search tables..." 占位符
+dataConnection.tableStructure         # "Structure" Tab 标签
+dataConnection.tablePreview           # "Preview" Tab 标签
+dataConnection.noTables               # "No tables found" 空状态
+
+# Datasets Tab 新增
+dataset.importDataset                 # "Import Dataset" 下拉按钮
+dataset.fromMySQL                     # "From MySQL" 菜单项
+dataset.uploadFile                    # "Upload Excel/CSV" 菜单项
+dataset.available                     # "Available" 状态标签
+
+# 新建连接 Modal
+dataConnection.newConnectionTitle     # "New Connection" Modal 标题
+dataConnection.saveConnection         # "Save" 按钮
+dataConnection.saveSuccess            # "Connection saved" 成功提示
 ```
 
-### 侧边栏导航入口
+### 侧边栏导航入口（已实现）
 
-在现有 `layout/Sidebar` 组件中添加 "Data Connection" 一级菜单项，图标使用 Ant Design `ApiOutlined` 或 `DatabaseOutlined`，路由指向 `/ontology/data-connection`。
+已在 `layout/Sidebar` 组件中添加 "Data Connection" 一级菜单项。
 
 ---
 
 ## 文件清单
 
-### 后端（已存在 — 需修复）
+### 后端（需修改）
 
 ```
 apps/server/
-├── app/services/crypto_service.py             # 修改：单例化
-├── app/services/mysql_import_service.py       # 修改：表名校验、行数限制、日志
-├── app/services/file_import_service.py        # 修改：预览缓存 TTL、日志
-├── app/storage/dataset_storage.py             # 修改：简化 delete
-├── app/routers/imports.py                     # 修改：response_model、请求模型迁出
-├── app/routers/mysql_connections.py           # 修改：response_model、新增 DELETE
-├── app/domain/mysql_connection.py             # 修改：新增 ConnectionTestResponse
-├── app/domain/import_task.py                  # 修改：新增 FileUploadPreviewResponse 等
+├── app/domain/mysql_connection.py             # 修改：MySQLConnection 增加 dataset_count 字段
+├── app/storage/dataset_storage.py             # 修改：新增 count_by_connection_rids() 方法
+├── app/services/mysql_import_service.py       # 修改：list_connections 填充 dataset_count；新增 get_connection
+├── app/routers/mysql_connections.py           # 修改：新增 GET /{rid} 端点
+├── tests/unit/test_mysql_import_service.py    # 修改：覆盖新方法
+├── tests/integration/test_mysql_connections.py # 修改：覆盖新端点
 └── openapi.json                               # 重新生成
 ```
 
-### 前端（全部新建）
+### 前端（需修改/新建）
 
 ```
 apps/web/src/
 ├── pages/data-connection/
-│   ├── DataConnectionPage.tsx                 # 新建：主页面（Tabs）
 │   ├── components/
-│   │   ├── ConnectionsTab.tsx                 # 新建：连接列表 Tab
-│   │   ├── DatasetsTab.tsx                    # 新建：Dataset 列表 Tab
-│   │   ├── MySQLImportWizard.tsx              # 新建：4 步导入向导 Modal
-│   │   ├── FileUploadWizard.tsx               # 新建：3 步上传向导 Modal
-│   │   ├── DatasetPreviewDrawer.tsx           # 新建：数据预览抽屉
-│   │   └── ImportProgress.tsx                 # 新建：导入进度组件（复用于两个向导）
-│   └── __tests__/
-│       ├── ConnectionsTab.test.tsx            # 新建
-│       └── DatasetsTab.test.tsx               # 新建
+│   │   ├── ConnectionsTab.tsx             # 修改：移除导入按钮，新增列，名称可点击
+│   │   ├── DatasetsTab.tsx                # 修改：新增 Import Dataset 下拉按钮，Available 状态
+│   │   ├── MySQLImportWizard.tsx          # 修改：handleSelectExisting 改为 form.setFieldsValue
+│   │   ├── NewConnectionModal.tsx         # 新建：独立的连接创建 Modal
+│   │   └── ConnectionDetailDrawer.tsx     # 新建：Schema 浏览器 Drawer
 ├── api/
-│   ├── mysql-connections.ts                   # 已存在 — 更新 hooks
-│   ├── imports.ts                             # 已存在 — 更新 hooks
-│   └── datasets.ts                            # 已存在 — 更新 hooks
+│   └── mysql-connections.ts               # 修改：新增 useMySQLConnection hook
 ├── stores/
-│   ├── data-connection-store.ts               # 新建：向导/抽屉 UI 状态
-│   └── __tests__/
-│       └── data-connection-store.test.ts      # 新建
+│   └── data-connection-store.ts           # 修改：新增 detailConnectionRid + newConnection modal 类型
 ├── locales/
-│   ├── en/dataConnection.json                 # 新建
-│   └── zh/dataConnection.json                 # 新建
-└── generated/api.ts                           # 重新生成
+│   ├── en-US.json                         # 修改：新增 i18n 键
+│   └── zh-CN.json                         # 修改：新增 i18n 键
+└── generated/api.ts                       # 重新生成
 ```
