@@ -36,8 +36,10 @@ class TestMySQLConnectionsAPI:
         assert len(connections) == 1
         assert connections[0]["rid"] == connection_rid
 
-    async def test_test_connection_failure_returns_422(self, seeded_client: AsyncClient):
-        """Testing a bad connection returns 422 with standard error format."""
+    async def test_test_connection_failure_returns_200_with_success_false(
+        self, seeded_client: AsyncClient
+    ):
+        """Testing a bad connection returns 200 with success=false."""
         resp = await seeded_client.post(
             "/api/v1/mysql-connections/test",
             json={
@@ -48,9 +50,11 @@ class TestMySQLConnectionsAPI:
                 "password": "pass",
             },
         )
-        assert resp.status_code == 422
-        error = resp.json()["error"]
-        assert error["code"] == "MYSQL_CONNECTION_FAILED"
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is False
+        assert data["error"] is not None
+        assert data["latencyMs"] is not None
 
     async def test_browse_tables_connection_not_found(self, seeded_client: AsyncClient):
         """Browsing tables of nonexistent connection → 404."""
