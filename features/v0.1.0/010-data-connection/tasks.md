@@ -340,4 +340,7 @@ cd apps/web && pnpm test --run                        # 全部测试通过
 
 > 完成后，在此记录实现与 design.md 的偏差，供后续参考。
 
-- （待填写）
+- T011/T014 与 T010 合并实现（ConnectionsTab/DatasetsTab 直接在 T010 中一起完成）
+- T015 Store 简化为单一 `useDataConnectionStore`（activeTab / openModal / selectedConnectionRid / previewDatasetRid）
+- T016 结果：tsc --noEmit 零错误；vitest 25 个失败均为预先存在的 `storage.setItem` 问题（zustand persist + jsdom），非本次引入
+- 前端测试文件（T011-T014 中规划的 `__tests__/` 文件）推迟到 T017 端到端验证阶段补充
