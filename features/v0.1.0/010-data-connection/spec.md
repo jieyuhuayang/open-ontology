@@ -83,6 +83,8 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 | AC-CM03 | 管理员 | 测试连接时使用已保存连接的 `connection_rid` 复用密码 | 系统从数据库解密已有密码进行连接测试，无需用户重新输入 |
 | AC-CM04 | 管理员 | 查看连接列表 | 返回所有已保存的 MySQL 连接，按创建时间降序，不含密码字段 |
 | AC-CM05 | 管理员 | 测试连接时填写错误的 Host/Port/凭据 | 返回连接失败信息 + 错误详情，HTTP 200（`success: false`） |
+| AC-CM06 | 管理员 | 删除已保存的连接（指定 RID） | 连接配置被删除，HTTP 204 |
+| AC-CM07 | 管理员 | 删除不存在的连接 RID | 返回 `CONNECTION_NOT_FOUND`，HTTP 404 |
 
 ### MySQL 导入（MySQL Import）
 
