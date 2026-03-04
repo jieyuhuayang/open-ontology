@@ -167,7 +167,7 @@ export default function CreateObjectTypeWizard() {
               <Button
                 type="primary"
                 onClick={handleNext}
-                disabled={isNextDisabled}
+                disabled={false}
               >
                 {t('wizard.next')}
               </Button>
