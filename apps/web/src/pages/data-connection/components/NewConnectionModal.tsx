@@ -25,8 +25,10 @@ export default function NewConnectionModal() {
   };
 
   const handleTest = async () => {
+    console.log('[handleTest] called, form fields:', form.getFieldsValue());
     try {
       const values = await form.validateFields();
+      console.log('[handleTest] validated:', values);
       const req: MySQLConnectionTestRequest = {
         host: values.host,
         port: values.port ?? 3306,
