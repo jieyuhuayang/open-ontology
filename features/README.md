@@ -22,7 +22,6 @@ features/
 ├── README.md                    # This file
 ├── _templates/                  # Reusable templates
 │   ├── spec.md
-│   ├── design.md
 │   ├── tasks.md
 │   └── release-contract.md
 └── v0.1.0/                      # MVP feature set
