@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Button,
   Flex,
   Input,
   Table,
@@ -9,10 +8,9 @@ import {
   Typography,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { useDatasets, useDatasetPreview } from '@/api/datasets';
 import { useCreateWizardStore } from '@/stores/create-wizard-store';
-import MySQLImportWizard from './MySQLImportWizard';
-import FileUploadWizard from './FileUploadWizard';
 import type { DatasetListItem } from '@/api/types';
 
 const { Text } = Typography;
@@ -25,31 +23,23 @@ const SOURCE_LABEL: Record<string, string> = {
 
 export default function WizardStepDatasource() {
   const { t } = useTranslation();
-  const { selectedDatasetRid, setSelectedDataset, nextStep } = useCreateWizardStore();
+  const { selectedDatasetRid, setSelectedDataset } = useCreateWizardStore();
   const [search, setSearch] = useState('');
   const [hoveredRid, setHoveredRid] = useState<string | undefined>();
-  const [mysqlOpen, setMysqlOpen] = useState(false);
-  const [fileOpen, setFileOpen] = useState(false);
 
   const { data: datasetsData } = useDatasets(search || undefined);
   const datasets = datasetsData?.items ?? [];
+
+  const sortedDatasets = [...datasets].sort((a, b) => {
+    if (a.inUse !== b.inUse) return a.inUse ? 1 : -1;
+    return new Date(b.importedAt).getTime() - new Date(a.importedAt).getTime();
+  });
 
   const previewRid = selectedDatasetRid ?? hoveredRid ?? '';
   const { data: preview } = useDatasetPreview(previewRid, 5);
 
   const handleSelectDataset = (rid: string) => {
     setSelectedDataset(rid);
-  };
-
-  const handleUseDataset = () => {
-    if (selectedDatasetRid) {
-      nextStep();
-    }
-  };
-
-  const handleImportSuccess = (datasetRid: string) => {
-    setSelectedDataset(datasetRid);
-    nextStep();
   };
 
   const columns = [
@@ -118,7 +108,7 @@ export default function WizardStepDatasource() {
       />
 
       <Table
-        dataSource={datasets}
+        dataSource={sortedDatasets}
         columns={columns}
         rowKey="rid"
         size="small"
@@ -156,28 +146,10 @@ export default function WizardStepDatasource() {
         </Flex>
       )}
 
-      <Flex gap={8} justify="flex-end">
-        <Button onClick={() => setFileOpen(true)}>{t('dataset.uploadFile')}</Button>
-        <Button onClick={() => setMysqlOpen(true)}>{t('dataset.importFromMySQL')}</Button>
-        <Button
-          type="primary"
-          disabled={!selectedDatasetRid}
-          onClick={handleUseDataset}
-        >
-          {t('dataset.useThisDataset')}
-        </Button>
-      </Flex>
-
-      <MySQLImportWizard
-        open={mysqlOpen}
-        onClose={() => setMysqlOpen(false)}
-        onSuccess={handleImportSuccess}
-      />
-      <FileUploadWizard
-        open={fileOpen}
-        onClose={() => setFileOpen(false)}
-        onSuccess={handleImportSuccess}
-      />
+      <Text type="secondary">
+        {t('dataset.importHint')}{' '}
+        <Link to="/data-connection">{t('nav.dataConnection')}</Link>
+      </Text>
     </Flex>
   );
 }
