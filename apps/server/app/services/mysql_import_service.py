@@ -1,6 +1,8 @@
 """MySQL import service — connection management and background import."""
 
 import asyncio
+import logging
+import re
 import time
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,16 +20,21 @@ from app.domain.mysql_connection import (
 )
 from app.domain.type_mapping import mysql_type_to_property_type
 from app.exceptions import AppError
-from app.services.crypto_service import CryptoService
+from app.services.crypto_service import get_crypto_service
 from app.services.import_task_service import shared_import_task_service as _import_task_service
 from app.storage.models import MySQLConnectionModel
 from app.storage.mysql_connection_storage import MySQLConnectionStorage
+
+logger = logging.getLogger(__name__)
+
+_TABLE_NAME_RE = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]{0,63}$")
+_MAX_IMPORT_ROWS = 100_000
 
 
 class MySQLImportService:
     def __init__(self, session: AsyncSession):
         self._session = session
-        self._crypto = CryptoService()
+        self._crypto = get_crypto_service()
 
     async def save_connection(self, req: MySQLConnectionCreateRequest) -> MySQLConnection:
         encrypted_pw = self._crypto.encrypt(req.password)
