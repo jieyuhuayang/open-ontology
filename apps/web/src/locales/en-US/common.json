@@ -8,7 +8,8 @@
     "objectTypes": "Object Types",
     "properties": "Properties",
     "linkTypes": "Link Types",
-    "actionTypes": "Action Types"
+    "actionTypes": "Action Types",
+    "dataConnection": "Data Connection"
   },
   "topBar": {
     "searchPlaceholder": "Search by name, RID, aliases...",
