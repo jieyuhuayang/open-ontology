@@ -105,14 +105,14 @@ class FileImportService:
             datetime.now(timezone.utc),
         )
 
-        return {
-            "fileToken": file_token,
-            "filename": filename,
-            "fileSize": len(file_content),
-            "sheets": sheets,
-            "defaultSheet": default_sheet,
-            "preview": preview,
-        }
+        return FileUploadPreviewResponse(
+            file_token=file_token,
+            filename=filename,
+            file_size=len(file_content),
+            sheets=sheets,
+            default_sheet=default_sheet,
+            preview=preview,
+        )
 
     def _parse_csv_preview(self, content: bytes) -> dict:
         text = content.decode("utf-8-sig")
