@@ -63,6 +63,16 @@ class TestMySQLImportService:
         mock_conn_orm.database_name = "test"
         mock_conn_orm.username = "root"
 
+        # Mock the count check cursor
+        mock_cursor = AsyncMock()
+        mock_cursor.fetchone = AsyncMock(return_value=(100,))
+        mock_cursor.__aenter__ = AsyncMock(return_value=mock_cursor)
+        mock_cursor.__aexit__ = AsyncMock(return_value=False)
+
+        mock_mysql_conn = AsyncMock()
+        mock_mysql_conn.cursor = MagicMock(return_value=mock_cursor)
+        mock_mysql_conn.close = MagicMock()
+
         with (
             patch(
                 "app.services.mysql_import_service.MySQLConnectionStorage.get_by_rid",
@@ -70,8 +80,11 @@ class TestMySQLImportService:
                 return_value=mock_conn_orm,
             ),
             patch.object(svc._crypto, "decrypt", return_value="secret"),
+            patch.object(svc, "_validate_table_exists", new_callable=AsyncMock),
+            patch("app.services.mysql_import_service.aiomysql") as mock_aiomysql,
             patch("app.services.mysql_import_service.asyncio") as mock_asyncio,
         ):
+            mock_aiomysql.connect = AsyncMock(return_value=mock_mysql_conn)
             task = await svc.start_import(
                 connection_rid="ri.ontology.mysql-connection.abc",
                 table="orders",
@@ -86,10 +99,13 @@ class TestMySQLImportService:
         mock_session = AsyncMock()
         svc = MySQLImportService(mock_session)
 
-        with patch(
-            "app.services.mysql_import_service.MySQLConnectionStorage.get_by_rid",
-            new_callable=AsyncMock,
-            return_value=None,
+        with (
+            patch.object(svc, "_validate_table_exists", new_callable=AsyncMock),
+            patch(
+                "app.services.mysql_import_service.MySQLConnectionStorage.get_by_rid",
+                new_callable=AsyncMock,
+                return_value=None,
+            ),
         ):
             with pytest.raises(AppError) as exc_info:
                 await svc.start_import(
@@ -98,3 +114,21 @@ class TestMySQLImportService:
                     dataset_name="test",
                 )
             assert exc_info.value.status_code == 404
+
+    async def test_invalid_table_name_raises_422(self):
+        from app.services.mysql_import_service import MySQLImportService
+
+        svc = MySQLImportService(AsyncMock())
+        with pytest.raises(AppError) as exc_info:
+            svc._validate_table_name_format("Robert'; DROP TABLE--")
+        assert exc_info.value.status_code == 422
+        assert exc_info.value.code == "INVALID_TABLE_NAME"
+
+    async def test_valid_table_name_passes(self):
+        from app.services.mysql_import_service import MySQLImportService
+
+        svc = MySQLImportService(AsyncMock())
+        # Should not raise
+        svc._validate_table_name_format("orders")
+        svc._validate_table_name_format("user_profiles")
+        svc._validate_table_name_format("_temp")
