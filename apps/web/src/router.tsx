@@ -26,6 +26,7 @@ export const routeConfig: RouteObject[] = [
           { path: 'link-types', element: <LinkTypeListPage /> },
           { path: 'properties', element: <PlaceholderPage title="Properties" comingSoon /> },
           { path: 'action-types', element: <PlaceholderPage title="Action Types" comingSoon /> },
+          { path: 'data-connection', element: <DataConnectionPage /> },
         ],
       },
       {
