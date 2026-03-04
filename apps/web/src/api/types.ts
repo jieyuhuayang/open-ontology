@@ -40,3 +40,5 @@ export type ImportTask = components['schemas']['ImportTask'];
 export type ImportTaskStatus = components['schemas']['ImportTaskStatus'];
 export type MySQLImportRequest = components['schemas']['MySQLImportRequest'];
 export type FileConfirmRequest = components['schemas']['FileConfirmRequest'];
+export type ConnectionTestResponse = components['schemas']['ConnectionTestResponse'];
+export type FileUploadPreviewResponse = components['schemas']['FileUploadPreviewResponse'];
