@@ -14,6 +14,7 @@ export default function ConnectionsTab() {
   const deleteMutation = useDeleteMySQLConnection();
   const testMutation = useTestMySQLConnection();
   const setOpenModal = useDataConnectionStore((s) => s.setOpenModal);
+  const setDetailConnectionRid = useDataConnectionStore((s) => s.setDetailConnectionRid);
   const [testingRid, setTestingRid] = useState<string | null>(null);
   const [testResults, setTestResults] = useState<Record<string, { success: boolean; error?: string }>>({});
 
@@ -50,12 +51,22 @@ export default function ConnectionsTab() {
     } catch {
       message.error(t('common.delete') + ' failed');
     }
-    // Clear test result for deleted connection
     setTestResults((prev) => {
       const next = { ...prev };
       delete next[rid];
       return next;
     });
+  };
+
+  const getStatusTag = (record: MySQLConnection) => {
+    if (testingRid === record.rid) return <Tag color="processing">{t('dataConnection.testing')}</Tag>;
+    const result = testResults[record.rid];
+    if (!result) return <Tag>{t('dataConnection.untested')}</Tag>;
+    return result.success ? (
+      <Tag color="success">{t('dataConnection.connected')}</Tag>
+    ) : (
+      <Tag color="error">{t('dataConnection.failed')}</Tag>
+    );
   };
 
   const columns: ColumnsType<MySQLConnection> = [
@@ -64,37 +75,28 @@ export default function ConnectionsTab() {
       dataIndex: 'name',
       key: 'name',
       ellipsis: true,
+      render: (name: string, record: MySQLConnection) => (
+        <a onClick={() => setDetailConnectionRid(record.rid)}>{name}</a>
+      ),
     },
     {
-      title: t('mysqlConnection.fields.host'),
-      dataIndex: 'host',
-      key: 'host',
-    },
-    {
-      title: t('mysqlConnection.fields.port'),
-      dataIndex: 'port',
-      key: 'port',
-      width: 80,
-    },
-    {
-      title: t('mysqlConnection.fields.database'),
-      dataIndex: 'databaseName',
-      key: 'databaseName',
+      title: t('dataConnection.type'),
+      key: 'type',
+      width: 100,
+      render: () => <Tag>MySQL</Tag>,
     },
     {
       title: t('dataConnection.status'),
       key: 'status',
       width: 120,
-      render: (_: unknown, record: MySQLConnection) => {
-        const result = testResults[record.rid];
-        if (testingRid === record.rid) return <Tag color="processing">{t('dataConnection.testing')}</Tag>;
-        if (!result) return <Tag>—</Tag>;
-        return result.success ? (
-          <Tag color="success">{t('dataConnection.connected')}</Tag>
-        ) : (
-          <Tag color="error">{t('dataConnection.failed')}</Tag>
-        );
-      },
+      render: (_: unknown, record: MySQLConnection) => getStatusTag(record),
+    },
+    {
+      title: t('dataConnection.datasetCount'),
+      dataIndex: 'datasetCount',
+      key: 'datasetCount',
+      width: 100,
+      render: (val: number) => val ?? 0,
     },
     {
       title: t('dataConnection.lastUsed'),
@@ -133,11 +135,8 @@ export default function ConnectionsTab() {
   return (
     <div>
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpenModal('mysqlImport')}>
-          {t('dataset.importFromMySQL')}
-        </Button>
-        <Button icon={<PlusOutlined />} onClick={() => setOpenModal('fileUpload')}>
-          {t('dataset.uploadFile')}
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpenModal('newConnection')}>
+          {t('dataConnection.newConnection')}
         </Button>
       </div>
       <Table<MySQLConnection>
