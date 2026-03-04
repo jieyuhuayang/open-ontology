@@ -25,10 +25,8 @@ export default function NewConnectionModal() {
   };
 
   const handleTest = async () => {
-    console.log('[handleTest] called, form fields:', form.getFieldsValue());
     try {
       const values = await form.validateFields();
-      console.log('[handleTest] validated:', values);
       const req: MySQLConnectionTestRequest = {
         host: values.host,
         port: values.port ?? 3306,
@@ -37,9 +35,7 @@ export default function NewConnectionModal() {
         password: values.password ?? '',
         sslEnabled: values.sslEnabled ?? false,
       };
-      console.log('[handleTest] sending request:', JSON.stringify(req));
       const result = await testConnection.mutateAsync(req);
-      console.log('[handleTest] result:', JSON.stringify(result));
       if (result.success) {
         message.success(t('mysqlConnection.testSuccess'));
         setTested(true);
