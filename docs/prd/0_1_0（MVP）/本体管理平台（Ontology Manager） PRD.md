@@ -604,7 +604,7 @@ Action Type 的“逻辑”是通过 **Rules（规则）** 来定义的；官方
 
 * 错误：`FieldTypeIncompatibleWithOntologyPropertyType`
 
-如果出现 `FieldTypeIncompatibleWithOntologyPropertyType`，或收到消息 “Failed to Update Object Type in Phonograph”，说明支撑对象的数据集中的数据类型与本体所期望的数据类型不一致。你必须确保任何 schema 更新同时反映在数据集与本体中。如果你确实对本体或数据集做了有意变更，请与该对象及其底层数据源的负责人沟通，以了解近期变更情况。
+如果出现 `FieldTypeIncompatibleWithOntologyPropertyType`，或收到消息 “Failed to Update Object Type in Phonograph”，说明支撑对象的数据集中的数据类型与本体所期望的数据类型不一致。你必须确保任何 schema 更新同时反映在数据集与本体中。如果你确实对本体或数据集做了有意变更，请与该对象及其底层数据集的负责人沟通，以了解近期变更情况。
 
 
 
