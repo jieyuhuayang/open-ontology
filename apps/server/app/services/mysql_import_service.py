@@ -37,6 +37,36 @@ class MySQLImportService:
         self._session = session
         self._crypto = get_crypto_service()
 
+    async def _get_conn_orm_and_password(self, connection_rid: str):
+        """Look up connection ORM and decrypt password; raises AppError on failure."""
+        conn_orm = await MySQLConnectionStorage.get_by_rid(self._session, connection_rid)
+        if not conn_orm:
+            raise AppError(
+                code="MYSQL_CONNECTION_NOT_FOUND",
+                message=f"Connection '{connection_rid}' not found",
+                status_code=404,
+            )
+        password = self._crypto.decrypt(conn_orm.encrypted_password)
+        return conn_orm, password
+
+    @staticmethod
+    async def _open_mysql_conn(host: str, port: int, database: str, username: str, password: str):
+        """Open a MySQL connection, wrapping connection errors into AppError."""
+        try:
+            return await aiomysql.connect(
+                host=host,
+                port=port,
+                db=database,
+                user=username,
+                password=password,
+            )
+        except Exception as e:
+            raise AppError(
+                code="MYSQL_CONNECTION_FAILED",
+                message=f"Failed to connect to MySQL: {e}",
+                status_code=422,
+            )
+
     async def save_connection(self, req: MySQLConnectionCreateRequest) -> MySQLConnection:
         encrypted_pw = self._crypto.encrypt(req.password)
         orm = MySQLConnectionModel(
