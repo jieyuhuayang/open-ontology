@@ -87,7 +87,7 @@ class TestFileImportService:
             file_content=csv_content,
             content_type="text/csv",
         )
-        file_token = result["fileToken"]
+        file_token = result.file_token
 
         with patch("app.services.file_import_service.asyncio") as mock_asyncio:
             task = await svc.confirm_import(
