@@ -55,14 +55,17 @@ class MySQLImportService:
     async def list_connections(self) -> list[MySQLConnection]:
         return await MySQLConnectionStorage.list_by_ontology(self._session, DEFAULT_ONTOLOGY_RID)
 
-    async def test_connection(self, req: MySQLConnectionTestRequest) -> dict:
+    async def test_connection(self, req: MySQLConnectionTestRequest) -> "ConnectionTestResponse":
         """Test MySQL connection without saving."""
+        from app.domain.mysql_connection import ConnectionTestResponse
+
         password = req.password
         if req.connection_rid:
             orm = await MySQLConnectionStorage.get_by_rid(self._session, req.connection_rid)
             if orm:
                 password = self._crypto.decrypt(orm.encrypted_password)
 
+        start = time.monotonic()
         try:
             import aiomysql
 
@@ -77,13 +80,11 @@ class MySQLImportService:
                 timeout=10,
             )
             conn.close()
-            return {"success": True}
+            latency = int((time.monotonic() - start) * 1000)
+            return ConnectionTestResponse(success=True, latency_ms=latency)
         except Exception as e:
-            raise AppError(
-                code="MYSQL_CONNECTION_FAILED",
-                message=str(e),
-                status_code=422,
-            )
+            latency = int((time.monotonic() - start) * 1000)
+            return ConnectionTestResponse(success=False, latency_ms=latency, error=str(e))
 
     @staticmethod
     def _validate_table_name_format(table: str) -> None:
