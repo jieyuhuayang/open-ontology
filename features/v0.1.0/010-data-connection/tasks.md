@@ -73,7 +73,7 @@
 
 ### T004: Response Model 补齐
 
-- [ ] **T004**: 补齐 Pydantic response_model + 请求模型迁移
+- [x] **T004**: 补齐 Pydantic response_model + 请求模型迁移
   - 文件:
     - `apps/server/app/domain/mysql_connection.py` — 新增 `ConnectionTestResponse`
     - `apps/server/app/domain/import_task.py` — 新增 `FileUploadPreviewResponse`、`FilePreviewColumn`、`MySQLImportRequest`、`FileConfirmRequest`
