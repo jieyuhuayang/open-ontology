@@ -24,7 +24,7 @@
 |----|------|------|
 | AD-1 | MySQL 连接使用专用 `mysql_connections` 表，不使用架构文档的通用 `data_sources` 表 | MVP 只支持 MySQL，通用抽象在引入更多连接器时再做（对应 KD-5） |
 | AD-2 | 密码加密使用 Fernet（AES-256 对称加密），密钥通过 `settings.ENCRYPTION_KEY` 注入 | Fernet 同时提供加密和完整性校验，API 简单；密钥从环境变量读取（对应 KD-2） |
-| AD-3 | 导入任务状态使用进程内存 `ImportTaskService` 单例跟踪（TTL 1h），不引入 Redis/Celery | MVP 单 worker 部署，内存方案足够；任务状态短暂且不需持久化（对应 KD-3） |
+| AD-3 | 导入任务状态使用进程内存 `ImportTaskService` 单例跟踪（TTL 1h），不引入 Redis/Celery。**部署约束：MVP 仅支持单 worker（`uvicorn --workers 1`）** | MVP 单 worker 部署，内存方案足够；任务状态短暂且不需持久化；多 worker 需迁移到 DB/Redis（对应 KD-3） |
 | AD-4 | Dataset 行数据以 JSONB 存储在 `dataset_rows` 表（每行一条记录） | Schema-free 灵活性，避免为每个 Dataset 动态建表；MVP 数据量有限（对应 KD-4） |
 | AD-5 | 文件上传采用两步模式：preview（返回 fileToken）→ confirm（触发导入） | 用户需先预览列结构和数据类型再确认导入，两步模式提供更好的交互体验 |
 
