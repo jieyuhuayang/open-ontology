@@ -93,12 +93,13 @@ A well-scoped task:
 
 0. **（版本开始时执行一次）Create release-contract.md** — 在第一个 feature spec 动笔前，写版本级领域归属表（表1）和不变量表（表2）。此后每个 spec 评审时，必须对照 release-contract.md 检查一致性。
 1. **Create spec.md** — derive from PRD and architecture docs; write AC as a structured table with unique IDs. 写 spec 前必须先阅读 release-contract.md；spec 只描述业务能力，UI 细节写在 design.md。
-2. **Review spec.md** — user confirms "可以写 design 了"，检查列表：
+2. **辅助审查 spec.md** — 写完后调用 `/sdd-review <feature_dir> spec`，Claude 对比 PRD 生成 gap 报告。检查列表：
+   - PRD 功能点 / 用户场景是否都有对应 AC？
    - AC 是否可测试、边界是否清晰？
    - 所有 AC 是否与 release-contract.md 的不变量一致？
    - 是否越界进入了其他 feature 的归属领域（表1）？
 
-   → mark spec.md row as ✅ 已评审 in tasks.md 状态表
+   用户看报告后决定是否补充 AC，说"可以写 design 了"后 → mark spec.md row as ✅ 已评审 in tasks.md 状态表（唯一手动暂停点）
 3. **Create design.md** — write architecture decisions (Why) and API/data contracts (What) only; no implementation steps, no test strategy
 4. **自动审查 design.md** — 写完 design.md 后，调用 `/sdd-review <feature_dir> design`；codex 自动检查架构合规性、AC 覆盖、API 契约完整性；有 high/medium 问题修复后重审（最多 2 轮）；通过后自动标为 ✅ 已评审，**无需用户确认**，直接进入步骤 5
 5. **Create tasks.md** — break design into test-implementation pairs; each test task must reference `覆盖 AC: AC-NN`
