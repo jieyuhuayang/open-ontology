@@ -49,7 +49,7 @@
 
 ### T002: SQL 注入修复 — 表名白名单校验
 
-- [ ] **T002**: MySQL 表名白名单校验 + 行数上限
+- [x] **T002**: MySQL 表名白名单校验 + 行数上限
   - 文件:
     - `apps/server/app/services/mysql_import_service.py` — 新增 `_validate_table_name()`（SHOW TABLES 白名单 + 正则辅助校验）；`start_import()` 添加 10 万行 COUNT 检查
     - `apps/server/tests/unit/test_mysql_import_service.py` — 补充：非法表名 → 422、表名不存在 → 422、超过 10 万行 → 422
