@@ -2,10 +2,11 @@
 
 from datetime import datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.mysql_connection import MySQLConnection
+from app.exceptions import AppError
 from app.storage.models import MySQLConnectionModel
 
 
