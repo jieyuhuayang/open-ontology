@@ -93,7 +93,7 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 | AC-MI01 | 管理员 | 选择已保存的连接，浏览数据库表 | 返回表列表（名称 + 行数），HTTP 200 |
 | AC-MI02 | 管理员 | 选择一张表，查看列结构 | 返回列列表（名称、类型、可空、主键、推断的属性类型），HTTP 200 |
 | AC-MI03 | 管理员 | 选择一张表，预览数据 | 返回前 50 行数据 + 总行数，HTTP 200 |
-| AC-MI04 | 管理员 | 指定 Dataset 名称和选择的列，发起导入 | 系统返回 ImportTask（status=pending），HTTP 202；后台异步执行导入 |
+| AC-MI04 | 管理员 | 指定 Dataset 名称和选择的列，发起导入（表行数 ≤10 万） | 系统返回 ImportTask（status=pending），HTTP 202；后台异步执行导入 |
 | AC-MI05 | 管理员 | 导入进行中，轮询任务状态 | 返回当前 ImportTask 状态（pending/running/completed/failed），含 row_count/duration_ms |
 | AC-MI06 | 管理员 | 导入完成后查看结果 | ImportTask status=completed，含 dataset_rid、row_count、column_count、duration_ms |
 | AC-MI07 | 管理员 | 导入同一张表两次 | 允许，每次创建独立的 Dataset 快照，互不影响 |
