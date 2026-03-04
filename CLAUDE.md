@@ -162,7 +162,7 @@ justfile                              # Monorepo 任务运行器
 1. **spec.md** — 定义用户故事、验收标准、边界
    - 验收标准必须用表格格式：`| ID | 角色 | 操作 | 预期结果 |`，AC-ID 在特性内唯一
    - 写 spec 前必须先阅读版本的 `release-contract.md`
-2. **评审 spec** — 用户明确说"可以写 design 了"后，将 tasks.md 状态表中 spec.md 行更新为 ✅ 已评审
+2. **辅助审查 spec** — 写完 spec.md 后，调用 `/sdd-review <feature_dir> spec`；Claude 对比 PRD 生成 gap 报告并向用户展示；用户决定是否补充 AC 后说"可以写 design 了"确认，将 tasks.md 状态表中 spec.md 行更新为 ✅ 已评审（唯一手动暂停点）
 3. **design.md** — 只写架构决策（Why）和 API/数据契约（What），不写实现步骤（How）
    - 禁止在 design.md 中写测试策略（由本文件 §测试要求统一管理）
 4. **自动审查 design** — 写完 design.md 后，调用 `/sdd-review <feature_dir> design`；有 high/medium 问题则修复后重审（最多 2 轮）；通过后将 design.md 行标为 ✅ 已评审并**自动继续写 tasks.md**，无需等待用户
