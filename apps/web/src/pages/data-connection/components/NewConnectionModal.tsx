@@ -76,7 +76,6 @@ export default function NewConnectionModal() {
       onCancel={handleClose}
       footer={null}
       width={520}
-      destroyOnClose
       forceRender
     >
       <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
