@@ -5,6 +5,8 @@ import ConnectionsTab from './components/ConnectionsTab';
 import DatasetsTab from './components/DatasetsTab';
 import MySQLImportWizard from './components/MySQLImportWizard';
 import FileUploadWizard from './components/FileUploadWizard';
+import NewConnectionModal from './components/NewConnectionModal';
+import ConnectionDetailDrawer from './components/ConnectionDetailDrawer';
 
 const { Title } = Typography;
 
@@ -33,6 +35,8 @@ export default function DataConnectionPage() {
       <Tabs activeKey={activeTab} items={items} onChange={(key) => setActiveTab(key as 'connections' | 'datasets')} />
       <MySQLImportWizard />
       <FileUploadWizard />
+      <NewConnectionModal />
+      <ConnectionDetailDrawer />
     </div>
   );
 }
