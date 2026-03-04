@@ -1111,6 +1111,81 @@
         }
       }
     },
+    "/api/v1/mysql-connections/{rid}": {
+      "get": {
+        "tags": [
+          "mysql-connections"
+        ],
+        "summary": "Get Connection",
+        "operationId": "get_connection_api_v1_mysql_connections__rid__get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MySQLConnection"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "mysql-connections"
+        ],
+        "summary": "Delete Connection",
+        "operationId": "delete_connection_api_v1_mysql_connections__rid__delete",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/mysql-connections/test": {
       "post": {
         "tags": [
@@ -1138,41 +1213,6 @@
                 }
               }
             }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/mysql-connections/{rid}": {
-      "delete": {
-        "tags": [
-          "mysql-connections"
-        ],
-        "summary": "Delete Connection",
-        "operationId": "delete_connection_api_v1_mysql_connections__rid__delete",
-        "parameters": [
-          {
-            "name": "rid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Rid"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -2527,6 +2567,11 @@
               }
             ],
             "title": "Lastusedat"
+          },
+          "datasetCount": {
+            "type": "integer",
+            "title": "Datasetcount",
+            "default": 0
           }
         },
         "type": "object",

@@ -340,7 +340,18 @@
     "status": "Status",
     "connected": "Connected",
     "failed": "Failed",
-    "testing": "Testing..."
+    "testing": "Testing...",
+    "untested": "Untested",
+    "type": "Type",
+    "datasetCount": "Datasets",
+    "schemaDrawerTitle": "Schema Browser",
+    "searchTables": "Search tables...",
+    "tableStructure": "Structure",
+    "tablePreview": "Preview",
+    "noTables": "No tables found",
+    "newConnectionTitle": "New Connection",
+    "saveConnection": "Save",
+    "saveSuccess": "Connection saved"
   },
   "dataset": {
     "listTitle": "Datasets",
