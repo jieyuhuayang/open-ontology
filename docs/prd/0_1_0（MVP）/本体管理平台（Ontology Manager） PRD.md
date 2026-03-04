@@ -368,7 +368,7 @@ Action Type 的“逻辑”是通过 **Rules（规则）** 来定义的；官方
 
 6. **Icon（图标）**：在对象类型视图侧边栏选择默认图标，可自定义对象类型图标与颜色；当用户在用户应用中查看该类型对象时，会显示此图标与颜色。
 
-7. **Backing datasource（底层数据源）**：作为该类型对象属性值来源的数据源。
+7. **Backing dataset（底层数据集）**：作为该类型对象属性值来源的数据集。
 
 ![](<images/本体管理平台（Ontology Manager） PRD-OoEEbMOX3oEF6UxmI2ycmIecnBg.png>)
 
