@@ -251,10 +251,11 @@ class FileConfirmRequest(DomainModel):
 
 ### Critical 修复
 
-**C1: SQL 注入 — 表名校验（AD-7）**
-- 位置：`MySQLImportService.preview_table()`, `_run_import()`, `get_table_columns()`
-- 方案：在所有接受 `table` 参数的方法入口添加正则校验 `^[a-zA-Z_][a-zA-Z0-9_]{0,63}$`，不匹配时抛出 422
-- 额外方案：`browse_tables` 已通过 `SHOW TABLE STATUS` 获取真实表名列表，可用作二次白名单验证
+**C1: SQL 注入 — 表名白名单校验（AD-7）**
+- 位置：`MySQLImportService.preview_table()`, `_run_import()`, `get_table_columns()`, `start_import()`
+- **必选方案**：新增 `_validate_table_name(connection_rid, table)` 方法 — 先 `SHOW TABLES` 获取连接内真实表名列表，验证 `table` 参数存在于列表中；不存在则抛出 422 `INVALID_TABLE_NAME`
+- **辅助方案**：入口处先做正则格式校验 `^[a-zA-Z_][a-zA-Z0-9_]{0,63}$`，快速拦截明显非法输入
+- **约束**：任何含 `table` 参数的 service 方法入口必须先调用 `_validate_table_name()`
 
 **C2: CryptoService 密钥不稳定（AD-6）**
 - 位置：`CryptoService.__init__()`
