@@ -1,45 +1,21 @@
 """Import endpoints — MySQL import, file upload preview/confirm, task polling."""
 
 from fastapi import APIRouter, Depends, UploadFile
-from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db_session
-from app.domain.import_task import ImportTask
+from app.domain.import_task import (
+    FileConfirmRequest,
+    FileUploadPreviewResponse,
+    ImportTask,
+    MySQLImportRequest,
+)
 from app.exceptions import AppError
 from app.services.file_import_service import FileImportService
 from app.services.import_task_service import shared_import_task_service as _import_task_service
 from app.services.mysql_import_service import MySQLImportService
 
 router = APIRouter(prefix="/api/v1", tags=["imports"])
-
-
-# --- Request models ---
-
-
-def _to_camel(s: str) -> str:
-    parts = s.split("_")
-    return parts[0] + "".join(p.capitalize() for p in parts[1:])
-
-
-class MySQLImportRequest(BaseModel):
-    connection_rid: str
-    table: str
-    dataset_name: str
-    selected_columns: list[str] | None = None
-
-    model_config = {"populate_by_name": True, "alias_generator": _to_camel}
-
-
-class FileConfirmRequest(BaseModel):
-    file_token: str
-    dataset_name: str
-    sheet_name: str | None = None
-    has_header: bool = True
-    selected_columns: list[str] | None = None
-    column_type_overrides: dict[str, str] | None = None
-
-    model_config = {"populate_by_name": True, "alias_generator": _to_camel}
 
 
 # --- Dependencies ---
@@ -73,7 +49,7 @@ async def start_mysql_import(
     )
 
 
-@router.post("/datasets/upload/preview")
+@router.post("/datasets/upload/preview", response_model=FileUploadPreviewResponse)
 async def upload_preview(
     file: UploadFile,
     service: FileImportService = Depends(_get_file_service),
