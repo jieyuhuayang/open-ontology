@@ -247,6 +247,19 @@ class FileConfirmRequest(DomainModel):
 
 ---
 
+## 跨 Feature 契约：INV-3 Dataset 1:1 绑定
+
+| 职责 | Owner Feature | 实现方式 |
+|------|--------------|---------|
+| 只读 in_use 计算 | 010-data-connection | `DatasetService.get_in_use_map()` 合并已发布 OT + WS 草稿中的 `backingDatasource` 引用 |
+| 占用者名称返回 | 010-data-connection | `DatasetListItem.linked_object_type_name` 字段（已实现） |
+| 保存时唯一性校验 | 003-object-type-crud | OT Service 在绑定 Dataset 时校验该 Dataset 未被其他 OT 绑定，冲突返回 `DATASET_ALREADY_BOUND`（HTTP 409） |
+| DB 级兜底约束 | 003-object-type-crud | 建议对 `object_types.backing_datasource->>'datasetRid'` 建唯一部分索引（WHERE backing_datasource IS NOT NULL），防并发写入 |
+
+> 010 只负责"展示谁在用"，不负责"阻止重复绑定"。写入唯一性由 003 在保存 ObjectType 时保障。
+
+---
+
 ## 后端修复方案
 
 ### Critical 修复
