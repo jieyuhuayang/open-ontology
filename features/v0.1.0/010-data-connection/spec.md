@@ -16,6 +16,10 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 
 **核心模型**：数据拷贝（Dataset Import）—— 外部数据源 → 一次性快照导入 → 平台内部 Dataset → 对象类型绑定。Data Connection **生产** Dataset；Ontology Manager **消费** Dataset。
 
+**页面职责分离**（PRD §3.2/§3.3）：
+- **Connections Tab**：仅管理连接配置（列表、新建、测试、删除、Schema 浏览），不触发导入操作
+- **Datasets Tab**：管理已导入 Dataset + 提供导入入口（Import from MySQL / Upload File）
+
 ---
 
 ## 关键设计决策
@@ -35,7 +39,7 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 ### US-1: 连接管理（Connection Management）
 
 作为 **本体管理员**，
-我希望 **注册和管理 MySQL 数据库连接配置**，
+我希望 **注册、测试、浏览和管理 MySQL 数据库连接配置**，
 以便 **后续从这些数据源导入数据到平台**。
 
 ### US-2: MySQL 数据导入（MySQL Import）
@@ -81,10 +85,17 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 | AC-CM01 | 管理员 | 填写 MySQL 连接信息（名称、Host、Port、Database、Username、Password）并保存 | 连接保存成功，密码加密存储，返回连接信息（不含密码），HTTP 201 |
 | AC-CM02 | 管理员 | 填写连接信息后点击"测试连接" | 系统尝试建立 MySQL 连接（10s 超时），返回成功/失败状态 + 耗时，HTTP 200 |
 | AC-CM03 | 管理员 | 测试连接时使用已保存连接的 `connection_rid` 复用密码 | 系统从数据库解密已有密码进行连接测试，无需用户重新输入 |
-| AC-CM04 | 管理员 | 查看连接列表 | 返回所有已保存的 MySQL 连接，按创建时间降序，不含密码字段 |
+| AC-CM04 | 管理员 | 查看连接列表 | 返回所有已保存的 MySQL 连接，按创建时间降序，不含密码字段；每个连接包含关联 Dataset 数量（`datasetCount`） |
 | AC-CM05 | 管理员 | 测试连接时填写错误的 Host/Port/凭据 | 返回连接失败信息 + 错误详情，HTTP 200（`success: false`） |
 | AC-CM06 | 管理员 | 删除已保存的连接（指定 RID） | 连接配置被删除，HTTP 204 |
 | AC-CM07 | 管理员 | 删除不存在的连接 RID | 返回 `CONNECTION_NOT_FOUND`，HTTP 404 |
+| AC-CM08 | 管理员 | 在 Connections Tab 点击"New Connection"按钮 | 打开连接配置表单（仅创建连接，不触发导入流程），填写信息后保存，连接出现在列表中 |
+| AC-CM09 | 管理员 | 查看连接列表中的"关联 Dataset 数"列 | 每个连接显示通过该连接导入的 Dataset 数量（source_metadata 中 connectionRid 匹配的 ready 状态 Dataset 计数） |
+| AC-CM10 | 管理员 | 点击连接列表中的连接名称 | 打开 Schema 浏览器，展示该数据库下的所有表列表，支持按名称搜索过滤 |
+| AC-CM11 | 管理员 | 在 Schema 浏览器中选中一张表 | 展示该表的列结构（列名、数据类型、主键标识、是否可为 NULL） |
+| AC-CM12 | 管理员 | 在 Schema 浏览器中选中一张表 | 展示该表前 50 行数据预览，只读表格形式 |
+| AC-CM13 | 管理员 | 查看连接列表的状态列 | 未测试的连接显示 `untested`；测试成功后显示 `connected`；测试失败后显示 `failed` |
+| AC-CM14 | 管理员 | 获取单个连接详情（指定 RID） | 返回该连接的完整信息（不含密码）+ 关联 Dataset 数量，HTTP 200 |
 
 ### MySQL 导入（MySQL Import）
 
@@ -99,6 +110,7 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 | AC-MI07 | 管理员 | 导入同一张表两次 | 允许，每次创建独立的 Dataset 快照，互不影响 |
 | AC-MI08 | 管理员 | 查询不存在的 task_id | 返回 HTTP 404 |
 | AC-MI09 | 管理员 | 导入行数超过 10 万的表 | 返回 `ROW_LIMIT_EXCEEDED`，HTTP 422，提示"MVP 版本单次导入上限 10 万行" |
+| AC-MI10 | 管理员 | 在 MySQL 向导 Step 1 选择已有连接 | 表单自动填充该连接的配置信息（密码字段除外），用户可修改后再点"下一步" |
 
 ### 文件上传（File Upload）
 
@@ -115,13 +127,14 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 
 | ID | 角色 | 操作 | 预期结果 |
 |----|------|------|---------|
-| AC-DM01 | 管理员 | 查看 Dataset 列表 | 返回所有 status=ready 的 Dataset，含名称、来源类型、行数、列数、导入时间、in_use 状态；已被引用的显示关联的 ObjectType 名称 |
+| AC-DM01 | 管理员 | 查看 Dataset 列表 | 返回所有 status=ready 的 Dataset，含名称、来源类型、行数、列数、导入时间、in_use 状态；已被引用的显示 `In use` + 关联的 ObjectType 名称；未被引用的显示 `Available` |
 | AC-DM02 | 管理员 | 搜索 Dataset（关键词） | 按名称模糊匹配过滤结果 |
 | AC-DM03 | 管理员 | 查看单个 Dataset 详情 | 返回 Dataset 完整信息 + 列定义列表 |
 | AC-DM04 | 管理员 | 预览 Dataset 数据 | 返回指定行数（默认 50，最多 500）的行数据 |
 | AC-DM05 | 管理员 | 删除未被引用的 Dataset | Dataset 及其行数据、列定义被删除，HTTP 204 |
 | AC-DM06 | 管理员 | 删除已被对象类型引用（in_use）的 Dataset | 返回 `DATASET_IN_USE` 错误，HTTP 403，不允许删除 |
 | AC-DM07 | 管理员 | 查询不存在的 Dataset RID | 返回 HTTP 404 |
+| AC-DM08 | 管理员 | 在 Datasets Tab 点击"Import Dataset"按钮 | 弹出选择器（Import from MySQL / Upload Excel/CSV），选择后打开对应向导 |
 
 ### 导航与集成（Navigation & Integration）
 
@@ -138,6 +151,7 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 - 当导入过程中 MySQL 连接断开时，ImportTask 应标记为 `failed` 并记录错误信息，不产生残留数据
 - 当并发导入同一张表时，系统应正常创建两个独立 Dataset（无冲突）
 - 当临时上传文件的 fileToken 过期或无效时，确认导入应返回 404
+- 当连接被删除后，通过该连接导入的 Dataset 仍保留（连接与 Dataset 无级联删除关系）
 - **不支持**：PostgreSQL 连接器（延后到 v0.2.0）
 - **不支持**：通用 Connector 抽象层 / ConnectorRegistry（延后到 v0.2.0）
 - **不支持**：Schema Drift 检测（延后到 v0.3.0）
