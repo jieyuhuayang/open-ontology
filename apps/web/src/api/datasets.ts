@@ -21,6 +21,7 @@ export function useDatasets(search?: string) {
       });
       return data;
     },
+    staleTime: 0,
   });
 }
 
