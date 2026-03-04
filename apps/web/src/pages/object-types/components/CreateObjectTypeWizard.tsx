@@ -44,8 +44,6 @@ export default function CreateObjectTypeWizard() {
   const createMutation = useCreateObjectType();
   const [isCreating, setIsCreating] = useState(false);
 
-  const isNextDisabled = currentStep === 0 && !selectedDatasetRid;
-
   const buildCreateRequest = () => ({
     displayName,
     description: description || null,
