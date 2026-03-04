@@ -62,7 +62,7 @@ export default function FileUploadWizard() {
       const task = await fileImportConfirm.mutateAsync({
         fileToken: previewData.fileToken,
         datasetName: datasetName || 'Untitled',
-        sheet: selectedSheet,
+        sheetName: selectedSheet,
         hasHeader,
         selectedColumns: selectedColumns.length > 0 ? selectedColumns : undefined,
       });
