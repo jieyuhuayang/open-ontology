@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.domain.common import generate_rid
 from app.domain.constants import DEFAULT_ONTOLOGY_RID, DEFAULT_USER_ID
-from app.domain.import_task import ImportTask, ImportTaskStatus
+from app.domain.import_task import FileUploadPreviewResponse, ImportTask, ImportTaskStatus
 from app.domain.type_mapping import infer_column_type
 from app.exceptions import AppError
 from app.services.import_task_service import shared_import_task_service as _import_task_service
