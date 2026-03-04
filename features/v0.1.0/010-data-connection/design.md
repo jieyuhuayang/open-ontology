@@ -209,7 +209,7 @@ class FileConfirmRequest(DomainModel):
 | 422 | `FILE_TOO_LARGE` | 上传文件超过 50MB | AC-FU03 |
 | 422 | `UNSUPPORTED_FILE_FORMAT` | 文件格式不支持 | AC-FU04 |
 | 422 | `INVALID_TABLE_NAME` | MySQL 表名不合法（AD-7 校验） | — |
-| 422 | `ROW_LIMIT_EXCEEDED` | 表行数超过 10 万行上限 | — |
+| 422 | `ROW_LIMIT_EXCEEDED` | 表行数超过 10 万行上限 | AC-MI09 |
 
 ---
 
