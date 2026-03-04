@@ -43,7 +43,7 @@ export default function ConnectionsTab() {
     }
   };
 
-  const handleDelete = async (rid: string, _name: string) => {
+  const handleDelete = async (rid: string) => {
     try {
       await deleteMutation.mutateAsync(rid);
       message.success(t('dataConnection.deleteConnectionSuccess'));
