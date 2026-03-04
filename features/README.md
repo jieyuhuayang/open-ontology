@@ -4,13 +4,12 @@ This directory houses all feature specifications for Open Ontology, organized us
 
 ## What is SDD?
 
-SDD is a methodology where each feature is defined through up to three layered artifacts before any code is written:
+SDD is a methodology where each feature is defined through two layered artifacts before any code is written:
 
 | Artifact | File | Purpose |
 |----------|------|---------|
-| 需求规范 | `spec.md` | What to build — user stories, **structured AC table** (ID \| 角色 \| 操作 \| 预期结果), boundaries |
-| 技术方案 | `design.md` | **Why and What only** — architecture decisions, DB/Pydantic schemas, API contracts, component trees. No implementation steps, no test strategy. |
-| 原子任务 | `tasks.md` | Execution checklist — test-implementation pairs, **AC traceability**, status tracking |
+| 完整规格 | `spec.md` | 合并需求规范与技术设计 — user stories, **structured AC table**, architecture decisions, DB/Pydantic schemas, API contracts, component trees. No implementation steps, no test strategy. |
+| 原子任务 | `tasks.md` | Self-contained execution checklist — each task inlines file, logic, test context. **AC traceability**, status tracking |
 
 This structure is especially suited for AI-assisted development, where each conversation session can focus on a single, well-scoped task rather than an entire feature.
 
