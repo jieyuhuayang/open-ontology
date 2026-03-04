@@ -168,7 +168,7 @@
 
 ### T011: Connections Tab
 
-- [ ] **T011**: Connections Tab 实现（列表 + 测试连接 + 删除）
+- [x] **T011**: Connections Tab 实现（列表 + 测试连接 + 删除）
   - 测试文件: `apps/web/src/pages/data-connection/__tests__/ConnectionsTab.test.tsx`
   - 实现文件: `apps/web/src/pages/data-connection/components/ConnectionsTab.tsx`
   - 测试内容:
