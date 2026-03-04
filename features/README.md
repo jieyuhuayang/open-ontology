@@ -136,8 +136,7 @@ A well-scoped task:
 - `docs/specs/` — domain model specifications (terminology, property types, etc.)
 - `features/` — bridges the above into executable development units
 
-When writing `spec.md`, always link back to the relevant PRD section.
-When writing `design.md`, always reference the relevant architecture document.
+When writing `spec.md`, always link back to the relevant PRD section and reference the relevant architecture document.
 
 ---
 
