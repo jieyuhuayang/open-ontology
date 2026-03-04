@@ -195,7 +195,7 @@ class FileConfirmRequest(DomainModel):
 
 | Method | Path | 描述 | 关联 AC |
 |--------|------|------|---------|
-| DELETE | `/api/v1/mysql-connections/{rid}` | 删除连接 | （PRD 要求） |
+| DELETE | `/api/v1/mysql-connections/{rid}` | 删除连接 | AC-CM06, AC-CM07 |
 
 ### 错误码
 
