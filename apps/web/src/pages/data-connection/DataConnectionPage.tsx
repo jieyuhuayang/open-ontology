@@ -31,6 +31,8 @@ export default function DataConnectionPage() {
         {t('dataConnection.pageTitle')}
       </Title>
       <Tabs activeKey={activeTab} items={items} onChange={(key) => setActiveTab(key as 'connections' | 'datasets')} />
+      <MySQLImportWizard />
+      <FileUploadWizard />
     </div>
   );
 }
