@@ -50,6 +50,8 @@ class FileImportService:
         file_content: bytes,
         content_type: str,
     ) -> dict:
+        _cleanup_expired_previews()
+
         # Validate file size
         max_bytes = settings.UPLOAD_MAX_SIZE_MB * 1024 * 1024
         if len(file_content) > max_bytes:
