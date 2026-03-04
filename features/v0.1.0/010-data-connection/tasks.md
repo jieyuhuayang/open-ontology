@@ -183,7 +183,7 @@
 
 ### T012: MySQL 导入向导（4 步 Modal）
 
-- [ ] **T012**: MySQLImportWizard 实现（4 步向导）
+- [x] **T012**: MySQLImportWizard 实现（4 步向导）
   - 测试文件: `apps/web/src/pages/data-connection/__tests__/MySQLImportWizard.test.tsx`
   - 实现文件: `apps/web/src/pages/data-connection/components/MySQLImportWizard.tsx`
   - 测试内容:
