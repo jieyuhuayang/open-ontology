@@ -65,6 +65,17 @@ export default function HomeSidebar() {
         },
       ],
     },
+    {
+      type: 'group',
+      label: t('dataConnection.pageTitle'),
+      children: [
+        {
+          key: '/data-connection',
+          icon: <DatabaseOutlined />,
+          label: t('nav.dataConnection'),
+        },
+      ],
+    },
   ];
 
   const onClick: MenuProps['onClick'] = ({ key }) => {
