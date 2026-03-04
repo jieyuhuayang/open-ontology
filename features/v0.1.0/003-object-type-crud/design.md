@@ -789,6 +789,41 @@ interface CreateWizardState {
 | `CreateMenu.tsx` | 更新引用 |
 | `HomeLayout.tsx` | 更新引用 |
 
+### WizardStepDatasource 改动（问题 1.1–1.5）
+
+- `useDatasets` 添加 `staleTime: 0` 防止缓存显示已删除数据集
+- 移除 `MySQLImportWizard`、`FileUploadWizard` 导入及相关 state/handler
+- 移除底部「上传 Excel/CSV」「从 MySQL 导入」「使用此数据集」三个按钮
+- 数据集列表按可用在前（按导入时间降序）、已使用沉底排序
+- 底部替换为引导文字：「需要导入新数据？请前往 数据连接」
+- `CreateObjectTypeWizard` 移除 `isNextDisabled`（允许不选数据源直接下一步）
+
+### ObjectTypeOverviewPage 属性/动作类型区域（问题 2）
+
+- 替换第一个 `PlaceholderCard` 为属性列表 Card：
+  - 使用 `useProperties(rid)` 加载属性
+  - Card 标题：`属性 (N)` + 右上角「添加」按钮
+  - 列表每行：`<PropertyTypeIcon baseType={p.baseType} /> {p.displayName}` + PK/Title Tag
+  - 空状态：`<Empty description="暂未定义属性" />`
+- 替换第二个 `PlaceholderCard` 为动作类型 Card：
+  - 从 `data.intendedActions` 读取
+  - Card 标题：`动作类型 (N)`
+  - 有值时显示 Tag 列表（Create/Modify/Delete）
+  - 空时显示 Empty
+
+### PropertyTypeIcon 新组件
+
+- 文件：`apps/web/src/components/PropertyTypeIcon.tsx`
+- 为每种 `baseType` 映射 Ant Design 图标（string→FontSizeOutlined, number→NumberOutlined, boolean→CheckOutlined, date/timestamp→CalendarOutlined 等）
+- 组件接口：`<PropertyTypeIcon baseType="string" />`，带 Tooltip 显示类型名称
+
+### DiscoverPage 延迟通知 + 卡片导航（问题 3）
+
+- 移除 `useEffect` 中的 `message.info()` 和 `removeItem()` — 不再自动通知和清理
+- 保留 `useQueries` 用于检测已删除项
+- Card 添加 `onClick`：若 query 报错则提示已删除并移除；否则导航到详情页
+- 已删除项卡片加淡灰处理（opacity: 0.6）
+
 ### i18n 新增 keys
 
 wizard.*、dataset.*、step.* 命名空间
