@@ -249,7 +249,7 @@
 
 ### T016: 前端测试全量验证
 
-- [ ] **T016**: TypeScript 编译 + 前端全量测试
+- [x] **T016**: TypeScript 编译 + 前端全量测试
   - 内容:
     - `npx tsc --noEmit` 无类型错误
     - 更新受影响的现有测试（mock 数据、import 路径等）
