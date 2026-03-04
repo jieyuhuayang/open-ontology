@@ -84,8 +84,9 @@ export default function MySQLImportWizard() {
       });
       setConnectionRid(conn.rid);
       setStep(1);
-    } catch {
-      // form validation or API error
+    } catch (err) {
+      if (err && typeof err === 'object' && 'errorFields' in err) return;
+      message.error(String(err));
     }
   };
 
