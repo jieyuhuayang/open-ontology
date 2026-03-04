@@ -556,7 +556,7 @@ Action Type 的“逻辑”是通过 **Rules（规则）** 来定义的；官方
 
 ![](<images/本体管理平台（Ontology Manager） PRD-ZQnabIZpMoFxfAxKetpcjlNenCf.png>)
 
-> 更改对象类型的底层数据源会移除旧数据源列与对象类型属性之间的所有连接。只有在你切换到一个与旧数据源**schema 相同**的新数据源时，系统才会为你自动重新映射属性；否则，你需要手动将对象类型属性重新映射到新数据源。
+> 更改对象类型的底层数据集会移除旧数据集列与对象类型属性之间的所有连接。只有在你切换到一个与旧数据集 **schema 相同**的新数据集时，系统才会为你自动重新映射属性；否则，你需要手动将对象类型属性重新映射到新数据集。
 
 ![](<images/本体管理平台（Ontology Manager） PRD-GvA0bEeePo991NxFLV6cUEKgnpg.png>)
 
