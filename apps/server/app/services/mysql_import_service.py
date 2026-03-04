@@ -138,21 +138,13 @@ class MySQLImportService:
             )
 
     async def browse_tables(self, connection_rid: str) -> list[MySQLTableInfo]:
-        conn_orm = await MySQLConnectionStorage.get_by_rid(self._session, connection_rid)
-        if not conn_orm:
-            raise AppError(
-                code="MYSQL_CONNECTION_NOT_FOUND",
-                message=f"Connection '{connection_rid}' not found",
-                status_code=404,
-            )
-        password = self._crypto.decrypt(conn_orm.encrypted_password)
-
-        conn = await aiomysql.connect(
-            host=conn_orm.host,
-            port=conn_orm.port,
-            db=conn_orm.database_name,
-            user=conn_orm.username,
-            password=password,
+        conn_orm, password = await self._get_conn_orm_and_password(connection_rid)
+        conn = await self._open_mysql_conn(
+            conn_orm.host,
+            conn_orm.port,
+            conn_orm.database_name,
+            conn_orm.username,
+            password,
         )
         try:
             async with conn.cursor() as cur:
