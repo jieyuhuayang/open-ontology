@@ -85,6 +85,28 @@ class MySQLImportService:
                 status_code=422,
             )
 
+    @staticmethod
+    def _validate_table_name_format(table: str) -> None:
+        """Quick regex check to reject obviously invalid table names."""
+        if not _TABLE_NAME_RE.match(table):
+            raise AppError(
+                code="INVALID_TABLE_NAME",
+                message=f"Invalid table name: '{table}'",
+                status_code=422,
+            )
+
+    async def _validate_table_exists(self, connection_rid: str, table: str) -> None:
+        """Whitelist validation: confirm table exists via SHOW TABLES."""
+        self._validate_table_name_format(table)
+        real_tables = await self.browse_tables(connection_rid)
+        real_names = {t.name for t in real_tables}
+        if table not in real_names:
+            raise AppError(
+                code="INVALID_TABLE_NAME",
+                message=f"Table '{table}' does not exist in this database",
+                status_code=422,
+            )
+
     async def browse_tables(self, connection_rid: str) -> list[MySQLTableInfo]:
         conn_orm = await MySQLConnectionStorage.get_by_rid(self._session, connection_rid)
         if not conn_orm:
