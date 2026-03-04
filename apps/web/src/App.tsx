@@ -21,7 +21,9 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ConfigProvider theme={theme} locale={antdLocale}>
-        <RouterProvider router={router} />
+        <AntdApp>
+          <RouterProvider router={router} />
+        </AntdApp>
       </ConfigProvider>
     </QueryClientProvider>
   );
