@@ -130,7 +130,7 @@
 
 ### T008: OpenAPI 类型重新生成 + API Hooks
 
-- [ ] **T008**: 类型重新生成 + API Hooks 更新
+- [x] **T008**: 类型重新生成 + API Hooks 更新
   - 文件:
     - `apps/web/src/generated/api.ts` — `npx openapi-typescript` 重新生成
     - `apps/web/src/api/types.ts` — 追加 Dataset / MySQLConnection / ImportTask 类型别名
