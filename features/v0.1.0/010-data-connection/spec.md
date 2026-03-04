@@ -161,7 +161,7 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 
 | 不变量 | 本特性职责 |
 |--------|-----------|
-| INV-3 | 同一 Dataset 只能关联一个 ObjectType（1:1 绑定）— Dataset 侧通过 in_use 状态标记实现 |
+| INV-3 | 同一 Dataset 只能关联一个 ObjectType（1:1 绑定）— **010 职责**：只读 in_use 计算 + 占用者名称返回；**003 职责**：保存 ObjectType 时由 OT Service 做唯一性校验（DB 级约束），冲突时返回 `DATASET_ALREADY_BOUND` 错误 |
 | INV-6 | 密码使用 AES-256 加密存储，API 响应和日志中不得出现明文 — 由 CryptoService 实现 |
 
 ### 跨 Feature 依赖
