@@ -148,7 +148,8 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 
 ## 非功能要求
 
-- **性能**: 连接测试超时 10s；Schema 提取超时 60s；数据预览超时 30s；文件上传最大 50MB
+- **性能**: 连接测试超时 10s；Schema 提取超时 60s；数据预览超时 30s；文件上传最大 50MB；单次 MySQL 导入上限 10 万行
+- **部署约束**: MVP 版本 ImportTaskService 使用进程内存存储，**仅支持单 worker 部署**（`uvicorn --workers 1`）
 - **安全**: 密码 AES-256 加密存储（INV-6）；API 响应和日志中不得出现明文密码；加密密钥通过环境变量注入
 - **可用性**: 导入任务提供状态轮询（pending → running → completed/failed）；失败时返回可读错误信息
 
