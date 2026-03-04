@@ -49,7 +49,7 @@ class FileImportService:
         filename: str,
         file_content: bytes,
         content_type: str,
-    ) -> dict:
+    ) -> FileUploadPreviewResponse:
         _cleanup_expired_previews()
 
         # Validate file size
