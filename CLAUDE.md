@@ -165,14 +165,14 @@ justfile                              # Monorepo 任务运行器
 2. **评审 spec** — 用户明确说"可以写 design 了"后，将 tasks.md 状态表中 spec.md 行更新为 ✅ 已评审
 3. **design.md** — 只写架构决策（Why）和 API/数据契约（What），不写实现步骤（How）
    - 禁止在 design.md 中写测试策略（由本文件 §测试要求统一管理）
-4. **评审 design** — 用户明确说"可以写 tasks 了"后，更新 tasks.md 状态表中 design.md 行为 ✅ 已评审
+4. **自动审查 design** — 写完 design.md 后，调用 `/sdd-review <feature_dir> design`；有 high/medium 问题则修复后重审（最多 2 轮）；通过后将 design.md 行标为 ✅ 已评审并**自动继续写 tasks.md**，无需等待用户
 5. **tasks.md** — 将 design 拆解为测试-实现配对的原子任务（每个任务一次 AI 会话可完成）
    - 每个测试任务必须标注 `覆盖 AC: AC-NN, AC-NN`，追溯到 spec.md 的表格行
    - 缺少 AC 标注的测试任务视为规格不完整，禁止开始对应的实现任务
-6. **评审 tasks** — 用户明确说"可以开始实现了"后，更新 tasks.md 状态表中 tasks.md 行为 ✅ 已拆解
+6. **自动审查 tasks** — 写完 tasks.md 后，调用 `/sdd-review <feature_dir> tasks`；有 high/medium 问题则修复后重审；通过后将 tasks.md 行标为 ✅ 已拆解并**立即开始实现**，无需等待用户
 7. **执行** — 逐任务实施，完成后在 tasks.md 打勾
 
-**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。`design.md` 和 `tasks.md` 未完成前禁止写代码。只有用户明确要求"执行任务"或"开始实现"时，才可编写源代码。`spec.md` 只描述业务能力，UI 细节写在 `design.md`；写 spec 前必须先阅读版本的 `release-contract.md`。
+**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。`design.md` 和 `tasks.md` 经 `/sdd-review` 自动审查通过后，可直接开始实现，无需用户确认。`spec.md` 评审仍需用户明确确认（唯一的手动暂停点）。`spec.md` 只描述业务能力，UI 细节写在 `design.md`；写 spec 前必须先阅读版本的 `release-contract.md`。
 
 ## 外部 MySQL 策略
 
