@@ -5,6 +5,7 @@ import logging
 import re
 import time
 
+import aiomysql
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.common import generate_rid
