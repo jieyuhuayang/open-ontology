@@ -257,8 +257,8 @@ class FileImportService:
         selected_columns: list[str] | None = None,
         column_type_overrides: dict[str, str] | None = None,
     ) -> ImportTask:
-        preview_data = _previews.get(file_token)
-        if not preview_data:
+        entry = _previews.get(file_token)
+        if not entry:
             raise AppError(
                 code="FILE_TOKEN_EXPIRED",
                 message="File token not found or expired",
