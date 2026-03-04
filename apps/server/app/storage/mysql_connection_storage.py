@@ -58,3 +58,17 @@ class MySQLConnectionStorage:
         if orm:
             orm.last_used_at = datetime.now(timezone.utc)
             await session.flush()
+
+    @staticmethod
+    async def delete(session: AsyncSession, rid: str) -> None:
+        stmt = select(MySQLConnectionModel).where(MySQLConnectionModel.rid == rid)
+        result = await session.execute(stmt)
+        orm = result.scalar_one_or_none()
+        if not orm:
+            raise AppError(
+                code="CONNECTION_NOT_FOUND",
+                message=f"MySQL connection '{rid}' not found",
+                status_code=404,
+            )
+        await session.execute(delete(MySQLConnectionModel).where(MySQLConnectionModel.rid == rid))
+        await session.flush()
