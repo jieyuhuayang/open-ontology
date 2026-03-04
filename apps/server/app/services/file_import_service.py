@@ -94,13 +94,16 @@ class FileImportService:
                 status_code=400,
             )
 
-        # Store preview data for confirm step
-        _previews[file_token] = {
-            "path": temp_path,
-            "ext": ext,
-            "filename": filename,
-            "preview": preview,
-        }
+        # Store preview data for confirm step (with creation timestamp for TTL)
+        _previews[file_token] = (
+            {
+                "path": temp_path,
+                "ext": ext,
+                "filename": filename,
+                "preview": preview,
+            },
+            datetime.now(timezone.utc),
+        )
 
         return {
             "fileToken": file_token,
