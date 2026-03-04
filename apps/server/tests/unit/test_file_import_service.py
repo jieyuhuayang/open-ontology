@@ -27,11 +27,11 @@ class TestFileImportService:
                 file_content=csv_content,
                 content_type="text/csv",
             )
-            assert result["fileToken"] is not None
-            assert result["filename"] == "test.csv"
-            assert result["sheets"] is None  # CSV has no sheets
-            assert len(result["preview"]["columns"]) == 3
-            assert result["preview"]["hasHeader"] is True
+            assert result.file_token is not None
+            assert result.filename == "test.csv"
+            assert result.sheets is None  # CSV has no sheets
+            assert len(result.preview["columns"]) == 3
+            assert result.preview["hasHeader"] is True
         finally:
             os.unlink(temp_path)
 
