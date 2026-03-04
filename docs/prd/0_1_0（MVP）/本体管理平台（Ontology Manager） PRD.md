@@ -462,7 +462,7 @@ Action Type 的“逻辑”是通过 **Rules（规则）** 来定义的；官方
 
    * Display name（展示名称）
 
-   * Backing datasource（支撑数据源）
+   * Backing dataset（支撑数据集）
 
    * API name
 
