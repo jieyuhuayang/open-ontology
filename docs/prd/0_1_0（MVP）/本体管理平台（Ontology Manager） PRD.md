@@ -584,7 +584,7 @@ Action Type 的“逻辑”是通过 **Rules（规则）** 来定义的；官方
 
 * 错误：`FoundryColumnNameNotFound`
 
-如果出现 `FoundryColumnNameNotFound`，说明你正尝试保存的对象类型，其底层数据源中有一列已被移除，导致某个属性处于未映射（unmapped）状态。该属性需要被重新映射或删除。
+如果出现 `FoundryColumnNameNotFound`，说明你正尝试保存的对象类型，其底层数据集中有一列已被移除，导致某个属性处于未映射（unmapped）状态。该属性需要被重新映射或删除。
 
 * 错误：`InvalidColumnRemoval`
 
