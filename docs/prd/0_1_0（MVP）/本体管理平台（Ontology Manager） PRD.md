@@ -588,7 +588,7 @@ Action Type 的“逻辑”是通过 **Rules（规则）** 来定义的；官方
 
 * 错误：`InvalidColumnRemoval`
 
-如果出现 `InvalidColumnRemoval`，说明被移除的列曾作为某个“已接收过编辑”的属性的底层支撑。你需要将该列加回数据源，或对对象类型执行注销并重新注册。
+如果出现 `InvalidColumnRemoval`，说明被移除的列曾作为某个”已接收过编辑”的属性的底层支撑。你需要将该列加回数据集，或对对象类型执行注销并重新注册。
 
 * 错误：`InvalidColumnFieldSchemaChange`
 
