@@ -1,5 +1,5 @@
-import { Table, Tag, Tooltip, Button, Popconfirm, Space, App, Input, Drawer } from 'antd';
-import { DeleteOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { Table, Tag, Tooltip, Button, Popconfirm, Space, App, Input, Drawer, Dropdown } from 'antd';
+import { DeleteOutlined, EyeOutlined, SearchOutlined, PlusOutlined, DownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useDatasets, useDeleteDataset, useDatasetPreview } from '@/api/datasets';
 import { useDataConnectionStore } from '@/stores/data-connection-store';
@@ -41,6 +41,7 @@ export default function DatasetsTab() {
   const { data, isLoading } = useDatasets(search || undefined);
   const deleteMutation = useDeleteDataset();
   const { previewDatasetRid, setPreviewDatasetRid } = useDataConnectionStore();
+  const setOpenModal = useDataConnectionStore((s) => s.setOpenModal);
 
   const handleDelete = async (rid: string) => {
     try {
@@ -50,6 +51,19 @@ export default function DatasetsTab() {
       message.error(t('dataset.deleteInUse'));
     }
   };
+
+  const importMenuItems = [
+    {
+      key: 'mysql',
+      label: t('dataset.fromMySQL'),
+      onClick: () => setOpenModal('mysqlImport'),
+    },
+    {
+      key: 'file',
+      label: t('dataset.uploadFile'),
+      onClick: () => setOpenModal('fileUpload'),
+    },
+  ];
 
   const columns: ColumnsType<DatasetListItem> = [
     {
@@ -79,9 +93,9 @@ export default function DatasetsTab() {
       width: 100,
     },
     {
-      title: t('dataset.inUse'),
+      title: t('dataConnection.status'),
       key: 'inUse',
-      width: 100,
+      width: 120,
       render: (_: unknown, record: DatasetListItem) => {
         if (record.inUse) {
           return (
@@ -90,7 +104,7 @@ export default function DatasetsTab() {
             </Tooltip>
           );
         }
-        return null;
+        return <Tag color="green">{t('dataset.available')}</Tag>;
       },
     },
     {
@@ -123,14 +137,20 @@ export default function DatasetsTab() {
 
   return (
     <div>
-      <div style={{ marginBottom: 16, maxWidth: 320 }}>
+      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Input
           prefix={<SearchOutlined />}
           placeholder={t('topBar.searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           allowClear
+          style={{ maxWidth: 320 }}
         />
+        <Dropdown menu={{ items: importMenuItems }} trigger={['click']}>
+          <Button type="primary" icon={<PlusOutlined />}>
+            {t('dataset.importDataset')} <DownOutlined />
+          </Button>
+        </Dropdown>
       </div>
       <Table<DatasetListItem>
         rowKey="rid"
