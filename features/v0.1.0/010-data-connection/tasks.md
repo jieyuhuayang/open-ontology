@@ -234,7 +234,7 @@
 
 ### T015: Zustand Store
 
-- [ ] **T015**: DataConnectionStore 实现 + 测试
+- [x] **T015**: DataConnectionStore 实现 + 测试
   - 测试文件: `apps/web/src/stores/__tests__/data-connection-store.test.ts`
   - 实现文件: `apps/web/src/stores/data-connection-store.ts`
   - 测试内容:
