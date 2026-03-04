@@ -144,7 +144,7 @@
 
 ### T009: i18n 翻译
 
-- [ ] **T009**: Data Connection i18n 翻译文件
+- [x] **T009**: Data Connection i18n 翻译文件
   - 文件:
     - `apps/web/src/locales/en-US/` — 新建或追加 `dataConnection` 命名空间
     - `apps/web/src/locales/zh-CN/` — 对应中文翻译
