@@ -79,7 +79,6 @@ export default function NewConnectionModal() {
       onCancel={handleClose}
       footer={null}
       width={520}
-      destroyOnClose
     >
       <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
         <Form.Item name="name" label={t('mysqlConnection.fields.name')} rules={[{ required: true }]}>
