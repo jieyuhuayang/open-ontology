@@ -377,6 +377,7 @@ class MySQLImportService:
             )
 
         except Exception as e:
+            logger.exception("MySQL import task %s failed", task_id)
             duration = int((time.monotonic() - start_time) * 1000)
             _import_task_service.update_status(
                 task_id,
