@@ -214,7 +214,7 @@
 
 ### T014: Datasets Tab（列表 + 详情 + 预览 + 删除）
 
-- [ ] **T014**: Datasets Tab 实现
+- [x] **T014**: Datasets Tab 实现
   - 测试文件: `apps/web/src/pages/data-connection/__tests__/DatasetsTab.test.tsx`
   - 实现文件:
     - `apps/web/src/pages/data-connection/components/DatasetsTab.tsx`
