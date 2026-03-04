@@ -25,6 +25,8 @@ export default function ConnectionsTab() {
         port: conn.port,
         databaseName: conn.databaseName,
         username: conn.username,
+        password: '',
+        sslEnabled: false,
         connectionRid: conn.rid,
       };
       const result = await testMutation.mutateAsync(req);
