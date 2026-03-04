@@ -168,7 +168,9 @@
 
 **AC-MC2** 概览页的"属性"区域，若尚未关联数据源，显示"Add a backing datasource"按钮。点击后打开数据源选择面板（与向导 Step 1 相同的已有数据集列表布局）。
 
-**AC-MC3** 概览页的"元数据"区域展示当前元数据（Display name、Description、Icon、ID），可直接内联编辑。
+**AC-MC3** 概览页的"元数据"区域展示当前元数据（Display name、Description、Icon、ID），可直接内联编辑。概览页「属性」区域应展示属性列表 — 类型图标 + 属性名 + Primary Key/Title Key 标签，带计数标题和「添加」按钮。
+
+**AC-MC7** 概览页「动作类型」区域应展示 `intended_actions` 配置（Create/Modify/Delete 标签），空时显示空状态。
 
 **AC-MC4** 关联数据源后，概览页的"属性"区域显示"编辑属性映射"按钮，点击进入属性编辑器（与向导 Step 3 相同的左右分栏布局）。
 
