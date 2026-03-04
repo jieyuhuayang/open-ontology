@@ -191,31 +191,33 @@ Before implementing a feature, **read the relevant doc first**:
 
 ## Development Workflow (SDD — Spec-Driven Development)
 
+> **⚠️ 前提条件（强制）**：写 spec.md 前，必须**完整准确理解 PRD**。
+> 必须先读取 PRD 原文（`docs/prd/` 下对应文件）和 `release-contract.md`，完整读取不能遗漏。
+
 **所有新特性必须按以下顺序执行**（参见 `features/README.md`）：
 
-1. **spec.md** — 定义用户故事、验收标准、边界
-2. **评审** — 确认 AC 可测试、边界清晰
-3. **design.md** — 设计数据结构、API 契约、组件树、架构决策
-4. **tasks.md** — 将 design 拆解为原子任务（每个任务一次 AI 会话可完成）
-5. **执行** — 逐任务实施，完成后在 tasks.md 打勾
+1. **spec.md** — 合并需求规范与技术设计的完整规格文档（用户故事、AC 表格、架构决策、API 契约、数据模型等）
+2. **审查** — `/sdd-review <dir> spec`，同时检查 PRD gap 和架构合规性，用户确认后推进
+3. **tasks.md** — 将 spec 拆解为自包含的原子任务（每个任务内联文件、逻辑、测试上下文）
+4. **执行** — 逐任务实施，完成后在 tasks.md 打勾
 
-> ⚠️ **禁止跳步**：不得在 design.md 和 tasks.md 完成前开始写代码。
-> 每个特性目录下必须存在这三个文件，否则视为流程未完成。
+> ⚠️ **禁止跳步**：不得在 spec.md 和 tasks.md 完成前开始写代码。
+> 每个特性目录下必须存在 spec.md 和 tasks.md，否则视为流程未完成。
 
 ### SDD 严格执行规则
 
 **每一步只产出该步骤的文件，不得提前执行后续步骤：**
 
-- 当用户要求"完成 design.md"时，**只写 `design.md` 文件**，不得生成任何源代码（`apps/` 目录下的 `.py`、`.ts`、`.tsx` 等）
+- 当用户要求"完成 spec.md"时，**只写 `spec.md` 文件**，不得生成任何源代码（`apps/` 目录下的 `.py`、`.ts`、`.tsx` 等）
 - 当用户要求"完成 tasks.md"时，**只写 `tasks.md` 文件**，不得生成源代码
 - 只有当用户明确要求"执行任务"或"开始实现"时，才可以编写源代码
-- 如果当前特性目录下缺少 `design.md` 或 `tasks.md`，**必须先补齐，再开始写代码**
+- 如果当前特性目录下缺少 `spec.md` 或 `tasks.md`，**必须先补齐，再开始写代码**
 
 **常见违规场景（必须避免）：**
 
-1. 完成 design.md 后直接开始写代码，跳过了 tasks.md
-2. 在 design 审批通过后自动进入实现阶段，没有等待用户指令
-3. 将 design.md 和代码实现混在同一次会话中完成
+1. 完成 spec.md 后直接开始写代码，跳过了 tasks.md
+2. 在 spec 审查通过后自动进入实现阶段，没有等待用户指令
+3. 将 spec.md 和代码实现混在同一次会话中完成
 
 
 ## Workflow: Auto-format + Auto-commit on File Edit
