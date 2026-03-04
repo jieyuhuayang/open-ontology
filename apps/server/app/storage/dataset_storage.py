@@ -67,6 +67,25 @@ class DatasetStorage:
         return [DatasetStorage._to_list_item(orm) for orm in result.scalars().all()]
 
     @staticmethod
+    async def count_by_connection_rids(
+        session: AsyncSession, connection_rids: list[str]
+    ) -> dict[str, int]:
+        """Return {connectionRid: dataset_count} for given connection RIDs."""
+        if not connection_rids:
+            return {}
+        conn_rid_expr = DatasetModel.source_metadata["connectionRid"].as_string()
+        stmt = (
+            select(conn_rid_expr, func.count())
+            .where(
+                DatasetModel.status == "ready",
+                conn_rid_expr.in_(connection_rids),
+            )
+            .group_by(conn_rid_expr)
+        )
+        result = await session.execute(stmt)
+        return {row[0]: row[1] for row in result.all()}
+
+    @staticmethod
     async def get_by_rid(session: AsyncSession, rid: str) -> Dataset | None:
         stmt = (
             select(DatasetModel)
