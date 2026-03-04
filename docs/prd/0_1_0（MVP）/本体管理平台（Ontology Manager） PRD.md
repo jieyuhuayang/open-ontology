@@ -1313,5 +1313,5 @@ Ontology 还支持**日期和时间格式化**，以及user ID 格式化、resou
 
 详见《[数据连接（Data Connection）PRD](数据连接（Data Connection）PRD.md)》。
 
-Ontology Manager 中的对象类型创建/编辑流程通过选择平台内已有 Dataset 来关联底层数据源，不再内嵌数据导入向导。
+Ontology Manager 中的对象类型创建/编辑流程通过选择平台内已有 Dataset 来关联底层数据集，不再内嵌数据导入向导。
 
