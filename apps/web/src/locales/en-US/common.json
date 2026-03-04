@@ -324,6 +324,23 @@
       "apiNameInvalid": "Invalid format"
     }
   },
+  "dataConnection": {
+    "pageTitle": "Data Connection",
+    "connectionsTab": "Connections",
+    "datasetsTab": "Datasets",
+    "newConnection": "New Connection",
+    "noConnections": "No connections yet",
+    "deleteConnection": "Delete Connection",
+    "deleteConnectionConfirm": "Are you sure you want to delete connection \"{{name}}\"? This will not affect imported datasets.",
+    "deleteConnectionSuccess": "Connection deleted",
+    "connectionName": "Connection Name",
+    "lastUsed": "Last Used",
+    "never": "Never",
+    "status": "Status",
+    "connected": "Connected",
+    "failed": "Failed",
+    "testing": "Testing..."
+  },
   "dataset": {
     "listTitle": "Datasets",
     "source": {
