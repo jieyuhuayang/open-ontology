@@ -117,8 +117,6 @@ class MySQLImportService:
             )
         password = self._crypto.decrypt(conn_orm.encrypted_password)
 
-        import aiomysql
-
         conn = await aiomysql.connect(
             host=conn_orm.host,
             port=conn_orm.port,
@@ -146,8 +144,6 @@ class MySQLImportService:
                 status_code=404,
             )
         password = self._crypto.decrypt(conn_orm.encrypted_password)
-
-        import aiomysql
 
         conn = await aiomysql.connect(
             host=conn_orm.host,
@@ -193,8 +189,6 @@ class MySQLImportService:
             )
         password = self._crypto.decrypt(conn_orm.encrypted_password)
 
-        import aiomysql
-
         conn = await aiomysql.connect(
             host=conn_orm.host,
             port=conn_orm.port,
@@ -236,7 +230,6 @@ class MySQLImportService:
 
         # Check row count limit
         password = self._crypto.decrypt(conn_orm.encrypted_password)
-        import aiomysql
 
         check_conn = await aiomysql.connect(
             host=conn_orm.host,
