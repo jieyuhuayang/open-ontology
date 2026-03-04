@@ -85,7 +85,7 @@ export default function DatasetsTab() {
       render: (_: unknown, record: DatasetListItem) => {
         if (record.inUse) {
           return (
-            <Tooltip title={t('dataset.inUseTooltip', { name: record.inUseByObjectType ?? '' })}>
+            <Tooltip title={t('dataset.inUseTooltip', { name: record.linkedObjectTypeName ?? '' })}>
               <Tag color="blue">{t('dataset.inUse')}</Tag>
             </Tooltip>
           );
