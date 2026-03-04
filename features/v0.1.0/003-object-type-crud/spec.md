@@ -74,7 +74,7 @@
 
 **AC-W5** 向导在首次进入 Step 2（元数据）时，若已选择 Dataset，则自动推断并填充 Display name（取自 Dataset 名称）和 API name（将 Dataset 名称转为 PascalCase）。用户可手动修改。
 
-**AC-W6** 向导完成所有步骤后点击"创建"，对象类型以 Working State 草稿形式创建（不直接写入主表），页面跳转到 Ontology Manager 首页，顶部提示"变更已暂存，请保存到本体"。
+**AC-W6** 向导完成所有步骤后点击"创建"，对象类型以 Working State 草稿形式创建（不直接写入主表），页面跳转到 Ontology Manager 首页，后续通过右上角"保存"按钮进行对本体的修改。
 
 ---
 
