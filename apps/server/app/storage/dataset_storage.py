@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 
 from app.domain.common import generate_rid
 from app.domain.dataset import Dataset, DatasetColumn, DatasetListItem
-from app.storage.models import DatasetColumnModel, DatasetModel, DatasetRowModel
+from app.storage.models import DatasetModel, DatasetRowModel
 
 
 class DatasetStorage:
