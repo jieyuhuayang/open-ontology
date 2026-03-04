@@ -336,7 +336,7 @@ Action Type 的“逻辑”是通过 **Rules（规则）** 来定义的；官方
 
 此时，对象类型处于未保存状态，且在完成以下所有步骤之前无法保存：
 
-1. 为新对象类型添加底层数据源（Add a backing datasource to a new object type）。可以按以下方式操作：
+1. 为新对象类型添加底层数据集（Add a backing dataset to a new object type）。可以按以下方式操作：
 
    1. 在概览页面的 属性 区域选择 新建（Create new），进入属性编辑器；或在对象类型视图侧边栏的 属性 页面选择 编辑属性映射。
 
