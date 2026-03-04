@@ -77,6 +77,7 @@ export default function NewConnectionModal() {
       footer={null}
       width={520}
       destroyOnClose
+      forceRender
     >
       <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
         <Form.Item name="name" label={t('mysqlConnection.fields.name')} rules={[{ required: true }]}>
