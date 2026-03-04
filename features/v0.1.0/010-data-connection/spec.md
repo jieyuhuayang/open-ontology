@@ -114,7 +114,7 @@ Data Connection 负责外部数据源接入和 Dataset 管理。用户通过 Dat
 
 | ID | 角色 | 操作 | 预期结果 |
 |----|------|------|---------|
-| AC-DM01 | 管理员 | 查看 Dataset 列表 | 返回所有 status=ready 的 Dataset，含名称、来源类型、行数、列数、导入时间、in_use 状态 |
+| AC-DM01 | 管理员 | 查看 Dataset 列表 | 返回所有 status=ready 的 Dataset，含名称、来源类型、行数、列数、导入时间、in_use 状态；已被引用的显示关联的 ObjectType 名称 |
 | AC-DM02 | 管理员 | 搜索 Dataset（关键词） | 按名称模糊匹配过滤结果 |
 | AC-DM03 | 管理员 | 查看单个 Dataset 详情 | 返回 Dataset 完整信息 + 列定义列表 |
 | AC-DM04 | 管理员 | 预览 Dataset 数据 | 返回指定行数（默认 50，最多 500）的行数据 |
