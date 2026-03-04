@@ -85,7 +85,29 @@ class MySQLImportService:
         return await MySQLConnectionStorage.create(self._session, orm)
 
     async def list_connections(self) -> list[MySQLConnection]:
-        return await MySQLConnectionStorage.list_by_ontology(self._session, DEFAULT_ONTOLOGY_RID)
+        connections = await MySQLConnectionStorage.list_by_ontology(
+            self._session, DEFAULT_ONTOLOGY_RID
+        )
+        if connections:
+            rids = [c.rid for c in connections]
+            counts = await DatasetStorage.count_by_connection_rids(self._session, rids)
+            for conn in connections:
+                conn.dataset_count = counts.get(conn.rid, 0)
+        return connections
+
+    async def get_connection(self, rid: str) -> MySQLConnection:
+        """Get a single connection by RID with dataset_count."""
+        conn_orm = await MySQLConnectionStorage.get_by_rid(self._session, rid)
+        if not conn_orm:
+            raise AppError(
+                code="CONNECTION_NOT_FOUND",
+                message=f"MySQL connection '{rid}' not found",
+                status_code=404,
+            )
+        conn = MySQLConnectionStorage._to_domain(conn_orm)
+        counts = await DatasetStorage.count_by_connection_rids(self._session, [rid])
+        conn.dataset_count = counts.get(rid, 0)
+        return conn
 
     async def test_connection(self, req: MySQLConnectionTestRequest) -> "ConnectionTestResponse":
         """Test MySQL connection without saving."""
