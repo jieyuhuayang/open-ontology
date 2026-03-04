@@ -38,6 +38,14 @@ async def save_connection(
     return await service.save_connection(req)
 
 
+@router.get("/mysql-connections/{rid}", response_model=MySQLConnection)
+async def get_connection(
+    rid: str,
+    service: MySQLImportService = Depends(_get_service),
+):
+    return await service.get_connection(rid)
+
+
 @router.post("/mysql-connections/test", response_model=ConnectionTestResponse)
 async def test_connection(
     req: MySQLConnectionTestRequest,
