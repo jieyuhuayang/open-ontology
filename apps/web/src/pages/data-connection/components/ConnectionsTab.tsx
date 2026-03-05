@@ -33,7 +33,7 @@ export default function ConnectionsTab() {
   const setOpenModal = useDataConnectionStore((s) => s.setOpenModal);
   const setDetailConnectionRid = useDataConnectionStore((s) => s.setDetailConnectionRid);
   const [testingRid, setTestingRid] = useState<string | null>(null);
-  const [testResults, setTestResults] = useState<Record<string, { success: boolean; error?: string }>>({});
+  const queryClient = __useQueryClient();
 
   const handleTest = async (conn: MySQLConnection) => {
     setTestingRid(conn.rid);
@@ -48,14 +48,15 @@ export default function ConnectionsTab() {
         connectionRid: conn.rid,
       };
       const result = await testMutation.mutateAsync(req);
-      setTestResults((prev) => ({ ...prev, [conn.rid]: { success: result.success, error: result.error ?? undefined } }));
       if (result.success) {
         message.success(t('mysqlConnection.testSuccess'));
       } else {
         message.error(t('mysqlConnection.testFailed', { error: result.error }));
       }
+      // Refetch connections to get updated status from backend
+      queryClient.invalidateQueries({ queryKey: ['mysql-connections'] });
     } catch {
-      setTestResults((prev) => ({ ...prev, [conn.rid]: { success: false, error: 'Unknown error' } }));
+      message.error(t('mysqlConnection.testFailed', { error: 'Unknown error' }));
     } finally {
       setTestingRid(null);
     }
