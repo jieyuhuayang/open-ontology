@@ -25,6 +25,8 @@ class MySQLConnectionStorage:
             created_at=orm.created_at,
             created_by=orm.created_by,
             last_used_at=orm.last_used_at,
+            status=orm.status,
+            last_tested_at=orm.last_tested_at,
         )
 
     @staticmethod
