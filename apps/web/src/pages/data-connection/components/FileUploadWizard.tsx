@@ -169,6 +169,12 @@ export default function FileUploadWizard() {
           </Form.Item>
         </Form>
 
+        {previewData.preview.totalRows != null && (
+          <Form.Item label={t('import.totalRows')}>
+            <span>{previewData.preview.totalRows.toLocaleString()}</span>
+          </Form.Item>
+        )}
+
         <Table
           rowKey={(_, index) => String(index)}
           columns={previewColumns}
