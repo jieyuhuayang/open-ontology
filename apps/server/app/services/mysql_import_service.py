@@ -246,6 +246,12 @@ class MySQLImportService:
         finally:
             conn.close()
 
+    async def get_imported_tables(self, connection_rid: str) -> list[str]:
+        """Return table names already imported from the given connection."""
+        return await DatasetStorage.list_imported_tables_by_connection(
+            self._session, connection_rid
+        )
+
     async def delete_connection(self, rid: str) -> None:
         """Delete a saved MySQL connection."""
         await MySQLConnectionStorage.delete(self._session, rid)
