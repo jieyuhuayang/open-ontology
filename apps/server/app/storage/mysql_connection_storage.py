@@ -53,6 +53,18 @@ class MySQLConnectionStorage:
         return MySQLConnectionStorage._to_domain(orm)
 
     @staticmethod
+    async def update_status(
+        session: AsyncSession, rid: str, status: str, tested_at: datetime
+    ) -> None:
+        stmt = select(MySQLConnectionModel).where(MySQLConnectionModel.rid == rid)
+        result = await session.execute(stmt)
+        orm = result.scalar_one_or_none()
+        if orm:
+            orm.status = status
+            orm.last_tested_at = tested_at
+            await session.flush()
+
+    @staticmethod
     async def update_last_used(session: AsyncSession, rid: str) -> None:
         stmt = select(MySQLConnectionModel).where(MySQLConnectionModel.rid == rid)
         result = await session.execute(stmt)
