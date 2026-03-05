@@ -34,7 +34,7 @@ export default function ConnectionsTab() {
   const setOpenModal = useDataConnectionStore((s) => s.setOpenModal);
   const setDetailConnectionRid = useDataConnectionStore((s) => s.setDetailConnectionRid);
   const [testingRid, setTestingRid] = useState<string | null>(null);
-  const queryClient = __useQueryClient();
+  const queryClient = useQueryClient();
 
   const handleTest = async (conn: MySQLConnection) => {
     setTestingRid(conn.rid);
