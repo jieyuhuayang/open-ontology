@@ -106,6 +106,17 @@ export function useMySQLTableColumns(rid: string, table: string) {
   });
 }
 
+export function useMySQLImportedTables(rid: string) {
+  return useQuery({
+    queryKey: mysqlConnectionKeys.importedTables(rid),
+    queryFn: async () => {
+      const { data } = await apiClient.get<string[]>(`/mysql-connections/${rid}/imported-tables`);
+      return data;
+    },
+    enabled: !!rid,
+  });
+}
+
 export function useMySQLTablePreview(rid: string, table: string) {
   return useQuery({
     queryKey: mysqlConnectionKeys.tablePreview(rid, table),
