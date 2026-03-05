@@ -70,22 +70,14 @@ export default function ConnectionsTab() {
     } catch {
       message.error(t('common.delete') + ' failed');
     }
-    setTestResults((prev) => {
-      const next = { ...prev };
-      delete next[rid];
-      return next;
-    });
   };
 
   const getStatusTag = (record: MySQLConnection) => {
     if (testingRid === record.rid) return <Tag color="processing">{t('dataConnection.testing')}</Tag>;
-    const result = testResults[record.rid];
-    if (!result) return <Tag>{t('dataConnection.untested')}</Tag>;
-    return result.success ? (
-      <Tag color="success">{t('dataConnection.connected')}</Tag>
-    ) : (
-      <Tag color="error">{t('dataConnection.failed')}</Tag>
-    );
+    const status = (record as MySQLConnection & { status?: string }).status ?? 'untested';
+    if (status === 'connected') return <Tag color="success">{t('dataConnection.connected')}</Tag>;
+    if (status === 'failed') return <Tag color="error">{t('dataConnection.failed')}</Tag>;
+    return <Tag>{t('dataConnection.untested')}</Tag>;
   };
 
   const columns: ColumnsType<MySQLConnection> = [
