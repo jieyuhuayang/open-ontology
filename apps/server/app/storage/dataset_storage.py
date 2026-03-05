@@ -86,6 +86,24 @@ class DatasetStorage:
         return {row[0]: row[1] for row in result.all()}
 
     @staticmethod
+    async def list_imported_tables_by_connection(
+        session: AsyncSession, connection_rid: str
+    ) -> list[str]:
+        """Return distinct table names imported from the given connection."""
+        table_expr = DatasetModel.source_metadata["table"].as_string()
+        conn_rid_expr = DatasetModel.source_metadata["connectionRid"].as_string()
+        stmt = (
+            select(table_expr)
+            .where(
+                DatasetModel.status == "ready",
+                conn_rid_expr == connection_rid,
+            )
+            .distinct()
+        )
+        result = await session.execute(stmt)
+        return [row[0] for row in result.all()]
+
+    @staticmethod
     async def get_by_rid(session: AsyncSession, rid: str) -> Dataset | None:
         stmt = (
             select(DatasetModel)
