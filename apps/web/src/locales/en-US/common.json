@@ -411,7 +411,12 @@
     "snapshotNote": "This will create a data snapshot",
     "confirmImport": "Confirm Import",
     "importSuccess": "Import successful",
-    "importFailed": "Import failed"
+    "importFailed": "Import failed",
+    "saveFailed": "Failed to save connection",
+    "snapshotWarning": "Note: This will create a data snapshot. The imported data will not sync automatically with source changes.",
+    "noConnections": "No connections available. Please create one in the Connections tab first.",
+    "selectConnection": "Select a connection",
+    "searchTables": "Search tables..."
   },
   "apiErrors": {
     "PROPERTY_INVALID_ID": "Property name cannot generate a valid ID. Name must start with a letter and only contain letters, digits, hyphens, or underscores",
