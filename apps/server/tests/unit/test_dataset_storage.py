@@ -75,6 +75,8 @@ class TestMySQLConnectionStorageToDomain:
         orm.created_at = now
         orm.created_by = "default"
         orm.last_used_at = None
+        orm.status = "untested"
+        orm.last_tested_at = None
 
         conn = MySQLConnectionStorage._to_domain(orm)
         assert conn.rid == "ri.ontology.mysql-connection.def456"
