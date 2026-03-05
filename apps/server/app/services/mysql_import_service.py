@@ -110,7 +110,9 @@ class MySQLImportService:
         return conn
 
     async def test_connection(self, req: MySQLConnectionTestRequest) -> "ConnectionTestResponse":
-        """Test MySQL connection without saving."""
+        """Test MySQL connection and persist status if connection_rid provided."""
+        from datetime import datetime, timezone
+
         from app.domain.mysql_connection import ConnectionTestResponse
 
         password = req.password
@@ -133,9 +135,17 @@ class MySQLImportService:
             )
             conn.close()
             latency = int((time.monotonic() - start) * 1000)
+            if req.connection_rid:
+                await MySQLConnectionStorage.update_status(
+                    self._session, req.connection_rid, "connected", datetime.now(timezone.utc)
+                )
             return ConnectionTestResponse(success=True, latency_ms=latency)
         except Exception as e:
             latency = int((time.monotonic() - start) * 1000)
+            if req.connection_rid:
+                await MySQLConnectionStorage.update_status(
+                    self._session, req.connection_rid, "failed", datetime.now(timezone.utc)
+                )
             return ConnectionTestResponse(success=False, latency_ms=latency, error=str(e))
 
     @staticmethod
