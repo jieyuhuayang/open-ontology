@@ -63,3 +63,41 @@ class TestMySQLConnectionsAPI:
         )
         assert resp.status_code == 404
         assert resp.json()["error"]["code"] == "MYSQL_CONNECTION_NOT_FOUND"
+
+    async def test_save_connection_has_untested_status(self, seeded_client: AsyncClient):
+        """Newly saved connection should have status=untested."""
+        resp = await seeded_client.post(
+            "/api/v1/mysql-connections",
+            json={
+                "name": "Status Test DB",
+                "host": "localhost",
+                "port": 3306,
+                "databaseName": "testdb",
+                "username": "root",
+                "password": "secret123",
+            },
+        )
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data["status"] == "untested"
+        assert data["lastTestedAt"] is None
+
+    async def test_imported_tables_empty(self, seeded_client: AsyncClient):
+        """Imported tables for a new connection should be empty."""
+        resp = await seeded_client.post(
+            "/api/v1/mysql-connections",
+            json={
+                "name": "Import Tables Test",
+                "host": "localhost",
+                "port": 3306,
+                "databaseName": "testdb",
+                "username": "root",
+                "password": "secret123",
+            },
+        )
+        assert resp.status_code == 201
+        rid = resp.json()["rid"]
+
+        resp = await seeded_client.get(f"/api/v1/mysql-connections/{rid}/imported-tables")
+        assert resp.status_code == 200
+        assert resp.json() == []
