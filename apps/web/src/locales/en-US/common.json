@@ -412,6 +412,7 @@
     "confirmImport": "Confirm Import",
     "importSuccess": "Import successful",
     "importFailed": "Import failed",
+    "startImportFailed": "Failed to start import task",
     "saveFailed": "Failed to save connection",
     "snapshotWarning": "Note: This will create a data snapshot. The imported data will not sync automatically with source changes.",
     "noConnections": "No connections available. Please create one in the Connections tab first.",
