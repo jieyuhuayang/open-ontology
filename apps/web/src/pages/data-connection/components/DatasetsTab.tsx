@@ -135,7 +135,7 @@ export default function DatasetsTab() {
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 160,
-      render: (val: string) => (val ? new Date(val).toLocaleString() : '—'),
+      render: (val: string) => formatRelativeTime(val),
     },
     {
       key: 'actions',
