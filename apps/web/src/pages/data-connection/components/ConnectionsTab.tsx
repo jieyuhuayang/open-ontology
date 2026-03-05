@@ -114,7 +114,7 @@ export default function ConnectionsTab() {
       dataIndex: 'lastUsedAt',
       key: 'lastUsedAt',
       width: 160,
-      render: (val: string | null) => (val ? new Date(val).toLocaleString() : t('dataConnection.never')),
+      render: (val: string | null) => (val ? formatRelativeTime(val) : t('dataConnection.never')),
     },
     {
       key: 'actions',
