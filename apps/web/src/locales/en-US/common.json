@@ -396,8 +396,7 @@
       "database": "Database",
       "username": "Username",
       "password": "Password",
-      "ssl": "SSL Encryption",
-      "dataType": "Data Type"
+      "ssl": "SSL Encryption"
     },
     "testConnection": "Test Connection",
     "testSuccess": "Connection successful",
@@ -447,8 +446,6 @@
     "columns": "columns",
     "duration": "Duration",
     "retry": "Retry",
-    "done": "Done",
-    "totalRows": "Total Rows",
     "useDataset": "Use This Dataset",
     "fileUpload": {
       "title": "Upload Excel/CSV",

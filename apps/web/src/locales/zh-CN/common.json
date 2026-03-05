@@ -396,8 +396,7 @@
       "database": "数据库",
       "username": "用户名",
       "password": "密码",
-      "ssl": "SSL 加密",
-      "dataType": "数据类型"
+      "ssl": "SSL 加密"
     },
     "testConnection": "测试连接",
     "testSuccess": "连接成功",
@@ -448,8 +447,6 @@
     "columns": "列",
     "duration": "耗时",
     "retry": "重试",
-    "done": "完成",
-    "totalRows": "总行数",
     "useDataset": "使用此数据集",
     "fileUpload": {
       "title": "上传 Excel/CSV",

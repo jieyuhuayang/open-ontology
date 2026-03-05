@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Steps, Upload, Button, Form, Input, Table, Checkbox, Select, Result, Spin, App, Space } from 'antd';
+import { Modal, Steps, Upload, Button, Form, Input, Table, Checkbox, Select, Result, Spin, App } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useFileUploadPreview, useFileImportConfirm, useImportTask } from '@/api/imports';
@@ -169,12 +169,6 @@ export default function FileUploadWizard() {
           </Form.Item>
         </Form>
 
-        {previewData.preview.totalRows != null && (
-          <Form.Item label={t('import.totalRows')}>
-            <span>{previewData.preview.totalRows.toLocaleString()}</span>
-          </Form.Item>
-        )}
-
         <Table
           rowKey={(_, index) => String(index)}
           columns={previewColumns}
@@ -212,7 +206,7 @@ export default function FileUploadWizard() {
           status="success"
           title={t('mysqlConnection.importSuccess')}
           subTitle={`${taskData.rowCount?.toLocaleString()} ${t('import.rows')}, ${taskData.columnCount} ${t('import.columns')}`}
-          extra={<Button type="primary" onClick={handleClose}>{t('import.done')}</Button>}
+          extra={<Button type="primary" onClick={handleClose}>{t('common.confirm')}</Button>}
         />
       );
     }
@@ -221,12 +215,7 @@ export default function FileUploadWizard() {
         status="error"
         title={t('mysqlConnection.importFailed')}
         subTitle={taskData.errorMessage}
-        extra={
-          <Space>
-            <Button onClick={() => { setTaskId(null); setStep(1); }}>{t('import.retry')}</Button>
-            <Button onClick={handleClose}>{t('common.cancel')}</Button>
-          </Space>
-        }
+        extra={<Button onClick={handleClose}>{t('common.confirm')}</Button>}
       />
     );
   };
