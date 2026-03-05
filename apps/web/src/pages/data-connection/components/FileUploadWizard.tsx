@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Modal, Steps, Upload, Button, Form, Input, Table, Checkbox, Select, Result, Spin, App } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -40,6 +40,20 @@ export default function FileUploadWizard() {
 
   const open = openModal === 'fileUpload';
 
+  // Track whether we've shown the result toast to avoid duplicates
+  const toastShownRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!taskData) return;
+    if (taskData.status === 'completed' && toastShownRef.current !== 'completed') {
+      toastShownRef.current = 'completed';
+      message.success(t('mysqlConnection.importSuccess'));
+    } else if (taskData.status === 'failed' && toastShownRef.current !== 'failed') {
+      toastShownRef.current = 'failed';
+      message.error(t('mysqlConnection.importFailed'));
+    }
+  }, [taskData?.status, message, t]);
+
   const handleClose = () => {
     setOpenModal(null);
     setStep(0);
@@ -50,6 +64,7 @@ export default function FileUploadWizard() {
     setHasHeader(true);
     setTaskId(null);
     setColumnTypeOverrides({});
+    toastShownRef.current = null;
   };
 
   const handleUpload = async (file: File) => {
@@ -94,7 +109,7 @@ export default function FileUploadWizard() {
       setTaskId(task.taskId);
       setStep(2);
     } catch {
-      message.error(t('mysqlConnection.importFailed'));
+      message.error(t('mysqlConnection.startImportFailed'));
     }
   };
 
@@ -178,19 +193,29 @@ export default function FileUploadWizard() {
           size="small"
           style={{ marginBottom: 16 }}
         />
-        <Button
-          type="primary"
-          onClick={handleConfirm}
-          loading={fileImportConfirm.isPending}
-          disabled={selectedColumns.length === 0}
-        >
-          {t('import.fileUpload.confirmImport')}
-        </Button>
-        {selectedColumns.length === 0 && (
-          <span style={{ marginLeft: 8, color: '#ff4d4f', fontSize: 12 }}>
-            {t('import.fileUpload.atLeastOneColumn')}
-          </span>
-        )}
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Button onClick={() => {
+            setStep(0);
+            setPreviewData(null);
+          }}>
+            {t('wizard.back')}
+          </Button>
+          <div>
+            <Button
+              type="primary"
+              onClick={handleConfirm}
+              loading={fileImportConfirm.isPending}
+              disabled={selectedColumns.length === 0}
+            >
+              {t('import.fileUpload.confirmImport')}
+            </Button>
+            {selectedColumns.length === 0 && (
+              <span style={{ marginLeft: 8, color: '#ff4d4f', fontSize: 12 }}>
+                {t('import.fileUpload.atLeastOneColumn')}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
     );
   };
