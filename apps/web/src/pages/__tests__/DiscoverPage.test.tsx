@@ -1,14 +1,20 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import DiscoverPage from '@/pages/DiscoverPage';
 import { useRecentlyViewedStore } from '@/stores/recently-viewed-store';
 
 function renderPage() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
   return render(
-    <MemoryRouter>
-      <DiscoverPage />
-    </MemoryRouter>,
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <DiscoverPage />
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 
