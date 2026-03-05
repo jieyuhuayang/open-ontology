@@ -212,7 +212,7 @@ export default function FileUploadWizard() {
           status="success"
           title={t('mysqlConnection.importSuccess')}
           subTitle={`${taskData.rowCount?.toLocaleString()} ${t('import.rows')}, ${taskData.columnCount} ${t('import.columns')}`}
-          extra={<Button type="primary" onClick={handleClose}>{t('common.confirm')}</Button>}
+          extra={<Button type="primary" onClick={handleClose}>{t('import.done')}</Button>}
         />
       );
     }
@@ -221,7 +221,12 @@ export default function FileUploadWizard() {
         status="error"
         title={t('mysqlConnection.importFailed')}
         subTitle={taskData.errorMessage}
-        extra={<Button onClick={handleClose}>{t('common.confirm')}</Button>}
+        extra={
+          <Space>
+            <Button onClick={() => { setTaskId(null); setStep(1); }}>{t('import.retry')}</Button>
+            <Button onClick={handleClose}>{t('common.cancel')}</Button>
+          </Space>
+        }
       />
     );
   };
