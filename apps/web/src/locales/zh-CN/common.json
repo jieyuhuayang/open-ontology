@@ -396,7 +396,8 @@
       "database": "数据库",
       "username": "用户名",
       "password": "密码",
-      "ssl": "SSL 加密"
+      "ssl": "SSL 加密",
+      "dataType": "数据类型"
     },
     "testConnection": "测试连接",
     "testSuccess": "连接成功",
