@@ -7,6 +7,23 @@ import type { MySQLConnection, MySQLConnectionTestRequest } from '@/api/types';
 import { useState } from 'react';
 import type { ColumnsType } from 'antd/es/table';
 
+function formatRelativeTime(val: string | null | undefined): string {
+  if (!val) return '—';
+  const date = new Date(val);
+  const now = Date.now();
+  const diffMs = now - date.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHr = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHr / 24);
+
+  if (diffSec < 60) return '< 1 min';
+  if (diffMin < 60) return `${diffMin} min`;
+  if (diffHr < 24) return `${diffHr} hr`;
+  if (diffDay < 30) return `${diffDay} d`;
+  return date.toLocaleDateString();
+}
+
 export default function ConnectionsTab() {
   const { t } = useTranslation();
   const { message } = App.useApp();
