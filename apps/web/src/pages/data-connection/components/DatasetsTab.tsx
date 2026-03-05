@@ -7,6 +7,29 @@ import { useState } from 'react';
 import type { DatasetListItem } from '@/api/types';
 import type { ColumnsType } from 'antd/es/table';
 
+function formatRowCount(val: number | null | undefined): string {
+  if (val == null) return '—';
+  if (val >= 1000) return `${(val / 1000).toFixed(val % 1000 === 0 ? 0 : 1)}K`;
+  return val.toLocaleString();
+}
+
+function formatRelativeTime(val: string | null | undefined): string {
+  if (!val) return '—';
+  const date = new Date(val);
+  const now = Date.now();
+  const diffMs = now - date.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHr = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHr / 24);
+
+  if (diffSec < 60) return '< 1 min';
+  if (diffMin < 60) return `${diffMin} min`;
+  if (diffHr < 24) return `${diffHr} hr`;
+  if (diffDay < 30) return `${diffDay} d`;
+  return date.toLocaleDateString();
+}
+
 function PreviewDrawer({ rid, onClose }: { rid: string; onClose: () => void }) {
   const { t } = useTranslation();
   const { data, isLoading } = useDatasetPreview(rid, 50);
