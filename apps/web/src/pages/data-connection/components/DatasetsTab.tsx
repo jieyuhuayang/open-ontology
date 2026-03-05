@@ -107,7 +107,7 @@ export default function DatasetsTab() {
       dataIndex: 'rowCount',
       key: 'rowCount',
       width: 100,
-      render: (val: number) => val?.toLocaleString() ?? '—',
+      render: (val: number) => formatRowCount(val),
     },
     {
       title: t('dataset.columns.columns'),
