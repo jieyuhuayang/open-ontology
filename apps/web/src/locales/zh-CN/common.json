@@ -447,6 +447,8 @@
     "columns": "列",
     "duration": "耗时",
     "retry": "重试",
+    "done": "完成",
+    "totalRows": "总行数",
     "useDataset": "使用此数据集",
     "fileUpload": {
       "title": "上传 Excel/CSV",
