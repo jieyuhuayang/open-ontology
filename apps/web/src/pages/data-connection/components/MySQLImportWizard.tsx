@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Modal,
   Steps,
@@ -64,6 +64,20 @@ export default function MySQLImportWizard() {
     return tables.filter((t) => t.name.toLowerCase().includes(lower));
   }, [tables, tableSearch]);
 
+  // Track whether we've shown the result toast to avoid duplicates
+  const toastShownRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!taskData) return;
+    if (taskData.status === 'completed' && toastShownRef.current !== 'completed') {
+      toastShownRef.current = 'completed';
+      message.success(t('mysqlConnection.importSuccess'));
+    } else if (taskData.status === 'failed' && toastShownRef.current !== 'failed') {
+      toastShownRef.current = 'failed';
+      message.error(t('mysqlConnection.importFailed'));
+    }
+  }, [taskData?.status, message, t]);
+
   const handleClose = () => {
     setOpenModal(null);
     setStep(0);
@@ -73,6 +87,7 @@ export default function MySQLImportWizard() {
     setDatasetName('');
     setTaskId(null);
     setTableSearch('');
+    toastShownRef.current = null;
   };
 
   const handleSelectConnection = (rid: string) => {
@@ -83,10 +98,13 @@ export default function MySQLImportWizard() {
     if (connectionRid) setStep(1);
   };
 
-  const handleSelectTable = (table: MySQLTableInfo) => {
+  const handleSelectTableRow = (table: MySQLTableInfo) => {
     setSelectedTable(table);
     setDatasetName(table.name);
-    setStep(2);
+  };
+
+  const handleNextFromStep1 = () => {
+    if (selectedTable) setStep(2);
   };
 
   // Initialize selectedColumns with PK columns when columns load
@@ -130,9 +148,26 @@ export default function MySQLImportWizard() {
       setTaskId(task.taskId);
       setStep(3);
     } catch {
-      message.error(t('mysqlConnection.importFailed'));
+      message.error(t('mysqlConnection.startImportFailed'));
     }
   };
+
+  const renderNavButtons = (onPrev?: () => void, onNext?: () => void, nextDisabled?: boolean) => (
+    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16 }}>
+      <div>
+        {onPrev && (
+          <Button onClick={onPrev}>{t('wizard.back')}</Button>
+        )}
+      </div>
+      <div>
+        {onNext && (
+          <Button type="primary" disabled={nextDisabled} onClick={onNext}>
+            {t('wizard.next')}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
 
   const renderStep0 = () => {
     const hasConnections = existingConnections && existingConnections.length > 0;
@@ -146,14 +181,17 @@ export default function MySQLImportWizard() {
           placeholder={t('mysqlConnection.selectConnection')}
           value={connectionRid ?? undefined}
           onChange={handleSelectConnection}
+          showSearch
+          size="large"
+          filterOption={(input, option) =>
+            (option?.label as string)?.toLowerCase().includes(input.toLowerCase()) ?? false
+          }
           options={existingConnections?.map((c) => ({
             label: `${c.name} (${c.host}:${c.port}/${c.databaseName})`,
             value: c.rid,
           }))}
         />
-        <Button type="primary" disabled={!connectionRid} onClick={handleGoToTables}>
-          {t('wizard.next')}
-        </Button>
+        {renderNavButtons(undefined, handleGoToTables, !connectionRid)}
       </div>
     );
   };
@@ -174,8 +212,15 @@ export default function MySQLImportWizard() {
           rowKey="name"
           dataSource={filteredTables}
           pagination={false}
+          rowSelection={{
+            type: 'radio',
+            selectedRowKeys: selectedTable ? [selectedTable.name] : [],
+            onChange: (_keys, rows) => {
+              if (rows[0]) handleSelectTableRow(rows[0]);
+            },
+          }}
           onRow={(record) => ({
-            onClick: () => handleSelectTable(record),
+            onClick: () => handleSelectTableRow(record),
             style: { cursor: 'pointer' },
           })}
           columns={[
@@ -201,6 +246,7 @@ export default function MySQLImportWizard() {
           ]}
         />
       )}
+      {renderNavButtons(() => setStep(0), handleNextFromStep1, !selectedTable)}
     </div>
   );
 
@@ -240,9 +286,12 @@ export default function MySQLImportWizard() {
         message={t('mysqlConnection.snapshotWarning')}
         style={{ marginBottom: 16 }}
       />
-      <Button type="primary" onClick={handleStartImport} loading={mysqlImport.isPending}>
-        {t('mysqlConnection.confirmImport')}
-      </Button>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Button onClick={() => setStep(1)}>{t('wizard.back')}</Button>
+        <Button type="primary" onClick={handleStartImport} loading={mysqlImport.isPending}>
+          {t('mysqlConnection.confirmImport')}
+        </Button>
+      </div>
     </div>
   );
 
