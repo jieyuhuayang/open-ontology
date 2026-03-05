@@ -411,7 +411,12 @@
     "snapshotNote": "此操作将创建一份数据快照",
     "confirmImport": "确认导入",
     "importSuccess": "导入成功",
-    "importFailed": "导入失败"
+    "importFailed": "导入失败",
+    "saveFailed": "保存连接失败",
+    "snapshotWarning": "注意：此操作将创建一份数据快照，导入后的数据不会自动与源端变更同步。",
+    "noConnections": "暂无可用连接，请先在「连接管理」标签页中创建。",
+    "selectConnection": "请选择连接",
+    "searchTables": "搜索表..."
   },
   "apiErrors": {
     "PROPERTY_INVALID_ID": "属性名称无法生成有效 ID，名称必须以字母开头，且只能包含字母、数字、连字符或下划线",
