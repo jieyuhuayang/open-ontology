@@ -1,7 +1,7 @@
 import { Button, Table, Space, Popconfirm, Tag, App } from 'antd';
 import { PlusOutlined, DeleteOutlined, ApiOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient as __useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useMySQLConnections, useDeleteMySQLConnection, useTestMySQLConnection } from '@/api/mysql-connections';
 import { useDataConnectionStore } from '@/stores/data-connection-store';
 import type { MySQLConnection, MySQLConnectionTestRequest } from '@/api/types';
