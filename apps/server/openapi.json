@@ -1227,6 +1227,52 @@
         }
       }
     },
+    "/api/v1/mysql-connections/{rid}/imported-tables": {
+      "get": {
+        "tags": [
+          "mysql-connections"
+        ],
+        "summary": "Get Imported Tables",
+        "operationId": "get_imported_tables_api_v1_mysql_connections__rid__imported_tables_get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response Get Imported Tables Api V1 Mysql Connections  Rid  Imported Tables Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/mysql-connections/{rid}/tables": {
       "get": {
         "tags": [
@@ -2572,6 +2618,23 @@
             "type": "integer",
             "title": "Datasetcount",
             "default": 0
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "untested"
+          },
+          "lastTestedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lasttestedat"
           }
         },
         "type": "object",

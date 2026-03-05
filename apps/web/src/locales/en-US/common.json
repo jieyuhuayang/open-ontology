@@ -403,7 +403,7 @@
     "testFailed": "Connection failed: {{error}}",
     "useExisting": "Use Existing Connection",
     "browseTable": "Select Table",
-    "snapshotExists": "Snapshot exists",
+    "snapshotExists": "Has Snapshot",
     "configTitle": "Configure Import",
     "datasetName": "Dataset Name",
     "selectColumns": "Select Columns",
