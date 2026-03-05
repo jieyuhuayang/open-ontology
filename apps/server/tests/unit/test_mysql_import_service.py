@@ -132,3 +132,99 @@ class TestMySQLImportService:
         svc._validate_table_name_format("orders")
         svc._validate_table_name_format("user_profiles")
         svc._validate_table_name_format("_temp")
+
+    async def test_test_connection_persists_connected_status(self):
+        from app.domain.mysql_connection import MySQLConnectionTestRequest
+        from app.services.mysql_import_service import MySQLImportService
+
+        mock_session = AsyncMock()
+        svc = MySQLImportService(mock_session)
+
+        mock_orm = MagicMock()
+        mock_orm.encrypted_password = "encrypted"
+
+        mock_conn = AsyncMock()
+        mock_conn.close = MagicMock()
+
+        req = MySQLConnectionTestRequest(
+            host="localhost",
+            port=3306,
+            database_name="test",
+            username="root",
+            password="",
+            connection_rid="ri.ontology.mysql-connection.abc",
+        )
+
+        with (
+            patch(
+                "app.services.mysql_import_service.MySQLConnectionStorage.get_by_rid",
+                new_callable=AsyncMock,
+                return_value=mock_orm,
+            ),
+            patch.object(svc._crypto, "decrypt", return_value="secret"),
+            patch("app.services.mysql_import_service.asyncio") as mock_asyncio,
+            patch(
+                "app.services.mysql_import_service.MySQLConnectionStorage.update_status",
+                new_callable=AsyncMock,
+            ) as mock_update_status,
+        ):
+            mock_asyncio.wait_for = AsyncMock(return_value=mock_conn)
+            result = await svc.test_connection(req)
+            assert result.success is True
+            mock_update_status.assert_called_once()
+            call_args = mock_update_status.call_args
+            assert call_args[0][1] == "ri.ontology.mysql-connection.abc"
+            assert call_args[0][2] == "connected"
+
+    async def test_test_connection_persists_failed_status(self):
+        from app.domain.mysql_connection import MySQLConnectionTestRequest
+        from app.services.mysql_import_service import MySQLImportService
+
+        mock_session = AsyncMock()
+        svc = MySQLImportService(mock_session)
+
+        mock_orm = MagicMock()
+        mock_orm.encrypted_password = "encrypted"
+
+        req = MySQLConnectionTestRequest(
+            host="localhost",
+            port=3306,
+            database_name="test",
+            username="root",
+            password="",
+            connection_rid="ri.ontology.mysql-connection.abc",
+        )
+
+        with (
+            patch(
+                "app.services.mysql_import_service.MySQLConnectionStorage.get_by_rid",
+                new_callable=AsyncMock,
+                return_value=mock_orm,
+            ),
+            patch.object(svc._crypto, "decrypt", return_value="secret"),
+            patch("app.services.mysql_import_service.asyncio") as mock_asyncio,
+            patch(
+                "app.services.mysql_import_service.MySQLConnectionStorage.update_status",
+                new_callable=AsyncMock,
+            ) as mock_update_status,
+        ):
+            mock_asyncio.wait_for = AsyncMock(side_effect=Exception("Connection refused"))
+            result = await svc.test_connection(req)
+            assert result.success is False
+            mock_update_status.assert_called_once()
+            call_args = mock_update_status.call_args
+            assert call_args[0][2] == "failed"
+
+    async def test_get_imported_tables(self):
+        from app.services.mysql_import_service import MySQLImportService
+
+        mock_session = AsyncMock()
+        svc = MySQLImportService(mock_session)
+
+        with patch(
+            "app.services.mysql_import_service.DatasetStorage.list_imported_tables_by_connection",
+            new_callable=AsyncMock,
+            return_value=["orders", "customers"],
+        ):
+            result = await svc.get_imported_tables("ri.ontology.mysql-connection.abc")
+            assert result == ["orders", "customers"]
