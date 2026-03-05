@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Steps, Upload, Button, Form, Input, Table, Checkbox, Select, Result, Spin, Tag, App } from 'antd';
+import { Modal, Steps, Upload, Button, Form, Input, Table, Checkbox, Select, Result, Spin, App } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useFileUploadPreview, useFileImportConfirm, useImportTask } from '@/api/imports';
@@ -8,6 +8,16 @@ import { useDataConnectionStore } from '@/stores/data-connection-store';
 
 const { Dragger } = Upload;
 const STEPS = ['upload', 'preview', 'result'] as const;
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
+
+const COLUMN_TYPE_OPTIONS = [
+  { label: 'String', value: 'string' },
+  { label: 'Integer', value: 'integer' },
+  { label: 'Double', value: 'double' },
+  { label: 'Boolean', value: 'boolean' },
+  { label: 'Date', value: 'date' },
+  { label: 'Timestamp', value: 'timestamp' },
+];
 
 export default function FileUploadWizard() {
   const { t } = useTranslation();
@@ -22,6 +32,7 @@ export default function FileUploadWizard() {
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
   const [hasHeader, setHasHeader] = useState(true);
   const [taskId, setTaskId] = useState<string | null>(null);
+  const [columnTypeOverrides, setColumnTypeOverrides] = useState<Record<string, string>>({});
 
   const uploadPreview = useFileUploadPreview();
   const fileImportConfirm = useFileImportConfirm();
@@ -38,9 +49,14 @@ export default function FileUploadWizard() {
     setSelectedColumns([]);
     setHasHeader(true);
     setTaskId(null);
+    setColumnTypeOverrides({});
   };
 
   const handleUpload = async (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      message.error(t('import.fileUpload.tooLarge'));
+      return false;
+    }
     try {
       const result = await uploadPreview.mutateAsync(file);
       setPreviewData(result);
@@ -58,6 +74,14 @@ export default function FileUploadWizard() {
 
   const handleConfirm = async () => {
     if (!previewData) return;
+    // Build overrides only for changed types
+    const overrides: Record<string, string> = {};
+    for (const [colName, colType] of Object.entries(columnTypeOverrides)) {
+      const original = previewData.preview.columns.find((c) => c.name === colName);
+      if (original && original.inferredType !== colType) {
+        overrides[colName] = colType;
+      }
+    }
     try {
       const task = await fileImportConfirm.mutateAsync({
         fileToken: previewData.fileToken,
@@ -65,6 +89,7 @@ export default function FileUploadWizard() {
         sheetName: selectedSheet,
         hasHeader,
         selectedColumns: selectedColumns.length > 0 ? selectedColumns : undefined,
+        columnTypeOverrides: Object.keys(overrides).length > 0 ? overrides : undefined,
       });
       setTaskId(task.taskId);
       setStep(2);
@@ -127,9 +152,18 @@ export default function FileUploadWizard() {
               style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
             >
               {previewData.preview.columns.map((col) => (
-                <Checkbox key={col.name} value={col.name}>
-                  {col.name} <Tag>{col.inferredType}</Tag>
-                </Checkbox>
+                <div key={col.name} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Checkbox value={col.name}>{col.name}</Checkbox>
+                  <Select
+                    size="small"
+                    value={columnTypeOverrides[col.name] ?? col.inferredType}
+                    onChange={(val) =>
+                      setColumnTypeOverrides((prev) => ({ ...prev, [col.name]: val }))
+                    }
+                    options={COLUMN_TYPE_OPTIONS}
+                    style={{ width: 120 }}
+                  />
+                </div>
               ))}
             </Checkbox.Group>
           </Form.Item>
@@ -144,9 +178,19 @@ export default function FileUploadWizard() {
           size="small"
           style={{ marginBottom: 16 }}
         />
-        <Button type="primary" onClick={handleConfirm} loading={fileImportConfirm.isPending}>
+        <Button
+          type="primary"
+          onClick={handleConfirm}
+          loading={fileImportConfirm.isPending}
+          disabled={selectedColumns.length === 0}
+        >
           {t('import.fileUpload.confirmImport')}
         </Button>
+        {selectedColumns.length === 0 && (
+          <span style={{ marginLeft: 8, color: '#ff4d4f', fontSize: 12 }}>
+            {t('import.fileUpload.atLeastOneColumn')}
+          </span>
+        )}
       </div>
     );
   };
