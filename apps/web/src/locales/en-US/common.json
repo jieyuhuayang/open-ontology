@@ -396,7 +396,8 @@
       "database": "Database",
       "username": "Username",
       "password": "Password",
-      "ssl": "SSL Encryption"
+      "ssl": "SSL Encryption",
+      "dataType": "Data Type"
     },
     "testConnection": "Test Connection",
     "testSuccess": "Connection successful",
