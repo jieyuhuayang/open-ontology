@@ -1,9 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Modal,
   Steps,
   Form,
   Input,
+  InputNumber,
+  Switch,
   Button,
   Table,
   Checkbox,
@@ -13,19 +15,26 @@ import {
   App,
   Select,
   Tag,
-  Empty,
   Alert,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
 import {
   useMySQLConnections,
+  useCreateMySQLConnection,
+  useTestMySQLConnection,
   useMySQLTables,
   useMySQLTableColumns,
   useMySQLImportedTables,
+  useMySQLTablePreview,
 } from '@/api/mysql-connections';
 import { useMySQLImport, useImportTask } from '@/api/imports';
 import { useDataConnectionStore } from '@/stores/data-connection-store';
-import type { MySQLTableInfo, MySQLColumnInfo } from '@/api/types';
+import type {
+  MySQLConnectionCreateRequest,
+  MySQLConnectionTestRequest,
+  MySQLTableInfo,
+  MySQLColumnInfo,
+} from '@/api/types';
 
 const STEPS = ['connection', 'tables', 'config', 'result'] as const;
 
@@ -37,19 +46,30 @@ export default function MySQLImportWizard() {
 
   const [step, setStep] = useState(0);
   const [connectionRid, setConnectionRid] = useState<string | null>(null);
-  const [selectedTable, setSelectedTable] = useState<MySQLTableInfo | null>(null);
+  const [selectedTableName, setSelectedTableName] = useState<string | null>(null);
+  const [selectedTableRowCount, setSelectedTableRowCount] = useState<number | null>(null);
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+  const [columnsInitialized, setColumnsInitialized] = useState(false);
   const [datasetName, setDatasetName] = useState('');
   const [taskId, setTaskId] = useState<string | null>(null);
   const [tableSearch, setTableSearch] = useState('');
 
+  const [form] = Form.useForm<MySQLConnectionCreateRequest>();
+  const [useExisting, setUseExisting] = useState(false);
+
   const { data: existingConnections } = useMySQLConnections();
+  const createConnection = useCreateMySQLConnection();
+  const testConnection = useTestMySQLConnection();
   const { data: tables, isLoading: tablesLoading } = useMySQLTables(connectionRid ?? '');
   const { data: columns, isLoading: columnsLoading } = useMySQLTableColumns(
     connectionRid ?? '',
-    selectedTable?.name ?? '',
+    selectedTableName ?? '',
   );
   const { data: importedTables } = useMySQLImportedTables(connectionRid ?? '');
+  const { data: tablePreview, isLoading: previewLoading } = useMySQLTablePreview(
+    connectionRid ?? '',
+    selectedTableName ?? '',
+  );
   const mysqlImport = useMySQLImport();
   const { data: taskData } = useImportTask(taskId ?? undefined);
 
@@ -61,57 +81,128 @@ export default function MySQLImportWizard() {
     if (!tables) return [];
     if (!tableSearch) return tables;
     const lower = tableSearch.toLowerCase();
-    return tables.filter((t) => t.name.toLowerCase().includes(lower));
+    return tables.filter((tbl) => tbl.name.toLowerCase().includes(lower));
   }, [tables, tableSearch]);
+
+  // When columns load, default all columns to selected
+  useEffect(() => {
+    if (columns && columns.length > 0 && !columnsInitialized) {
+      setSelectedColumns(columns.map((c) => c.name));
+      setColumnsInitialized(true);
+    }
+  }, [columns, columnsInitialized]);
 
   const handleClose = () => {
     setOpenModal(null);
     setStep(0);
     setConnectionRid(null);
-    setSelectedTable(null);
+    setSelectedTableName(null);
+    setSelectedTableRowCount(null);
     setSelectedColumns([]);
+    setColumnsInitialized(false);
     setDatasetName('');
     setTaskId(null);
     setTableSearch('');
+    setUseExisting(false);
+    form.resetFields();
   };
 
-  const handleSelectConnection = (rid: string) => {
-    setConnectionRid(rid);
+  const handleSelectExisting = (rid: string) => {
+    const conn = existingConnections?.find((c) => c.rid === rid);
+    if (conn) {
+      form.setFieldsValue({
+        name: conn.name,
+        host: conn.host,
+        port: conn.port,
+        databaseName: conn.databaseName,
+        username: conn.username,
+        sslEnabled: conn.sslEnabled,
+      });
+      setConnectionRid(rid);
+    }
   };
 
-  const handleGoToTables = () => {
-    if (connectionRid) setStep(1);
+  const handleTestConnection = async () => {
+    try {
+      const values = await form.validateFields();
+      const req: MySQLConnectionTestRequest = {
+        host: values.host,
+        port: values.port ?? 3306,
+        databaseName: values.databaseName,
+        username: values.username,
+        password: values.password ?? '',
+        sslEnabled: values.sslEnabled ?? false,
+        connectionRid: connectionRid ?? undefined,
+      };
+      const result = await testConnection.mutateAsync(req);
+      if (result.success) {
+        message.success(t('mysqlConnection.testSuccess'));
+      } else {
+        message.error(t('mysqlConnection.testFailed', { error: result.error }));
+      }
+    } catch (err) {
+      if (err && typeof err === 'object' && 'errorFields' in err) return;
+      message.error(t('mysqlConnection.testFailed', { error: String(err) }));
+    }
+  };
+
+  const handleStep0Next = async () => {
+    try {
+      const values = await form.validateFields();
+      // If using existing connection, just go next
+      if (connectionRid && useExisting) {
+        setStep(1);
+        return;
+      }
+      // Otherwise test + save new connection
+      const testReq: MySQLConnectionTestRequest = {
+        host: values.host,
+        port: values.port ?? 3306,
+        databaseName: values.databaseName,
+        username: values.username,
+        password: values.password ?? '',
+        sslEnabled: values.sslEnabled ?? false,
+      };
+      const testResult = await testConnection.mutateAsync(testReq);
+      if (!testResult.success) {
+        message.error(t('mysqlConnection.testFailed', { error: testResult.error }));
+        return;
+      }
+      const conn = await createConnection.mutateAsync({
+        name: values.name,
+        host: values.host,
+        port: values.port ?? 3306,
+        databaseName: values.databaseName,
+        username: values.username,
+        password: values.password ?? '',
+        sslEnabled: values.sslEnabled ?? false,
+      });
+      setConnectionRid(conn.rid);
+      setStep(1);
+    } catch (err) {
+      if (err && typeof err === 'object' && 'errorFields' in err) return;
+      message.error(t('mysqlConnection.saveFailed'));
+    }
   };
 
   const handleSelectTable = (table: MySQLTableInfo) => {
-    setSelectedTable(table);
+    setSelectedTableName(table.name);
+    setSelectedTableRowCount(table.rowCount ?? null);
     setDatasetName(table.name);
-    setStep(2);
+    setColumnsInitialized(false);
+    setSelectedColumns([]);
   };
 
-  // Initialize selectedColumns with PK columns when columns load
-  const handleColumnsLoaded = (cols: MySQLColumnInfo[]) => {
-    if (selectedColumns.length === 0) {
-      const pkCols = cols.filter((c) => c.isPrimaryKey).map((c) => c.name);
-      if (pkCols.length > 0) setSelectedColumns(pkCols);
-    }
+  const handleStep1Next = () => {
+    if (selectedTableName) setStep(2);
   };
-
-  // Call this effect-like logic when columns data changes
-  if (columns && columns.length > 0 && selectedColumns.length === 0) {
-    const pkCols = columns.filter((c) => c.isPrimaryKey).map((c) => c.name);
-    if (pkCols.length > 0 && selectedColumns.length === 0) {
-      // Defer to avoid setting state during render
-      setTimeout(() => handleColumnsLoaded(columns), 0);
-    }
-  }
 
   const handleColumnToggle = (checkedValues: string[]) => {
-    // Ensure PK columns cannot be unchecked
     if (!columns) {
       setSelectedColumns(checkedValues);
       return;
     }
+    // Ensure PK columns cannot be unchecked
     const pkNames = columns.filter((c) => c.isPrimaryKey).map((c) => c.name);
     const merged = new Set(checkedValues);
     for (const pk of pkNames) merged.add(pk);
@@ -119,12 +210,12 @@ export default function MySQLImportWizard() {
   };
 
   const handleStartImport = async () => {
-    if (!connectionRid || !selectedTable) return;
+    if (!connectionRid || !selectedTableName) return;
     try {
       const task = await mysqlImport.mutateAsync({
         connectionRid,
-        table: selectedTable.name,
-        datasetName: datasetName || selectedTable.name,
+        table: selectedTableName,
+        datasetName: datasetName || selectedTableName,
         selectedColumns: selectedColumns.length > 0 ? selectedColumns : undefined,
       });
       setTaskId(task.taskId);
@@ -134,75 +225,255 @@ export default function MySQLImportWizard() {
     }
   };
 
+  const handleRetry = () => {
+    setTaskId(null);
+    setStep(2);
+  };
+
+  // --- Step renderers ---
+
   const renderStep0 = () => {
-    const hasConnections = existingConnections && existingConnections.length > 0;
-    if (!hasConnections) {
-      return <Empty description={t('mysqlConnection.noConnections')} />;
-    }
+    const hasExisting = existingConnections && existingConnections.length > 0;
     return (
       <div>
-        <Select
-          style={{ width: '100%', marginBottom: 16 }}
-          placeholder={t('mysqlConnection.selectConnection')}
-          value={connectionRid ?? undefined}
-          onChange={handleSelectConnection}
-          options={existingConnections?.map((c) => ({
-            label: `${c.name} (${c.host}:${c.port}/${c.databaseName})`,
-            value: c.rid,
-          }))}
-        />
-        <Button type="primary" disabled={!connectionRid} onClick={handleGoToTables}>
-          {t('wizard.next')}
-        </Button>
+        {hasExisting && (
+          <div style={{ marginBottom: 16 }}>
+            <Button
+              type={useExisting ? 'default' : 'primary'}
+              onClick={() => setUseExisting(false)}
+              style={{ marginRight: 8 }}
+            >
+              {t('dataConnection.newConnection')}
+            </Button>
+            <Button
+              type={useExisting ? 'primary' : 'default'}
+              onClick={() => setUseExisting(true)}
+            >
+              {t('mysqlConnection.useExisting')}
+            </Button>
+          </div>
+        )}
+
+        {useExisting ? (
+          <div>
+            <Select
+              style={{ width: '100%', marginBottom: 16 }}
+              placeholder={t('mysqlConnection.selectConnection')}
+              onChange={handleSelectExisting}
+              options={existingConnections?.map((c) => ({
+                label: `${c.name} (${c.host}:${c.port}/${c.databaseName})`,
+                value: c.rid,
+              }))}
+            />
+            <Form form={form} layout="vertical" style={{ display: 'none' }} />
+            <Button type="primary" disabled={!connectionRid} onClick={handleStep0Next}>
+              {t('wizard.next')}
+            </Button>
+          </div>
+        ) : (
+          <Form form={form} layout="vertical">
+            <Form.Item
+              name="name"
+              label={t('mysqlConnection.fields.name')}
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+            <Space style={{ width: '100%' }} styles={{ item: { flex: 1 } }}>
+              <Form.Item
+                name="host"
+                label={t('mysqlConnection.fields.host')}
+                rules={[{ required: true }]}
+                style={{ flex: 1 }}
+              >
+                <Input placeholder="localhost" />
+              </Form.Item>
+              <Form.Item
+                name="port"
+                label={t('mysqlConnection.fields.port')}
+                initialValue={3306}
+              >
+                <InputNumber min={1} max={65535} style={{ width: 100 }} />
+              </Form.Item>
+            </Space>
+            <Form.Item
+              name="databaseName"
+              label={t('mysqlConnection.fields.database')}
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="username"
+              label={t('mysqlConnection.fields.username')}
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="password"
+              label={t('mysqlConnection.fields.password')}
+              rules={[{ required: true }]}
+            >
+              <Input.Password />
+            </Form.Item>
+            <Form.Item
+              name="sslEnabled"
+              label={t('mysqlConnection.fields.ssl')}
+              valuePropName="checked"
+              initialValue={false}
+            >
+              <Switch />
+            </Form.Item>
+            <Space>
+              <Button onClick={handleTestConnection} loading={testConnection.isPending}>
+                {t('mysqlConnection.testConnection')}
+              </Button>
+              <Button
+                type="primary"
+                onClick={handleStep0Next}
+                loading={createConnection.isPending}
+              >
+                {t('wizard.next')}
+              </Button>
+            </Space>
+          </Form>
+        )}
       </div>
     );
   };
 
-  const renderStep1 = () => (
-    <div>
-      <Input.Search
-        placeholder={t('mysqlConnection.searchTables')}
-        value={tableSearch}
-        onChange={(e) => setTableSearch(e.target.value)}
-        allowClear
-        style={{ marginBottom: 12 }}
-      />
-      {tablesLoading ? (
-        <Spin />
-      ) : (
-        <Table<MySQLTableInfo>
-          rowKey="name"
-          dataSource={filteredTables}
-          pagination={false}
-          onRow={(record) => ({
-            onClick: () => handleSelectTable(record),
-            style: { cursor: 'pointer' },
-          })}
-          columns={[
-            {
-              title: t('mysqlConnection.fields.name'),
-              dataIndex: 'name',
-              key: 'name',
-              render: (name: string) => (
-                <Space>
-                  {name}
-                  {importedTableSet.has(name) && (
-                    <Tag color="orange">{t('mysqlConnection.snapshotExists')}</Tag>
-                  )}
-                </Space>
-              ),
-            },
-            {
-              title: t('mysqlConnection.estimatedRows'),
-              dataIndex: 'rowCount',
-              key: 'rowCount',
-              render: (v: number) => v?.toLocaleString() ?? '—',
-            },
-          ]}
-        />
-      )}
-    </div>
-  );
+  const renderStep1 = () => {
+    const previewColumns =
+      tablePreview?.columns?.map((col: MySQLColumnInfo) => ({
+        title: (
+          <Space size={4}>
+            {col.name}
+            {col.isPrimaryKey && <Tag color="gold">PK</Tag>}
+          </Space>
+        ),
+        dataIndex: col.name,
+        key: col.name,
+        ellipsis: true,
+      })) ?? [];
+
+    return (
+      <div style={{ display: 'flex', gap: 16 }}>
+        {/* Left pane: table list */}
+        <div style={{ width: 260, flexShrink: 0 }}>
+          <Input.Search
+            placeholder={t('mysqlConnection.searchTables')}
+            value={tableSearch}
+            onChange={(e) => setTableSearch(e.target.value)}
+            allowClear
+            style={{ marginBottom: 8 }}
+            size="small"
+          />
+          {tablesLoading ? (
+            <Spin />
+          ) : (
+            <div
+              style={{
+                maxHeight: 400,
+                overflowY: 'auto',
+                border: '1px solid #f0f0f0',
+                borderRadius: 6,
+              }}
+            >
+              {filteredTables.map((tbl) => (
+                <div
+                  key={tbl.name}
+                  onClick={() => handleSelectTable(tbl)}
+                  style={{
+                    padding: '8px 12px',
+                    cursor: 'pointer',
+                    background: selectedTableName === tbl.name ? '#e6f4ff' : undefined,
+                    borderBottom: '1px solid #f0f0f0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Space size={4}>
+                    <span>{tbl.name}</span>
+                    {importedTableSet.has(tbl.name) && (
+                      <Tag color="orange" style={{ marginRight: 0 }}>
+                        {t('mysqlConnection.snapshotExists')}
+                      </Tag>
+                    )}
+                  </Space>
+                  <span style={{ color: '#999', fontSize: 12 }}>
+                    {tbl.rowCount?.toLocaleString() ?? '—'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Right pane: column structure + preview */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {selectedTableName ? (
+            <>
+              <h4 style={{ marginTop: 0 }}>{t('dataConnection.tableStructure')}</h4>
+              {columnsLoading ? (
+                <Spin />
+              ) : (
+                <Table<MySQLColumnInfo>
+                  rowKey="name"
+                  dataSource={columns ?? []}
+                  pagination={false}
+                  size="small"
+                  style={{ marginBottom: 16 }}
+                  columns={[
+                    { title: t('mysqlConnection.fields.name'), dataIndex: 'name', key: 'name' },
+                    { title: t('mysqlConnection.fields.dataType'), dataIndex: 'dataType', key: 'dataType' },
+                    {
+                      title: 'PK',
+                      dataIndex: 'isPrimaryKey',
+                      key: 'pk',
+                      width: 60,
+                      render: (v: boolean) => (v ? <Tag color="gold">PK</Tag> : null),
+                    },
+                    {
+                      title: 'Nullable',
+                      dataIndex: 'isNullable',
+                      key: 'nullable',
+                      width: 80,
+                      render: (v: boolean) => (v ? 'NULL' : 'NOT NULL'),
+                    },
+                  ]}
+                />
+              )}
+              <h4>{t('dataConnection.tablePreview')}</h4>
+              {previewLoading ? (
+                <Spin />
+              ) : (
+                <Table
+                  rowKey={(_, index) => String(index)}
+                  columns={previewColumns}
+                  dataSource={tablePreview?.rows ?? []}
+                  pagination={false}
+                  scroll={{ x: 'max-content' }}
+                  size="small"
+                />
+              )}
+            </>
+          ) : (
+            <div style={{ color: '#999', paddingTop: 80, textAlign: 'center' }}>
+              {t('mysqlConnection.browseTable')}
+            </div>
+          )}
+          <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between' }}>
+            <Button onClick={() => setStep(0)}>{t('wizard.back')}</Button>
+            <Button type="primary" disabled={!selectedTableName} onClick={handleStep1Next}>
+              {t('wizard.next')}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const renderStep2 = () => (
     <div>
@@ -210,9 +481,9 @@ export default function MySQLImportWizard() {
         <Form.Item label={t('mysqlConnection.datasetName')}>
           <Input value={datasetName} onChange={(e) => setDatasetName(e.target.value)} />
         </Form.Item>
-        {selectedTable?.rowCount != null && (
+        {selectedTableRowCount != null && (
           <Form.Item label={t('mysqlConnection.estimatedRows')}>
-            <span>{selectedTable.rowCount.toLocaleString()}</span>
+            <span>{selectedTableRowCount.toLocaleString()}</span>
           </Form.Item>
         )}
         <Form.Item label={t('mysqlConnection.selectColumns')}>
@@ -240,9 +511,20 @@ export default function MySQLImportWizard() {
         message={t('mysqlConnection.snapshotWarning')}
         style={{ marginBottom: 16 }}
       />
-      <Button type="primary" onClick={handleStartImport} loading={mysqlImport.isPending}>
-        {t('mysqlConnection.confirmImport')}
-      </Button>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Button
+          onClick={() => {
+            setStep(1);
+            setColumnsInitialized(false);
+            setSelectedColumns([]);
+          }}
+        >
+          {t('wizard.back')}
+        </Button>
+        <Button type="primary" onClick={handleStartImport} loading={mysqlImport.isPending}>
+          {t('mysqlConnection.confirmImport')}
+        </Button>
+      </div>
     </div>
   );
 
@@ -261,7 +543,7 @@ export default function MySQLImportWizard() {
           subTitle={`${taskData.rowCount?.toLocaleString()} ${t('import.rows')}, ${taskData.columnCount} ${t('import.columns')}`}
           extra={
             <Button type="primary" onClick={handleClose}>
-              {t('common.confirm')}
+              {t('import.done')}
             </Button>
           }
         />
@@ -273,7 +555,10 @@ export default function MySQLImportWizard() {
         title={t('mysqlConnection.importFailed')}
         subTitle={taskData.errorMessage}
         extra={
-          <Button onClick={handleClose}>{t('common.confirm')}</Button>
+          <Space>
+            <Button onClick={handleRetry}>{t('import.retry')}</Button>
+            <Button onClick={handleClose}>{t('common.cancel')}</Button>
+          </Space>
         }
       />
     );
@@ -285,7 +570,7 @@ export default function MySQLImportWizard() {
       title={t('mysqlConnection.title')}
       onCancel={handleClose}
       footer={null}
-      width={720}
+      width={step === 1 ? 900 : 720}
       destroyOnClose
     >
       <Steps
