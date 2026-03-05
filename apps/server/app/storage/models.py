@@ -421,3 +421,5 @@ class MySQLConnectionModel(Base):
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     created_by = Column(String(255), nullable=False)
     last_used_at = Column(DateTime(timezone=True), nullable=True)
+    status = Column(String(20), nullable=False, server_default="untested")
+    last_tested_at = Column(DateTime(timezone=True), nullable=True)
