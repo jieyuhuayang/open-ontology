@@ -21,6 +21,7 @@ export const mysqlConnectionKeys = {
     [...mysqlConnectionKeys.tables(rid), table, 'columns'] as const,
   tablePreview: (rid: string, table: string) =>
     [...mysqlConnectionKeys.tables(rid), table, 'preview'] as const,
+  importedTables: (rid: string) => [...mysqlConnectionKeys.detail(rid), 'imported-tables'] as const,
 };
 
 export function useMySQLConnections() {
