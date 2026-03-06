@@ -67,6 +67,11 @@ export default function IngestionDropZone({ onFileDropped, onManualCreate }: Ing
           style={{ display: 'none' }}
           onChange={handleFileSelect}
         />
+        {onManualCreate && (
+          <button className={styles.idleManualBtn} onClick={onManualCreate}>
+            {t('demo.manualCreate')}
+          </button>
+        )}
       </div>
     </motion.div>
   );
