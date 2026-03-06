@@ -1,7 +1,6 @@
 import { useCallback, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { CloudUploadOutlined } from '@ant-design/icons';
 import styles from '../styles/canvas.module.css';
 
 interface IngestionDropZoneProps {
@@ -46,22 +45,21 @@ export default function IngestionDropZone({ onFileDropped }: IngestionDropZonePr
 
   return (
     <motion.div
-      className={styles.dropZone}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
+      className={`${styles.idleOverlay} ${isDragOver ? styles.idleOverlayDragActive : ''}`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.6 }}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
     >
-      <div
-        className={`${styles.dropZoneInner} ${isDragOver ? styles.dropZoneActive : ''}`}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onClick={handleClick}
-      >
-        <CloudUploadOutlined className={styles.dropZoneIcon} />
-        <div className={styles.dropZoneTitle}>{t('demo.dropTitle')}</div>
-        <div className={styles.dropZoneHint}>{t('demo.dropHint')}</div>
+      <div className={styles.idleCard}>
+        <h1 className={styles.idleTitle}>{t('demo.dropTitle')}</h1>
+        <p className={styles.idleSubtitle}>{t('demo.dropHint')}</p>
+        <button className={styles.idleButton} onClick={handleClick}>
+          Upload
+        </button>
         <input
           ref={fileInputRef}
           type="file"
