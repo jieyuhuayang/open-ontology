@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Billboard, Text } from '@react-three/drei';
 import type { Mesh, PointLight as TPointLight } from 'three';
@@ -8,48 +8,158 @@ interface StarNodeProps {
   node: GraphNode;
   onClick: (id: string) => void;
   selected: boolean;
+  isBirth?: boolean;
+  onDragLinkStart?: (
+    nodeId: string,
+    position: { x: number; y: number; z: number },
+  ) => void;
+  onDragLinkEnd?: (nodeId: string) => void;
+  isDragSource?: boolean;
+  isDragHoverTarget?: boolean;
+  isDragging?: boolean;
 }
 
-export default function StarNode({ node, onClick, selected }: StarNodeProps) {
+export default function StarNode({
+  node,
+  onClick,
+  selected,
+  isBirth,
+  onDragLinkStart,
+  onDragLinkEnd,
+  isDragSource,
+  isDragHoverTarget,
+  isDragging,
+}: StarNodeProps) {
   const meshRef = useRef<Mesh>(null);
   const lightRef = useRef<TPointLight>(null);
   const [hovered, setHovered] = useState(false);
   const phaseOffset = useRef(Math.random() * Math.PI * 2);
+
+  // Birth animation state
+  const birthStartTime = useRef<number | null>(null);
+  const [birthScale, setBirthScale] = useState(isBirth ? 0 : 1);
+  const [birthEmissiveBoost, setBirthEmissiveBoost] = useState(
+    isBirth ? 4.0 : 0,
+  );
+
+  // Long-press tracking
+  const pointerDownTime = useRef<number>(0);
+  const longPressTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isLongPress = useRef(false);
+
+  useEffect(() => {
+    if (isBirth) {
+      birthStartTime.current = performance.now();
+    }
+  }, [isBirth]);
 
   const baseRadius = 0.5 + node.data.properties.length * 0.08;
   const color = node.data.color;
 
   useFrame(({ clock }) => {
     if (!meshRef.current) return;
+
+    // Birth animation: scale 0 → 1.15 → 1 over 0.6s (easeOutBack)
+    if (isBirth && birthStartTime.current !== null) {
+      const elapsed = (performance.now() - birthStartTime.current) / 1000;
+      if (elapsed < 0.6) {
+        const t = elapsed / 0.6;
+        // easeOutBack
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        const scale = 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+        setBirthScale(Math.max(0, scale));
+        // Emissive flash: 4.0 → 0 over 0.6s
+        setBirthEmissiveBoost(4.0 * (1 - t));
+      } else {
+        setBirthScale(1);
+        setBirthEmissiveBoost(0);
+        birthStartTime.current = null;
+      }
+    }
+
     const t = clock.getElapsedTime() + phaseOffset.current;
-    const baseIntensity = hovered || selected ? 2.0 : 0.8 + Math.sin(t * 1.5) * 0.2;
+    let baseIntensity =
+      hovered || selected ? 2.0 : 0.8 + Math.sin(t * 1.5) * 0.2;
+    if (isDragSource) baseIntensity = 3.0;
+    baseIntensity += birthEmissiveBoost;
+
     const mat = meshRef.current.material;
     if ('emissiveIntensity' in mat) {
       (mat as { emissiveIntensity: number }).emissiveIntensity = baseIntensity;
     }
     if (lightRef.current) {
-      lightRef.current.intensity = hovered || selected ? 1.5 : 0.3 + node.data.properties.length * 0.1;
+      lightRef.current.intensity =
+        hovered || selected
+          ? 1.5
+          : 0.3 + node.data.properties.length * 0.1;
     }
   });
 
+  const handlePointerDown = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    pointerDownTime.current = Date.now();
+    isLongPress.current = false;
+
+    if (onDragLinkStart) {
+      longPressTimeout.current = setTimeout(() => {
+        isLongPress.current = true;
+        onDragLinkStart(node.id, node.position);
+      }, 200);
+    }
+  };
+
+  const handlePointerUp = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (longPressTimeout.current) {
+      clearTimeout(longPressTimeout.current);
+      longPressTimeout.current = null;
+    }
+
+    if (isDragging && onDragLinkEnd) {
+      onDragLinkEnd(node.id);
+      return;
+    }
+
+    if (!isLongPress.current) {
+      onClick(node.id);
+    }
+    isLongPress.current = false;
+  };
+
+  const handlePointerOver = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    setHovered(true);
+    if (!isDragging) {
+      document.body.style.cursor = 'pointer';
+    }
+  };
+
+  const handlePointerOut = () => {
+    setHovered(false);
+    if (!isDragging) {
+      document.body.style.cursor = 'auto';
+    }
+  };
+
+  const outerOpacity = isDragHoverTarget
+    ? 0.3
+    : hovered || selected
+      ? 0.15
+      : 0.06;
+
   return (
-    <group position={[node.position.x, node.position.y, node.position.z]}>
+    <group
+      position={[node.position.x, node.position.y, node.position.z]}
+      scale={birthScale}
+    >
       {/* Inner core */}
       <mesh
         ref={meshRef}
-        onClick={(e) => {
-          e.stopPropagation();
-          onClick(node.id);
-        }}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          setHovered(true);
-          document.body.style.cursor = 'pointer';
-        }}
-        onPointerOut={() => {
-          setHovered(false);
-          document.body.style.cursor = 'auto';
-        }}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
       >
         <sphereGeometry args={[baseRadius, 32, 32]} />
         <meshStandardMaterial
@@ -64,9 +174,9 @@ export default function StarNode({ node, onClick, selected }: StarNodeProps) {
       <mesh>
         <sphereGeometry args={[baseRadius * 1.4, 32, 32]} />
         <meshBasicMaterial
-          color={color}
+          color={isDragHoverTarget ? '#4fc3f7' : color}
           transparent
-          opacity={hovered || selected ? 0.15 : 0.06}
+          opacity={outerOpacity}
           depthWrite={false}
         />
       </mesh>
