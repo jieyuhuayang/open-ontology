@@ -2,7 +2,7 @@
 name: sdd-review
 description: 对 Open Ontology 项目的 SDD 文档执行审查。
   - spec：写完 spec.md 后调用，同时检查 PRD gap 和架构合规性，生成报告供用户参考
-  - tasks：写完 tasks.md 后可选调用，检查 AC 追溯和任务原子化
+  - tasks：写完 tasks.md 后自动调用，检查 AC 追溯、任务拆解质量和技术债预防
   用法：/sdd-review <feature_dir> <doc_type>，doc_type 为 spec / tasks。
   TRIGGER when: 用户完成了 SDD 的 spec.md / tasks.md 编写，或者用户使用 /sdd-review 命令，或者 Claude 完成了这些文件的编写后需要审查。
 ---
