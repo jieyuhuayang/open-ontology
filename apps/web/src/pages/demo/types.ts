@@ -40,6 +40,18 @@ export type IngestionPhase =
   | 'CRYSTALLIZING'
   | 'COMPLETE';
 
+export interface DragLinkState {
+  sourceNodeId: string;
+  sourcePosition: { x: number; y: number; z: number };
+  currentPointerPosition: { x: number; y: number; z: number };
+  hoveredTargetId: string | null;
+}
+
+export interface PendingLink {
+  sourceId: string;
+  targetId: string;
+}
+
 export interface Suggestion {
   id: string;
   text: string;
