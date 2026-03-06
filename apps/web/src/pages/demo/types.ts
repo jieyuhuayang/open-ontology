@@ -20,6 +20,19 @@ export interface DemoLinkType {
   cardinality: string;
 }
 
+export interface GraphNode {
+  id: string;
+  position: { x: number; y: number; z: number };
+  data: DemoObjectType;
+}
+
+export interface GraphEdge {
+  id: string;
+  source: string;
+  target: string;
+  data: { label: string; cardinality: string };
+}
+
 export type IngestionPhase =
   | 'IDLE'
   | 'ABSORBING'
