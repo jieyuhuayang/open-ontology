@@ -178,9 +178,10 @@ justfile                              # Monorepo 任务运行器
    - 每个任务内联必要实现上下文（文件、逻辑、测试），实现阶段不需要回读 spec.md
    - 每个测试任务必须标注 `覆盖 AC: AC-NN, AC-NN`，追溯到 spec.md 的 AC 表格
    - 缺少 AC 标注的测试任务视为规格不完整，禁止开始对应的实现任务
-4. **执行** — 逐任务实施，完成后在 tasks.md 打勾
+4. **审查 tasks** — 写完 tasks.md 后自动调用 `/sdd-review <feature_dir> tasks`；检查 AC 追溯、任务拆解质量和技术债预防；通过则自动推进；有 high/medium 问题时自动修复后重审（最多 2 轮）
+5. **执行** — 逐任务实施，完成后在 tasks.md 打勾
 
-**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。`spec.md` 评审需用户最终确认（唯一手动暂停点）。写 spec 前必须先阅读版本的 `release-contract.md` 和完整的 PRD 原文。
+**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。`spec.md` 评审需用户最终确认（唯一手动暂停点）；`tasks.md` 审查为全自动（无需用户确认）。写 spec 前必须先阅读版本的 `release-contract.md` 和完整的 PRD 原文。
 
 ## 外部 MySQL 策略
 
