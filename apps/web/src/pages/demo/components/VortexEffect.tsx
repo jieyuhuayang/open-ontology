@@ -131,6 +131,12 @@ export default function VortexEffect({ phase, fileName, targetNodes }: VortexEff
             array={positions}
             itemSize={3}
           />
+          <bufferAttribute
+            attach="attributes-size"
+            count={PARTICLE_COUNT}
+            array={sizes}
+            itemSize={1}
+          />
         </bufferGeometry>
         <pointsMaterial
           size={0.1}
