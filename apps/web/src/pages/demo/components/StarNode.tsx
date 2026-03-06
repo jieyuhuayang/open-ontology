@@ -105,7 +105,7 @@ export default function StarNode({
       longPressTimeout.current = setTimeout(() => {
         isLongPress.current = true;
         onDragLinkStart(node.id, node.position);
-      }, 200);
+      }, 150);
     }
   };
 
