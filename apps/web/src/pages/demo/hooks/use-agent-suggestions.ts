@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { Suggestion } from '../types';
+import type { Suggestion, GraphNode, GraphEdge } from '../types';
 import { getNextSuggestion } from '../mock/mock-suggestions';
-import type { Node, Edge } from '@xyflow/react';
 
 const MAX_VISIBLE = 3;
 const SUGGESTION_INTERVAL_MIN = 4000;
@@ -9,8 +8,8 @@ const SUGGESTION_INTERVAL_MAX = 6000;
 const SUGGESTION_TTL = 30000;
 
 export function useAgentSuggestions(
-  nodes: Node[],
-  edges: Edge[],
+  nodes: GraphNode[],
+  edges: GraphEdge[],
   isActive: boolean,
 ) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
