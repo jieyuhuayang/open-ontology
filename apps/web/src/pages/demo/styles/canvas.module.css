@@ -1,0 +1,398 @@
+.canvasContainer {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #0f1419, #1a1f2e, #0d1117);
+  position: relative;
+  overflow: hidden;
+}
+
+.canvasContainer :global(.react-flow__background) {
+  opacity: 0.3;
+}
+
+/* Glassmorphism node card */
+.nodeCard {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 16px;
+  min-width: 200px;
+  color: rgba(255, 255, 255, 0.87);
+  cursor: grab;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nodeCard:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 24px rgba(22, 119, 255, 0.15);
+}
+
+.nodeCardSelected {
+  border-color: #1677ff;
+  box-shadow: 0 0 32px rgba(22, 119, 255, 0.25);
+}
+
+.nodeHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.nodeIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.nodeName {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nodeStats {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 4px;
+}
+
+/* Property list inside expanded node */
+.propertyList {
+  margin-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.propertyItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+.propertyName {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.propertyType {
+  color: rgba(255, 255, 255, 0.35);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 11px;
+}
+
+/* Edge label */
+.edgeLabel {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+}
+
+.edgeLabelCardinality {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  margin-left: 4px;
+}
+
+/* Drop zone */
+.dropZone {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.dropZoneInner {
+  width: 400px;
+  height: 300px;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  transition: border-color 0.3s, background-color 0.3s;
+  cursor: pointer;
+}
+
+.dropZoneInner:hover,
+.dropZoneActive {
+  border-color: #1677ff;
+  background: rgba(22, 119, 255, 0.05);
+}
+
+.dropZoneIcon {
+  font-size: 48px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.dropZoneTitle {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.dropZoneHint {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* Header */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  background: rgba(15, 20, 25, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 100;
+  gap: 12px;
+}
+
+.headerBackBtn {
+  color: rgba(255, 255, 255, 0.6);
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.headerBackBtn:hover {
+  color: rgba(255, 255, 255, 0.87);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.headerTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.headerBadge {
+  font-size: 11px;
+  color: #1677ff;
+  background: rgba(22, 119, 255, 0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Toolbar */
+.toolbar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  z-index: 50;
+}
+
+.toolbarBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.toolbarBtn:hover {
+  color: rgba(255, 255, 255, 0.87);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Agent sidekick panel */
+.agentPanel {
+  position: fixed;
+  bottom: 80px;
+  right: 24px;
+  width: 340px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.agentHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.agentDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #52c41a;
+  flex-shrink: 0;
+}
+
+/* Suggestion bubble */
+.suggestionBubble {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.suggestionActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.suggestionAccept {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: none;
+  background: #1677ff;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.suggestionAccept:hover {
+  background: #4096ff;
+}
+
+.suggestionDismiss {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.suggestionDismiss:hover {
+  color: rgba(255, 255, 255, 0.75);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Handle styles */
+.handleStyle {
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Vortex container */
+.vortexContainer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.vortexCenter {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.vortexText {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Property editor */
+.propertyEditor {
+  margin-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 8px;
+}
+
+.propertyEditorRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.propertyEditorInput {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.87);
+  padding: 2px 6px;
+  font-size: 12px;
+  outline: none;
+}
+
+.propertyEditorInput:focus {
+  border-color: #1677ff;
+}
