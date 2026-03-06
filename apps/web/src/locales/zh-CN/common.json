@@ -432,7 +432,19 @@
     "zoomIn": "放大",
     "zoomOut": "缩小",
     "fitView": "适应画布",
-    "reset": "重置"
+    "reset": "重置",
+    "addObjectType": "添加对象类型",
+    "createObjectType": "创建对象类型",
+    "objectTypeName": "输入名称",
+    "pickColor": "选择颜色",
+    "pickIcon": "选择图标",
+    "createLink": "创建连接",
+    "linkName": "关系名称",
+    "cardinality": "基数",
+    "manualCreate": "或，手动创建",
+    "closePanel": "关闭",
+    "linkFrom": "从",
+    "linkTo": "到"
   },
   "apiErrors": {
     "PROPERTY_INVALID_ID": "属性名称无法生成有效 ID，名称必须以字母开头，且只能包含字母、数字、连字符或下划线",
