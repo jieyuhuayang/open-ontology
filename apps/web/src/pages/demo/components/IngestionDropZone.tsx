@@ -5,6 +5,7 @@ import styles from '../styles/canvas.module.css';
 
 interface IngestionDropZoneProps {
   onFileDropped: (fileName: string) => void;
+  onManualCreate?: () => void;
 }
 
 export default function IngestionDropZone({ onFileDropped }: IngestionDropZoneProps) {
