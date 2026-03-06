@@ -143,6 +143,7 @@ export default function StarNode({
       clearTimeout(longPressTimeout.current);
       longPressTimeout.current = null;
     }
+    ringStartTime.current = null;
 
     if (isDragging && onDragLinkEnd) {
       onDragLinkEnd(node.id);
