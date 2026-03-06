@@ -7,9 +7,12 @@ import IngestionDropZone from './components/IngestionDropZone';
 import AgentSidekick from './components/AgentSidekick';
 import CanvasToolbar from './components/CanvasToolbar';
 import NodeDetailPanel from './components/NodeDetailPanel';
+import AddObjectTypeForm from './components/AddObjectTypeForm';
+import LinkConfigForm from './components/LinkConfigForm';
 import { useDemoGraph } from './hooks/use-demo-graph';
 import { useIngestion } from './hooks/use-ingestion';
 import { useAgentSuggestions } from './hooks/use-agent-suggestions';
+import { useManualMode } from './hooks/use-manual-mode';
 import { reviewLinks } from './mock/mock-suggestions';
 import type { DemoObjectType, DemoLinkType } from './types';
 import styles from './styles/canvas.module.css';
@@ -17,6 +20,7 @@ import styles from './styles/canvas.module.css';
 export function Component() {
   const canvasRef = useRef<StarfieldCanvasHandle>(null);
   const [canvasReady, setCanvasReady] = useState(false);
+  const [birthNodeId, setBirthNodeId] = useState<string | null>(null);
 
   const {
     nodes,
@@ -29,6 +33,22 @@ export function Component() {
     selectedNodeId,
     setSelectedNodeId,
   } = useDemoGraph();
+
+  const {
+    isCreationPanelOpen,
+    isAddFormVisible,
+    dragLink,
+    pendingLink,
+    orbitEnabled,
+    toggleCreationPanel,
+    openAddForm,
+    closeAddForm,
+    startDragLink,
+    updateDragPointer,
+    endDragLink,
+    confirmPendingLink,
+    cancelPendingLink,
+  } = useManualMode();
 
   const handleIngestionComplete = useCallback(
     (objectTypes: DemoObjectType[], linkTypes: DemoLinkType[]) => {
@@ -112,7 +132,65 @@ export function Component() {
     [toggleNodeExpanded],
   );
 
+  const handleManualCreate = useCallback(() => {
+    setCanvasReady(true);
+  }, []);
+
+  const handleAddObjectType = useCallback(
+    (objectType: DemoObjectType) => {
+      addNode(objectType);
+      setBirthNodeId(objectType.id);
+      closeAddForm();
+      // Clear birth animation flag after it completes
+      setTimeout(() => setBirthNodeId(null), 800);
+    },
+    [addNode, closeAddForm],
+  );
+
+  const handleDragLinkStart = useCallback(
+    (nodeId: string, position: { x: number; y: number; z: number }) => {
+      startDragLink(nodeId, position);
+    },
+    [startDragLink],
+  );
+
+  const handleDragLinkEnd = useCallback(
+    (nodeId: string | undefined) => {
+      endDragLink(nodeId);
+    },
+    [endDragLink],
+  );
+
+  const handleDragPointerMove = useCallback(
+    (position: { x: number; y: number; z: number }) => {
+      updateDragPointer(position);
+    },
+    [updateDragPointer],
+  );
+
+  const handleConfirmLink = useCallback(
+    (label: string, cardinality: string) => {
+      const link = confirmPendingLink();
+      if (!link) return;
+      addLink({
+        id: `manual-link-${Date.now()}`,
+        sourceId: link.sourceId,
+        targetId: link.targetId,
+        label,
+        cardinality,
+      });
+    },
+    [confirmPendingLink, addLink],
+  );
+
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
+
+  const pendingSourceNode = pendingLink
+    ? nodes.find((n) => n.id === pendingLink.sourceId)
+    : null;
+  const pendingTargetNode = pendingLink
+    ? nodes.find((n) => n.id === pendingLink.targetId)
+    : null;
 
   return (
     <div className={styles.canvasContainer}>
@@ -126,11 +204,20 @@ export function Component() {
         fileName={fileName}
         selectedNodeId={selectedNodeId}
         onNodeClick={handleNodeClick}
+        dragLink={dragLink}
+        onDragLinkStart={handleDragLinkStart}
+        onDragLinkEnd={handleDragLinkEnd}
+        onDragPointerMove={handleDragPointerMove}
+        orbitEnabled={orbitEnabled}
+        birthNodeId={birthNodeId}
       />
 
       <AnimatePresence>
         {phase === 'IDLE' && !canvasReady && (
-          <IngestionDropZone onFileDropped={startIngestion} />
+          <IngestionDropZone
+            onFileDropped={startIngestion}
+            onManualCreate={handleManualCreate}
+          />
         )}
       </AnimatePresence>
 
@@ -141,6 +228,9 @@ export function Component() {
             onZoomOut={handleZoomOut}
             onFitView={handleFitView}
             onReset={handleReset}
+            isCreationPanelOpen={isCreationPanelOpen}
+            onToggleCreationPanel={toggleCreationPanel}
+            onOpenAddForm={openAddForm}
           />
           <AgentSidekick
             suggestions={suggestions}
@@ -148,6 +238,22 @@ export function Component() {
             onDismiss={dismiss}
           />
         </>
+      )}
+
+      {isAddFormVisible && (
+        <AddObjectTypeForm
+          onSubmit={handleAddObjectType}
+          onClose={closeAddForm}
+        />
+      )}
+
+      {pendingLink && pendingSourceNode && pendingTargetNode && (
+        <LinkConfigForm
+          sourceNode={pendingSourceNode}
+          targetNode={pendingTargetNode}
+          onConfirm={handleConfirmLink}
+          onCancel={cancelPendingLink}
+        />
       )}
 
       <AnimatePresence>
