@@ -152,7 +152,7 @@ export default function VortexEffect({ phase, fileName, targetNodes }: VortexEff
 
   return (
     <group>
-      <points ref={pointsRef}>
+      <points ref={pointsRef} material={shaderMaterial}>
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
@@ -167,15 +167,6 @@ export default function VortexEffect({ phase, fileName, targetNodes }: VortexEff
             itemSize={1}
           />
         </bufferGeometry>
-        <pointsMaterial
-          size={0.1}
-          color="#88bbff"
-          transparent
-          opacity={0.8}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          sizeAttenuation
-        />
       </points>
 
       <pointLight ref={lightRef} position={[0, 0, 0]} intensity={1} distance={20} />
