@@ -100,6 +100,27 @@ export default function StarNode({
           ? 1.5
           : 0.3 + node.data.properties.length * 0.1;
     }
+
+    // Long-press ring animation: shrink from 2x to 1.4x baseRadius over LONG_PRESS_MS
+    if (ringRef.current) {
+      if (ringStartTime.current !== null) {
+        const ringElapsed = performance.now() - ringStartTime.current;
+        const progress = Math.min(ringElapsed / LONG_PRESS_MS, 1);
+        const ringScale = baseRadius * (2 - 0.6 * progress);
+        ringRef.current.scale.set(ringScale, ringScale, 1);
+        const ringMat = ringRef.current.material;
+        if ('opacity' in ringMat) {
+          (ringMat as { opacity: number }).opacity = 0.4 * (1 - progress);
+        }
+        ringRef.current.visible = true;
+        if (progress >= 1) {
+          ringStartTime.current = null;
+          ringRef.current.visible = false;
+        }
+      } else {
+        ringRef.current.visible = false;
+      }
+    }
   });
 
   const handlePointerDown = (e: { stopPropagation: () => void }) => {
