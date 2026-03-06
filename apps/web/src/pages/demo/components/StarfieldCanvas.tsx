@@ -127,9 +127,9 @@ function SceneContent({
 
       <EffectComposer>
         <Bloom
-          luminanceThreshold={0.15}
+          luminanceThreshold={0.25}
           luminanceSmoothing={0.9}
-          intensity={1.8}
+          intensity={1.3}
         />
       </EffectComposer>
 
