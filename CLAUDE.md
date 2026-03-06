@@ -179,9 +179,17 @@ justfile                              # Monorepo 任务运行器
    - 每个测试任务必须标注 `覆盖 AC: AC-NN, AC-NN`，追溯到 spec.md 的 AC 表格
    - 缺少 AC 标注的测试任务视为规格不完整，禁止开始对应的实现任务
 4. **审查 tasks** — 写完 tasks.md 后自动调用 `/sdd-review <feature_dir> tasks`；检查 AC 追溯、任务拆解质量和技术债预防；通过则自动推进；有 high/medium 问题时自动修复后重审（最多 2 轮）
-5. **执行** — 逐任务实施，完成后在 tasks.md 打勾
+5. **创建 Feature 分支** — `git checkout -b feat/<version>/<feature-id>-<short-name>`
+   - 分支命名示例：`feat/v0.1.0/005-object-type-crud-frontend`
+   - 步骤 1-4 的文档工作在 main 上完成；步骤 6 的代码实现在 feature 分支上
+6. **执行** — 在 feature 分支上逐任务实施，完成后在 tasks.md 打勾
+7. **代码审查** — 全部任务完成后，调用 `/code-review --base main`
+   - 自动运行（Codex + Gemini 并行），无需用户确认
+   - PASS / PASS_WITH_WARNINGS → 可合并
+   - NEEDS_FIX → 修复 HIGH 问题后重审（最多 2 轮）
+8. **合并** — `git checkout main && git merge --no-ff feat/<version>/<branch> && git branch -d feat/<version>/<branch>`
 
-**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。`spec.md` 评审需用户最终确认（唯一手动暂停点）；`tasks.md` 审查为全自动（无需用户确认）。写 spec 前必须先阅读版本的 `release-contract.md` 和完整的 PRD 原文。
+**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。`spec.md` 评审需用户最终确认（唯一手动暂停点）；`tasks.md` 审查和代码审查均为全自动（无需用户确认）。执行阶段在 feature 分支上进行，审查通过后合并回 main。写 spec 前必须先阅读版本的 `release-contract.md` 和完整的 PRD 原文。
 
 ## 外部 MySQL 策略
 
