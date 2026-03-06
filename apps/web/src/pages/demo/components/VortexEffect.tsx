@@ -32,8 +32,9 @@ export default function VortexEffect({ phase, fileName, targetNodes }: VortexEff
   }
 
   // Initialize particle data
-  const positions = useMemo(() => {
+  const { positions, sizes } = useMemo(() => {
     const pos = new Float32Array(PARTICLE_COUNT * 3);
+    const sz = new Float32Array(PARTICLE_COUNT);
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
@@ -41,8 +42,9 @@ export default function VortexEffect({ phase, fileName, targetNodes }: VortexEff
       pos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
       pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       pos[i * 3 + 2] = r * Math.cos(phi);
+      sz[i] = 0.05 + Math.random() * 0.09;
     }
-    return pos;
+    return { positions: pos, sizes: sz };
   }, []);
 
   useFrame(({ clock }) => {
