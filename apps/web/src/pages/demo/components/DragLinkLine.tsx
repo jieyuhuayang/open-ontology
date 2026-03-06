@@ -21,7 +21,7 @@ export default function DragLinkLine({ dragLink }: DragLinkLineProps) {
         ],
       ]}
       color={color}
-      lineWidth={2}
+      lineWidth={hoveredTargetId ? 3 : 2}
       dashed
       dashSize={0.22}
       gapSize={0.14}
