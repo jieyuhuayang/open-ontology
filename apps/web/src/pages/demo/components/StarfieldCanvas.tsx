@@ -2,22 +2,21 @@ import { useRef, useImperativeHandle, forwardRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
-type OrbitControlsImpl = InstanceType<typeof import('@react-three/drei').OrbitControls extends React.ForwardRefExoticComponent<infer P> ? never : never> & {
-  object: import('three').Camera;
-  target: import('three').Vector3;
-  update: () => void;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type OrbitControlsRef = any;
+import type * as THREE from 'three';
 import BackgroundStars from './BackgroundStars';
 import StarNode from './StarNode';
 import StarLink from './StarLink';
 import VortexEffect from './VortexEffect';
 import type { GraphNode, GraphEdge, IngestionPhase } from '../types';
 
+interface OrbitControlsHandle {
+  object: THREE.Camera & { position: THREE.Vector3 };
+  target: THREE.Vector3;
+  update: () => void;
+}
+
 export interface StarfieldCanvasHandle {
-  controls: OrbitControlsImpl | null;
+  controls: OrbitControlsHandle | null;
 }
 
 interface StarfieldCanvasProps {
@@ -37,7 +36,7 @@ function SceneContent({
   selectedNodeId,
   onNodeClick,
   controlsRef,
-}: StarfieldCanvasProps & { controlsRef: React.RefObject<OrbitControlsImpl | null> }) {
+}: StarfieldCanvasProps & { controlsRef: React.RefObject<OrbitControlsHandle | null> }) {
   const nodeMap = new Map(nodes.map((n) => [n.id, n]));
   const showVortex = phase !== 'IDLE' && phase !== 'COMPLETE';
 
@@ -47,7 +46,7 @@ function SceneContent({
       <fog attach="fog" args={['#080812', 30, 80]} />
 
       <OrbitControls
-        ref={controlsRef}
+        ref={controlsRef as React.RefObject<never>}
         autoRotate
         autoRotateSpeed={0.15}
         enableDamping
@@ -101,7 +100,7 @@ function SceneContent({
 
 const StarfieldCanvas = forwardRef<StarfieldCanvasHandle, StarfieldCanvasProps>(
   function StarfieldCanvas(props, ref) {
-    const controlsRef = useRef<OrbitControlsImpl | null>(null);
+    const controlsRef = useRef<OrbitControlsHandle | null>(null);
 
     useImperativeHandle(ref, () => ({
       get controls() {
