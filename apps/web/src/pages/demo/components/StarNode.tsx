@@ -210,6 +210,18 @@ export default function StarNode({
         />
       </mesh>
 
+      {/* Long-press closing ring */}
+      <mesh ref={ringRef} visible={false} rotation={[0, 0, 0]}>
+        <ringGeometry args={[0.9, 1.0, 64]} />
+        <meshBasicMaterial
+          color="white"
+          transparent
+          opacity={0.4}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+        />
+      </mesh>
+
       {/* Point light */}
       <pointLight
         ref={lightRef}
