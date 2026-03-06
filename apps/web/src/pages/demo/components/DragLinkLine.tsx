@@ -23,8 +23,8 @@ export default function DragLinkLine({ dragLink }: DragLinkLineProps) {
       color={color}
       lineWidth={2}
       dashed
-      dashSize={0.3}
-      gapSize={0.2}
+      dashSize={0.22}
+      gapSize={0.14}
       transparent
       opacity={opacity}
     />
