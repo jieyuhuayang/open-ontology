@@ -2,7 +2,14 @@ import { useRef, useImperativeHandle, forwardRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
-import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+type OrbitControlsImpl = InstanceType<typeof import('@react-three/drei').OrbitControls extends React.ForwardRefExoticComponent<infer P> ? never : never> & {
+  object: import('three').Camera;
+  target: import('three').Vector3;
+  update: () => void;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type OrbitControlsRef = any;
 import BackgroundStars from './BackgroundStars';
 import StarNode from './StarNode';
 import StarLink from './StarLink';
