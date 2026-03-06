@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Billboard, Text } from '@react-three/drei';
+import * as THREE from 'three';
 import type { Mesh, PointLight as TPointLight } from 'three';
 import type { GraphNode } from '../types';
 
