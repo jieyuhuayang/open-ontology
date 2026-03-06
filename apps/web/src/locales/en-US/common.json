@@ -419,6 +419,21 @@
     "selectConnection": "Select a connection",
     "searchTables": "Search tables..."
   },
+  "demo": {
+    "title": "Ontology Canvas",
+    "dropTitle": "Drop your business data, let AI understand your world",
+    "dropHint": "Any file format accepted (demo only, content not parsed)",
+    "phaseAbsorbing": "Absorbing file...",
+    "phaseProcessing": "AI is distilling semantic structure...",
+    "phaseCrystallizing": "Crystallizing semantics...",
+    "agentTitle": "AI assistant is observing your ontology...",
+    "accept": "Accept",
+    "dismiss": "Dismiss",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "fitView": "Fit View",
+    "reset": "Reset"
+  },
   "apiErrors": {
     "PROPERTY_INVALID_ID": "Property name cannot generate a valid ID. Name must start with a letter and only contain letters, digits, hyphens, or underscores",
     "PROPERTY_INVALID_API_NAME": "Property name cannot generate a valid API Name. Name must start with a letter and only contain letters and digits (1-100 chars)",
