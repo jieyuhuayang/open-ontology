@@ -131,7 +131,7 @@ justfile                              # Monorepo 任务运行器
 
 - **禁止在组件中硬编码用户可见字符串** — 必须使用 `t('key')`
 - Ant Design 国际化通过 `ConfigProvider` 配置
-- PRD 为简体中文；UI 必须支持国际化
+- UI 必须支持国际化
 
 ## 测试要求
 
