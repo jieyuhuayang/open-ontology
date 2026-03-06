@@ -48,6 +48,11 @@ export default function StarNode({
   const longPressTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLongPress = useRef(false);
 
+  // Long-press ring feedback
+  const ringRef = useRef<Mesh>(null);
+  const ringStartTime = useRef<number | null>(null);
+  const LONG_PRESS_MS = 150;
+
   useEffect(() => {
     if (isBirth) {
       birthStartTime.current = performance.now();
