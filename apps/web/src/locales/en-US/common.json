@@ -432,7 +432,19 @@
     "zoomIn": "Zoom In",
     "zoomOut": "Zoom Out",
     "fitView": "Fit View",
-    "reset": "Reset"
+    "reset": "Reset",
+    "addObjectType": "Add Object Type",
+    "createObjectType": "Create Object Type",
+    "objectTypeName": "Enter name",
+    "pickColor": "Pick Color",
+    "pickIcon": "Pick Icon",
+    "createLink": "Create Link",
+    "linkName": "Relationship Name",
+    "cardinality": "Cardinality",
+    "manualCreate": "or, create manually",
+    "closePanel": "Close",
+    "linkFrom": "From",
+    "linkTo": "To"
   },
   "apiErrors": {
     "PROPERTY_INVALID_ID": "Property name cannot generate a valid ID. Name must start with a letter and only contain letters, digits, hyphens, or underscores",
