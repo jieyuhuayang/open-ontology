@@ -1,163 +1,9 @@
 .canvasContainer {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #0f1419, #1a1f2e, #0d1117);
+  background: #080812;
   position: relative;
   overflow: hidden;
-}
-
-.canvasContainer :global(.react-flow__background) {
-  opacity: 0.3;
-}
-
-/* Glassmorphism node card */
-.nodeCard {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  padding: 16px;
-  min-width: 200px;
-  color: rgba(255, 255, 255, 0.87);
-  cursor: grab;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.nodeCard:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 0 24px rgba(22, 119, 255, 0.15);
-}
-
-.nodeCardSelected {
-  border-color: #1677ff;
-  box-shadow: 0 0 32px rgba(22, 119, 255, 0.25);
-}
-
-.nodeHeader {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.nodeIcon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.nodeName {
-  font-size: 15px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.nodeStats {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.45);
-  margin-top: 4px;
-}
-
-/* Property list inside expanded node */
-.propertyList {
-  margin-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 8px;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.propertyItem {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 0;
-  font-size: 12px;
-}
-
-.propertyName {
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.propertyType {
-  color: rgba(255, 255, 255, 0.35);
-  font-family: 'SF Mono', 'Fira Code', monospace;
-  font-size: 11px;
-}
-
-/* Edge label */
-.edgeLabel {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  white-space: nowrap;
-}
-
-.edgeLabelCardinality {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.35);
-  margin-left: 4px;
-}
-
-/* Drop zone */
-.dropZone {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-
-.dropZoneInner {
-  width: 400px;
-  height: 300px;
-  border: 2px dashed rgba(255, 255, 255, 0.2);
-  border-radius: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  transition: border-color 0.3s, background-color 0.3s;
-  cursor: pointer;
-}
-
-.dropZoneInner:hover,
-.dropZoneActive {
-  border-color: #1677ff;
-  background: rgba(22, 119, 255, 0.05);
-}
-
-.dropZoneIcon {
-  font-size: 48px;
-  color: rgba(255, 255, 255, 0.3);
-}
-
-.dropZoneTitle {
-  font-size: 18px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
-  text-align: center;
-}
-
-.dropZoneHint {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.35);
 }
 
 /* Header */
@@ -170,7 +16,7 @@
   display: flex;
   align-items: center;
   padding: 0 20px;
-  background: rgba(15, 20, 25, 0.8);
+  background: rgba(8, 8, 18, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -334,65 +180,157 @@
   border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Handle styles */
-.handleStyle {
-  width: 8px;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-/* Vortex container */
-.vortexContainer {
+/* Idle overlay — ethereal invitation */
+.idleOverlay {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
+  transition: box-shadow 0.3s;
 }
 
-.vortexCenter {
-  position: relative;
-  width: 200px;
-  height: 200px;
+.idleOverlayDragActive {
+  box-shadow: inset 0 0 80px rgba(22, 119, 255, 0.15);
 }
 
-.vortexText {
-  position: absolute;
-  bottom: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
+.idleCard {
+  width: 420px;
+  padding: 48px 40px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  text-align: center;
+}
+
+.idleTitle {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-size: 32px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 12px;
+  line-height: 1.3;
+}
+
+.idleSubtitle {
+  font-family: 'Geist', system-ui, sans-serif;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 28px;
+  line-height: 1.5;
 }
 
-/* Property editor */
-.propertyEditor {
-  margin-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 8px;
-}
-
-.propertyEditorRow {
-  display: flex;
+.idleButton {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 3px 0;
+  padding: 10px 28px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-family: 'Geist', system-ui, sans-serif;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
-.propertyEditorInput {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 4px;
+.idleButton:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Detail panel — slide in from right */
+.detailPanel {
+  position: fixed;
+  top: 56px;
+  right: 0;
+  bottom: 0;
+  width: 350px;
+  background: rgba(12, 12, 24, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 60;
+  padding: 24px;
+  overflow-y: auto;
   color: rgba(255, 255, 255, 0.87);
-  padding: 2px 6px;
-  font-size: 12px;
-  outline: none;
 }
 
-.propertyEditorInput:focus {
-  border-color: #1677ff;
+.detailPanelHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.detailPanelIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.detailPanelTitle {
+  font-size: 20px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.detailPanelClose {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.detailPanelClose:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.detailPanelSection {
+  margin-top: 8px;
+}
+
+.detailPanelSectionTitle {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 12px;
+}
+
+.detailPanelProp {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detailPanelPropName {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.detailPanelPropType {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
 }
