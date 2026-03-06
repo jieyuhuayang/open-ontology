@@ -1,5 +1,5 @@
-import { useRef, useImperativeHandle, forwardRef } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import type * as THREE from 'three';
@@ -7,7 +7,13 @@ import BackgroundStars from './BackgroundStars';
 import StarNode from './StarNode';
 import StarLink from './StarLink';
 import VortexEffect from './VortexEffect';
-import type { GraphNode, GraphEdge, IngestionPhase } from '../types';
+import DragLinkLine from './DragLinkLine';
+import type {
+  GraphNode,
+  GraphEdge,
+  IngestionPhase,
+  DragLinkState,
+} from '../types';
 
 interface OrbitControlsHandle {
   object: THREE.Camera & { position: THREE.Vector3 };
@@ -26,6 +32,47 @@ interface StarfieldCanvasProps {
   fileName: string | null;
   selectedNodeId: string | null;
   onNodeClick: (id: string) => void;
+  dragLink?: DragLinkState | null;
+  onDragLinkStart?: (
+    nodeId: string,
+    position: { x: number; y: number; z: number },
+  ) => void;
+  onDragLinkEnd?: (nodeId: string | undefined) => void;
+  onDragPointerMove?: (position: {
+    x: number;
+    y: number;
+    z: number;
+  }) => void;
+  orbitEnabled?: boolean;
+  birthNodeId?: string | null;
+}
+
+function DragPlane({
+  onPointerMove,
+  onPointerUp,
+}: {
+  onPointerMove: (point: { x: number; y: number; z: number }) => void;
+  onPointerUp: () => void;
+}) {
+  const { camera } = useThree();
+
+  return (
+    <mesh
+      position={[0, 0, 0]}
+      rotation={camera.rotation}
+      onPointerMove={(e) => {
+        e.stopPropagation();
+        onPointerMove({ x: e.point.x, y: e.point.y, z: e.point.z });
+      }}
+      onPointerUp={(e) => {
+        e.stopPropagation();
+        onPointerUp();
+      }}
+    >
+      <planeGeometry args={[200, 200]} />
+      <meshBasicMaterial visible={false} />
+    </mesh>
+  );
 }
 
 function SceneContent({
@@ -36,9 +83,29 @@ function SceneContent({
   selectedNodeId,
   onNodeClick,
   controlsRef,
-}: StarfieldCanvasProps & { controlsRef: React.RefObject<OrbitControlsHandle | null> }) {
+  dragLink,
+  onDragLinkStart,
+  onDragLinkEnd,
+  onDragPointerMove,
+  orbitEnabled = true,
+  birthNodeId,
+}: StarfieldCanvasProps & {
+  controlsRef: React.RefObject<OrbitControlsHandle | null>;
+}) {
   const nodeMap = new Map(nodes.map((n) => [n.id, n]));
   const showVortex = phase !== 'IDLE' && phase !== 'COMPLETE';
+  const isDragging = dragLink !== null;
+
+  const handleDragPointerMove = useCallback(
+    (point: { x: number; y: number; z: number }) => {
+      onDragPointerMove?.(point);
+    },
+    [onDragPointerMove],
+  );
+
+  const handleDragPointerUp = useCallback(() => {
+    onDragLinkEnd?.(undefined);
+  }, [onDragLinkEnd]);
 
   return (
     <>
@@ -47,7 +114,8 @@ function SceneContent({
 
       <OrbitControls
         ref={controlsRef as React.RefObject<never>}
-        autoRotate
+        enabled={orbitEnabled}
+        autoRotate={!isDragging && orbitEnabled}
         autoRotateSpeed={0.15}
         enableDamping
         dampingFactor={0.05}
@@ -72,6 +140,12 @@ function SceneContent({
           node={node}
           onClick={onNodeClick}
           selected={selectedNodeId === node.id}
+          isBirth={birthNodeId === node.id}
+          onDragLinkStart={onDragLinkStart}
+          onDragLinkEnd={(nodeId) => onDragLinkEnd?.(nodeId)}
+          isDragSource={dragLink?.sourceNodeId === node.id}
+          isDragHoverTarget={dragLink?.hoveredTargetId === node.id}
+          isDragging={isDragging}
         />
       ))}
 
@@ -89,6 +163,17 @@ function SceneContent({
           />
         );
       })}
+
+      {/* Drag link line */}
+      {dragLink && <DragLinkLine dragLink={dragLink} />}
+
+      {/* Drag capture plane */}
+      {isDragging && (
+        <DragPlane
+          onPointerMove={handleDragPointerMove}
+          onPointerUp={handleDragPointerUp}
+        />
+      )}
 
       {/* Ingestion vortex */}
       {showVortex && (
