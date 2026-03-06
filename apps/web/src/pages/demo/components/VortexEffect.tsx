@@ -32,29 +32,17 @@ export default function VortexEffect({ phase, fileName, targetNodes }: VortexEff
   }
 
   // Initialize particle data
-  const { positions, initialPositions, velocities } = useMemo(() => {
+  const positions = useMemo(() => {
     const pos = new Float32Array(PARTICLE_COUNT * 3);
-    const initPos = new Float32Array(PARTICLE_COUNT * 3);
-    const vel = new Float32Array(PARTICLE_COUNT * 3);
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      // Random sphere position
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       const r = 8 + Math.random() * 7;
-      const x = r * Math.sin(phi) * Math.cos(theta);
-      const y = r * Math.sin(phi) * Math.sin(theta);
-      const z = r * Math.cos(phi);
-      pos[i * 3] = x;
-      pos[i * 3 + 1] = y;
-      pos[i * 3 + 2] = z;
-      initPos[i * 3] = x;
-      initPos[i * 3 + 1] = y;
-      initPos[i * 3 + 2] = z;
-      vel[i * 3] = (Math.random() - 0.5) * 0.02;
-      vel[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
-      vel[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
+      pos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      pos[i * 3 + 2] = r * Math.cos(phi);
     }
-    return { positions: pos, initialPositions: initPos, velocities: vel };
+    return pos;
   }, []);
 
   useFrame(({ clock }) => {
