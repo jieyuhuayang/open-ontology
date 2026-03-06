@@ -8,7 +8,7 @@ interface IngestionDropZoneProps {
   onManualCreate?: () => void;
 }
 
-export default function IngestionDropZone({ onFileDropped }: IngestionDropZoneProps) {
+export default function IngestionDropZone({ onFileDropped, onManualCreate }: IngestionDropZoneProps) {
   const { t } = useTranslation();
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
