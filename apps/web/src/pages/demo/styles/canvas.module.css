@@ -334,3 +334,287 @@
   background: rgba(255, 255, 255, 0.05);
   border-radius: 4px;
 }
+
+/* ── Manual Mode: Toolbar Extensions ── */
+
+.toolbarDivider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.12);
+  align-self: center;
+  margin: 0 2px;
+}
+
+.toolbarBtnActive {
+  color: #1677ff !important;
+  background: rgba(22, 119, 255, 0.15);
+}
+
+.toolbarExpansion {
+  display: flex;
+  gap: 8px;
+  max-width: 0;
+  overflow: hidden;
+  transition: max-width 0.3s ease;
+}
+
+.toolbarExpansionOpen {
+  max-width: 120px;
+}
+
+/* ── Manual Mode: Add Object Type Form ── */
+
+.addFormCard {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  padding: 20px;
+  background: rgba(12, 12, 24, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  z-index: 55;
+}
+
+.addFormHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.addFormClose {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 12px;
+  transition: color 0.2s;
+}
+
+.addFormClose:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.addFormInput {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 14px;
+  font-family: 'Geist', system-ui, sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  margin-bottom: 14px;
+}
+
+.addFormInput::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.addFormInput:focus {
+  border-color: rgba(22, 119, 255, 0.5);
+}
+
+.addFormSwatches {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.addFormSwatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.addFormSwatch:hover {
+  transform: scale(1.15);
+}
+
+.addFormSwatchActive {
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.addFormIcons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.addFormIcon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.addFormIcon:hover {
+  color: rgba(255, 255, 255, 0.87);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.addFormIconActive {
+  color: #1677ff;
+  border-color: rgba(22, 119, 255, 0.5);
+  background: rgba(22, 119, 255, 0.15);
+}
+
+.addFormSubmit {
+  width: 100%;
+  padding: 10px;
+  background: #1677ff;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Geist', system-ui, sans-serif;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.addFormSubmit:hover {
+  background: #4096ff;
+}
+
+.addFormSubmit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Manual Mode: Link Config Form ── */
+
+.linkFormCard {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 360px;
+  padding: 20px;
+  background: rgba(12, 12, 24, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  z-index: 55;
+}
+
+.linkFormNodeInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 14px;
+  margin-bottom: 16px;
+  justify-content: center;
+}
+
+.linkFormDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.linkFormArrow {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 16px;
+}
+
+.linkFormField {
+  margin-bottom: 14px;
+}
+
+.linkFormLabel {
+  display: block;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 6px;
+}
+
+.linkFormSelect {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 14px;
+  font-family: 'Geist', system-ui, sans-serif;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.linkFormSelect option {
+  background: #1a1a2e;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.linkFormActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.linkFormActions .addFormSubmit {
+  flex: 1;
+}
+
+.linkFormCancel {
+  padding: 10px 20px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  font-family: 'Geist', system-ui, sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.linkFormCancel:hover {
+  color: rgba(255, 255, 255, 0.75);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Manual Mode: Idle Manual Create Button ── */
+
+.idleManualBtn {
+  display: block;
+  margin-top: 16px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 13px;
+  font-family: 'Geist', system-ui, sans-serif;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.idleManualBtn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
