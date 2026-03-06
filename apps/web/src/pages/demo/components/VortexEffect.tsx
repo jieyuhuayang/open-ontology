@@ -31,8 +31,8 @@ export default function VortexEffect({ phase, fileName, targetNodes }: VortexEff
     prevPhase.current = phase;
   }
 
-  // Initialize particle data
-  const { positions, sizes } = useMemo(() => {
+  // Initialize particle data with per-particle sizes
+  const { positions, sizes, shaderMaterial } = useMemo(() => {
     const pos = new Float32Array(PARTICLE_COUNT * 3);
     const sz = new Float32Array(PARTICLE_COUNT);
     for (let i = 0; i < PARTICLE_COUNT; i++) {
@@ -44,7 +44,36 @@ export default function VortexEffect({ phase, fileName, targetNodes }: VortexEff
       pos[i * 3 + 2] = r * Math.cos(phi);
       sz[i] = 0.05 + Math.random() * 0.09;
     }
-    return { positions: pos, sizes: sz };
+    const mat = new THREE.ShaderMaterial({
+      uniforms: {
+        color: { value: new THREE.Color('#88bbff') },
+        opacity: { value: 0.8 },
+      },
+      vertexShader: `
+        attribute float size;
+        varying float vAlpha;
+        void main() {
+          vAlpha = 1.0;
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = size * (300.0 / -mvPosition.z);
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 color;
+        uniform float opacity;
+        void main() {
+          float d = length(gl_PointCoord - vec2(0.5));
+          if (d > 0.5) discard;
+          float alpha = opacity * (1.0 - smoothstep(0.3, 0.5, d));
+          gl_FragColor = vec4(color, alpha);
+        }
+      `,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    return { positions: pos, sizes: sz, shaderMaterial: mat };
   }, []);
 
   useFrame(({ clock }) => {
