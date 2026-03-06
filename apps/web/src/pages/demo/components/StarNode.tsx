@@ -197,6 +197,8 @@ export default function StarNode({
           fillOpacity={hovered || selected ? 0.95 : 0.7}
           anchorX="center"
           anchorY="top"
+          outlineWidth={0.02}
+          outlineColor="#080812"
         >
           {node.data.displayName}
         </Text>
@@ -207,6 +209,8 @@ export default function StarNode({
           anchorX="center"
           anchorY="top"
           position={[0, -0.4, 0]}
+          outlineWidth={0.015}
+          outlineColor="#080812"
         >
           {`${node.data.properties.length} props`}
         </Text>
