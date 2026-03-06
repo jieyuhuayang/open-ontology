@@ -4,6 +4,9 @@ import {
   ZoomOutOutlined,
   ExpandOutlined,
   ReloadOutlined,
+  PlusOutlined,
+  StarOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
 import styles from '../styles/canvas.module.css';
 
@@ -12,6 +15,9 @@ interface CanvasToolbarProps {
   onZoomOut: () => void;
   onFitView: () => void;
   onReset: () => void;
+  isCreationPanelOpen?: boolean;
+  onToggleCreationPanel?: () => void;
+  onOpenAddForm?: () => void;
 }
 
 export default function CanvasToolbar({
@@ -19,6 +25,9 @@ export default function CanvasToolbar({
   onZoomOut,
   onFitView,
   onReset,
+  isCreationPanelOpen,
+  onToggleCreationPanel,
+  onOpenAddForm,
 }: CanvasToolbarProps) {
   const { t } = useTranslation();
 
@@ -52,6 +61,37 @@ export default function CanvasToolbar({
       >
         <ReloadOutlined />
       </button>
+
+      {onToggleCreationPanel && (
+        <>
+          <div className={styles.toolbarDivider} />
+          <button
+            className={`${styles.toolbarBtn} ${isCreationPanelOpen ? styles.toolbarBtnActive : ''}`}
+            onClick={onToggleCreationPanel}
+            title={t('demo.addObjectType')}
+          >
+            <PlusOutlined />
+          </button>
+          <div
+            className={`${styles.toolbarExpansion} ${isCreationPanelOpen ? styles.toolbarExpansionOpen : ''}`}
+          >
+            <button
+              className={styles.toolbarBtn}
+              onClick={onOpenAddForm}
+              title={t('demo.addObjectType')}
+            >
+              <StarOutlined />
+            </button>
+            <button
+              className={styles.toolbarBtn}
+              onClick={onToggleCreationPanel}
+              title={t('demo.closePanel')}
+            >
+              <CloseOutlined />
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
