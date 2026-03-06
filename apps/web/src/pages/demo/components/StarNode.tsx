@@ -127,6 +127,7 @@ export default function StarNode({
     e.stopPropagation();
     pointerDownTime.current = Date.now();
     isLongPress.current = false;
+    ringStartTime.current = performance.now();
 
     if (onDragLinkStart) {
       longPressTimeout.current = setTimeout(() => {
