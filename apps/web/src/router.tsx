@@ -14,6 +14,10 @@ import LinkTypeListPage from '@/pages/link-types/LinkTypeListPage';
 import DataConnectionPage from '@/pages/data-connection/DataConnectionPage';
 export const routeConfig: RouteObject[] = [
   {
+    path: '/demo/canvas',
+    lazy: () => import('@/pages/demo/DemoCanvasPage'),
+  },
+  {
     path: '/',
     element: <AppShell />,
     errorElement: <ErrorBoundary />,
