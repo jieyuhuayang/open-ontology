@@ -130,6 +130,8 @@ function SceneContent({
           luminanceThreshold={0.25}
           luminanceSmoothing={0.9}
           intensity={1.3}
+          mipmapBlur
+          resolutionScale={0.5}
         />
       </EffectComposer>
 
