@@ -197,7 +197,7 @@ const StarfieldCanvas = forwardRef<StarfieldCanvasHandle, StarfieldCanvasProps>(
       <Canvas
         camera={{ position: [0, 0, 20], fov: 60 }}
         style={{ position: 'absolute', inset: 0 }}
-        gl={{ antialias: true, alpha: false }}
+        gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
         onCreated={({ gl }) => {
           gl.setClearColor('#080812');
         }}
