@@ -175,8 +175,8 @@ export default function StarNode({
 
   return (
     <group
+      ref={groupRef}
       position={[node.position.x, node.position.y, node.position.z]}
-      scale={birthScale}
     >
       {/* Inner core */}
       <mesh
@@ -186,7 +186,7 @@ export default function StarNode({
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
       >
-        <sphereGeometry args={[baseRadius, 32, 32]} />
+        <sphereGeometry args={[baseRadius, 16, 16]} />
         <meshStandardMaterial
           color={color}
           emissive={color}
@@ -197,7 +197,7 @@ export default function StarNode({
 
       {/* Outer shell (halo) */}
       <mesh>
-        <sphereGeometry args={[baseRadius * 1.4, 32, 32]} />
+        <sphereGeometry args={[baseRadius * 1.4, 16, 16]} />
         <meshBasicMaterial
           color={isDragHoverTarget ? '#4fc3f7' : color}
           transparent
@@ -208,7 +208,7 @@ export default function StarNode({
 
       {/* Long-press closing ring */}
       <mesh ref={ringRef} visible={false} rotation={[0, 0, 0]}>
-        <ringGeometry args={[0.9, 1.0, 64]} />
+        <ringGeometry args={[0.9, 1.0, 32]} />
         <meshBasicMaterial
           color="white"
           transparent
@@ -217,14 +217,6 @@ export default function StarNode({
           depthWrite={false}
         />
       </mesh>
-
-      {/* Point light */}
-      <pointLight
-        ref={lightRef}
-        color={color}
-        intensity={0.3 + node.data.properties.length * 0.1}
-        distance={5}
-      />
 
       {/* Label */}
       <Billboard position={[0, -(baseRadius + 0.5), 0]}>
