@@ -13,7 +13,7 @@ interface StarLinkProps {
 function computeBezierPoints(
   src: THREE.Vector3,
   tgt: THREE.Vector3,
-  segments = 48,
+  segments = 24,
 ): THREE.Vector3[] {
   const mid = new THREE.Vector3().addVectors(src, tgt).multiplyScalar(0.5);
   // Elevate control point perpendicular to the source→target vector
