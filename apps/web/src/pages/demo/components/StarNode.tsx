@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Billboard, Text } from '@react-three/drei';
 import * as THREE from 'three';
-import type { Mesh, PointLight as TPointLight } from 'three';
+import type { Mesh } from 'three';
 import type { GraphNode } from '../types';
 
 interface StarNodeProps {
@@ -32,16 +32,13 @@ export default function StarNode({
   isDragging,
 }: StarNodeProps) {
   const meshRef = useRef<Mesh>(null);
-  const lightRef = useRef<TPointLight>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   const phaseOffset = useRef(Math.random() * Math.PI * 2);
 
-  // Birth animation state
+  // Birth animation state (refs to avoid re-renders in useFrame)
   const birthStartTime = useRef<number | null>(null);
-  const [birthScale, setBirthScale] = useState(isBirth ? 0 : 1);
-  const [birthEmissiveBoost, setBirthEmissiveBoost] = useState(
-    isBirth ? 4.0 : 0,
-  );
+  const birthEmissiveBoostRef = useRef(isBirth ? 4.0 : 0);
 
   // Long-press tracking
   const pointerDownTime = useRef<number>(0);
@@ -56,6 +53,9 @@ export default function StarNode({
   useEffect(() => {
     if (isBirth) {
       birthStartTime.current = performance.now();
+      if (groupRef.current) {
+        groupRef.current.scale.set(0, 0, 0);
+      }
     }
   }, [isBirth]);
 
@@ -70,16 +70,18 @@ export default function StarNode({
       const elapsed = (performance.now() - birthStartTime.current) / 1000;
       if (elapsed < 0.6) {
         const t = elapsed / 0.6;
-        // easeOutBack
         const c1 = 1.70158;
         const c3 = c1 + 1;
-        const scale = 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-        setBirthScale(Math.max(0, scale));
-        // Emissive flash: 4.0 → 0 over 0.6s
-        setBirthEmissiveBoost(4.0 * (1 - t));
+        const scale = Math.max(0, 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2));
+        if (groupRef.current) {
+          groupRef.current.scale.set(scale, scale, scale);
+        }
+        birthEmissiveBoostRef.current = 4.0 * (1 - t);
       } else {
-        setBirthScale(1);
-        setBirthEmissiveBoost(0);
+        if (groupRef.current) {
+          groupRef.current.scale.set(1, 1, 1);
+        }
+        birthEmissiveBoostRef.current = 0;
         birthStartTime.current = null;
       }
     }
@@ -88,17 +90,11 @@ export default function StarNode({
     let baseIntensity =
       hovered || selected ? 2.0 : 0.8 + Math.sin(t * 1.5) * 0.2;
     if (isDragSource) baseIntensity = 3.0;
-    baseIntensity += birthEmissiveBoost;
+    baseIntensity += birthEmissiveBoostRef.current;
 
     const mat = meshRef.current.material;
     if ('emissiveIntensity' in mat) {
       (mat as { emissiveIntensity: number }).emissiveIntensity = baseIntensity;
-    }
-    if (lightRef.current) {
-      lightRef.current.intensity =
-        hovered || selected
-          ? 1.5
-          : 0.3 + node.data.properties.length * 0.1;
     }
 
     // Long-press ring animation: shrink from 2x to 1.4x baseRadius over LONG_PRESS_MS
