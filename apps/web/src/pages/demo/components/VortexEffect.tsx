@@ -176,7 +176,7 @@ export default function VortexEffect({ phase, fileName, targetNodes }: VortexEff
         <>
           {[0, 1, 2].map((i) => (
             <mesh key={i} rotation={[Math.PI / 2, 0, 0]}>
-              <ringGeometry args={[1.8 + i * 0.8, 1.85 + i * 0.8, 64]} />
+              <ringGeometry args={[1.8 + i * 0.8, 1.85 + i * 0.8, 32]} />
               <meshBasicMaterial
                 color="#4488ff"
                 transparent
