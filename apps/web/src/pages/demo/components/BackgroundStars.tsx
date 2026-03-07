@@ -6,7 +6,7 @@ export default function BackgroundStars() {
       <Stars
         radius={100}
         depth={60}
-        count={3000}
+        count={1500}
         factor={4}
         saturation={0.2}
         fade
