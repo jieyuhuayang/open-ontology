@@ -166,30 +166,41 @@ justfile                              # Monorepo 任务运行器
 > - 技术设计部分必须基于对 PRD 业务逻辑的准确理解，不能凭假设设计
 
 0. **（版本开始时执行一次）release-contract.md** — 在第一个 feature spec 动笔前，创建版本级领域归属表和不变量表（模板：`features/_templates/release-contract.md`）
-1. **spec.md** — 合并需求规范与技术设计的完整规格文档
+1. **Spec Discovery（架构师提问）** — 完整阅读 PRD + release-contract.md + 相关架构文档后，**禁止直接写 spec.md**，必须先以架构师视角识别 PRD 中的不确定性，向用户提出针对性问题。
+   - 目的是**对齐不确定性**，不是逐条确认已明确的内容
+   - 提问维度参考（仅就 PRD 未明确的部分提问，已明确的跳过）：
+     · 边界条件：极端值、空状态、超长输入、批量操作上限等
+     · 异常路径：并发冲突、部分成功、数据不一致、级联影响等
+     · 权限与安全：角色权限边界、越权行为的预期处理
+     · 数据约束：字段上限、唯一性、级联删除、数据量级等
+     · 回滚与降级：操作失败的恢复策略、迁移的 downgrade 方案
+     · 跨 Feature 影响：是否触及 release-contract.md 中其他 feature 的归属领域
+   - 如果 PRD 已经足够清晰、无不确定性，可声明"无需提问"并说明理由，跳过此步骤
+   - **手动暂停点**：用户回答并确认后，方可进入步骤 2 编写 spec.md
+2. **spec.md** — 合并需求规范与技术设计的完整规格文档
    - **需求部分**：用户故事、验收标准（AC 表格）、边界情况
    - **设计部分**：架构决策、数据库 & Domain 模型、API 契约、前端组件设计、错误码表
    - 验收标准必须用表格格式：`| ID | 角色 | 操作 | 预期结果 |`，AC-ID 在特性内唯一
    - 设计部分只写契约和决策（Why + What），不写实现步骤（How）
    - 禁止在 spec.md 中写测试策略（由本文件 §测试要求统一管理）
    - 写 spec 前必须先阅读版本的 `release-contract.md`
-2. **审查 spec** — 写完 spec.md 后，调用 `/sdd-review <feature_dir> spec`；Claude 同时检查 PRD gap 和架构合规性，生成报告供用户参考；用户确认后将 tasks.md 状态表中 spec.md 行更新为 ✅ 已评审（唯一手动暂停点）
-3. **tasks.md** — 将 spec 拆解为自包含的原子任务（每个任务一次 AI 会话可完成）
+3. **审查 spec** — 写完 spec.md 后，调用 `/sdd-review <feature_dir> spec`；Claude 同时检查 PRD gap 和架构合规性，生成报告供用户参考；用户确认后将 tasks.md 状态表中 spec.md 行更新为 ✅ 已评审（手动暂停点）
+4. **tasks.md** — 将 spec 拆解为自包含的原子任务（每个任务一次 AI 会话可完成）
    - 每个任务内联必要实现上下文（文件、逻辑、测试），实现阶段不需要回读 spec.md
    - 每个测试任务必须标注 `覆盖 AC: AC-NN, AC-NN`，追溯到 spec.md 的 AC 表格
    - 缺少 AC 标注的测试任务视为规格不完整，禁止开始对应的实现任务
-4. **审查 tasks** — 写完 tasks.md 后自动调用 `/sdd-review <feature_dir> tasks`；检查 AC 追溯、任务拆解质量和技术债预防；通过则自动推进；有 high/medium 问题时自动修复后重审（最多 2 轮）
-5. **创建 Feature 分支** — `git checkout -b feat/<version>/<feature-id>-<short-name>`
+5. **审查 tasks** — 写完 tasks.md 后自动调用 `/sdd-review <feature_dir> tasks`；检查 AC 追溯、任务拆解质量和技术债预防；通过则自动推进；有 high/medium 问题时自动修复后重审（最多 2 轮）
+6. **创建 Feature 分支** — `git checkout -b feat/<version>/<feature-id>-<short-name>`
    - 分支命名示例：`feat/v0.1.0/005-object-type-crud-frontend`
-   - 步骤 1-4 的文档工作在 main 上完成；步骤 6 的代码实现在 feature 分支上
-6. **执行** — 在 feature 分支上逐任务实施，完成后在 tasks.md 打勾
-7. **代码审查** — 全部任务完成后，调用 `/code-review --base main`
+   - 步骤 1-5 的文档工作在 main 上完成；步骤 7 的代码实现在 feature 分支上
+7. **执行** — 在 feature 分支上逐任务实施，完成后在 tasks.md 打勾
+8. **代码审查** — 全部任务完成后，调用 `/code-review --base main`
    - 自动运行（Codex + Gemini 并行），无需用户确认
    - PASS / PASS_WITH_WARNINGS → 可合并
    - NEEDS_FIX → 修复 HIGH 问题后重审（最多 2 轮）
-8. **合并** — `git checkout main && git merge --no-ff feat/<version>/<branch> && git branch -d feat/<version>/<branch>`
+9. **合并** — `git checkout main && git merge --no-ff feat/<version>/<branch> && git branch -d feat/<version>/<branch>`
 
-**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。`spec.md` 评审需用户最终确认（唯一手动暂停点）；`tasks.md` 审查和代码审查均为全自动（无需用户确认）。执行阶段在 feature 分支上进行，审查通过后合并回 main。写 spec 前必须先阅读版本的 `release-contract.md` 和完整的 PRD 原文。
+**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。有**两个手动暂停点**：步骤 1（Spec Discovery 用户确认）和步骤 3（spec 评审用户确认）；`tasks.md` 审查和代码审查均为全自动（无需用户确认）。执行阶段在 feature 分支上进行，审查通过后合并回 main。写 spec 前必须先阅读版本的 `release-contract.md` 和完整的 PRD 原文。
 
 ## 外部 MySQL 策略
 
