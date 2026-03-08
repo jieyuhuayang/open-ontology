@@ -210,6 +210,15 @@ export default function FileUploadWizard() {
           </Form.Item>
         </Form>
 
+        <Typography.Text
+          type="secondary"
+          style={{ display: 'block', marginBottom: 8, fontSize: 12 }}
+        >
+          {t('import.fileUpload.previewHint', {
+            total: previewData.preview.totalRows,
+            count: Math.min(10, previewData.preview.totalRows),
+          })}
+        </Typography.Text>
         <Table
           rowKey={(_, index) => String(index)}
           columns={previewColumns}
