@@ -188,7 +188,7 @@ export default function FileUploadWizard() {
         <Table
           rowKey={(_, index) => String(index)}
           columns={previewColumns}
-          dataSource={previewData.preview.rows}
+          dataSource={previewData.preview.rows.slice(0, 10)}
           pagination={false}
           scroll={{ x: 'max-content' }}
           size="small"
