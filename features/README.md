@@ -97,21 +97,22 @@ A well-scoped task:
 > - 技术设计部分必须基于对 PRD 业务逻辑的准确理解，不能凭假设设计
 
 0. **（版本开始时执行一次）Create release-contract.md** — 在第一个 feature spec 动笔前，写版本级领域归属表（表1）和不变量表（表2）。此后每个 spec 评审时，必须对照 release-contract.md 检查一致性。
-1. **Create spec.md** — 合并需求规范与技术设计的完整规格文档。写 spec 前必须先完整阅读 PRD 和 release-contract.md。包含：
+1. **Spec Discovery（架构师提问）** — 完整阅读 PRD + release-contract.md + 相关架构文档后，以架构师视角识别 PRD 中的不确定性，向用户提出针对性问题（对齐不确定性，不逐条确认已明确内容）。PRD 足够清晰时可声明"无需提问"并跳过。**手动暂停点**：用户确认后方可进入步骤 2。
+2. **Create spec.md** — 合并需求规范与技术设计的完整规格文档。写 spec 前必须先完整阅读 PRD 和 release-contract.md，且已完成步骤 1 的 Spec Discovery。包含：
    - 需求部分：用户故事、验收标准（AC 表格，唯一 ID）、边界情况
    - 设计部分：架构决策、数据库 & Domain 模型、API 契约、前端组件设计、错误码表
    - 设计部分只写 Why + What，不写 How，不写测试策略
-2. **审查 spec.md** — 写完后调用 `/sdd-review <feature_dir> spec`，同时检查 PRD gap 和架构合规性。检查列表：
+3. **审查 spec.md** — 写完后调用 `/sdd-review <feature_dir> spec`，同时检查 PRD gap 和架构合规性。检查列表：
    - PRD 功能点 / 用户场景是否都有对应 AC？
    - AC 是否可测试、边界是否清晰？
    - 所有 AC 是否与 release-contract.md 的不变量一致？
    - 是否越界进入了其他 feature 的归属领域（表1）？
    - 架构决策是否符合项目规范？API 契约是否完整？
 
-   用户看报告后决定是否修改，确认后 → mark spec.md row as ✅ 已评审 in tasks.md 状态表（唯一手动暂停点）
-3. **Create tasks.md** — 将 spec 拆解为自包含的原子任务；每个任务内联文件、逻辑、测试上下文（实现阶段不需要回读 spec.md）；每个测试任务必须标注 `覆盖 AC: AC-NN`
-4. **Execute tasks** — one per session, checking off as complete; run tests and show output before marking done
-5. **Mark deviations** — if implementation differs from plan, note in tasks.md §实际偏差记录
+   用户看报告后决定是否修改，确认后 → mark spec.md row as ✅ 已评审 in tasks.md 状态表（手动暂停点）
+4. **Create tasks.md** — 将 spec 拆解为自包含的原子任务；每个任务内联文件、逻辑、测试上下文（实现阶段不需要回读 spec.md）；每个测试任务必须标注 `覆盖 AC: AC-NN`
+5. **Execute tasks** — one per session, checking off as complete; run tests and show output before marking done
+6. **Mark deviations** — if implementation differs from plan, note in tasks.md §实际偏差记录
 
 ---
 
