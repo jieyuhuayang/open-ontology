@@ -80,6 +80,7 @@ export default function FileUploadWizard() {
       if (result.sheets && result.sheets.length > 0) {
         setSelectedSheet(result.defaultSheet ?? result.sheets[0]);
       }
+      setSelectedColumns(result.preview.columns.map((c) => c.name));
       setStep(1);
     } catch {
       message.error(t('import.fileUpload.unsupportedFormat'));
