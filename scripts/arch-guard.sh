@@ -77,7 +77,7 @@ fi
 
 # ── 检查 7：禁止手动编辑生成文件 ────────────────────────────────────────────
 # CLAUDE.md 强制约束：src/generated/api.ts 由 openapi-typescript 自动生成，手动修改会被下次生成覆盖
-if [[ "$FILE" == *"/src/generated/api.ts" ]]; then
+if [[ "$FILE" == *"/src/generated/"* ]]; then
     echo "⚠️  [arch-guard] 正在编辑自动生成文件 — 该文件会被 just web-typegen 覆盖"
 fi
 
