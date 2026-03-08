@@ -111,7 +111,12 @@ A well-scoped task:
 
    用户看报告后决定是否修改，确认后 → mark spec.md row as ✅ 已评审 in tasks.md 状态表（手动暂停点）
 4. **Create tasks.md** — 将 spec 拆解为自包含的原子任务；每个任务内联文件、逻辑、测试上下文（实现阶段不需要回读 spec.md）；每个测试任务必须标注 `覆盖 AC: AC-NN`
-5. **Execute tasks** — one per session, checking off as complete; run tests and show output before marking done
+5. **Execute tasks** — one per session:
+   1. 实现任务代码
+   2. 运行测试并展示通过输出
+   3. 执行 `/task-review <feature_dir> <task_id>` — L1 约定合规检查
+   4. PASS 后在 tasks.md 中打勾 ✅
+   5. NEEDS_FIX → 修复问题后重审（最多 1 轮）
 6. **Mark deviations** — if implementation differs from plan, note in tasks.md §实际偏差记录
 
 ---
