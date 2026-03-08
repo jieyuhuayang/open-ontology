@@ -218,7 +218,8 @@ justfile                              # Monorepo 任务运行器
 6. **创建 Feature 分支** — `git checkout -b feat/<version>/<feature-id>-<short-name>`
    - 分支命名示例：`feat/v0.1.0/005-object-type-crud-frontend`
    - 步骤 1-5 的文档工作在 main 上完成；步骤 7 的代码实现在 feature 分支上
-7. **执行** — 在 feature 分支上逐任务实施，完成后在 tasks.md 打勾
+7. **执行** — 在 feature 分支上逐任务实施：
+   - 实现代码 → 运行测试 → `/task-review <feature_dir> <task_id>` → PASS 后打勾
 8. **代码审查** — 全部任务完成后，调用 `/code-review --base main`
    - 自动运行（Codex + Gemini 并行），无需用户确认
    - PASS / PASS_WITH_WARNINGS → 可合并
