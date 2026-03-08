@@ -107,21 +107,17 @@ export default function MySQLImportWizard() {
     if (selectedTable) setStep(2);
   };
 
-  // Initialize selectedColumns with PK columns when columns load
+  // Initialize selectedColumns with all columns when columns load
   const handleColumnsLoaded = (cols: MySQLColumnInfo[]) => {
     if (selectedColumns.length === 0) {
-      const pkCols = cols.filter((c) => c.isPrimaryKey).map((c) => c.name);
-      if (pkCols.length > 0) setSelectedColumns(pkCols);
+      setSelectedColumns(cols.map((c) => c.name));
     }
   };
 
   // Call this effect-like logic when columns data changes
   if (columns && columns.length > 0 && selectedColumns.length === 0) {
-    const pkCols = columns.filter((c) => c.isPrimaryKey).map((c) => c.name);
-    if (pkCols.length > 0 && selectedColumns.length === 0) {
-      // Defer to avoid setting state during render
-      setTimeout(() => handleColumnsLoaded(columns), 0);
-    }
+    // Defer to avoid setting state during render
+    setTimeout(() => handleColumnsLoaded(columns), 0);
   }
 
   const handleColumnToggle = (checkedValues: string[]) => {
