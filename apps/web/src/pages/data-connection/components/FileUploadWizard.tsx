@@ -164,7 +164,23 @@ export default function FileUploadWizard() {
               {t('import.fileUpload.hasHeader')}
             </Checkbox>
           </Form.Item>
-          <Form.Item label={t('mysqlConnection.selectColumns')}>
+          <Form.Item
+            label={
+              <Space>
+                {t('mysqlConnection.selectColumns')}
+                <Typography.Link
+                  onClick={() =>
+                    setSelectedColumns(previewData.preview.columns.map((c) => c.name))
+                  }
+                >
+                  {t('common.selectAll')}
+                </Typography.Link>
+                <Typography.Link onClick={() => setSelectedColumns([])}>
+                  {t('common.deselectAll')}
+                </Typography.Link>
+              </Space>
+            }
+          >
             <Checkbox.Group
               value={selectedColumns}
               onChange={(vals) => setSelectedColumns(vals as string[])}
@@ -185,6 +201,12 @@ export default function FileUploadWizard() {
                 </div>
               ))}
             </Checkbox.Group>
+            <Typography.Text type="secondary" style={{ fontSize: 12, marginTop: 4 }}>
+              {t('import.columnsSelected', {
+                selected: selectedColumns.length,
+                total: previewData.preview.columns.length,
+              })}
+            </Typography.Text>
           </Form.Item>
         </Form>
 
