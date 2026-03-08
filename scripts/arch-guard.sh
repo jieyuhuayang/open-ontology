@@ -48,7 +48,34 @@ if [[ "$FILE" == *"/app/main.py" ]]; then
     fi
 fi
 
-# ── 检查 4：禁止手动编辑生成文件 ────────────────────────────────────────────
+# ── 检查 4：Services → Routers 反向导入（P0 红线）────────────────────────────
+# CLAUDE.md 强制约束：services 不得导入 routers，严格自顶向下
+# 违规信号：services/*.py 中出现 "from app.routers..." 导入
+if [[ "$FILE" == *"/app/services/"*.py ]]; then
+    if grep -qE "^from app\.routers" "$FILE" 2>/dev/null; then
+        echo "⚠️  [arch-guard] VIOLATION: $(basename "$FILE") 导入 routers 层 — 反向依赖违规"
+    fi
+fi
+
+# ── 检查 5：Domain 层 I/O 操作（P0 红线）────────────────────────────────────
+# CLAUDE.md 强制约束：domain 层是纯逻辑，无 I/O
+# 违规信号：domain/*.py 中出现 asyncio/aiohttp/sqlalchemy.ext 等 I/O 导入
+if [[ "$FILE" == *"/app/domain/"*.py ]]; then
+    if grep -qE "^(import (asyncio|aiohttp|aiofiles)|from (sqlalchemy\.ext|asyncio|aiohttp|aiofiles))" "$FILE" 2>/dev/null; then
+        echo "⚠️  [arch-guard] VIOLATION: $(basename "$FILE") 包含 I/O 操作 — domain 层必须是纯逻辑"
+    fi
+fi
+
+# ── 检查 6：Zustand 服务端状态（约定违规）─────────────────────────────────────
+# CLAUDE.md 强制约束：服务端状态属于 TanStack Query cache，不得放入 Zustand
+# 违规信号：stores/*.ts(x) 中出现 useQuery/useMutation
+if [[ "$FILE" == *"/stores/"*.ts || "$FILE" == *"/stores/"*.tsx ]]; then
+    if grep -qE "(useQuery|useMutation)" "$FILE" 2>/dev/null; then
+        echo "⚠️  [arch-guard] VIOLATION: $(basename "$FILE") 在 Zustand store 中使用 TanStack Query — 服务端状态不应放入 Zustand"
+    fi
+fi
+
+# ── 检查 7：禁止手动编辑生成文件 ────────────────────────────────────────────
 # CLAUDE.md 强制约束：src/generated/api.ts 由 openapi-typescript 自动生成，手动修改会被下次生成覆盖
 if [[ "$FILE" == *"/src/generated/api.ts" ]]; then
     echo "⚠️  [arch-guard] 正在编辑自动生成文件 — 该文件会被 just web-typegen 覆盖"
