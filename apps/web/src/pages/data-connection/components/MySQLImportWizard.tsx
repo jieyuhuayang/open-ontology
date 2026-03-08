@@ -15,6 +15,7 @@ import {
   Tag,
   Empty,
   Alert,
+  Typography,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
 import {
