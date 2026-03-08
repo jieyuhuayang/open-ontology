@@ -144,6 +144,9 @@ export default function FileUploadWizard() {
     return (
       <div>
         <Form layout="vertical">
+          <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
+            {previewData.filename} ({(previewData.fileSize / 1024).toFixed(1)} KB)
+          </Typography.Text>
           <Form.Item label={t('mysqlConnection.datasetName')}>
             <Input value={datasetName} onChange={(e) => setDatasetName(e.target.value)} />
           </Form.Item>
