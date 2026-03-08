@@ -492,7 +492,9 @@
       "selectSheet": "选择 Sheet",
       "hasHeader": "首行为表头",
       "atLeastOneColumn": "至少选择一列",
-      "confirmImport": "确认导入"
-    }
+      "confirmImport": "确认导入",
+      "previewHint": "仅预览前 {{count}} 行，共 {{total}} 行"
+    },
+    "columnsSelected": "已选 {{selected}}/{{total}} 列"
   }
 }
