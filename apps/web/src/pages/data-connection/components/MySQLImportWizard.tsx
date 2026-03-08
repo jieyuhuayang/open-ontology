@@ -258,7 +258,26 @@ export default function MySQLImportWizard() {
             <span>{selectedTable.rowCount.toLocaleString()}</span>
           </Form.Item>
         )}
-        <Form.Item label={t('mysqlConnection.selectColumns')}>
+        <Form.Item
+          label={
+            <Space>
+              {t('mysqlConnection.selectColumns')}
+              <Typography.Link
+                onClick={() => columns && setSelectedColumns(columns.map((c) => c.name))}
+              >
+                {t('common.selectAll')}
+              </Typography.Link>
+              <Typography.Link
+                onClick={() => {
+                  if (!columns) return;
+                  setSelectedColumns(columns.filter((c) => c.isPrimaryKey).map((c) => c.name));
+                }}
+              >
+                {t('common.deselectAll')}
+              </Typography.Link>
+            </Space>
+          }
+        >
           {columnsLoading ? (
             <Spin />
           ) : (
@@ -274,6 +293,14 @@ export default function MySQLImportWizard() {
                 </Checkbox>
               ))}
             </Checkbox.Group>
+          )}
+          {columns && (
+            <Typography.Text type="secondary" style={{ fontSize: 12, marginTop: 4 }}>
+              {t('import.columnsSelected', {
+                selected: selectedColumns.length,
+                total: columns.length,
+              })}
+            </Typography.Text>
           )}
         </Form.Item>
       </Form>
