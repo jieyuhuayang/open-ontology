@@ -41,7 +41,9 @@
     "back": "Back",
     "comingSoon": "Coming Soon",
     "noData": "No data",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all"
   },
   "error": {
     "pageNotFound": "Page Not Found",
