@@ -154,6 +154,31 @@ justfile                              # Monorepo 任务运行器
 - 禁止未运行测试就标记任务完成 — 必须运行并展示输出
 - 禁止将测试拆分为独立后续任务 — 测试与实现属于同一任务
 
+## 任务级审查（L1）
+
+在每个 SDD 任务完成后、打勾前，必须执行 `/task-review <feature_dir> <task_id>` 进行 L1 轻量审查。
+
+**三层审查架构**：
+
+| 层 | 触发 | 执行者 | 覆盖 |
+|---|------|--------|------|
+| **L0** | 每次 Write/Edit | arch-guard.sh | 反向导入、Domain I/O、Zustand 服务端状态、生成文件保护 |
+| **L1** | 每个任务完成后 | Claude（`/task-review`） | 约定合规 + 架构红线 + 任务元数据一致性 |
+| **L2** | 全部任务完成后 | Codex + Gemini（`/code-review`） | 完整 6 维度深度审查 |
+
+**L1 检查清单**（6 项）：
+
+| # | 检查项 | 严重度 |
+|---|--------|--------|
+| 1 | 层级导入（services→routers、domain I/O、storage→services） | HIGH |
+| 2 | 命名规范（文件名、类名、API 路径、错误码） | MEDIUM |
+| 3 | 序列化约定（Pydantic alias_generator + populate_by_name） | HIGH |
+| 4 | 数据库约定（rid 主键、Alembic 迁移、async session） | HIGH |
+| 5 | 前端约定（i18n `t()`、服务端数据不入 Zustand、API 类型自动生成） | MEDIUM |
+| 6 | 信息泄漏（无硬编码密钥/凭据） | HIGH |
+
+**判定规则**：PASS → 打勾 | PASS_WITH_NOTES → 打勾+记录 | NEEDS_FIX → 修复后重审（最多 1 轮）
+
 ## 开发工作流（SDD）
 
 所有新特性必须按以下顺序执行（详见 `features/README.md`）：
