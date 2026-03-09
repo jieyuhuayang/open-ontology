@@ -6,10 +6,14 @@ import {
   LinkOutlined,
   ThunderboltOutlined,
   DatabaseOutlined,
+  LeftOutlined,
+  RightOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSidebarStore } from '@/stores/sidebar-store';
+import { useObjectTypes } from '@/api/object-types';
+import { useLinkTypes } from '@/api/link-types';
 import type { MenuProps } from 'antd';
 
 const { Sider } = Layout;
