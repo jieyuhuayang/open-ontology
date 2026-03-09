@@ -105,7 +105,7 @@ export default function HomeSidebar() {
       collapsible
       collapsed={collapsed}
       width={240}
-      style={{ borderRight: '1px solid #f0f0f0', background: '#fff', height: '100%' }}
+      style={{ borderRight: '1px solid #f0f0f0' }}
     >
       <nav style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         {!collapsed && (
