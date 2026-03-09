@@ -3,7 +3,7 @@ import { Button, Empty, Flex, Select, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useObjectTypes } from '@/api/object-types';
-import { useCreateObjectTypeModalStore } from '@/stores/create-object-type-modal-store';
+import { useCreateWizardStore } from '@/stores/create-wizard-store';
 import ObjectTypeTable from './components/ObjectTypeTable';
 import type { ResourceStatus, Visibility } from '@/api/types';
 
