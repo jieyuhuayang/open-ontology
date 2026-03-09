@@ -24,8 +24,13 @@ export default function HomeSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { collapsed, toggleCollapsed } = useSidebarStore();
+  const { data: objectTypesData } = useObjectTypes(1, 1);
+  const { data: linkTypesData } = useLinkTypes(1, 1, {});
 
   const selectedKey = getSelectedKey(location.pathname);
+
+  const objectTypeCount = objectTypesData?.total;
+  const linkTypeCount = linkTypesData?.total;
 
   const menuItems: MenuProps['items'] = [
     {
@@ -40,10 +45,14 @@ export default function HomeSidebar() {
         {
           key: '/object-types',
           icon: <AppstoreOutlined />,
-          label: (
+          label: collapsed ? (
+            t('nav.objectTypes')
+          ) : (
             <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               {t('nav.objectTypes')}
-              <Text type="secondary" style={{ fontSize: 12 }}>—</Text>
+              {objectTypeCount != null && (
+                <Text type="secondary" style={{ fontSize: 12 }}>{objectTypeCount}</Text>
+              )}
             </span>
           ),
         },
@@ -55,10 +64,14 @@ export default function HomeSidebar() {
         {
           key: '/link-types',
           icon: <LinkOutlined />,
-          label: (
+          label: collapsed ? (
+            t('nav.linkTypes')
+          ) : (
             <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               {t('nav.linkTypes')}
-              <Text type="secondary" style={{ fontSize: 12 }}>—</Text>
+              {linkTypeCount != null && (
+                <Text type="secondary" style={{ fontSize: 12 }}>{linkTypeCount}</Text>
+              )}
             </span>
           ),
         },
