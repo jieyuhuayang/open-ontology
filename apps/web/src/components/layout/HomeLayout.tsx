@@ -6,9 +6,7 @@ import CreateObjectTypeWizard from '@/pages/object-types/components/CreateObject
 export default function HomeLayout() {
   return (
     <Layout>
-      <aside>
-        <HomeSidebar />
-      </aside>
+      <HomeSidebar />
       <Layout.Content>
         <main style={{ padding: 24 }}>
           <Outlet />
