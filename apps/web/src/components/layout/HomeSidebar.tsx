@@ -101,13 +101,13 @@ export default function HomeSidebar() {
 
   return (
     <Sider
+      trigger={null}
       collapsible
       collapsed={collapsed}
-      onCollapse={toggleCollapsed}
       width={240}
       style={{ borderRight: '1px solid #f0f0f0' }}
     >
-      <nav>
+      <nav style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         {!collapsed && (
           <div style={{ padding: '16px 24px 8px' }}>
             <Text strong>{t('sidebar.ontologyName')}</Text>
@@ -118,8 +118,24 @@ export default function HomeSidebar() {
           selectedKeys={[selectedKey]}
           items={menuItems}
           onClick={onClick}
-          style={{ border: 'none' }}
+          style={{ border: 'none', flex: 1 }}
         />
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={toggleCollapsed}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') toggleCollapsed();
+          }}
+          style={{
+            borderTop: '1px solid #f0f0f0',
+            padding: '12px 0',
+            textAlign: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          {collapsed ? <RightOutlined /> : <LeftOutlined />}
+        </div>
       </nav>
     </Sider>
   );
