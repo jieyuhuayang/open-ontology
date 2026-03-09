@@ -1,8 +1,16 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import HomeSidebar from '@/components/layout/HomeSidebar';
 import { useSidebarStore } from '@/stores/sidebar-store';
+
+vi.mock('@/api/object-types', () => ({
+  useObjectTypes: () => ({ data: { items: [], total: 5 }, isLoading: false }),
+}));
+
+vi.mock('@/api/link-types', () => ({
+  useLinkTypes: () => ({ data: { items: [], total: 3 }, isLoading: false }),
+}));
 
 function renderSidebar(initialRoute = '/') {
   return render(
@@ -40,10 +48,10 @@ describe('HomeSidebar', () => {
     expect(screen.getByText('Action Types')).toBeInTheDocument();
   });
 
-  it('shows dash for resource counts when API is not available', () => {
+  it('shows actual counts for object types and link types', () => {
     renderSidebar();
-    const dashes = screen.getAllByText('—');
-    expect(dashes.length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText('5')).toBeInTheDocument();
+    expect(screen.getByText('3')).toBeInTheDocument();
   });
 
   it('supports collapse toggle via sidebar store', async () => {
@@ -52,5 +60,10 @@ describe('HomeSidebar', () => {
 
     useSidebarStore.getState().toggleCollapsed();
     expect(useSidebarStore.getState().collapsed).toBe(true);
+  });
+
+  it('renders custom collapse button', () => {
+    renderSidebar();
+    expect(screen.getByRole('button')).toBeInTheDocument();
   });
 });
