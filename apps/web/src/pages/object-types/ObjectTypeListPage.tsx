@@ -11,7 +11,7 @@ const { Title } = Typography;
 
 export default function ObjectTypeListPage() {
   const { t } = useTranslation();
-  const openCreateModal = useCreateObjectTypeModalStore((s) => s.open);
+  const openCreateModal = useCreateWizardStore((s) => s.open);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [statusFilter, setStatusFilter] = useState<ResourceStatus[]>([]);
