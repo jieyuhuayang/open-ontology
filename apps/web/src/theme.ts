@@ -11,6 +11,7 @@ const theme: ThemeConfig = {
       headerBg: '#ffffff',
       headerHeight: 56,
       siderBg: '#ffffff',
+      bodyBg: '#ffffff',
     },
     Menu: {
       itemBorderRadius: 6,
