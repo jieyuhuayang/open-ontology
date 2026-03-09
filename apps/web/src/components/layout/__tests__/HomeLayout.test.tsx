@@ -8,6 +8,14 @@ vi.mock('@/pages/object-types/components/CreateObjectTypeWizard', () => ({
   default: () => null,
 }));
 
+vi.mock('@/api/object-types', () => ({
+  useObjectTypes: () => ({ data: { items: [], total: 0 }, isLoading: false }),
+}));
+
+vi.mock('@/api/link-types', () => ({
+  useLinkTypes: () => ({ data: { items: [], total: 0 }, isLoading: false }),
+}));
+
 describe('HomeLayout', () => {
   function renderWithRouter() {
     const router = createMemoryRouter([
