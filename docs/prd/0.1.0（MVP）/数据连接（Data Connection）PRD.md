@@ -134,15 +134,16 @@ Open Ontology 支持**两种数据接入模式**：
 
 #### 3.3.1 Dataset 列表
 
-以表格形式展示所有已导入的 Dataset：
+以表格形式展示所有 Dataset（包含快照和实时连接两种模式）：
 
 | 列 | 说明 |
 |-----|------|
 | 名称（Name） | Dataset 的 display name |
+| 模式（Mode） | 数据接入模式：`Snapshot` 或 `Live` |
 | 来源类型（Source） | 数据来源标识：`MySQL`、`Excel`、`CSV` |
-| 行数（Rows） | 数据行数，超过 1000 时以 `K` 为单位缩写（如 `12K`） |
+| 行数（Rows） | Snapshot Dataset 显示实际行数（超过 1000 时以 `K` 缩写，如 `12K`）；Live Dataset 显示 `Live` 标签（不显示行数） |
 | 列数（Columns） | 数据列数 |
-| 导入时间（Imported At） | 导入时间，展示相对时间（如 "3 天前"） |
+| 导入时间（Imported At） | Snapshot 显示导入时间；Live 显示注册时间；展示相对时间（如 "3 天前"） |
 | 关联 OT 状态 | 是否已被 Object Type 关联为 backing dataset，显示 `In use` 或 `Available` |
 
 #### 3.3.2 Dataset 详情页
