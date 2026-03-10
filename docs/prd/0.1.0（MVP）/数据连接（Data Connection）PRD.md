@@ -431,6 +431,17 @@ Open Ontology 支持**两种数据接入模式**：
 - Dataset 与 Object Type **1:1 绑定**：同一个 Dataset 只能作为一个 Object Type 的 backing dataset
 - Dataset in-use 状态由 Object Type 发布状态 + Working State 合并计算决定
 
+### 5.5 实时连接规则
+
+- **仅 MySQL 支持**：实时连接模式仅适用于 MySQL 数据源；Excel/CSV 为文件型数据源，天然只支持快照导入
+- **必须测试成功**：注册 Live Dataset 前，必须测试连接成功；与快照导入不同，不允许跳过测试
+- **无行数限制**：Live Dataset 不受 10 万行导入限制（数据不复制到平台内部）
+- **外部不可用降级**：当外部 MySQL 数据源不可用时：
+  - Schema（列结构）仍可正常查看（已注册到平台内部）
+  - 数据预览返回错误状态 + 提示文案 + **"重试连接"** 按钮
+- **连接删除级联**：删除连接时，该连接关联的所有 Live Dataset 标记为 `disconnected` 状态；`disconnected` 的 Live Dataset 仅可查看 schema，数据预览不可用，需用户重新关联连接或删除
+- **同一连接混用**：同一个连接配置可同时用于快照导入和实时连接，两种模式互不影响
+
 ---
 
 ## 6. 与 Ontology Manager 的集成点
