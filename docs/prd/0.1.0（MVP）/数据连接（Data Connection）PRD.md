@@ -175,11 +175,11 @@ Open Ontology 支持**两种数据接入模式**：
 
 ---
 
-### 3.4 MySQL 导入向导（4 步模态子向导）
+### 3.4 MySQL 快照导入向导（4 步模态子向导）
 
 > 迁移自主 PRD §8.3—§8.6
 
-点击 **"Import from MySQL"** 后，以**模态框向导（modal wizard）** 形式展开导入流程，共 4 步。
+点击 **"Import from MySQL（快照导入）"** 后，以**模态框向导（modal wizard）** 形式展开快照导入流程，共 4 步。
 
 #### Step 1：配置 MySQL 连接
 
