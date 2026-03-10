@@ -6,10 +6,14 @@
 
 Data Connection 是从 Ontology Manager 主 PRD 中剥离出的独立模块，负责为 Ontology 提供外部数据源接入和 Dataset 管理能力。
 
-Open Ontology 采用**数据拷贝（Dataset Import）模型**：从外部数据源（MySQL 数据库、Excel/CSV 文件）将数据导入到平台内部，创建一份 Dataset 快照。对象类型的底层数据（backing dataset）指向平台内部的 Dataset，而非实时查询外部数据源。
+Open Ontology 支持**两种数据接入模式**：
+
+- **快照导入（Snapshot Import）**：从外部数据源（MySQL 数据库、Excel/CSV 文件）将数据一次性复制到平台内部，创建 Dataset 快照。对象类型的底层数据（backing dataset）指向平台内部存储。
+- **实时连接（Live Connection）**：仅注册外部 MySQL 表的 schema 元数据，数据保留在外部数据库中，按需实时查询。适用于大数据量表或需要数据始终最新的场景。
 
 ```
-外部数据源 → [一次性快照导入] → 平台内部 Dataset → 对象类型（Object Type）
+快照导入路径：外部数据源 → [一次性快照导入] → 平台内部 Dataset → 对象类型（Object Type）
+实时连接路径：外部数据源 ← [按需实时查询] ← Live Dataset（仅元数据） → 对象类型（Object Type）
 ```
 
 ### 1.2 与 Ontology Manager 的关系
