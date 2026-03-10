@@ -162,6 +162,8 @@ Open Ontology 支持**两种数据接入模式**：
 
 - 删除前需先解除 Object Type 关联（若已关联则按钮置灰，Tooltip 提示"该数据集已被 \<ObjectTypeName\> 关联，请先解除关联"）
 - 删除操作需二次确认
+- **Snapshot Dataset**：删除平台内部存储的数据副本
+- **Live Dataset**：仅删除平台内的元数据注册信息，不影响外部 MySQL 数据库中的任何数据
 
 #### 3.3.4 Import Dataset
 
