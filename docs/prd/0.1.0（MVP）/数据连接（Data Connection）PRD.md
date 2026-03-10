@@ -448,7 +448,9 @@ Open Ontology 支持**两种数据接入模式**：
 
 | 集成场景 | 描述 |
 |---------|------|
-| OT 创建向导 Step 1 | "选择已有 Dataset" → 读取本模块的 Dataset 列表 API |
+| OT 创建向导 Step 1 | "选择已有 Dataset" → 读取本模块的 Dataset 列表 API；列表同时展示 Snapshot 和 Live Dataset，标注模式标签（`Snapshot` / `Live`） |
 | Dataset in-use 判定 | 已被 OT 关联的 Dataset 在列表中显示 `In use` 标签，不可被其他 OT 选择 |
+| OT 数据预览 | Snapshot Dataset 从平台内部存储读取；Live Dataset 按需实时查询外部 MySQL 数据库 |
 | OT 编辑页"替换数据源" | 从本模块的 Dataset 列表中选择新的 Dataset |
+| 连接不可用降级 | 当 Live Dataset 对应的外部连接不可用时，OT 数据预览展示降级提示："外部数据源当前不可用，请前往 Data Connection 检查连接状态" |
 | 提示引导 | OT 创建向导中展示"需要导入新数据？请前往 Data Connection 模块"引导文案 |
