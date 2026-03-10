@@ -169,7 +169,8 @@ Open Ontology 支持**两种数据接入模式**：
 
 点击 **"Import Dataset"** 按钮，弹出选择器：
 
-- **Import from MySQL** → 触发 MySQL 导入向导（§3.4）
+- **Import from MySQL（快照导入）** → 触发 MySQL 快照导入向导（§3.4）
+- **Connect to MySQL（实时连接）** → 触发 MySQL 实时连接向导（§3.6）
 - **Upload Excel/CSV** → 触发 Excel/CSV 上传向导（§3.5）
 
 ---
