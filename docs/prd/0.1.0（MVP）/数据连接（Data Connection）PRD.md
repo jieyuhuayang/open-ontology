@@ -18,10 +18,21 @@ Open Ontology 支持**两种数据接入模式**：
 
 ### 1.2 与 Ontology Manager 的关系
 
-- **Data Connection 生产 Dataset**：通过 MySQL 连接器导入或 Excel/CSV 上传，在平台内创建 Dataset 快照
-- **Ontology Manager 消费 Dataset**：OT 创建/编辑时，从 Dataset 列表中选择已有 Dataset 作为 backing dataset
+- **Data Connection 生产 Dataset**：通过 MySQL 连接器（快照导入或实时连接）或 Excel/CSV 上传，在平台内创建 Dataset
+- **Ontology Manager 消费 Dataset**：OT 创建/编辑时，从 Dataset 列表中选择已有 Dataset（Snapshot 或 Live）作为 backing dataset
 
-### 1.3 架构参考
+### 1.3 两种模式对比
+
+| 维度 | 快照导入（Snapshot Import） | 实时连接（Live Connection） |
+|------|---------------------------|---------------------------|
+| 数据存储位置 | 平台内部（PostgreSQL） | 外部 MySQL 数据库 |
+| Dataset 内容 | 完整数据副本 | 仅 schema 元数据（列名、类型） |
+| 行数限制 | 10 万行 | 无限制 |
+| 离线可用 | ✅ 外部数据源断开后仍可查看数据 | ❌ 外部不可用时仅可查看 schema，数据预览不可用 |
+| 数据新鲜度 | 导入时的快照，不自动更新 | 始终最新（每次查询实时读取外部） |
+| 支持的数据源 | MySQL、Excel/CSV | 仅 MySQL（文件天然为一次性导入） |
+
+### 1.4 架构参考
 
 详见 `docs/architecture/05-data-connectivity.md`
 
