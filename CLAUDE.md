@@ -209,7 +209,7 @@ justfile                              # Monorepo 任务运行器
    - 设计部分只写契约和决策（Why + What），不写实现步骤（How）
    - 禁止在 spec.md 中写测试策略（由本文件 §测试要求统一管理）
    - 写 spec 前必须先阅读版本的 `release-contract.md`
-3. **审查 spec** — 写完 spec.md 后，调用 `/sdd-review <feature_dir> spec`；Claude 同时检查 PRD gap 和架构合规性，生成报告供用户参考；用户确认后将 tasks.md 状态表中 spec.md 行更新为 ✅ 已评审（手动暂停点）
+3. **审查 spec** — 写完 spec.md 后，调用 `/sdd-review <feature_dir> spec`；Claude 同时检查 PRD gap 和架构合规性，生成报告供用户参考；必须使用 `AskUserQuestion` 工具请求用户确认，用户确认后将 tasks.md 状态表中 spec.md 行更新为 ✅ 已评审（手动暂停点）
 4. **tasks.md** — 将 spec 拆解为自包含的原子任务（每个任务一次 AI 会话可完成）
    - 每个任务内联必要实现上下文（文件、逻辑、测试），实现阶段不需要回读 spec.md
    - 每个测试任务必须标注 `覆盖 AC: AC-NN, AC-NN`，追溯到 spec.md 的 AC 表格
