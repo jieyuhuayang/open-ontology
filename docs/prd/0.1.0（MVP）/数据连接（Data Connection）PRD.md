@@ -4,7 +4,7 @@
 
 ### 1.1 模块定位
 
-Data Connection 是从 Ontology Manager 主 PRD 中剥离出的独立模块，负责为 Ontology 提供外部数据源接入和 Dataset 管理能力。
+Data Connection 是从 Ontology Manager PRD（0.1.0 MVP 版本） 中剥离出的独立模块，负责为 Ontology 提供外部数据源接入和 Dataset 管理能力。
 
 Open Ontology 支持**两种数据接入模式**：
 
@@ -177,7 +177,7 @@ Open Ontology 支持**两种数据接入模式**：
 
 ### 3.4 MySQL 快照导入向导（4 步模态子向导）
 
-> 迁移自主 PRD §8.3—§8.6
+> 迁移自主 PRD（0.1.0 版本） §8.3—§8.6
 
 点击 **"Import from MySQL（快照导入）"** 后，以**模态框向导（modal wizard）** 形式展开快照导入流程，共 4 步。
 
