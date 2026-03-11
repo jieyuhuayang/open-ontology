@@ -226,7 +226,7 @@ justfile                              # Monorepo 任务运行器
    - NEEDS_FIX → 修复 HIGH 问题后重审（最多 2 轮）
 9. **合并** — `git checkout main && git merge --no-ff feat/<version>/<branch> && git branch -d feat/<version>/<branch>`
 
-**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。有**两个手动暂停点**：步骤 1（Spec Discovery 用户确认）和步骤 3（spec 评审用户确认）；`tasks.md` 审查和代码审查均为全自动（无需用户确认）。执行阶段在 feature 分支上进行，审查通过后合并回 main。写 spec 前必须先阅读版本的 `release-contract.md` 和完整的 PRD 原文。
+**核心约束**：每一步只产出该步骤的文件，不得提前执行后续步骤。有**两个手动暂停点**：步骤 1（Spec Discovery 用户确认）和步骤 3（spec 评审用户确认），暂停点必须使用 `AskUserQuestion` 工具与用户交互，禁止直接输出文本等待手动输入；`tasks.md` 审查和代码审查均为全自动（无需用户确认）。执行阶段在 feature 分支上进行，审查通过后合并回 main。写 spec 前必须先阅读版本的 `release-contract.md` 和完整的 PRD 原文。
 
 ## 外部 MySQL 策略
 
