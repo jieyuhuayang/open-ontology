@@ -156,7 +156,7 @@ Data Connection **生产** Dataset（Snapshot 或 Live）；Ontology Manager **�
 | AC-FU02 | 管理员 | 上传后确认导入（指定 Dataset 名称、选择列） | 系统返回 ImportTask（status=pending），HTTP 202；后台异步解析并写入；Dataset mode=snapshot |
 | AC-FU03 | 管理员 | 上传超过 50MB 的文件 | 返回文件过大错误，HTTP 422 |
 | AC-FU04 | 管理员 | 上传不支持的文件格式（如 .pdf） | 返回格式不支持错误，HTTP 422 |
-| AC-FU05 | 管理员 | Excel 文件包含多个 Sheet | 使用第一个 Sheet（MVP 简化处理） |
+| AC-FU05 | 管理员 | Excel 文件包含多个 Sheet | 展示 Sheet 列表供用户选择；默认选中第一个 Sheet |
 | AC-FU06 | 管理员 | CSV 列类型推断 | 采样前 1000 行；超过 5% 不匹配则回退 String 类型 |
 
 ### Dataset 管理（Dataset Management）
