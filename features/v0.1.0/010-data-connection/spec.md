@@ -128,7 +128,7 @@ Data Connection **生产** Dataset（Snapshot 或 Live）；Ontology Manager **�
 | AC-MI06 | 管理员 | 导入完成后查看结果 | ImportTask status=completed，含 dataset_rid、row_count、column_count、duration_ms |
 | AC-MI07 | 管理员 | 导入同一张表两次 | 允许，每次创建独立的 Dataset 快照，互不影响 |
 | AC-MI08 | 管理员 | 查询不存在的 task_id | 返回 HTTP 404 |
-| AC-MI09 | 管理员 | 导入行数超过 10 万的表 | 返回 `ROW_LIMIT_EXCEEDED`，HTTP 422，提示"MVP 版本单次导入上限 10 万行" |
+| AC-MI09 | 管理员 | 导入行数超过 10 万的表 | 在 Step 3 确认导入前，系统根据 `SELECT COUNT(*)` 预检行数，超限时显示 `ROW_LIMIT_EXCEEDED` 错误（HTTP 422），阻止进入 Step 4 |
 | AC-MI10 | 管理员 | 在快照导入向导 Step 1 选择已有连接 | 展示该连接的只读预览信息（连接名称、Host、Database）；若无可用连接，显示引导文案跳转至 Connections Tab |
 
 ### MySQL 实时连接（MySQL Live Connection）
