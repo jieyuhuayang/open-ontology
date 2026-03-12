@@ -51,6 +51,26 @@ justfile                              # Monorepo 任务运行器
 
 **类型共享管道**：FastAPI → `openapi.json` → `openapi-typescript` → TS 类型。禁止手写 API 类型。
 
+## 本地开发启动（原生模式，不依赖 Docker）
+
+> PostgreSQL 16 通过 Homebrew 安装并以 LaunchAgent 自启动，无需手动启动。
+> `psql` 路径：`/usr/local/Cellar/postgresql@16/16.13/bin/psql`（不在 PATH 中）
+
+```bash
+# 1. 数据库迁移（幂等，每次启动前跑一下确保表结构最新）
+cd apps/server && PYTHONPATH=. uv run alembic upgrade head
+
+# 2. 启动后端（必须在 apps/server 目录下，必须设 PYTHONPATH=.）
+cd apps/server && PYTHONPATH=. uv run uvicorn app.main:app --reload --port 8000
+
+# 3. 启动前端（另开终端）
+cd apps/web && pnpm dev
+```
+
+- 后端默认连接：`postgresql+asyncpg://ontology:ontology@localhost:5432/open_ontology`
+- 前端默认：http://localhost:5173（端口被占则自动递增）
+- 3D 星空 Demo 路由：`/demo/canvas`
+
 ## 领域术语
 
 在代码和文档中统一使用以下双语术语：
