@@ -448,7 +448,9 @@ Open Ontology 支持**两种数据接入模式**：
 - **外部不可用降级**：当外部 MySQL 数据源不可用时：
   - Schema（列结构）仍可正常查看（已注册到平台内部）
   - 数据预览返回错误状态 + 提示文案 + **"重试连接"** 按钮
-- **连接删除级联**：删除连接时，该连接关联的所有 Live Dataset 标记为 `disconnected` 状态；`disconnected` 的 Live Dataset 仅可查看 schema，数据预览不可用，需用户重新关联连接或删除
+- **连接删除保护**：若连接存在 in-use 状态的 Live Dataset（已被 ObjectType 关联），则阻止删除连接，提示用户先解除 ObjectType 关联
+- **连接删除级联**：删除连接时，该连接关联的所有 Live Dataset 标记为 `disconnected` 状态；`disconnected` 的 Live Dataset 仅可查看 schema，数据预览不可用，需用户删除后重新创建
+- **Snapshot 不受连接删除影响**：通过快照导入创建的 Dataset 数据已完整复制到平台内部，删除对应连接后 Snapshot Dataset 不受任何影响
 - **同一连接混用**：同一个连接配置可同时用于快照导入和实时连接，两种模式互不影响
 
 ---
