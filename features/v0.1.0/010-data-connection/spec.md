@@ -103,7 +103,7 @@ Data Connection **生产** Dataset（Snapshot 或 Live）；Ontology Manager **�
 | AC-CM01 | 管理员 | 填写 MySQL 连接信息（名称、Host、Port、Database、Username、Password）并保存 | 连接保存成功，密码加密存储，返回连接信息（不含密码），HTTP 201 |
 | AC-CM02 | 管理员 | 填写连接信息后点击"测试连接" | 系统尝试建立 MySQL 连接（10s 超时），返回成功/失败状态 + 耗时，HTTP 200 |
 | AC-CM03 | 管理员 | 测试连接时使用已保存连接的 `connection_rid` 复用密码 | 系统从数据库解密已有密码进行连接测试，无需用户重新输入 |
-| AC-CM04 | 管理员 | 查看连接列表 | 返回所有已保存的 MySQL 连接，按创建时间降序，不含密码字段；每个连接包含关联 Dataset 数量（`datasetCount`，含 Snapshot 和 Live） |
+| AC-CM04 | 管理员 | 查看连接列表 | 返回所有已保存的 MySQL 连接，按创建时间降序，不含密码字段；每个连接包含关联 Dataset 数量（`datasetCount`，含 Snapshot 和 Live）和最近使用时间（`lastUsedAt`，最近一次使用该连接导入/注册 Dataset 的时间，无使用记录时为 null） |
 | AC-CM05 | 管理员 | 测试连接时填写错误的 Host/Port/凭据 | 返回连接失败信息 + 错误详情，HTTP 200（`success: false`） |
 | AC-CM06 | 管理员 | 删除已保存的连接（指定 RID），该连接无 in-use 状态的 Live Dataset | 连接配置被删除；关联的 Live Dataset 标记为 `disconnected`；关联的 Snapshot Dataset 不受影响；HTTP 204 |
 | AC-CM07 | 管理员 | 删除不存在的连接 RID | 返回 `CONNECTION_NOT_FOUND`，HTTP 404 |
