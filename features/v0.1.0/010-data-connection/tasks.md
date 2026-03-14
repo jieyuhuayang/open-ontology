@@ -95,8 +95,30 @@ Snapshot 模式前后端已完整实现。本轮任务聚焦 **Live Connection �
 - **文件**:
   - `apps/server/app/routers/imports.py` — 修改
     - 新增 `POST /api/v1/datasets/register/live` → 注册 Live Dataset (HTTP 201)
-      - Request: `{ connectionRid, tableName, datasetName, selectedColumns }`
-      - Response: Dataset (含 mode="live")
+      - Request:
+        ```json
+        {
+          "connectionRid": "ri.mysql-connection.xxx",
+          "tableName": "orders",
+          "datasetName": "Orders Live",
+          "selectedColumns": ["id", "customer_id", "total", "created_at"]
+        }
+        ```
+      - Response (201):
+        ```json
+        {
+          "rid": "ri.dataset.xxx",
+          "name": "Orders Live",
+          "mode": "live",
+          "sourceType": "mysql",
+          "connectionRid": "ri.mysql-connection.xxx",
+          "sourceTable": "orders",
+          "columnCount": 4,
+          "rowCount": null,
+          "status": "ready",
+          "importedAt": "2026-03-14T10:00:00Z"
+        }
+        ```
   - `apps/server/app/routers/mysql_connections.py` — 修改（如需）
     - `DELETE /{rid}` 返回 HTTP 409 + `CONNECTION_HAS_IN_USE_LIVE_DATASETS` 场景
   - `apps/server/app/routers/datasets.py` — 修改（如需）
