@@ -67,8 +67,13 @@ export default function ConnectionsTab() {
     try {
       await deleteMutation.mutateAsync(rid);
       message.success(t('dataConnection.deleteConnectionSuccess'));
-    } catch {
-      message.error(t('common.delete') + ' failed');
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      if (status === 409) {
+        message.error(t('mysqlConnection.deleteBlockedByLive'));
+      } else {
+        message.error(t('common.delete') + ' failed');
+      }
     }
   };
 
