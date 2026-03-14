@@ -7,6 +7,7 @@ import MySQLImportWizard from './components/MySQLImportWizard';
 import FileUploadWizard from './components/FileUploadWizard';
 import NewConnectionModal from './components/NewConnectionModal';
 import ConnectionDetailDrawer from './components/ConnectionDetailDrawer';
+import LiveConnectionWizard from './components/LiveConnectionWizard';
 
 const { Title } = Typography;
 
