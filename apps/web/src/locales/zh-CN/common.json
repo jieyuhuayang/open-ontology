@@ -425,7 +425,8 @@
     "noConnections": "暂无可用连接，请先在「连接管理」标签页中创建。",
     "selectConnection": "请选择连接",
     "searchTables": "搜索表...",
-    "deleteBlockedByLive": "无法删除：此连接有正在被对象类型使用的实时数据集。"
+    "deleteBlockedByLive": "无法删除：此连接有正在被对象类型使用的实时数据集。",
+    "tableName": "表名称"
   },
   "liveConnection": {
     "title": "连接 MySQL（实时）",
