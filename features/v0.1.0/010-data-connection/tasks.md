@@ -10,7 +10,7 @@
 | 步骤 | 状态 | 备注 |
 |------|------|------|
 | spec.md | ✅ 已评审 | 用户确认通过，含 Live Connection 模式 |
-| tasks.md | 🔲 待审查 | |
+| tasks.md | ✅ 已审查 | 自动审查 PASS_WITH_NOTES，已修复 2 个 MEDIUM |
 | 实现 | 🔲 未开始 | 0 / 14 完成 |
 
 ---
