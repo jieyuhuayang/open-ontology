@@ -419,7 +419,23 @@
     "snapshotWarning": "注意：此操作将创建一份数据快照，导入后的数据不会自动与源端变更同步。",
     "noConnections": "暂无可用连接，请先在「连接管理」标签页中创建。",
     "selectConnection": "请选择连接",
-    "searchTables": "搜索表..."
+    "searchTables": "搜索表...",
+    "deleteBlockedByLive": "无法删除：此连接有正在被对象类型使用的实时数据集。"
+  },
+  "liveConnection": {
+    "title": "连接 MySQL（实时）",
+    "banner": "实时连接模式：数据保留在外部数据库中，平台实时查询，不复制数据到本平台。",
+    "steps": {
+      "connection": "选择连接",
+      "tables": "选择表与列",
+      "confirm": "确认"
+    },
+    "testRequired": "继续前请先测试连接并确认连接成功。",
+    "noConnections": "暂无可用连接，请先在「连接管理」标签页中创建。",
+    "confirmRegister": "注册实时数据集",
+    "resultSummary": "实时数据集「{{name}}」注册成功。",
+    "disconnectedTip": "此实时数据集的连接已被删除，请删除后重新使用新连接创建。",
+    "registerFailed": "注册实时数据集失败"
   },
   "demo": {
     "title": "Ontology Canvas",
