@@ -1,7 +1,6 @@
-# Tasks: 010 Data Connection（数据连接）— 重构
+# Tasks: 010 Data Connection（数据连接）— Live Connection 补充
 
 **关联规范**: [spec.md](./spec.md)
-**技术方案**: [design.md](./design.md)
 **版本**: v0.1.0
 
 ---
@@ -10,139 +9,322 @@
 
 | 步骤 | 状态 | 备注 |
 |------|------|------|
-| spec.md | ✅ 已评审 | 用户确认"可以写 design 了" |
-| design.md | ✅ 已评审 | 自动审查通过 |
-| tasks.md | ✅ 已拆解 | 自动审查通过 |
-| 实现 | 🔲 未开始 | 0 / 10 完成 |
+| spec.md | ✅ 已评审 | 用户确认通过，含 Live Connection 模式 |
+| tasks.md | 🔲 待审查 | |
+| 实现 | 🔲 未开始 | 0 / 14 完成 |
 
 ---
 
-## 开发模式
+## 背景
 
-本次为已有功能的**重构补充**，后端新增逻辑少（主要是 datasetCount + GET 单连接），前端修改多。
-采用 Test-Implementation 配对模式。
+Snapshot 模式前后端已完整实现。本轮任务聚焦 **Live Connection 模式补充**，核心变更：
+
+1. `datasets` 表新增 `mode` 字段（`snapshot` / `live`）和 `connection_rid` 引用
+2. Live Dataset 注册流程（仅写 schema 元数据，不复制数据）
+3. Live Dataset 数据预览（实时查询外部 MySQL）
+4. 连接删除保护（有 in-use Live Dataset 时阻止）+ 级联（标记 `disconnected`）
+5. 前端 LiveConnectionWizard + DatasetsTab/ConnectionsTab 适配
 
 ---
 
 ## Tasks
 
-### 后端补充
+### T001: DB Migration — datasets 表增加 mode 和 connection_rid
 
-- [ ] **T001**: 后端 — Domain + Storage + Service 补充
-  - 文件:
-    - `apps/server/app/domain/mysql_connection.py` — `MySQLConnection` 增加 `dataset_count: int = 0`
-    - `apps/server/app/storage/dataset_storage.py` — 新增 `count_by_connection_rids()` 方法
-    - `apps/server/app/services/mysql_import_service.py` — `list_connections` 填充 dataset_count；新增 `get_connection` 方法
-    - `apps/server/app/routers/mysql_connections.py` — 新增 `GET /{rid}` 端点
-  - 覆盖 AC: AC-CM04, AC-CM09, AC-CM14
-  - 依赖: 无
+- **文件**:
+  - `apps/server/alembic/versions/XXXX_add_dataset_mode_and_connection_rid.py` — 新建
+- **逻辑**:
+  - `datasets` 表新增列 `mode TEXT NOT NULL DEFAULT 'snapshot'`（值域：`snapshot` / `live`）
+  - `datasets` 表新增列 `connection_rid TEXT`（可空，Live Dataset 引用 mysql_connections.rid）
+  - `datasets` 表新增列 `source_table TEXT`（可空，Live Dataset 记录源表名）
+  - 现有 Snapshot Dataset 自动回填 `mode='snapshot'`（DEFAULT 已处理）
+  - 新增索引 `idx_datasets_connection_rid` on `connection_rid`
+  - 新增索引 `idx_datasets_mode` on `mode`
+- **覆盖 AC**: KD-6（复用同一表 + mode 字段）
+- **依赖**: 无
 
-- [ ] **T002**: 后端测试 — 覆盖新增逻辑
-  - 文件:
-    - `apps/server/tests/unit/test_mysql_import_service.py` — 新增 `test_list_connections_with_dataset_count`, `test_get_connection_success`, `test_get_connection_not_found`
-    - `apps/server/tests/integration/test_mysql_connections.py` — 新增 `test_get_connection_endpoint`, `test_list_connections_has_dataset_count`
-  - 覆盖 AC: AC-CM04, AC-CM09, AC-CM14
-  - 依赖: T001
-  - 验证: `cd apps/server && uv run pytest tests/ -v -k "dataset_count or get_connection"`
+### T002: Domain + Storage 模型更新
 
-- [ ] **T003**: openapi.json 重新生成 + TS 类型重新生成
-  - 文件:
-    - `apps/server/openapi.json` — 重新生成
-    - `apps/web/src/generated/api.ts` — 重新生成
-  - 依赖: T001
-  - 验证: `diff` 确认 `datasetCount` 和 `GET /mysql-connections/{rid}` 出现在 openapi.json 中
+- **文件**:
+  - `apps/server/app/domain/dataset.py` — 修改
+    - `Dataset` 增加 `mode: str`（`"snapshot"` / `"live"`）、`connection_rid: str | None`、`source_table: str | None`
+    - `DatasetListItem` 增加 `mode: str`
+    - 新增 `LiveDatasetCreateRequest(BaseModel)`: `name`, `connection_rid`, `source_table`, `selected_columns` (list[str])
+  - `apps/server/app/storage/models.py` — 修改
+    - `DatasetModel` 增加 `mode`, `connection_rid`, `source_table` 列
+  - `apps/server/app/storage/dataset_storage.py` — 修改
+    - `create()` 支持无 rows 创建（Live Dataset 场景）
+    - 新增 `list_live_by_connection_rid(connection_rid)` → 返回该连接关联的所有 Live Dataset
+    - 新增 `mark_disconnected(connection_rid)` → 批量将指定连接的 Live Dataset status 设为 `disconnected`
+    - `count_by_connection_rids()` 更新：同时计入 Snapshot 和 Live Dataset
+- **覆盖 AC**: AC-CM09, AC-LC06, AC-LC11, KD-6
+- **依赖**: T001
 
-### 前端 — i18n + Store 更新
+### T003: Service — Live Dataset 注册 + 连接删除保护/级联
 
-- [ ] **T004**: i18n 新增键 + Store 更新
-  - 文件:
-    - `apps/web/src/locales/en-US.json` — 新增 i18n 键
-    - `apps/web/src/locales/zh-CN.json` — 新增 i18n 键
-    - `apps/web/src/stores/data-connection-store.ts` — 新增 `detailConnectionRid`、`openModal` 增加 `'newConnection'` 类型
-    - `apps/web/src/api/mysql-connections.ts` — 新增 `useMySQLConnection` hook
-  - 覆盖 AC: AC-CM08, AC-CM10, AC-DM08
-  - 依赖: T003
+- **文件**:
+  - `apps/server/app/services/mysql_import_service.py` — 修改
+    - 新增 `register_live_dataset(request: LiveDatasetCreateRequest, ontology_rid: str)`:
+      1. 校验 connection_rid 存在 + 连接可用
+      2. 连接外部 MySQL，提取指定表的列元数据（复用 `get_table_columns`）
+      3. 按 `selected_columns` 过滤列（主键列强制保留）
+      4. 调用 `dataset_storage.create()` 创建 mode=live 的 Dataset（无 rows）
+      5. 更新 connection 的 `last_used_at`
+      6. 返回创建的 Dataset
+    - 修改 `delete_connection(rid)`:
+      1. 查询该连接关联的 Live Dataset 中是否有 in-use 的（调用 DatasetService 的 in_use 计算）
+      2. 若有 in-use Live Dataset → 抛出 `CONNECTION_HAS_IN_USE_LIVE_DATASETS` (HTTP 409)
+      3. 若无 → 调用 `dataset_storage.mark_disconnected(rid)` 标记 Live Dataset 为 `disconnected`
+      4. 删除连接
+  - `apps/server/app/services/dataset_service.py` — 修改
+    - `get_preview()` 增加 Live 模式分支:
+      1. 若 dataset.mode == 'live' 且 dataset.connection_rid 存在:
+         - 从 mysql_connections 获取连接配置，解密密码
+         - 实时连接外部 MySQL，查询 `SELECT * FROM <source_table> LIMIT <limit>`
+         - 返回预览数据
+      2. 若 dataset.mode == 'live' 且 status == 'disconnected':
+         - 抛出 `LIVE_DATASET_DISCONNECTED` 错误
+      3. 若外部 MySQL 连接失败:
+         - 抛出 `LIVE_DATASET_SOURCE_UNAVAILABLE` 错误（降级：schema 仍可查看）
+- **覆盖 AC**: AC-CM06, AC-CM15, AC-LC06, AC-LC09, AC-LC10, AC-LC11, AC-DM05
+- **依赖**: T002
 
-### 前端 — ConnectionsTab 重构
+### T004: Router — Live Dataset 注册端点 + 连接删除更新
 
-- [ ] **T005**: ConnectionsTab 重构
-  - 文件: `apps/web/src/pages/data-connection/components/ConnectionsTab.tsx`
-  - 变更:
-    - 移除顶部 "Import from MySQL" 和 "Upload File" 按钮（AD-14）
-    - 新增 "New Connection" 按钮 → 打开 NewConnectionModal（AC-CM08）
-    - 新增列：Type（固定 "MySQL"）、Dataset 数（`datasetCount`，AC-CM09）
-    - 状态列：默认显示 `untested` Tag（AC-CM13）
-    - 名称列：可点击，`onClick` 设置 `detailConnectionRid`（AC-CM10）
-  - 覆盖 AC: AC-CM08, AC-CM09, AC-CM10, AC-CM13
-  - 依赖: T004
+- **文件**:
+  - `apps/server/app/routers/imports.py` — 修改
+    - 新增 `POST /api/v1/datasets/register/live` → 注册 Live Dataset (HTTP 201)
+      - Request: `{ connectionRid, tableName, datasetName, selectedColumns }`
+      - Response: Dataset (含 mode="live")
+  - `apps/server/app/routers/mysql_connections.py` — 修改（如需）
+    - `DELETE /{rid}` 返回 HTTP 409 + `CONNECTION_HAS_IN_USE_LIVE_DATASETS` 场景
+  - `apps/server/app/routers/datasets.py` — 修改（如需）
+    - `GET /datasets/{rid}/preview` 增加 Live 模式降级错误响应
+- **覆盖 AC**: AC-CM15, AC-LC06, AC-LC08, AC-DM05
+- **依赖**: T003
 
-### 前端 — NewConnectionModal（新建）
+### T005: 后端单元测试 — Live Connection 逻辑
 
-- [ ] **T006**: NewConnectionModal 新建
-  - 文件: `apps/web/src/pages/data-connection/components/NewConnectionModal.tsx`
-  - 内容: 从 MySQLImportWizard Step 1 表单抽取为独立组件。包含：连接配置表单 + Test Connection 按钮 + Save 按钮。保存成功后关闭弹窗，invalidate connections query。
-  - 覆盖 AC: AC-CM01, AC-CM02, AC-CM08
-  - 依赖: T004
+- **文件**:
+  - `apps/server/tests/unit/test_mysql_import_service.py` — 修改
+    - `test_register_live_dataset_success` — 正常注册 Live Dataset
+    - `test_register_live_dataset_connection_not_found` — 连接不存在
+    - `test_delete_connection_with_in_use_live_dataset` — 阻止删除（AC-CM15）
+    - `test_delete_connection_cascade_disconnected` — 级联标记 disconnected（AC-CM06）
+    - `test_delete_connection_snapshot_unaffected` — Snapshot Dataset 不受影响
+  - `apps/server/tests/unit/test_dataset_service.py` — 修改
+    - `test_preview_live_dataset_success` — Live Dataset 实时预览
+    - `test_preview_live_dataset_disconnected` — disconnected 状态预览失败
+    - `test_preview_live_dataset_source_unavailable` — 外部不可用降级
+- **覆盖 AC**: AC-CM06, AC-CM15, AC-LC06, AC-LC10, AC-LC11, AC-DM05
+- **依赖**: T003
+- **验证**: `cd apps/server && uv run pytest tests/unit/ -v -k "live"`
 
-### 前端 — ConnectionDetailDrawer（新建）
+### T006: 后端集成测试 — Live Connection API
 
-- [ ] **T007**: ConnectionDetailDrawer 新建
-  - 文件: `apps/web/src/pages/data-connection/components/ConnectionDetailDrawer.tsx`
-  - 内容: 宽 Drawer（width=900+），展示 Schema 浏览器。复用 `useMySQLTables`、`useMySQLTableColumns`、`useMySQLTablePreview`。左右分栏：表列表（带搜索）+ 选中表后列结构 & 数据预览。
-  - 覆盖 AC: AC-CM10, AC-CM11, AC-CM12
-  - 依赖: T004
+- **文件**:
+  - `apps/server/tests/integration/test_live_connection_api.py` — 新建
+    - `test_register_live_dataset` — POST /datasets/register/live → 201（AC-LC06）
+    - `test_register_live_dataset_duplicate_table` — 同一表注册两次（AC-LC12）
+    - `test_delete_connection_blocks_with_in_use_live` — DELETE 连接 → 409（AC-CM15）
+    - `test_delete_connection_cascades_disconnected` — DELETE 连接 → Live Dataset disconnected（AC-CM06）
+    - `test_live_dataset_in_list` — GET /datasets 列表中显示 mode=live（AC-DM01）
+    - `test_delete_live_dataset` — DELETE Live Dataset → 仅删除元数据（AC-DM07）
+  - `apps/server/tests/integration/test_dataset_api.py` — 修改
+    - 现有测试不受影响（Snapshot 行为不变）
+- **覆盖 AC**: AC-CM06, AC-CM15, AC-LC06, AC-LC12, AC-DM01, AC-DM07
+- **依赖**: T004
+- **验证**: `cd apps/server && uv run pytest tests/integration/test_live_connection_api.py -v`
 
-### 前端 — DatasetsTab 重构
+### T007: openapi.json + TS 类型重新生成
 
-- [ ] **T008**: DatasetsTab 重构
-  - 文件: `apps/web/src/pages/data-connection/components/DatasetsTab.tsx`
-  - 变更:
-    - 新增 "Import Dataset" Dropdown.Button（菜单项：From MySQL / Upload File），AC-DM08
-    - 非 in_use 时显示 `<Tag>Available</Tag>`，AC-DM01
-  - 覆盖 AC: AC-DM01, AC-DM08
-  - 依赖: T004
+- **文件**:
+  - `apps/server/openapi.json` — 重新生成
+  - `apps/web/src/generated/api.ts` — 重新生成
+- **验证**: 确认新增内容出现在 openapi.json 中:
+  - `POST /datasets/register/live` 端点
+  - Dataset schema 含 `mode`, `connectionRid`, `sourceTable` 字段
+  - `CONNECTION_HAS_IN_USE_LIVE_DATASETS` 错误码
+- **依赖**: T004
 
-### 前端 — MySQLImportWizard 微调
+### T008: 前端 — i18n + Store + API hooks 更新
 
-- [ ] **T009**: MySQLImportWizard Step 1 微调
-  - 文件: `apps/web/src/pages/data-connection/components/MySQLImportWizard.tsx`
-  - 变更: `handleSelectExisting` 改为 `form.setFieldsValue({ name, host, port, databaseName, username, sslEnabled })`，不直接 `setStep(1)`；密码字段不填充；用户可修改后再点"下一步"。
-  - 覆盖 AC: AC-MI10
-  - 依赖: T004
+- **文件**:
+  - `apps/web/src/locales/en-US/common.json` — 修改：新增 Live Connection 相关 i18n 键
+  - `apps/web/src/locales/zh-CN/common.json` — 修改：新增 Live Connection 相关 i18n 键
+    - `liveConnection.title`, `liveConnection.banner`, `liveConnection.testRequired`
+    - `liveConnection.noConnections`, `liveConnection.confirmRegister`
+    - `liveConnection.resultSummary`, `liveConnection.disconnectedTip`
+    - `dataset.modeLive`, `dataset.modeSnapshot`, `dataset.liveLabel`
+    - `dataConnection.connectToMySQL`
+    - `mysqlConnection.deleteBlockedByLive`
+  - `apps/web/src/stores/data-connection-store.ts` — 修改
+    - `ModalType` 增加 `'liveConnection'`
+  - `apps/web/src/api/imports.ts` — 修改
+    - 新增 `useRegisterLiveDataset()` mutation hook → POST /datasets/register/live
+- **覆盖 AC**: AC-LC01, AC-LC03, AC-LC07, AC-LC11, AC-DM10
+- **依赖**: T007
 
-### 前端 — 集成 + DataConnectionPage 更新
+### T009: 前端 — LiveConnectionWizard 组件（3 步）
 
-- [ ] **T010**: DataConnectionPage 集成 + 前端验证
-  - 文件: `apps/web/src/pages/data-connection/DataConnectionPage.tsx`
-  - 变更: 引入 NewConnectionModal 和 ConnectionDetailDrawer 组件
-  - 验证:
-    - `cd apps/web && npx tsc --noEmit` 零错误
-    - `cd apps/web && pnpm test --run` 无新增失败
-  - 覆盖 AC: AC-CM08, AC-CM10, AC-DM08
-  - 依赖: T005, T006, T007, T008, T009
+- **文件**:
+  - `apps/web/src/pages/data-connection/components/LiveConnectionWizard.tsx` — 新建
+- **内容**:
+  - **Step L1（选择连接）**:
+    - 顶部"实时连接模式"Banner（Alert 组件，type=info）
+    - 连接下拉选择器（复用 `useMySQLConnections`）
+    - 无可用连接时显示引导文案 + 跳转链接（AC-LC03）
+    - 选中连接后展示只读预览（连接名称、Host、Database）（AC-LC01）
+    - "测试连接"按钮 — **必须测试成功**后"下一步"才可用（AC-LC02）
+  - **Step L2（选择表并配置）**:
+    - 复用 `useMySQLTables`, `useMySQLTableColumns`, `useMySQLTablePreview` hooks
+    - 左右分栏：表列表（带搜索 + `已有快照`/`已有实时连接` 标签）+ 表详情（列结构 + 数据预览）
+    - 配置项：Dataset 名称 + 列选择（主键不可取消）（AC-LC05, AC-LC06）
+    - 底部提示文案（实时连接模式说明）
+    - "确认注册"按钮
+  - **Step L3（注册结果）**:
+    - 成功：摘要（列数、连接名称、源表名）+ "完成"按钮（AC-LC07）
+    - 失败：错误信息 + "重试"按钮（回到 Step L2）+ "取消"按钮（AC-LC08）
+- **覆盖 AC**: AC-LC01, AC-LC02, AC-LC03, AC-LC04, AC-LC05, AC-LC06, AC-LC07, AC-LC08, AC-LC12
+- **依赖**: T008
+
+### T010: 前端 — DatasetsTab 适配 Live Connection
+
+- **文件**:
+  - `apps/web/src/pages/data-connection/components/DatasetsTab.tsx` — 修改
+- **变更**:
+  - 表格新增"模式"列：`Snapshot` / `Live` Tag（AC-DM01）
+  - 行数列：Snapshot 显示数字，Live 显示 `Live` 标签（AC-DM01）
+  - "Import Dataset" 下拉菜单增加第三项 "Connect to MySQL（实时连接）"（AC-DM10）
+  - 点击"Connect to MySQL" → `setOpenModal('liveConnection')`
+  - 删除操作：Live Dataset 删除提示文案差异化（AC-DM07：仅删除元数据）
+  - `disconnected` 状态 Live Dataset 在列表中显示警告图标
+  - 预览 Drawer：Live 模式增加降级提示处理（AC-DM05, AC-LC10）
+- **覆盖 AC**: AC-DM01, AC-DM05, AC-DM07, AC-DM10, AC-LC10
+- **依赖**: T008
+
+### T011: 前端 — ConnectionsTab 适配连接删除保护
+
+- **文件**:
+  - `apps/web/src/pages/data-connection/components/ConnectionsTab.tsx` — 修改
+- **变更**:
+  - 删除连接时：若后端返回 409 `CONNECTION_HAS_IN_USE_LIVE_DATASETS`，显示错误提示（AC-CM15）
+  - 删除确认弹窗增加提示：若该连接有关联的 Live Dataset，警告删除后 Live Dataset 将变为 disconnected（AC-CM06）
+- **覆盖 AC**: AC-CM06, AC-CM15
+- **依赖**: T008
+
+### T012: 前端 — DataConnectionPage 集成 LiveConnectionWizard
+
+- **文件**:
+  - `apps/web/src/pages/data-connection/DataConnectionPage.tsx` — 修改
+- **变更**:
+  - 引入 `LiveConnectionWizard` 组件
+  - 当 `openModal === 'liveConnection'` 时渲染 LiveConnectionWizard
+- **覆盖 AC**: AC-DM10, AC-LC01
+- **依赖**: T009, T010, T011
+
+### T013: 前端测试 — LiveConnectionWizard
+
+- **文件**:
+  - `apps/web/src/pages/data-connection/__tests__/LiveConnectionWizard.test.tsx` — 新建
+- **测试用例**:
+  - 渲染 Step L1，显示 Banner 和连接下拉
+  - 无连接时显示引导文案
+  - 选择连接后显示只读预览
+  - 测试连接成功后"下一步"可用
+  - 注册成功后显示摘要
+- **覆盖 AC**: AC-LC01, AC-LC02, AC-LC03, AC-LC07
+- **依赖**: T009
+
+### T014: 全量验证
+
+- **验证步骤**:
+  - `cd apps/server && uv run pytest tests/ -v` — 所有后端测试通过
+  - `cd apps/web && npx tsc --noEmit` — TypeScript 零错误
+  - `cd apps/web && pnpm test --run` — 所有前端测试通过
+- **覆盖 AC**: 全量回归
+- **依赖**: T012, T013
 
 ---
 
 ## AC 覆盖追溯矩阵
 
+### 连接管理（Connection Management）
+
+| AC | 覆盖任务 | 说明 |
+|----|---------|------|
+| AC-CM01 ~ CM05 | 已实现 | Snapshot 阶段已完成 |
+| AC-CM06 | T003, T006, T011 | 连接删除级联 — Live Dataset 标记 disconnected |
+| AC-CM07 ~ CM14 | 已实现 | Snapshot 阶段已完成 |
+| AC-CM15 | T003, T004, T006, T011 | 连接删除保护 — in-use Live Dataset |
+
+### MySQL 快照导入（MySQL Snapshot Import）
+
+| AC | 覆盖任务 | 说明 |
+|----|---------|------|
+| AC-MI01 ~ MI09 | 已实现 | Snapshot 阶段已完成 |
+| AC-MI10 | 已实现 | 向导 Step 0 已是下拉选择器 |
+
+### MySQL 实时连接（MySQL Live Connection）
+
 | AC | 覆盖任务 |
 |----|---------|
-| AC-CM01 | T001, T006 |
-| AC-CM02 | T006 |
-| AC-CM04 | T001, T002 |
-| AC-CM08 | T005, T006, T010 |
-| AC-CM09 | T001, T002, T005 |
-| AC-CM10 | T005, T007, T010 |
-| AC-CM11 | T007 |
-| AC-CM12 | T007 |
-| AC-CM13 | T005 |
-| AC-CM14 | T001, T002 |
-| AC-MI10 | T009 |
-| AC-DM01 | T008 |
-| AC-DM08 | T008, T010 |
+| AC-LC01 | T008, T009 |
+| AC-LC02 | T009 |
+| AC-LC03 | T008, T009 |
+| AC-LC04 | T009 |
+| AC-LC05 | T009 |
+| AC-LC06 | T002, T003, T004, T006, T009 |
+| AC-LC07 | T008, T009 |
+| AC-LC08 | T009 |
+| AC-LC09 | T003, T010 |
+| AC-LC10 | T003, T010 |
+| AC-LC11 | T002, T003, T010 |
+| AC-LC12 | T006, T009 |
+
+### 文件上传（File Upload）
+
+| AC | 覆盖任务 | 说明 |
+|----|---------|------|
+| AC-FU01 ~ FU06 | 已实现 | Snapshot 阶段已完成（FU05 Sheet 选择已支持） |
+
+### Dataset 管理（Dataset Management）
+
+| AC | 覆盖任务 |
+|----|---------|
+| AC-DM01 | T002, T010 |
+| AC-DM02 ~ DM04 | 已实现 |
+| AC-DM05 | T003, T010 |
+| AC-DM06 | 已实现 |
+| AC-DM07 | T002, T006, T010 |
+| AC-DM08 | 已实现 |
+| AC-DM09 | 已实现 |
+| AC-DM10 | T008, T010, T012 |
+
+### 导航与集成（Navigation & Integration）
+
+| AC | 覆盖任务 | 说明 |
+|----|---------|------|
+| AC-NV01 | 已实现 | |
+| AC-NV02 | T002 | Dataset 列表 API 自动包含 mode 字段 |
 
 ---
 
-## 实际偏差记录
+## 任务依赖图
 
-> 完成后，在此记录实现与 design.md 的偏差，供后续参考。
+```
+T001 (Migration)
+  └── T002 (Domain + Storage)
+        └── T003 (Service: Live Registration + Deletion Protection)
+              └── T004 (Router)
+                    ├── T005 (Unit Tests)
+                    ├── T006 (Integration Tests)
+                    └── T007 (openapi.json + TS types)
+                          └── T008 (i18n + Store + API hooks)
+                                ├── T009 (LiveConnectionWizard)
+                                ├── T010 (DatasetsTab 适配)
+                                ├── T011 (ConnectionsTab 适配)
+                                └── T012 (DataConnectionPage 集成) ← T009, T010, T011
+                                      └── T013 (Frontend Tests)
+                                            └── T014 (全量验证)
+```
