@@ -104,11 +104,15 @@ export default function DatasetsTab() {
       title: t('dataset.columns.source'),
       dataIndex: 'sourceType',
       key: 'sourceType',
-      width: 100,
+      width: 160,
       render: (val: string, record: DatasetListItem) => (
         <Space size={4}>
           <Tag>{t(`dataset.source.${val}`)}</Tag>
-          {record.mode === 'live' && <Tag color="cyan">{t('dataset.liveLabel')}</Tag>}
+          {record.mode === 'live' && (
+            <Tag color="green" bordered={false}>
+              ● {t('dataset.liveLabel')}
+            </Tag>
+          )}
         </Space>
       ),
     },
