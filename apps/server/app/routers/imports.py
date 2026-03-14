@@ -50,6 +50,14 @@ async def start_mysql_import(
     )
 
 
+@router.post("/datasets/register/live", response_model=Dataset, status_code=201)
+async def register_live_dataset(
+    req: LiveDatasetCreateRequest,
+    service: MySQLImportService = Depends(_get_mysql_service),
+):
+    return await service.register_live_dataset(req)
+
+
 @router.post("/datasets/upload/preview", response_model=FileUploadPreviewResponse)
 async def upload_preview(
     file: UploadFile,
