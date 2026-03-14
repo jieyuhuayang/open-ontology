@@ -121,7 +121,7 @@ export default function DatasetsTab() {
       dataIndex: 'rowCount',
       key: 'rowCount',
       width: 100,
-      render: (val: number) => formatRowCount(val),
+      render: (val: number, record: DatasetListItem) => (record.mode === 'live' ? '—' : formatRowCount(val)),
     },
     {
       title: t('dataset.columns.columns'),
