@@ -61,7 +61,7 @@ class DatasetStorage:
             select(DatasetModel)
             .where(
                 DatasetModel.ontology_rid == ontology_rid,
-                DatasetModel.status == "ready",
+                DatasetModel.status.in_(["ready", "disconnected"]),
             )
             .order_by(DatasetModel.imported_at.desc())
         )
