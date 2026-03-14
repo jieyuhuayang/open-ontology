@@ -291,23 +291,17 @@ export default function LiveConnectionWizard() {
           </Form>
         </div>
       )}
-      {renderNavButtons(
-        () => setStep(0),
-        registeredDataset ? undefined : handleRegister,
-        !selectedTable || selectedColumns.length === 0 || !datasetName,
-      )}
-      {!registeredDataset && selectedTable && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-          <Button
-            type="primary"
-            onClick={handleRegister}
-            loading={registerLive.isPending}
-            disabled={!selectedTable || selectedColumns.length === 0 || !datasetName}
-          >
-            {t('liveConnection.confirmRegister')}
-          </Button>
-        </div>
-      )}
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16 }}>
+        <Button onClick={() => setStep(0)}>{t('wizard.back')}</Button>
+        <Button
+          type="primary"
+          onClick={handleRegister}
+          loading={registerLive.isPending}
+          disabled={!selectedTable || selectedColumns.length === 0 || !datasetName}
+        >
+          {t('liveConnection.confirmRegister')}
+        </Button>
+      </div>
     </div>
   );
 
