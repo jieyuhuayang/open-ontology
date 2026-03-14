@@ -50,6 +50,7 @@ class TestDatasetStorageToDomain:
         orm = MagicMock()
         orm.rid = "ri.ontology.dataset.abc123"
         orm.name = "orders"
+        orm.mode = "snapshot"
         orm.source_type = "mysql"
         orm.row_count = 100
         orm.column_count = 5
