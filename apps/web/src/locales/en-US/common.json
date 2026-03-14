@@ -353,7 +353,8 @@
     "noTables": "No tables found",
     "newConnectionTitle": "New Connection",
     "saveConnection": "Save",
-    "saveSuccess": "Connection saved"
+    "saveSuccess": "Connection saved",
+    "connectToMySQL": "Connect to MySQL (Live)"
   },
   "dataset": {
     "listTitle": "Datasets",
