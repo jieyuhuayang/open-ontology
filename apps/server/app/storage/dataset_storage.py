@@ -139,18 +139,26 @@ class DatasetStorage:
         ontology_rid: str,
         created_by: str,
         columns: list[dict],
-        rows: list[dict],
+        rows: list[dict] | None = None,
+        *,
+        mode: str = "snapshot",
+        connection_rid: str | None = None,
+        source_table: str | None = None,
     ) -> Dataset:
+        actual_rows = rows or []
         orm = DatasetModel(
             rid=dataset_rid,
             name=name,
+            mode=mode,
             source_type=source_type,
             source_metadata=source_metadata,
-            row_count=len(rows),
+            row_count=len(actual_rows),
             column_count=len(columns),
             status="ready",
             ontology_rid=ontology_rid,
             created_by=created_by,
+            connection_rid=connection_rid,
+            source_table=source_table,
         )
         session.add(orm)
 
@@ -166,7 +174,7 @@ class DatasetStorage:
             )
             session.add(col_orm)
 
-        for i, row_data in enumerate(rows):
+        for i, row_data in enumerate(actual_rows):
             row_orm = DatasetRowModel(
                 dataset_rid=dataset_rid,
                 row_index=i,
@@ -176,6 +184,39 @@ class DatasetStorage:
 
         await session.flush()
         return await DatasetStorage.get_by_rid(session, dataset_rid)  # type: ignore
+
+    @staticmethod
+    async def list_live_by_connection_rid(
+        session: AsyncSession, connection_rid: str
+    ) -> list[DatasetListItem]:
+        """Return all Live Datasets associated with a given connection."""
+        stmt = (
+            select(DatasetModel)
+            .where(
+                DatasetModel.mode == "live",
+                DatasetModel.connection_rid == connection_rid,
+            )
+            .order_by(DatasetModel.imported_at.desc())
+        )
+        result = await session.execute(stmt)
+        return [DatasetStorage._to_list_item(orm) for orm in result.scalars().all()]
+
+    @staticmethod
+    async def mark_disconnected(session: AsyncSession, connection_rid: str) -> int:
+        """Mark all Live Datasets of a connection as disconnected. Returns count."""
+        from sqlalchemy import update
+
+        stmt = (
+            update(DatasetModel)
+            .where(
+                DatasetModel.mode == "live",
+                DatasetModel.connection_rid == connection_rid,
+            )
+            .values(status="disconnected")
+        )
+        result = await session.execute(stmt)
+        await session.flush()
+        return result.rowcount
 
     @staticmethod
     async def delete(session: AsyncSession, rid: str) -> None:
