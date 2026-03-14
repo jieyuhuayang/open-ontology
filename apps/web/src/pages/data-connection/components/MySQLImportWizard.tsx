@@ -208,7 +208,7 @@ export default function MySQLImportWizard() {
         <Table<MySQLTableInfo>
           rowKey="name"
           dataSource={filteredTables}
-          pagination={false}
+          pagination={{ pageSize: 10, showSizeChanger: false, simple: true }}
           rowSelection={{
             type: 'radio',
             selectedRowKeys: selectedTable ? [selectedTable.name] : [],
@@ -222,7 +222,7 @@ export default function MySQLImportWizard() {
           })}
           columns={[
             {
-              title: t('mysqlConnection.fields.name'),
+              title: t('mysqlConnection.tableName'),
               dataIndex: 'name',
               key: 'name',
               render: (name: string) => (
