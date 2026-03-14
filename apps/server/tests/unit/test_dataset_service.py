@@ -210,17 +210,20 @@ class TestDatasetServiceLivePreview:
         with (
             patch.object(svc, "get_by_rid", return_value=ds),
             patch(
-                "app.services.dataset_service.MySQLConnectionStorage.get_by_rid",
+                "app.storage.mysql_connection_storage.MySQLConnectionStorage.get_by_rid",
                 new_callable=AsyncMock,
                 return_value=mock_conn_orm,
             ),
             patch(
-                "app.services.dataset_service.get_crypto_service",
+                "app.services.crypto_service.get_crypto_service",
                 return_value=AsyncMock(decrypt=lambda x: "secret"),
             ),
-            patch("app.services.dataset_service.asyncio") as mock_asyncio,
+            patch(
+                "asyncio.wait_for",
+                new_callable=AsyncMock,
+                side_effect=Exception("Connection refused"),
+            ),
         ):
-            mock_asyncio.wait_for = AsyncMock(side_effect=Exception("Connection refused"))
             with pytest.raises(AppError) as exc_info:
                 await svc.get_preview("ri.ontology.dataset.live1")
             assert exc_info.value.status_code == 502
@@ -257,17 +260,16 @@ class TestDatasetServiceLivePreview:
         with (
             patch.object(svc, "get_by_rid", return_value=ds),
             patch(
-                "app.services.dataset_service.MySQLConnectionStorage.get_by_rid",
+                "app.storage.mysql_connection_storage.MySQLConnectionStorage.get_by_rid",
                 new_callable=AsyncMock,
                 return_value=mock_conn_orm,
             ),
             patch(
-                "app.services.dataset_service.get_crypto_service",
+                "app.services.crypto_service.get_crypto_service",
                 return_value=AsyncMock(decrypt=lambda x: "secret"),
             ),
-            patch("app.services.dataset_service.asyncio") as mock_asyncio,
+            patch("asyncio.wait_for", new_callable=AsyncMock, return_value=mock_mysql_conn),
         ):
-            mock_asyncio.wait_for = AsyncMock(return_value=mock_mysql_conn)
             result = await svc.get_preview("ri.ontology.dataset.live1")
             assert result.rid == "ri.ontology.dataset.live1"
             assert result.total_rows == 42
