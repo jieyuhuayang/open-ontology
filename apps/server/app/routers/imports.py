@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db_session
+from app.domain.dataset import Dataset, LiveDatasetCreateRequest
 from app.domain.import_task import (
     FileConfirmRequest,
     FileUploadPreviewResponse,
