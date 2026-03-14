@@ -150,7 +150,7 @@ class TestDatasetServiceLivePreview:
     """Unit tests for Live Dataset preview (T005)."""
 
     def _make_live_dataset(self, status="ready"):
-        from app.domain.dataset import ColumnInfo, Dataset
+        from app.domain.dataset import DatasetColumn, Dataset
 
         return Dataset(
             rid="ri.ontology.dataset.live1",
