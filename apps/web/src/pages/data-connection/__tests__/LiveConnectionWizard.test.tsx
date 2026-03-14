@@ -3,6 +3,7 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
+import { App } from 'antd';
 import LiveConnectionWizard from '@/pages/data-connection/components/LiveConnectionWizard';
 import { useDataConnectionStore } from '@/stores/data-connection-store';
 
