@@ -419,7 +419,29 @@
     "snapshotWarning": "Note: This will create a data snapshot. The imported data will not sync automatically with source changes.",
     "noConnections": "No connections available. Please create one in the Connections tab first.",
     "selectConnection": "Select a connection",
-    "searchTables": "Search tables..."
+    "searchTables": "Search tables...",
+    "deleteBlockedByLive": "Cannot delete: this connection has Live Datasets in use by Object Types."
+  },
+  "liveConnection": {
+    "title": "Connect to MySQL (Live)",
+    "banner": "Live Connection mode: data stays in the external database and is queried in real-time. No data is copied to the platform.",
+    "steps": {
+      "connection": "Select Connection",
+      "tables": "Select Table & Columns",
+      "confirm": "Confirm"
+    },
+    "testRequired": "You must test the connection successfully before proceeding.",
+    "noConnections": "No connections available. Please create one in the Connections tab first.",
+    "confirmRegister": "Register Live Dataset",
+    "resultSummary": "Live Dataset \"{{name}}\" registered successfully.",
+    "disconnectedTip": "This Live Dataset's connection has been deleted. Please delete it and recreate with a new connection.",
+    "registerFailed": "Failed to register Live Dataset"
+  },
+  "dataset": {
+    "modeLive": "Live",
+    "modeSnapshot": "Snapshot",
+    "liveLabel": "Live",
+    "connectToMySQL": "Connect to MySQL"
   },
   "demo": {
     "title": "Ontology Canvas",
