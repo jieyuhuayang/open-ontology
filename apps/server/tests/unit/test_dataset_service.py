@@ -167,10 +167,10 @@ class TestDatasetServiceLivePreview:
             connection_rid="ri.ontology.mysql-connection.abc",
             source_table="orders",
             columns=[
-                ColumnInfo(
+                DatasetColumn(
                     name="id", inferred_type="integer", is_nullable=False, is_primary_key=True
                 ),
-                ColumnInfo(
+                DatasetColumn(
                     name="name", inferred_type="string", is_nullable=True, is_primary_key=False
                 ),
             ],
