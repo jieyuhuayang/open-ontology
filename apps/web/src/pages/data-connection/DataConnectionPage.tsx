@@ -38,6 +38,7 @@ export default function DataConnectionPage() {
       <FileUploadWizard />
       <NewConnectionModal />
       <ConnectionDetailDrawer />
+      <LiveConnectionWizard />
     </div>
   );
 }
