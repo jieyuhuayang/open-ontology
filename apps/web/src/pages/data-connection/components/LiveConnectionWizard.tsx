@@ -102,10 +102,6 @@ export default function LiveConnectionWizard() {
     setSelectedColumns([]);
   };
 
-  const handleNextFromStep1 = () => {
-    if (selectedTable) setStep(2);
-  };
-
   const handleColumnToggle = (checkedValues: string[]) => {
     if (!columns) {
       setSelectedColumns(checkedValues);
