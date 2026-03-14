@@ -253,9 +253,11 @@ class TestDatasetServiceLivePreview:
         mock_cursor.__aenter__ = AsyncMock(return_value=mock_cursor)
         mock_cursor.__aexit__ = AsyncMock(return_value=False)
 
-        mock_mysql_conn = AsyncMock()
-        mock_mysql_conn.cursor = AsyncMock(return_value=mock_cursor)
-        mock_mysql_conn.close = AsyncMock()
+        from unittest.mock import MagicMock
+
+        mock_mysql_conn = MagicMock()
+        mock_mysql_conn.cursor = MagicMock(return_value=mock_cursor)
+        mock_mysql_conn.close = MagicMock()
 
         with (
             patch.object(svc, "get_by_rid", return_value=ds),
@@ -266,7 +268,7 @@ class TestDatasetServiceLivePreview:
             ),
             patch(
                 "app.services.crypto_service.get_crypto_service",
-                return_value=AsyncMock(decrypt=lambda x: "secret"),
+                return_value=MagicMock(decrypt=lambda x: "secret"),
             ),
             patch("asyncio.wait_for", new_callable=AsyncMock, return_value=mock_mysql_conn),
         ):
