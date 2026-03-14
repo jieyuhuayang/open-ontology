@@ -44,6 +44,7 @@ class DatasetStorage:
         return DatasetListItem(
             rid=orm.rid,
             name=orm.name,
+            mode=orm.mode,
             source_type=orm.source_type,
             row_count=orm.row_count,
             column_count=orm.column_count,
