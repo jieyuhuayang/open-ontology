@@ -59,7 +59,9 @@ function renderWizard() {
   return render(
     <QueryClientProvider client={queryClient}>
       <MemoryRouter>
-        <LiveConnectionWizard />
+        <App>
+          <LiveConnectionWizard />
+        </App>
       </MemoryRouter>
     </QueryClientProvider>,
   );
