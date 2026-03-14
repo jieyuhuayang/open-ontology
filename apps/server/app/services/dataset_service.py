@@ -191,9 +191,16 @@ class DatasetService:
                 await cur.execute(f"SELECT {cols_sql} FROM `{table}` LIMIT %s", (limit,))
                 rows = await cur.fetchall()
 
-                await cur.execute(f"SELECT COUNT(*) FROM `{table}`")
-                count_row = await cur.fetchone()
-                total = count_row["COUNT(*)"] if count_row else 0
+                # Use TABLE_STATUS for fast row estimate instead of COUNT(*)
+                # which does a full table scan on InnoDB and can freeze on large tables.
+                db_name = conn_orm.database_name
+                await cur.execute(
+                    "SELECT TABLE_ROWS FROM information_schema.TABLES "
+                    "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s",
+                    (db_name, table),
+                )
+                stat_row = await cur.fetchone()
+                total = stat_row["TABLE_ROWS"] if stat_row else len(rows)
 
             # Serialize values
             from app.services.mysql_import_service import _serialize_value
