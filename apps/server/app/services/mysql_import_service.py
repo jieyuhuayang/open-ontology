@@ -246,8 +246,8 @@ class MySQLImportService:
         finally:
             conn.close()
 
-    async def get_imported_tables(self, connection_rid: str) -> list[str]:
-        """Return table names already imported from the given connection."""
+    async def get_imported_tables(self, connection_rid: str) -> list[dict[str, str]]:
+        """Return table names with mode already imported from the given connection."""
         return await DatasetStorage.list_imported_tables_by_connection(
             self._session, connection_rid
         )
