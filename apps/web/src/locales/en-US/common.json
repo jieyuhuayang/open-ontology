@@ -437,12 +437,6 @@
     "disconnectedTip": "This Live Dataset's connection has been deleted. Please delete it and recreate with a new connection.",
     "registerFailed": "Failed to register Live Dataset"
   },
-  "dataset": {
-    "modeLive": "Live",
-    "modeSnapshot": "Snapshot",
-    "liveLabel": "Live",
-    "connectToMySQL": "Connect to MySQL"
-  },
   "demo": {
     "title": "Ontology Canvas",
     "dropTitle": "Drop your business data, let AI understand your world",
