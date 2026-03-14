@@ -1,7 +1,9 @@
 # Feature: 010 Data Connection（数据连接）
 
-> **spec 只描述业务能力（用户能做什么、验收边界）。**
-> UI 布局、交互细节、组件结构 → 写在 design.md。
+> **⚠️ 写 spec 前，必须完整准确理解 PRD（不可遗漏任何功能点）。**
+> **前置步骤**：本文档编写前必须已完成 Spec Discovery（架构师提问），确保 PRD 中的不确定性已与用户对齐。
+> 本文档合并需求规范与技术设计。需求部分描述业务能力，设计部分只写契约和决策（Why + What），不写实现步骤（How）。
+> 测试策略由 CLAUDE.md §测试要求统一管理，此处不重复。
 > 如有跨 feature 依赖，必须在"依赖与约束"节中声明，并对照 release-contract.md。
 
 **关联 PRD**: [docs/prd/0.1.0（MVP）/数据连接（Data Connection）PRD.md]
