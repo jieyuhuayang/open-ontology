@@ -126,20 +126,38 @@ class DatasetStorage:
     @staticmethod
     async def list_imported_tables_by_connection(
         session: AsyncSession, connection_rid: str
-    ) -> list[str]:
-        """Return distinct table names imported from the given connection."""
+    ) -> list[dict[str, str]]:
+        """Return distinct table names with their dataset mode from the given connection.
+
+        Returns list of {"table": "...", "mode": "snapshot|live"}.
+        """
+        from sqlalchemy import union_all
+
+        # Snapshot tables (from source_metadata JSONB)
         table_expr = DatasetModel.source_metadata["table"].as_string()
         conn_rid_expr = DatasetModel.source_metadata["connectionRid"].as_string()
-        stmt = (
-            select(table_expr)
-            .where(
-                DatasetModel.status == "ready",
-                conn_rid_expr == connection_rid,
-            )
-            .distinct()
+        snapshot_stmt = select(
+            table_expr.label("table_name"),
+            DatasetModel.mode.label("mode"),
+        ).where(
+            DatasetModel.status.in_(["ready", "disconnected"]),
+            DatasetModel.mode == "snapshot",
+            conn_rid_expr == connection_rid,
         )
-        result = await session.execute(stmt)
-        return [row[0] for row in result.all()]
+
+        # Live tables (from source_table column)
+        live_stmt = select(
+            DatasetModel.source_table.label("table_name"),
+            DatasetModel.mode.label("mode"),
+        ).where(
+            DatasetModel.status.in_(["ready", "disconnected"]),
+            DatasetModel.mode == "live",
+            DatasetModel.connection_rid == connection_rid,
+        )
+
+        combined = union_all(snapshot_stmt, live_stmt)
+        result = await session.execute(combined)
+        return [{"table": row[0], "mode": row[1]} for row in result.all()]
 
     @staticmethod
     async def get_by_rid(session: AsyncSession, rid: str) -> Dataset | None:
