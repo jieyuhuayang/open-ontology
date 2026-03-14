@@ -361,14 +361,19 @@ class DatasetModel(Base):
 
     rid = Column(String, primary_key=True)
     name = Column(String(255), nullable=False)
+    mode = Column(String(20), nullable=False, server_default="snapshot")  # snapshot | live
     source_type = Column(String(20), nullable=False)  # mysql | excel | csv
     source_metadata = Column(JSONB, nullable=False, server_default=text("'{}'::jsonb"))
     row_count = Column(Integer, nullable=False, server_default="0")
     column_count = Column(Integer, nullable=False, server_default="0")
-    status = Column(String(20), nullable=False, server_default="ready")  # importing | ready
+    status = Column(
+        String(20), nullable=False, server_default="ready"
+    )  # importing | ready | disconnected
     imported_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     ontology_rid = Column(String, ForeignKey("ontologies.rid", ondelete="CASCADE"), nullable=False)
     created_by = Column(String(255), nullable=False)
+    connection_rid = Column(String, nullable=True)  # Live Dataset → mysql_connections.rid
+    source_table = Column(String(255), nullable=True)  # Live Dataset source table name
 
     columns = relationship(
         "DatasetColumnModel", back_populates="dataset", cascade="all, delete-orphan"
