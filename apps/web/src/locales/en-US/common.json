@@ -425,7 +425,8 @@
     "noConnections": "No connections available. Please create one in the Connections tab first.",
     "selectConnection": "Select a connection",
     "searchTables": "Search tables...",
-    "deleteBlockedByLive": "Cannot delete: this connection has Live Datasets in use by Object Types."
+    "deleteBlockedByLive": "Cannot delete: this connection has Live Datasets in use by Object Types.",
+    "tableName": "Table Name"
   },
   "liveConnection": {
     "title": "Connect to MySQL (Live)",
