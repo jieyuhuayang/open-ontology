@@ -196,7 +196,7 @@ export default function LiveConnectionWizard() {
         <Table<MySQLTableInfo>
           rowKey="name"
           dataSource={filteredTables}
-          pagination={false}
+          pagination={{ pageSize: 10, showSizeChanger: false, simple: true }}
           scroll={{ y: 300 }}
           rowSelection={{
             type: 'radio',
@@ -211,7 +211,7 @@ export default function LiveConnectionWizard() {
           })}
           columns={[
             {
-              title: t('mysqlConnection.fields.name'),
+              title: t('mysqlConnection.tableName'),
               dataIndex: 'name',
               key: 'name',
               render: (name: string) => (
