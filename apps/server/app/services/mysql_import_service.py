@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.common import generate_rid
 from app.domain.constants import DEFAULT_ONTOLOGY_RID, DEFAULT_USER_ID
+from app.domain.dataset import Dataset, LiveDatasetCreateRequest
 from app.domain.import_task import ImportTask, ImportTaskStatus
 from app.domain.mysql_connection import (
     MySQLConnection,
