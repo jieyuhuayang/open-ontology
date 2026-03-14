@@ -25,6 +25,7 @@ class DatasetStorage:
         return Dataset(
             rid=orm.rid,
             name=orm.name,
+            mode=orm.mode,
             source_type=orm.source_type,
             source_metadata=orm.source_metadata,
             row_count=orm.row_count,
@@ -33,6 +34,8 @@ class DatasetStorage:
             imported_at=orm.imported_at,
             ontology_rid=orm.ontology_rid,
             created_by=orm.created_by,
+            connection_rid=orm.connection_rid,
+            source_table=orm.source_table,
             columns=columns,
         )
 
