@@ -65,7 +65,7 @@ async def delete_connection(
 
 @router.get(
     "/mysql-connections/{rid}/imported-tables",
-    response_model=list[str],
+    response_model=list[ImportedTableInfo],
 )
 async def get_imported_tables(
     rid: str,
