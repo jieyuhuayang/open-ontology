@@ -381,7 +381,11 @@
     "noDatasets": "暂无数据集",
     "deleteSuccess": "数据集已删除",
     "deleteInUse": "该数据集已被关联，无法删除",
-    "importHint": "需要导入新数据？请前往"
+    "importHint": "需要导入新数据？请前往",
+    "modeLive": "实时",
+    "modeSnapshot": "快照",
+    "liveLabel": "实时",
+    "connectToMySQL": "连接 MySQL"
   },
   "mysqlConnection": {
     "title": "从 MySQL 导入",
