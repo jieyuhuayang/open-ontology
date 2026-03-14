@@ -65,12 +65,13 @@ Snapshot 模式前后端已完整实现。本轮任务聚焦 **Live Connection �
 - **文件**:
   - `apps/server/app/services/mysql_import_service.py` — 修改
     - 新增 `register_live_dataset(request: LiveDatasetCreateRequest, ontology_rid: str)`:
+      - **同步操作**（不使用 ImportTask 异步模型）：Live Dataset 仅写 schema 元数据，不复制行数据，60s 超时内完成
       1. 校验 connection_rid 存在 + 连接可用
-      2. 连接外部 MySQL，提取指定表的列元数据（复用 `get_table_columns`）
+      2. 连接外部 MySQL，提取指定表的列元数据（复用 `get_table_columns`，60s 超时）
       3. 按 `selected_columns` 过滤列（主键列强制保留）
-      4. 调用 `dataset_storage.create()` 创建 mode=live 的 Dataset（无 rows）
+      4. 调用 `dataset_storage.create()` 创建 mode=live 的 Dataset（无 rows，status=ready）
       5. 更新 connection 的 `last_used_at`
-      6. 返回创建的 Dataset
+      6. 同步返回创建的 Dataset（HTTP 201）
     - 修改 `delete_connection(rid)`:
       1. 查询该连接关联的 Live Dataset 中是否有 in-use 的（调用 DatasetService 的 in_use 计算）
       2. 若有 in-use Live Dataset → 抛出 `CONNECTION_HAS_IN_USE_LIVE_DATASETS` (HTTP 409)
