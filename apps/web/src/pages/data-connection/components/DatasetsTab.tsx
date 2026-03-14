@@ -82,6 +82,11 @@ export default function DatasetsTab() {
       onClick: () => setOpenModal('mysqlImport'),
     },
     {
+      key: 'live',
+      label: t('dataConnection.connectToMySQL'),
+      onClick: () => setOpenModal('liveConnection'),
+    },
+    {
       key: 'file',
       label: t('dataset.uploadFile'),
       onClick: () => setOpenModal('fileUpload'),
