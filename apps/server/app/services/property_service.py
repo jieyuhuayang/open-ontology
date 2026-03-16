@@ -52,11 +52,9 @@ class PropertyService:
     async def _find_property_in_merged_view(
         self, object_type_rid: str, rid: str
     ) -> tuple[dict, ChangeState] | None:
-        merged = await self._get_merged_properties(object_type_rid)
-        for data, state in merged:
-            if data.get("rid") == rid:
-                return (data, state)
-        return None
+        return await self._ws_service.find_in_merged_view(
+            DEFAULT_ONTOLOGY_RID, ResourceType.PROPERTY, rid
+        )
 
     async def _check_object_type_exists(self, object_type_rid: str) -> dict:
         """Verify object type exists in merged view, return its data dict."""
@@ -136,6 +134,62 @@ class PropertyService:
                         status_code=400,
                     )
                 field_names.add(field.name)
+
+    async def _clear_old_key(
+        self,
+        object_type_rid: str,
+        exclude_rid: str,
+        key_field: str,
+        now: datetime,
+    ) -> list[Change]:
+        """Generate UPDATE changes to clear the old PK or TK flag from other properties."""
+        changes: list[Change] = []
+        merged = await self._get_merged_properties(object_type_rid)
+        for prop_data, prop_state in merged:
+            if (
+                prop_data.get("rid") != exclude_rid
+                and prop_data.get(key_field) is True
+                and prop_state != ChangeState.DELETED
+            ):
+                changes.append(
+                    Change(
+                        id=uuid.uuid4().hex[:12],
+                        resource_type=ResourceType.PROPERTY,
+                        resource_rid=prop_data["rid"],
+                        change_type=ChangeType.UPDATE,
+                        before={key_field: True},
+                        after={
+                            key_field: False,
+                            "lastModifiedAt": now.isoformat(),
+                            "lastModifiedBy": DEFAULT_USER_ID,
+                        },
+                        timestamp=now,
+                    )
+                )
+        return changes
+
+    @staticmethod
+    def _build_ot_key_change(
+        object_type_rid: str,
+        ot_field: str,
+        old_value: str | None,
+        new_value: str,
+        now: datetime,
+    ) -> Change:
+        """Build an UPDATE change for ObjectType's primaryKeyPropertyId or titleKeyPropertyId."""
+        return Change(
+            id=uuid.uuid4().hex[:12],
+            resource_type=ResourceType.OBJECT_TYPE,
+            resource_rid=object_type_rid,
+            change_type=ChangeType.UPDATE,
+            before={ot_field: old_value},
+            after={
+                ot_field: new_value,
+                "lastModifiedAt": now.isoformat(),
+                "lastModifiedBy": DEFAULT_USER_ID,
+            },
+            timestamp=now,
+        )
 
     async def list(self, object_type_rid: str) -> PropertyListResponse:
         # Verify object type exists
@@ -278,7 +332,6 @@ class PropertyService:
                     message=f"Property type '{base_type}' cannot be used as a primary key",
                     status_code=400,
                 )
-            # Check: ObjectType must not be active
             ot_data = await self._check_object_type_exists(object_type_rid)
             if ot_data.get("status") == "active":
                 raise AppError(
@@ -286,46 +339,13 @@ class PropertyService:
                     message="Cannot change primary key when object type is active",
                     status_code=400,
                 )
-            # Clear old PK
-            merged = await self._get_merged_properties(object_type_rid)
-            for prop_data, prop_state in merged:
-                if (
-                    prop_data.get("rid") != rid
-                    and prop_data.get("isPrimaryKey") is True
-                    and prop_state != ChangeState.DELETED
-                ):
-                    old_pk_rid = prop_data["rid"]
-                    old_pk_change = Change(
-                        id=uuid.uuid4().hex[:12],
-                        resource_type=ResourceType.PROPERTY,
-                        resource_rid=old_pk_rid,
-                        change_type=ChangeType.UPDATE,
-                        before={"isPrimaryKey": True},
-                        after={
-                            "isPrimaryKey": False,
-                            "lastModifiedAt": now.isoformat(),
-                            "lastModifiedBy": DEFAULT_USER_ID,
-                        },
-                        timestamp=now,
-                    )
-                    extra_changes.append(old_pk_change)
-            # Update ObjectType primaryKeyPropertyId
-            prop_id = data.get("id", "")
-            ot_rid = object_type_rid
-            ot_change = Change(
-                id=uuid.uuid4().hex[:12],
-                resource_type=ResourceType.OBJECT_TYPE,
-                resource_rid=ot_rid,
-                change_type=ChangeType.UPDATE,
-                before={"primaryKeyPropertyId": ot_data.get("primaryKeyPropertyId")},
-                after={
-                    "primaryKeyPropertyId": prop_id,
-                    "lastModifiedAt": now.isoformat(),
-                    "lastModifiedBy": DEFAULT_USER_ID,
-                },
-                timestamp=now,
+            extra_changes.extend(
+                await self._clear_old_key(object_type_rid, rid, "isPrimaryKey", now)
             )
-            extra_changes.append(ot_change)
+            extra_changes.append(self._build_ot_key_change(
+                object_type_rid, "primaryKeyPropertyId",
+                ot_data.get("primaryKeyPropertyId"), data.get("id", ""), now,
+            ))
 
         # Handle TK cascade (isTitleKey=true)
         if update_fields.get("isTitleKey") is True:
@@ -337,52 +357,15 @@ class PropertyService:
                     status_code=400,
                 )
             ot_data = await self._check_object_type_exists(object_type_rid)
-            # Clear old TK
-            merged = await self._get_merged_properties(object_type_rid)
-            for prop_data, prop_state in merged:
-                if (
-                    prop_data.get("rid") != rid
-                    and prop_data.get("isTitleKey") is True
-                    and prop_state != ChangeState.DELETED
-                ):
-                    old_tk_rid = prop_data["rid"]
-                    old_tk_change = Change(
-                        id=uuid.uuid4().hex[:12],
-                        resource_type=ResourceType.PROPERTY,
-                        resource_rid=old_tk_rid,
-                        change_type=ChangeType.UPDATE,
-                        before={"isTitleKey": True},
-                        after={
-                            "isTitleKey": False,
-                            "lastModifiedAt": now.isoformat(),
-                            "lastModifiedBy": DEFAULT_USER_ID,
-                        },
-                        timestamp=now,
-                    )
-                    extra_changes.append(old_tk_change)
-            # Update ObjectType titleKeyPropertyId
-            prop_id = data.get("id", "")
-            ot_rid = object_type_rid
-            ot_change = Change(
-                id=uuid.uuid4().hex[:12],
-                resource_type=ResourceType.OBJECT_TYPE,
-                resource_rid=ot_rid,
-                change_type=ChangeType.UPDATE,
-                before={"titleKeyPropertyId": ot_data.get("titleKeyPropertyId")},
-                after={
-                    "titleKeyPropertyId": prop_id,
-                    "lastModifiedAt": now.isoformat(),
-                    "lastModifiedBy": DEFAULT_USER_ID,
-                },
-                timestamp=now,
+            extra_changes.extend(
+                await self._clear_old_key(object_type_rid, rid, "isTitleKey", now)
             )
-            extra_changes.append(ot_change)
+            extra_changes.append(self._build_ot_key_change(
+                object_type_rid, "titleKeyPropertyId",
+                ot_data.get("titleKeyPropertyId"), data.get("id", ""), now,
+            ))
 
-        # Apply extra changes first
-        for extra_change in extra_changes:
-            await self._ws_service.add_change(DEFAULT_ONTOLOGY_RID, extra_change)
-
-        # Apply main property update change
+        # Build main property update change
         before = {k: data.get(k) for k in update_fields}
         change = Change(
             id=uuid.uuid4().hex[:12],
@@ -393,7 +376,10 @@ class PropertyService:
             after=update_fields,
             timestamp=now,
         )
-        await self._ws_service.add_change(DEFAULT_ONTOLOGY_RID, change)
+
+        # Apply all changes in a single batch (extra cascade changes + main change)
+        all_changes = [*extra_changes, change]
+        await self._ws_service.add_changes(DEFAULT_ONTOLOGY_RID, all_changes)
 
         # Build result with merged data
         merged_data = {**data, **update_fields}
@@ -459,8 +445,8 @@ class PropertyService:
                 )
 
         now = datetime.now(timezone.utc)
-        for item in req.property_orders:
-            change = Change(
+        changes = [
+            Change(
                 id=uuid.uuid4().hex[:12],
                 resource_type=ResourceType.PROPERTY,
                 resource_rid=item.rid,
@@ -473,4 +459,6 @@ class PropertyService:
                 },
                 timestamp=now,
             )
-            await self._ws_service.add_change(DEFAULT_ONTOLOGY_RID, change)
+            for item in req.property_orders
+        ]
+        await self._ws_service.add_changes(DEFAULT_ONTOLOGY_RID, changes)

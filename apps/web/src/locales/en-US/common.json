@@ -43,7 +43,13 @@
     "noData": "No data",
     "loading": "Loading...",
     "selectAll": "Select all",
-    "deselectAll": "Deselect all"
+    "deselectAll": "Deselect all",
+    "time": {
+      "lessThanMinute": "< 1 min",
+      "minutesAgo": "{{count}} min",
+      "hoursAgo": "{{count}} hr",
+      "daysAgo": "{{count}} d"
+    }
   },
   "error": {
     "pageNotFound": "Page Not Found",
@@ -346,6 +352,10 @@
     "untested": "Untested",
     "type": "Type",
     "datasetCount": "Datasets",
+    "pk": "PK",
+    "nullable": "Nullable",
+    "nullValue": "NULL",
+    "notNull": "NOT NULL",
     "schemaDrawerTitle": "Schema Browser",
     "searchTables": "Search tables...",
     "tableStructure": "Structure",
@@ -353,7 +363,8 @@
     "noTables": "No tables found",
     "newConnectionTitle": "New Connection",
     "saveConnection": "Save",
-    "saveSuccess": "Connection saved"
+    "saveSuccess": "Connection saved",
+    "connectToMySQL": "Connect to MySQL (Live)"
   },
   "dataset": {
     "listTitle": "Datasets",
@@ -381,7 +392,11 @@
     "noDatasets": "No datasets yet",
     "deleteSuccess": "Dataset deleted",
     "deleteInUse": "This dataset is linked and cannot be deleted",
-    "importHint": "Need to import new data? Go to"
+    "importHint": "Need to import new data? Go to",
+    "modeLive": "Live",
+    "modeSnapshot": "Snapshot",
+    "liveLabel": "Live",
+    "connectToMySQL": "Connect to MySQL"
   },
   "mysqlConnection": {
     "title": "Import from MySQL",
@@ -419,7 +434,24 @@
     "snapshotWarning": "Note: This will create a data snapshot. The imported data will not sync automatically with source changes.",
     "noConnections": "No connections available. Please create one in the Connections tab first.",
     "selectConnection": "Select a connection",
-    "searchTables": "Search tables..."
+    "searchTables": "Search tables...",
+    "deleteBlockedByLive": "Cannot delete: this connection has Live Datasets in use by Object Types.",
+    "tableName": "Table Name"
+  },
+  "liveConnection": {
+    "title": "Connect to MySQL (Live)",
+    "banner": "Live Connection mode: data stays in the external database and is queried in real-time. No data is copied to the platform.",
+    "steps": {
+      "connection": "Select Connection",
+      "tables": "Select Table & Columns",
+      "confirm": "Confirm"
+    },
+    "testRequired": "You must test the connection successfully before proceeding.",
+    "noConnections": "No connections available. Please create one in the Connections tab first.",
+    "confirmRegister": "Register Live Dataset",
+    "resultSummary": "Live Dataset \"{{name}}\" registered successfully.",
+    "disconnectedTip": "This Live Dataset's connection has been deleted. Please delete it and recreate with a new connection.",
+    "registerFailed": "Failed to register Live Dataset"
   },
   "demo": {
     "title": "Ontology Canvas",

@@ -144,3 +144,136 @@ class TestDatasetServiceDelete:
         ):
             await svc.delete("ri.ontology.dataset.ds1")
             mock_delete.assert_called_once()
+
+
+class TestDatasetServiceLivePreview:
+    """Unit tests for Live Dataset preview (T005)."""
+
+    def _make_live_dataset(self, status="ready"):
+        from app.domain.dataset import DatasetColumn, Dataset
+
+        return Dataset(
+            rid="ri.ontology.dataset.live1",
+            name="Orders Live",
+            mode="live",
+            source_type="mysql",
+            source_metadata={},
+            row_count=0,
+            column_count=2,
+            status=status,
+            imported_at=datetime.now(timezone.utc),
+            ontology_rid="ri.ontology.ontology.default",
+            created_by="default",
+            connection_rid="ri.ontology.mysql-connection.abc",
+            source_table="orders",
+            columns=[
+                DatasetColumn(
+                    name="id", inferred_type="integer", is_nullable=False, is_primary_key=True
+                ),
+                DatasetColumn(
+                    name="name", inferred_type="string", is_nullable=True, is_primary_key=False
+                ),
+            ],
+        )
+
+    async def test_preview_live_dataset_disconnected(self):
+        """AC-LC09: Disconnected Live Dataset returns 410."""
+        from app.exceptions import AppError
+        from app.services.dataset_service import DatasetService
+
+        mock_session = AsyncMock()
+        svc = DatasetService(mock_session)
+        ds = self._make_live_dataset(status="disconnected")
+
+        with patch.object(svc, "get_by_rid", return_value=ds):
+            with pytest.raises(AppError) as exc_info:
+                await svc.get_preview("ri.ontology.dataset.live1")
+            assert exc_info.value.status_code == 410
+            assert exc_info.value.code == "LIVE_DATASET_DISCONNECTED"
+
+    async def test_preview_live_dataset_source_unavailable(self):
+        """AC-LC06: Source unavailable returns 502."""
+        from app.exceptions import AppError
+        from app.services.dataset_service import DatasetService
+
+        mock_session = AsyncMock()
+        svc = DatasetService(mock_session)
+        ds = self._make_live_dataset()
+
+        mock_conn_orm = AsyncMock()
+        mock_conn_orm.encrypted_password = "encrypted"
+        mock_conn_orm.host = "localhost"
+        mock_conn_orm.port = 3306
+        mock_conn_orm.database_name = "test"
+        mock_conn_orm.username = "root"
+
+        with (
+            patch.object(svc, "get_by_rid", return_value=ds),
+            patch(
+                "app.services.dataset_service.MySQLConnectionStorage.get_by_rid",
+                new_callable=AsyncMock,
+                return_value=mock_conn_orm,
+            ),
+            patch(
+                "app.services.dataset_service.get_crypto_service",
+                return_value=AsyncMock(decrypt=lambda x: "secret"),
+            ),
+            patch(
+                "asyncio.wait_for",
+                new_callable=AsyncMock,
+                side_effect=Exception("Connection refused"),
+            ),
+        ):
+            with pytest.raises(AppError) as exc_info:
+                await svc.get_preview("ri.ontology.dataset.live1")
+            assert exc_info.value.status_code == 502
+            assert exc_info.value.code == "LIVE_DATASET_SOURCE_UNAVAILABLE"
+
+    async def test_preview_live_dataset_success(self):
+        """AC-DM05: Live preview queries external MySQL in real-time."""
+        from app.services.dataset_service import DatasetService
+
+        mock_session = AsyncMock()
+        svc = DatasetService(mock_session)
+        ds = self._make_live_dataset()
+
+        mock_conn_orm = AsyncMock()
+        mock_conn_orm.encrypted_password = "encrypted"
+        mock_conn_orm.host = "localhost"
+        mock_conn_orm.port = 3306
+        mock_conn_orm.database_name = "test"
+        mock_conn_orm.username = "root"
+
+        # Mock cursor for data query and count query
+        mock_cursor = AsyncMock()
+        mock_cursor.fetchall = AsyncMock(
+            return_value=[{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]
+        )
+        mock_cursor.fetchone = AsyncMock(return_value={"TABLE_ROWS": 42})
+        mock_cursor.__aenter__ = AsyncMock(return_value=mock_cursor)
+        mock_cursor.__aexit__ = AsyncMock(return_value=False)
+
+        from unittest.mock import MagicMock
+
+        mock_mysql_conn = MagicMock()
+        mock_mysql_conn.cursor = MagicMock(return_value=mock_cursor)
+        mock_mysql_conn.close = MagicMock()
+
+        with (
+            patch.object(svc, "get_by_rid", return_value=ds),
+            patch(
+                "app.services.dataset_service.MySQLConnectionStorage.get_by_rid",
+                new_callable=AsyncMock,
+                return_value=mock_conn_orm,
+            ),
+            patch(
+                "app.services.dataset_service.get_crypto_service",
+                return_value=MagicMock(decrypt=lambda x: "secret"),
+            ),
+            patch("asyncio.wait_for", new_callable=AsyncMock, return_value=mock_mysql_conn),
+        ):
+            result = await svc.get_preview("ri.ontology.dataset.live1")
+            assert result.rid == "ri.ontology.dataset.live1"
+            assert result.total_rows == 42
+            assert len(result.rows) == 2
+            assert result.rows[0]["id"] == 1

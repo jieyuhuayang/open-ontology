@@ -6,28 +6,12 @@ import { useDataConnectionStore } from '@/stores/data-connection-store';
 import { useState } from 'react';
 import type { DatasetListItem } from '@/api/types';
 import type { ColumnsType } from 'antd/es/table';
+import { formatRelativeTime } from '@/utils/format-time';
 
 function formatRowCount(val: number | null | undefined): string {
   if (val == null) return '—';
   if (val >= 1000) return `${(val / 1000).toFixed(val % 1000 === 0 ? 0 : 1)}K`;
   return val.toLocaleString();
-}
-
-function formatRelativeTime(val: string | null | undefined): string {
-  if (!val) return '—';
-  const date = new Date(val);
-  const now = Date.now();
-  const diffMs = now - date.getTime();
-  const diffSec = Math.floor(diffMs / 1000);
-  const diffMin = Math.floor(diffSec / 60);
-  const diffHr = Math.floor(diffMin / 60);
-  const diffDay = Math.floor(diffHr / 24);
-
-  if (diffSec < 60) return '< 1 min';
-  if (diffMin < 60) return `${diffMin} min`;
-  if (diffHr < 24) return `${diffHr} hr`;
-  if (diffDay < 30) return `${diffDay} d`;
-  return date.toLocaleDateString();
 }
 
 function PreviewDrawer({ rid, onClose }: { rid: string; onClose: () => void }) {
@@ -82,6 +66,11 @@ export default function DatasetsTab() {
       onClick: () => setOpenModal('mysqlImport'),
     },
     {
+      key: 'live',
+      label: t('dataConnection.connectToMySQL'),
+      onClick: () => setOpenModal('liveConnection'),
+    },
+    {
       key: 'file',
       label: t('dataset.uploadFile'),
       onClick: () => setOpenModal('fileUpload'),
@@ -99,15 +88,24 @@ export default function DatasetsTab() {
       title: t('dataset.columns.source'),
       dataIndex: 'sourceType',
       key: 'sourceType',
-      width: 100,
-      render: (val: string) => <Tag>{t(`dataset.source.${val}`)}</Tag>,
+      width: 160,
+      render: (val: string, record: DatasetListItem) => (
+        <Space size={4}>
+          <Tag>{t(`dataset.source.${val}`)}</Tag>
+          {record.mode === 'live' && (
+            <Tag color="green" bordered={false}>
+              ● {t('dataset.liveLabel')}
+            </Tag>
+          )}
+        </Space>
+      ),
     },
     {
       title: t('dataset.columns.rows'),
       dataIndex: 'rowCount',
       key: 'rowCount',
       width: 100,
-      render: (val: number) => formatRowCount(val),
+      render: (val: number, record: DatasetListItem) => (record.mode === 'live' ? '—' : formatRowCount(val)),
     },
     {
       title: t('dataset.columns.columns'),

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db_session
+from app.domain.dataset import Dataset, LiveDatasetCreateRequest
 from app.domain.import_task import (
     FileConfirmRequest,
     FileUploadPreviewResponse,
@@ -12,7 +13,7 @@ from app.domain.import_task import (
 )
 from app.exceptions import AppError
 from app.services.file_import_service import FileImportService
-from app.services.import_task_service import shared_import_task_service as _import_task_service
+from app.services.import_task_service import ImportTaskService, shared_import_task_service
 from app.services.mysql_import_service import MySQLImportService
 
 router = APIRouter(prefix="/api/v1", tags=["imports"])
@@ -33,6 +34,10 @@ def _get_file_service(
     return FileImportService(session)
 
 
+def _get_import_task_service() -> ImportTaskService:
+    return shared_import_task_service
+
+
 # --- Endpoints ---
 
 
@@ -47,6 +52,14 @@ async def start_mysql_import(
         dataset_name=req.dataset_name,
         selected_columns=req.selected_columns,
     )
+
+
+@router.post("/datasets/register/live", response_model=Dataset, status_code=201)
+async def register_live_dataset(
+    req: LiveDatasetCreateRequest,
+    service: MySQLImportService = Depends(_get_mysql_service),
+):
+    return await service.register_live_dataset(req)
 
 
 @router.post("/datasets/upload/preview", response_model=FileUploadPreviewResponse)
@@ -78,8 +91,11 @@ async def upload_confirm(
 
 
 @router.get("/import-tasks/{task_id}", response_model=ImportTask)
-async def get_import_task(task_id: str):
-    task = _import_task_service.get_task(task_id)
+async def get_import_task(
+    task_id: str,
+    service: ImportTaskService = Depends(_get_import_task_service),
+):
+    task = service.get_task(task_id)
     if task is None:
         raise AppError(
             code="IMPORT_TASK_NOT_FOUND",

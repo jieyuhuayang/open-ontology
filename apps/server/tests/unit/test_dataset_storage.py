@@ -19,6 +19,7 @@ class TestDatasetStorageToDomain:
         orm = MagicMock()
         orm.rid = "ri.ontology.dataset.abc123"
         orm.name = "orders"
+        orm.mode = "snapshot"
         orm.source_type = "mysql"
         orm.source_metadata = {"table": "orders"}
         orm.row_count = 100
@@ -27,11 +28,14 @@ class TestDatasetStorageToDomain:
         orm.imported_at = now
         orm.ontology_rid = "ri.ontology.ontology.default"
         orm.created_by = "default"
+        orm.connection_rid = None
+        orm.source_table = None
         orm.columns = [col_orm]
 
         ds = DatasetStorage._to_domain(orm)
         assert ds.rid == "ri.ontology.dataset.abc123"
         assert ds.name == "orders"
+        assert ds.mode == "snapshot"
         assert ds.source_type == "mysql"
         assert ds.row_count == 100
         assert len(ds.columns) == 1
@@ -46,6 +50,7 @@ class TestDatasetStorageToDomain:
         orm = MagicMock()
         orm.rid = "ri.ontology.dataset.abc123"
         orm.name = "orders"
+        orm.mode = "snapshot"
         orm.source_type = "mysql"
         orm.row_count = 100
         orm.column_count = 5

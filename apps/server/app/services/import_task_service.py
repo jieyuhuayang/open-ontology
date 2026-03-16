@@ -38,5 +38,6 @@ class ImportTaskService:
             del self._tasks[tid]
 
 
-# Shared singleton — all modules must import this instance, not create their own
+# TODO(post-MVP): Shared singleton is process-local and won't be shared across
+# multiple workers. Migrate to Redis or DB-backed task tracking for multi-worker deployments.
 shared_import_task_service = ImportTaskService()

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Modal,
   Steps,
@@ -18,21 +18,23 @@ import {
   Typography,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   useMySQLConnections,
   useMySQLTables,
   useMySQLTableColumns,
   useMySQLImportedTables,
 } from '@/api/mysql-connections';
-import { useMySQLImport, useImportTask } from '@/api/imports';
+import { useRegisterLiveDataset } from '@/api/imports';
 import { useDataConnectionStore } from '@/stores/data-connection-store';
 import type { MySQLTableInfo, MySQLColumnInfo } from '@/api/types';
 
-const STEPS = ['connection', 'tables', 'config', 'result'] as const;
+const STEPS = ['connection', 'tables', 'confirm'] as const;
 
-export default function MySQLImportWizard() {
+export default function LiveConnectionWizard() {
   const { t } = useTranslation();
   const { message } = App.useApp();
+  const queryClient = useQueryClient();
   const openModal = useDataConnectionStore((s) => s.openModal);
   const setOpenModal = useDataConnectionStore((s) => s.setOpenModal);
 
@@ -41,8 +43,10 @@ export default function MySQLImportWizard() {
   const [selectedTable, setSelectedTable] = useState<MySQLTableInfo | null>(null);
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
   const [datasetName, setDatasetName] = useState('');
-  const [taskId, setTaskId] = useState<string | null>(null);
   const [tableSearch, setTableSearch] = useState('');
+  const [registeredDataset, setRegisteredDataset] = useState<{ rid: string; name: string } | null>(
+    null,
+  );
 
   const { data: existingConnections } = useMySQLConnections();
   const { data: tables, isLoading: tablesLoading } = useMySQLTables(connectionRid ?? '');
@@ -51,10 +55,9 @@ export default function MySQLImportWizard() {
     selectedTable?.name ?? '',
   );
   const { data: importedTables } = useMySQLImportedTables(connectionRid ?? '');
-  const mysqlImport = useMySQLImport();
-  const { data: taskData } = useImportTask(taskId ?? undefined);
+  const registerLive = useRegisterLiveDataset();
 
-  const open = openModal === 'mysqlImport';
+  const open = openModal === 'liveConnection';
 
   const importedTableSet = useMemo(() => new Set(importedTables ?? []), [importedTables]);
 
@@ -65,19 +68,10 @@ export default function MySQLImportWizard() {
     return tables.filter((t) => t.name.toLowerCase().includes(lower));
   }, [tables, tableSearch]);
 
-  // Track whether we've shown the result toast to avoid duplicates
-  const toastShownRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (!taskData) return;
-    if (taskData.status === 'completed' && toastShownRef.current !== 'completed') {
-      toastShownRef.current = 'completed';
-      message.success(t('mysqlConnection.importSuccess'));
-    } else if (taskData.status === 'failed' && toastShownRef.current !== 'failed') {
-      toastShownRef.current = 'failed';
-      message.error(t('mysqlConnection.importFailed'));
-    }
-  }, [taskData?.status, message, t]);
+  // Auto-select all columns when columns load
+  if (columns && columns.length > 0 && selectedColumns.length === 0) {
+    setTimeout(() => setSelectedColumns(columns.map((c) => c.name)), 0);
+  }
 
   const handleClose = () => {
     setOpenModal(null);
@@ -86,9 +80,8 @@ export default function MySQLImportWizard() {
     setSelectedTable(null);
     setSelectedColumns([]);
     setDatasetName('');
-    setTaskId(null);
     setTableSearch('');
-    toastShownRef.current = null;
+    setRegisteredDataset(null);
   };
 
   const handleSelectConnection = (rid: string) => {
@@ -96,33 +89,20 @@ export default function MySQLImportWizard() {
   };
 
   const handleGoToTables = () => {
-    if (connectionRid) setStep(1);
+    if (connectionRid) {
+      setSelectedTable(null);
+      setSelectedColumns([]);
+      setStep(1);
+    }
   };
 
   const handleSelectTableRow = (table: MySQLTableInfo) => {
     setSelectedTable(table);
     setDatasetName(table.name);
+    setSelectedColumns([]);
   };
-
-  const handleNextFromStep1 = () => {
-    if (selectedTable) setStep(2);
-  };
-
-  // Initialize selectedColumns with all columns when columns load
-  const handleColumnsLoaded = (cols: MySQLColumnInfo[]) => {
-    if (selectedColumns.length === 0) {
-      setSelectedColumns(cols.map((c) => c.name));
-    }
-  };
-
-  // Call this effect-like logic when columns data changes
-  if (columns && columns.length > 0 && selectedColumns.length === 0) {
-    // Defer to avoid setting state during render
-    setTimeout(() => handleColumnsLoaded(columns), 0);
-  }
 
   const handleColumnToggle = (checkedValues: string[]) => {
-    // Ensure PK columns cannot be unchecked
     if (!columns) {
       setSelectedColumns(checkedValues);
       return;
@@ -133,29 +113,31 @@ export default function MySQLImportWizard() {
     setSelectedColumns([...merged]);
   };
 
-  const handleStartImport = async () => {
+  const handleRegister = async () => {
     if (!connectionRid || !selectedTable) return;
     try {
-      const task = await mysqlImport.mutateAsync({
+      const result = await registerLive.mutateAsync({
         connectionRid,
-        table: selectedTable.name,
+        tableName: selectedTable.name,
         datasetName: datasetName || selectedTable.name,
-        selectedColumns: selectedColumns.length > 0 ? selectedColumns : undefined,
+        selectedColumns: selectedColumns.length > 0 ? selectedColumns : [],
       });
-      setTaskId(task.taskId);
-      setStep(3);
+      setRegisteredDataset({ rid: result.rid, name: result.name });
+      setStep(2);
+      void queryClient.invalidateQueries({ queryKey: ['datasets'] });
+      message.success(t('liveConnection.resultSummary', { name: result.name }));
     } catch {
-      message.error(t('mysqlConnection.startImportFailed'));
+      message.error(t('liveConnection.registerFailed'));
     }
   };
 
-  const renderNavButtons = (onPrev?: () => void, onNext?: () => void, nextDisabled?: boolean) => (
+  const renderNavButtons = (
+    onPrev?: () => void,
+    onNext?: () => void,
+    nextDisabled?: boolean,
+  ) => (
     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16 }}>
-      <div>
-        {onPrev && (
-          <Button onClick={onPrev}>{t('wizard.back')}</Button>
-        )}
-      </div>
+      <div>{onPrev && <Button onClick={onPrev}>{t('wizard.back')}</Button>}</div>
       <div>
         {onNext && (
           <Button type="primary" disabled={nextDisabled} onClick={onNext}>
@@ -169,10 +151,16 @@ export default function MySQLImportWizard() {
   const renderStep0 = () => {
     const hasConnections = existingConnections && existingConnections.length > 0;
     if (!hasConnections) {
-      return <Empty description={t('mysqlConnection.noConnections')} />;
+      return <Empty description={t('liveConnection.noConnections')} />;
     }
     return (
       <div>
+        <Alert
+          type="info"
+          showIcon
+          message={t('liveConnection.banner')}
+          style={{ marginBottom: 16 }}
+        />
         <Select
           style={{ width: '100%', marginBottom: 16 }}
           placeholder={t('mysqlConnection.selectConnection')}
@@ -209,6 +197,7 @@ export default function MySQLImportWizard() {
           rowKey="name"
           dataSource={filteredTables}
           pagination={{ pageSize: 10, showSizeChanger: false, simple: true }}
+          scroll={{ y: 300 }}
           rowSelection={{
             type: 'radio',
             selectedRowKeys: selectedTable ? [selectedTable.name] : [],
@@ -243,95 +232,81 @@ export default function MySQLImportWizard() {
           ]}
         />
       )}
-      {renderNavButtons(() => setStep(0), handleNextFromStep1, !selectedTable)}
-    </div>
-  );
-
-  const renderStep2 = () => (
-    <div>
-      <Form layout="vertical">
-        <Form.Item label={t('mysqlConnection.datasetName')}>
-          <Input value={datasetName} onChange={(e) => setDatasetName(e.target.value)} />
-        </Form.Item>
-        {selectedTable?.rowCount != null && (
-          <Form.Item label={t('mysqlConnection.estimatedRows')}>
-            <span>{selectedTable.rowCount.toLocaleString()}</span>
-          </Form.Item>
-        )}
-        <Form.Item
-          label={
-            <Space>
-              {t('mysqlConnection.selectColumns')}
-              <Typography.Link
-                onClick={() => columns && setSelectedColumns(columns.map((c) => c.name))}
-              >
-                {t('common.selectAll')}
-              </Typography.Link>
-              <Typography.Link
-                onClick={() => {
-                  if (!columns) return;
-                  setSelectedColumns(columns.filter((c) => c.isPrimaryKey).map((c) => c.name));
-                }}
-              >
-                {t('common.deselectAll')}
-              </Typography.Link>
-            </Space>
-          }
-        >
+      {selectedTable && (
+        <div style={{ marginTop: 16 }}>
+          <Typography.Text strong style={{ marginBottom: 8, display: 'block' }}>
+            {t('mysqlConnection.selectColumns')}
+          </Typography.Text>
           {columnsLoading ? (
             <Spin />
           ) : (
-            <Checkbox.Group
-              value={selectedColumns}
-              onChange={(vals) => handleColumnToggle(vals as string[])}
-              style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
-            >
-              {columns?.map((col: MySQLColumnInfo) => (
-                <Checkbox key={col.name} value={col.name} disabled={col.isPrimaryKey}>
-                  {col.name} <Tag>{col.dataType}</Tag>
-                  {col.isPrimaryKey && <Tag color="gold">PK</Tag>}
-                </Checkbox>
-              ))}
-            </Checkbox.Group>
+            <>
+              <Space style={{ marginBottom: 8 }}>
+                <Typography.Link
+                  onClick={() => columns && setSelectedColumns(columns.map((c) => c.name))}
+                >
+                  {t('common.selectAll')}
+                </Typography.Link>
+                <Typography.Link
+                  onClick={() => {
+                    if (!columns) return;
+                    setSelectedColumns(
+                      columns.filter((c) => c.isPrimaryKey).map((c) => c.name),
+                    );
+                  }}
+                >
+                  {t('common.deselectAll')}
+                </Typography.Link>
+              </Space>
+              <Checkbox.Group
+                value={selectedColumns}
+                onChange={(vals) => handleColumnToggle(vals as string[])}
+                style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
+              >
+                {columns?.map((col: MySQLColumnInfo) => (
+                  <Checkbox key={col.name} value={col.name} disabled={col.isPrimaryKey}>
+                    {col.name} <Tag>{col.dataType}</Tag>
+                    {col.isPrimaryKey && <Tag color="gold">PK</Tag>}
+                  </Checkbox>
+                ))}
+              </Checkbox.Group>
+              {columns && (
+                <Typography.Text type="secondary" style={{ fontSize: 12, marginTop: 4 }}>
+                  {t('import.columnsSelected', {
+                    selected: selectedColumns.length,
+                    total: columns.length,
+                  })}
+                </Typography.Text>
+              )}
+            </>
           )}
-          {columns && (
-            <Typography.Text type="secondary" style={{ fontSize: 12, marginTop: 4 }}>
-              {t('import.columnsSelected', {
-                selected: selectedColumns.length,
-                total: columns.length,
-              })}
-            </Typography.Text>
-          )}
-        </Form.Item>
-      </Form>
-      <Alert
-        type="info"
-        showIcon
-        message={t('mysqlConnection.snapshotWarning')}
-        style={{ marginBottom: 16 }}
-      />
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Button onClick={() => setStep(1)}>{t('wizard.back')}</Button>
-        <Button type="primary" onClick={handleStartImport} loading={mysqlImport.isPending}>
-          {t('mysqlConnection.confirmImport')}
+          <Form layout="vertical" style={{ marginTop: 16 }}>
+            <Form.Item label={t('mysqlConnection.datasetName')}>
+              <Input value={datasetName} onChange={(e) => setDatasetName(e.target.value)} />
+            </Form.Item>
+          </Form>
+        </div>
+      )}
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16 }}>
+        <Button onClick={() => setStep(0)}>{t('wizard.back')}</Button>
+        <Button
+          type="primary"
+          onClick={handleRegister}
+          loading={registerLive.isPending}
+          disabled={!selectedTable || selectedColumns.length === 0 || !datasetName}
+        >
+          {t('liveConnection.confirmRegister')}
         </Button>
       </div>
     </div>
   );
 
-  const renderStep3 = () => {
-    if (!taskData) return <Spin />;
-    if (taskData.status === 'pending' || taskData.status === 'running') {
-      return (
-        <Result icon={<Spin size="large" />} title={t(`import.status.${taskData.status}`)} />
-      );
-    }
-    if (taskData.status === 'completed') {
+  const renderStep2 = () => {
+    if (registeredDataset) {
       return (
         <Result
           status="success"
-          title={t('mysqlConnection.importSuccess')}
-          subTitle={`${taskData.rowCount?.toLocaleString()} ${t('import.rows')}, ${taskData.columnCount} ${t('import.columns')}`}
+          title={t('liveConnection.resultSummary', { name: registeredDataset.name })}
           extra={
             <Button type="primary" onClick={handleClose}>
               {t('common.confirm')}
@@ -340,22 +315,13 @@ export default function MySQLImportWizard() {
         />
       );
     }
-    return (
-      <Result
-        status="error"
-        title={t('mysqlConnection.importFailed')}
-        subTitle={taskData.errorMessage}
-        extra={
-          <Button onClick={handleClose}>{t('common.confirm')}</Button>
-        }
-      />
-    );
+    return <Spin />;
   };
 
   return (
     <Modal
       open={open}
-      title={t('mysqlConnection.title')}
+      title={t('liveConnection.title')}
       onCancel={handleClose}
       footer={null}
       width={720}
@@ -363,13 +329,12 @@ export default function MySQLImportWizard() {
     >
       <Steps
         current={step}
-        items={STEPS.map((s) => ({ title: t(`mysqlConnection.steps.${s}`) }))}
+        items={STEPS.map((s) => ({ title: t(`liveConnection.steps.${s}`) }))}
         style={{ marginBottom: 24 }}
       />
       {step === 0 && renderStep0()}
       {step === 1 && renderStep1()}
       {step === 2 && renderStep2()}
-      {step === 3 && renderStep3()}
     </Modal>
   );
 }

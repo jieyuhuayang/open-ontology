@@ -25,6 +25,7 @@ class DatasetStorage:
         return Dataset(
             rid=orm.rid,
             name=orm.name,
+            mode=orm.mode,
             source_type=orm.source_type,
             source_metadata=orm.source_metadata,
             row_count=orm.row_count,
@@ -33,6 +34,8 @@ class DatasetStorage:
             imported_at=orm.imported_at,
             ontology_rid=orm.ontology_rid,
             created_by=orm.created_by,
+            connection_rid=orm.connection_rid,
+            source_table=orm.source_table,
             columns=columns,
         )
 
@@ -41,6 +44,7 @@ class DatasetStorage:
         return DatasetListItem(
             rid=orm.rid,
             name=orm.name,
+            mode=orm.mode,
             source_type=orm.source_type,
             row_count=orm.row_count,
             column_count=orm.column_count,
@@ -57,7 +61,7 @@ class DatasetStorage:
             select(DatasetModel)
             .where(
                 DatasetModel.ontology_rid == ontology_rid,
-                DatasetModel.status == "ready",
+                DatasetModel.status.in_(["ready", "disconnected"]),
             )
             .order_by(DatasetModel.imported_at.desc())
         )
@@ -70,38 +74,90 @@ class DatasetStorage:
     async def count_by_connection_rids(
         session: AsyncSession, connection_rids: list[str]
     ) -> dict[str, int]:
-        """Return {connectionRid: dataset_count} for given connection RIDs."""
+        """Return {connectionRid: dataset_count} for given connection RIDs.
+
+        Counts both:
+        - Snapshot Datasets (connectionRid in source_metadata JSONB)
+        - Live Datasets (connection_rid column)
+        """
         if not connection_rids:
             return {}
-        conn_rid_expr = DatasetModel.source_metadata["connectionRid"].as_string()
-        stmt = (
-            select(conn_rid_expr, func.count())
-            .where(
-                DatasetModel.status == "ready",
-                conn_rid_expr.in_(connection_rids),
+        from sqlalchemy import case, literal_column, union_all
+
+        # Snapshot: connectionRid stored in source_metadata JSONB
+        snapshot_rid_expr = DatasetModel.source_metadata["connectionRid"].as_string()
+        snapshot_stmt = (
+            select(
+                snapshot_rid_expr.label("conn_rid"),
+                func.count().label("cnt"),
             )
-            .group_by(conn_rid_expr)
+            .where(
+                DatasetModel.status.in_(["ready", "disconnected"]),
+                DatasetModel.mode == "snapshot",
+                snapshot_rid_expr.in_(connection_rids),
+            )
+            .group_by(snapshot_rid_expr)
         )
+
+        # Live: connection_rid column
+        live_stmt = (
+            select(
+                DatasetModel.connection_rid.label("conn_rid"),
+                func.count().label("cnt"),
+            )
+            .where(
+                DatasetModel.status.in_(["ready", "disconnected"]),
+                DatasetModel.mode == "live",
+                DatasetModel.connection_rid.in_(connection_rids),
+            )
+            .group_by(DatasetModel.connection_rid)
+        )
+
+        # Merge both counts
+        combined = union_all(snapshot_stmt, live_stmt).subquery()
+        stmt = select(
+            combined.c.conn_rid,
+            func.sum(combined.c.cnt),
+        ).group_by(combined.c.conn_rid)
+
         result = await session.execute(stmt)
-        return {row[0]: row[1] for row in result.all()}
+        return {row[0]: int(row[1]) for row in result.all()}
 
     @staticmethod
     async def list_imported_tables_by_connection(
         session: AsyncSession, connection_rid: str
-    ) -> list[str]:
-        """Return distinct table names imported from the given connection."""
+    ) -> list[dict[str, str]]:
+        """Return distinct table names with their dataset mode from the given connection.
+
+        Returns list of {"table": "...", "mode": "snapshot|live"}.
+        """
+        from sqlalchemy import union_all
+
+        # Snapshot tables (from source_metadata JSONB)
         table_expr = DatasetModel.source_metadata["table"].as_string()
         conn_rid_expr = DatasetModel.source_metadata["connectionRid"].as_string()
-        stmt = (
-            select(table_expr)
-            .where(
-                DatasetModel.status == "ready",
-                conn_rid_expr == connection_rid,
-            )
-            .distinct()
+        snapshot_stmt = select(
+            table_expr.label("table_name"),
+            DatasetModel.mode.label("mode"),
+        ).where(
+            DatasetModel.status.in_(["ready", "disconnected"]),
+            DatasetModel.mode == "snapshot",
+            conn_rid_expr == connection_rid,
         )
-        result = await session.execute(stmt)
-        return [row[0] for row in result.all()]
+
+        # Live tables (from source_table column)
+        live_stmt = select(
+            DatasetModel.source_table.label("table_name"),
+            DatasetModel.mode.label("mode"),
+        ).where(
+            DatasetModel.status.in_(["ready", "disconnected"]),
+            DatasetModel.mode == "live",
+            DatasetModel.connection_rid == connection_rid,
+        )
+
+        combined = union_all(snapshot_stmt, live_stmt)
+        result = await session.execute(combined)
+        return [{"table": row[0], "mode": row[1]} for row in result.all()]
 
     @staticmethod
     async def get_by_rid(session: AsyncSession, rid: str) -> Dataset | None:
@@ -135,18 +191,26 @@ class DatasetStorage:
         ontology_rid: str,
         created_by: str,
         columns: list[dict],
-        rows: list[dict],
+        rows: list[dict] | None = None,
+        *,
+        mode: str = "snapshot",
+        connection_rid: str | None = None,
+        source_table: str | None = None,
     ) -> Dataset:
+        actual_rows = rows or []
         orm = DatasetModel(
             rid=dataset_rid,
             name=name,
+            mode=mode,
             source_type=source_type,
             source_metadata=source_metadata,
-            row_count=len(rows),
+            row_count=len(actual_rows),
             column_count=len(columns),
             status="ready",
             ontology_rid=ontology_rid,
             created_by=created_by,
+            connection_rid=connection_rid,
+            source_table=source_table,
         )
         session.add(orm)
 
@@ -162,7 +226,7 @@ class DatasetStorage:
             )
             session.add(col_orm)
 
-        for i, row_data in enumerate(rows):
+        for i, row_data in enumerate(actual_rows):
             row_orm = DatasetRowModel(
                 dataset_rid=dataset_rid,
                 row_index=i,
@@ -172,6 +236,39 @@ class DatasetStorage:
 
         await session.flush()
         return await DatasetStorage.get_by_rid(session, dataset_rid)  # type: ignore
+
+    @staticmethod
+    async def list_live_by_connection_rid(
+        session: AsyncSession, connection_rid: str
+    ) -> list[DatasetListItem]:
+        """Return all Live Datasets associated with a given connection."""
+        stmt = (
+            select(DatasetModel)
+            .where(
+                DatasetModel.mode == "live",
+                DatasetModel.connection_rid == connection_rid,
+            )
+            .order_by(DatasetModel.imported_at.desc())
+        )
+        result = await session.execute(stmt)
+        return [DatasetStorage._to_list_item(orm) for orm in result.scalars().all()]
+
+    @staticmethod
+    async def mark_disconnected(session: AsyncSession, connection_rid: str) -> int:
+        """Mark all Live Datasets of a connection as disconnected. Returns count."""
+        from sqlalchemy import update
+
+        stmt = (
+            update(DatasetModel)
+            .where(
+                DatasetModel.mode == "live",
+                DatasetModel.connection_rid == connection_rid,
+            )
+            .values(status="disconnected")
+        )
+        result = await session.execute(stmt)
+        await session.flush()
+        return result.rowcount
 
     @staticmethod
     async def delete(session: AsyncSession, rid: str) -> None:

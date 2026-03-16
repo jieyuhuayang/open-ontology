@@ -34,13 +34,9 @@ class LinkTypeService:
         self._ws_service = WorkingStateService(session)
 
     async def _find_in_merged_view(self, rid: str) -> tuple[dict, ChangeState] | None:
-        merged = await self._ws_service.get_merged_view(
-            DEFAULT_ONTOLOGY_RID, ResourceType.LINK_TYPE
+        return await self._ws_service.find_in_merged_view(
+            DEFAULT_ONTOLOGY_RID, ResourceType.LINK_TYPE, rid
         )
-        for data, state in merged:
-            if data.get("rid") == rid:
-                return (data, state)
-        return None
 
     async def _get_ot_display_name_map(self) -> dict[str, str]:
         """Build a mapping from ObjectType RID to displayName from OT merged view."""

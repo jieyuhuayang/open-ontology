@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db_session
 from app.domain.mysql_connection import (
     ConnectionTestResponse,
+    ImportedTableInfo,
     MySQLConnection,
     MySQLConnectionCreateRequest,
     MySQLConnectionTestRequest,
@@ -64,7 +65,7 @@ async def delete_connection(
 
 @router.get(
     "/mysql-connections/{rid}/imported-tables",
-    response_model=list[str],
+    response_model=list[ImportedTableInfo],
 )
 async def get_imported_tables(
     rid: str,

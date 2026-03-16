@@ -1253,7 +1253,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/ImportedTableInfo"
                   },
                   "title": "Response Get Imported Tables Api V1 Mysql Connections  Rid  Imported Tables Get"
                 }
@@ -1449,6 +1449,47 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ImportTask"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/register/live": {
+      "post": {
+        "tags": [
+          "imports"
+        ],
+        "summary": "Register Live Dataset",
+        "operationId": "register_live_dataset_api_v1_datasets_register_live_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LiveDatasetCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dataset"
                 }
               }
             }
@@ -1790,6 +1831,11 @@
             "type": "string",
             "title": "Name"
           },
+          "mode": {
+            "type": "string",
+            "title": "Mode",
+            "default": "snapshot"
+          },
           "sourceType": {
             "type": "string",
             "title": "Sourcetype"
@@ -1826,6 +1872,28 @@
           "createdBy": {
             "type": "string",
             "title": "Createdby"
+          },
+          "connectionRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connectionrid"
+          },
+          "sourceTable": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sourcetable"
           },
           "columns": {
             "items": {
@@ -1890,6 +1958,11 @@
           "name": {
             "type": "string",
             "title": "Name"
+          },
+          "mode": {
+            "type": "string",
+            "title": "Mode",
+            "default": "snapshot"
           },
           "sourceType": {
             "type": "string",
@@ -2244,6 +2317,25 @@
         ],
         "title": "ImportTaskStatus"
       },
+      "ImportedTableInfo": {
+        "properties": {
+          "table": {
+            "type": "string",
+            "title": "Table"
+          },
+          "mode": {
+            "type": "string",
+            "title": "Mode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "table",
+          "mode"
+        ],
+        "title": "ImportedTableInfo",
+        "description": "Table already imported/registered from a connection."
+      },
       "JoinMethod": {
         "type": "string",
         "enum": [
@@ -2523,6 +2615,38 @@
         ],
         "title": "LinkTypeWithChangeState",
         "description": "LinkType with change state annotation for merged view."
+      },
+      "LiveDatasetCreateRequest": {
+        "properties": {
+          "connectionRid": {
+            "type": "string",
+            "title": "Connectionrid"
+          },
+          "tableName": {
+            "type": "string",
+            "title": "Tablename"
+          },
+          "datasetName": {
+            "type": "string",
+            "title": "Datasetname"
+          },
+          "selectedColumns": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Selectedcolumns"
+          }
+        },
+        "type": "object",
+        "required": [
+          "connectionRid",
+          "tableName",
+          "datasetName",
+          "selectedColumns"
+        ],
+        "title": "LiveDatasetCreateRequest",
+        "description": "Request to register a Live Dataset (schema only, no data copy)."
       },
       "MySQLColumnInfo": {
         "properties": {

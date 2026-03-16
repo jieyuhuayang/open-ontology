@@ -44,6 +44,9 @@ Feature spec 只能引用不变量 ID，不能重新定义或覆盖。
 | INV-4 | 状态为 `active` 的 ObjectType 不可删除          | ObjectType            | 003       |
 | INV-5 | 保留关键字不可用作 apiName                       | ObjectType            | 003       |
 | INV-6 | 密码使用 AES-256 加密存储，API 响应和日志中不得出现明文      | DataSource Connection | 010       |
+| INV-7 | LinkType 一端的 `apiName` 在关联 OT 的所有链接类型中唯一 | LinkType              | 006       |
+| INV-8 | `many-to-many` 基数的 LinkType 必须关联一个 `joinTableDatasetRid` | LinkType, Dataset | 006       |
+| INV-9 | LinkType 的 `id` 在同一 Ontology 内唯一            | LinkType              | 006       |
 
 
 **规则**：
@@ -65,6 +68,8 @@ Feature spec 只能引用不变量 ID，不能重新定义或覆盖。
 | 010-data-connection           | 001-scaffolding, 002-db-schema      | 需要 scaffolding 和 DB schema   |
 | 005-object-type-crud-frontend | 003-object-type-crud, 004-app-shell | 需要后端 API + App Shell         |
 | 005-object-type-crud-frontend | 010-data-connection                 | 需要 Dataset 列表 API（向导 Step 1） |
+| 006-link-type-crud            | 001-scaffolding, 002-db-schema, 003-object-type-crud, 004-app-shell | 需要 OT CRUD + WorkingState + App Shell |
+| 006-link-type-crud            | 010-data-connection                 | 需要 Dataset 列表 API（JT 连接表选择） |
 
 
 **规则**：
@@ -80,5 +85,6 @@ Feature spec 只能引用不变量 ID，不能重新定义或覆盖。
 | 日期         | 变更内容                                       | 影响范围 |
 | ---------- | ------------------------------------------ | ---- |
 | 2026-03-03 | 初始版本：从 PRD 需求拆分中创建，确立 003/006/007/010 领域归属 | —    |
+| 2026-03-16 | 追加 INV-7/8/9（LinkType 约束）+ 006 依赖图          | 006  |
 
 

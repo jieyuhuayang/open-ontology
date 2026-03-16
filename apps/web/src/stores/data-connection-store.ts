@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 type ActiveTab = 'connections' | 'datasets';
-type ModalType = 'mysqlImport' | 'fileUpload' | 'newConnection' | null;
+type ModalType = 'mysqlImport' | 'fileUpload' | 'newConnection' | 'liveConnection' | null;
 
 interface DataConnectionState {
   activeTab: ActiveTab;

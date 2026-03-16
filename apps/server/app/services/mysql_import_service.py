@@ -10,6 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.common import generate_rid
 from app.domain.constants import DEFAULT_ONTOLOGY_RID, DEFAULT_USER_ID
+from app.domain.serialization import serialize_value
+from app.domain.dataset import Dataset, LiveDatasetCreateRequest
 from app.domain.import_task import ImportTask, ImportTaskStatus
 from app.domain.mysql_connection import (
     MySQLConnection,
@@ -246,14 +248,120 @@ class MySQLImportService:
         finally:
             conn.close()
 
-    async def get_imported_tables(self, connection_rid: str) -> list[str]:
-        """Return table names already imported from the given connection."""
+    async def get_imported_tables(self, connection_rid: str) -> list[dict[str, str]]:
+        """Return table names with mode already imported from the given connection."""
         return await DatasetStorage.list_imported_tables_by_connection(
             self._session, connection_rid
         )
 
+    async def register_live_dataset(self, req: LiveDatasetCreateRequest) -> Dataset:
+        """Register a Live Dataset — schema metadata only, no data copy.
+
+        Synchronous operation (no ImportTask). Returns created Dataset directly.
+        """
+        # 1. Validate connection exists
+        conn_orm, password = await self._get_conn_orm_and_password(req.connection_rid)
+
+        # 2. Validate table exists
+        await self._validate_table_exists(req.connection_rid, req.table_name)
+
+        # 3. Extract column metadata from external MySQL
+        all_columns = await self.get_table_columns(req.connection_rid, req.table_name)
+
+        # 4. Filter by selected_columns (always keep primary key columns)
+        if req.selected_columns:
+            selected_set = set(req.selected_columns)
+            columns_info = []
+            for col in all_columns:
+                if col.name in selected_set or col.is_primary_key:
+                    columns_info.append(
+                        {
+                            "name": col.name,
+                            "inferred_type": col.inferred_property_type,
+                            "is_nullable": col.is_nullable,
+                            "is_primary_key": col.is_primary_key,
+                        }
+                    )
+        else:
+            columns_info = [
+                {
+                    "name": col.name,
+                    "inferred_type": col.inferred_property_type,
+                    "is_nullable": col.is_nullable,
+                    "is_primary_key": col.is_primary_key,
+                }
+                for col in all_columns
+            ]
+
+        # 5. Create Live Dataset (no rows)
+        dataset_rid = generate_rid("ontology", "dataset")
+        source_metadata = {
+            "connectionRid": req.connection_rid,
+            "database": conn_orm.database_name,
+            "table": req.table_name,
+        }
+
+        dataset = await DatasetStorage.create(
+            self._session,
+            dataset_rid=dataset_rid,
+            name=req.dataset_name,
+            source_type="mysql",
+            source_metadata=source_metadata,
+            ontology_rid=DEFAULT_ONTOLOGY_RID,
+            created_by=DEFAULT_USER_ID,
+            columns=columns_info,
+            rows=None,
+            mode="live",
+            connection_rid=req.connection_rid,
+            source_table=req.table_name,
+        )
+
+        # 6. Update connection last_used_at
+        await MySQLConnectionStorage.update_last_used(self._session, req.connection_rid)
+
+        return dataset  # type: ignore
+
     async def delete_connection(self, rid: str) -> None:
-        """Delete a saved MySQL connection."""
+        """Delete a saved MySQL connection.
+
+        Raises CONNECTION_HAS_IN_USE_LIVE_DATASETS (409) if any Live Dataset
+        associated with this connection is in-use by an ObjectType.
+        Cascades: marks remaining Live Datasets as 'disconnected'.
+        Snapshot Datasets are not affected.
+        """
+        # Check if connection exists
+        conn_orm = await MySQLConnectionStorage.get_by_rid(self._session, rid)
+        if not conn_orm:
+            raise AppError(
+                code="CONNECTION_NOT_FOUND",
+                message=f"MySQL connection '{rid}' not found",
+                status_code=404,
+            )
+
+        # Check for in-use Live Datasets
+        live_datasets = await DatasetStorage.list_live_by_connection_rid(self._session, rid)
+        if live_datasets:
+            # Import here to avoid circular dependency
+            from app.services.dataset_service import DatasetService
+
+            ds_service = DatasetService(self._session)
+            # Check in_use status for each live dataset
+            for ds in live_datasets:
+                full_list = await ds_service.list()
+                for item in full_list.items:
+                    if item.rid == ds.rid and item.in_use:
+                        raise AppError(
+                            code="CONNECTION_HAS_IN_USE_LIVE_DATASETS",
+                            message=(
+                                f"Cannot delete connection: Live Dataset '{item.name}' "
+                                f"is in use by ObjectType '{item.linked_object_type_name}'"
+                            ),
+                            status_code=409,
+                        )
+
+            # Mark all Live Datasets as disconnected
+            await DatasetStorage.mark_disconnected(self._session, rid)
+
         await MySQLConnectionStorage.delete(self._session, rid)
 
     async def start_import(
@@ -368,7 +476,7 @@ class MySQLImportService:
                 # Convert to serializable dicts
                 rows_data = []
                 for row in all_rows:
-                    rows_data.append({k: _serialize_value(v) for k, v in row.items()})
+                    rows_data.append({k: serialize_value(v) for k, v in row.items()})
 
             finally:
                 conn.close()
@@ -415,19 +523,3 @@ class MySQLImportService:
                 error_message=str(e),
                 duration_ms=duration,
             )
-
-
-def _serialize_value(v: object) -> object:
-    """Convert MySQL values to JSON-serializable types."""
-    from datetime import date, datetime
-    from decimal import Decimal
-
-    if isinstance(v, datetime):
-        return v.isoformat()
-    if isinstance(v, date):
-        return v.isoformat()
-    if isinstance(v, Decimal):
-        return float(v)
-    if isinstance(v, bytes):
-        return v.hex()
-    return v

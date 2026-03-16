@@ -45,6 +45,13 @@ class MySQLConnectionTestRequest(DomainModel):
     connection_rid: str | None = None  # Optional: reuse saved connection
 
 
+class ImportedTableInfo(DomainModel):
+    """Table already imported/registered from a connection."""
+
+    table: str
+    mode: str  # "snapshot" | "live"
+
+
 class MySQLTableInfo(DomainModel):
     name: str
     row_count: int | None = None
