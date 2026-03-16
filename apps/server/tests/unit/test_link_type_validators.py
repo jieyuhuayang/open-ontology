@@ -93,3 +93,31 @@ class TestValidateLinkSideApiName:
         with pytest.raises(AppError) as exc_info:
             validate_link_side_api_name("\uff41bc", "A")
         assert exc_info.value.code == "LINK_TYPE_API_NAME_NOT_NFKC"
+
+
+class TestValidateCardinalityJoinMethodMatch:
+    """Cardinality and join_method compatibility validation."""
+
+    @pytest.mark.parametrize(
+        "cardinality",
+        ["one-to-one", "one-to-many", "many-to-one"],
+    )
+    def test_fk_cardinalities_with_fk_method_pass(self, cardinality: str):
+        validate_cardinality_join_method_match(cardinality, "foreign-key")
+
+    def test_many_to_many_with_join_table_pass(self):
+        validate_cardinality_join_method_match("many-to-many", "join-table")
+
+    @pytest.mark.parametrize(
+        "cardinality",
+        ["one-to-one", "one-to-many", "many-to-one"],
+    )
+    def test_fk_cardinalities_with_join_table_reject(self, cardinality: str):
+        with pytest.raises(AppError) as exc_info:
+            validate_cardinality_join_method_match(cardinality, "join-table")
+        assert exc_info.value.code == "LINK_TYPE_CARDINALITY_JOIN_METHOD_MISMATCH"
+
+    def test_many_to_many_with_fk_reject(self):
+        with pytest.raises(AppError) as exc_info:
+            validate_cardinality_join_method_match("many-to-many", "foreign-key")
+        assert exc_info.value.code == "LINK_TYPE_CARDINALITY_JOIN_METHOD_MISMATCH"
