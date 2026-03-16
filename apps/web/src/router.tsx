@@ -44,6 +44,7 @@ export const routeConfig: RouteObject[] = [
           { path: 'datasources', element: <PlaceholderPage title="Object Type Datasources" /> },
         ],
       },
+      { path: 'link-types/:rid', element: <LinkTypeDetailPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
