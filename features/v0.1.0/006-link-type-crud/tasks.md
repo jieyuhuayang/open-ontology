@@ -55,7 +55,7 @@
 
 ### T03: ORM 模型 + Storage 层更新
 
-- [ ] **T03**
+- [x] **T03**
 - 文件:
   - `apps/server/app/storage/models.py` — 扩展 ORM 模型
   - `apps/server/app/storage/link_type_storage.py` — 更新存储方法
