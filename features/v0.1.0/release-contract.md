@@ -68,6 +68,8 @@ Feature spec 只能引用不变量 ID，不能重新定义或覆盖。
 | 010-data-connection           | 001-scaffolding, 002-db-schema      | 需要 scaffolding 和 DB schema   |
 | 005-object-type-crud-frontend | 003-object-type-crud, 004-app-shell | 需要后端 API + App Shell         |
 | 005-object-type-crud-frontend | 010-data-connection                 | 需要 Dataset 列表 API（向导 Step 1） |
+| 006-link-type-crud            | 001-scaffolding, 002-db-schema, 003-object-type-crud, 004-app-shell | 需要 OT CRUD + WorkingState + App Shell |
+| 006-link-type-crud            | 010-data-connection                 | 需要 Dataset 列表 API（JT 连接表选择） |
 
 
 **规则**：
