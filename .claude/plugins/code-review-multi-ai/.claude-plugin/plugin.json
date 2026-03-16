@@ -1,7 +1,0 @@
-{
-  "name": "code-review-multi-ai",
-  "description": "Multi-AI parallel code review tool using Codex and Gemini",
-  "author": {
-    "name": "OpenOntology Team"
-  }
-}
