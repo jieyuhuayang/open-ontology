@@ -37,6 +37,7 @@ class LinkType(DomainModel):
     side_b: LinkSide
     cardinality: Cardinality
     join_method: JoinMethod = JoinMethod.FOREIGN_KEY
+    join_table_dataset_rid: str | None = None
     status: ResourceStatus = ResourceStatus.EXPERIMENTAL
     project_rid: str
     ontology_rid: str
