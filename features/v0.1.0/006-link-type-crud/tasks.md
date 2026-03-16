@@ -72,7 +72,7 @@
 
 ### T04: Service 层更新 — JT/FK 校验 + API Name 锁定
 
-- [ ] **T04**
+- [x] **T04**
 - 文件:
   - `apps/server/app/services/link_type_service.py` — 核心业务逻辑更新
 - 内容:
