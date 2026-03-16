@@ -32,6 +32,8 @@ class LinkTypeStorage:
                 display_name=ep.display_name,
                 api_name=ep.api_name,
                 visibility=Visibility(vis_val),
+                foreign_key_property_id=ep.foreign_key_property_id,
+                join_table_column=ep.join_table_column,
             )
             if side_val == "A":
                 side_a = link_side
