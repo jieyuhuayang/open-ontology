@@ -43,7 +43,7 @@ def upgrade() -> None:
 def downgrade() -> None:
     # Reverse: restore global unique on id, drop composite
     op.drop_constraint("uq_link_types_ontology_id", "link_types", type_="unique")
-    op.create_unique_constraint("uq_link_types_id", "link_types", ["id"])
+    op.create_unique_constraint("link_types_id_key", "link_types", ["id"])
 
     # Remove added columns
     op.drop_column("link_type_endpoints", "join_table_column")
