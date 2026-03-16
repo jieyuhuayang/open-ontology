@@ -82,7 +82,11 @@
       "back": "Back",
       "sideA": "Side A",
       "sideB": "Side B",
-      "selectObjectType": "Select an object type"
+      "selectObjectType": "Select an object type",
+      "fkGroup": "Foreign Key",
+      "jtGroup": "Join Table",
+      "selectDataset": "Select join table dataset",
+      "columnMapping": "Select column"
     },
     "fields": {
       "id": "ID",
