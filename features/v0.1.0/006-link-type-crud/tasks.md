@@ -292,7 +292,7 @@
 
 ### T12: 前端测试 + 路由更新
 
-- [ ] **T12**
+- [x] **T12**
 - 文件:
   - `apps/web/src/pages/link-types/__tests__/LinkTypeListPage.test.tsx` — 更新
   - `apps/web/src/pages/link-types/__tests__/CreateLinkTypeWizard.test.tsx` — 更新
