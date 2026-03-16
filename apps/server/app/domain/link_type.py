@@ -26,6 +26,8 @@ class LinkSide(DomainModel):
     api_name: str
     visibility: Visibility = Visibility.NORMAL
     object_type_display_name: str | None = None
+    foreign_key_property_id: str | None = None
+    join_table_column: str | None = None
 
 
 class LinkType(DomainModel):
