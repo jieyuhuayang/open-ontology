@@ -52,9 +52,11 @@ class PropertyService:
     async def _find_property_in_merged_view(
         self, object_type_rid: str, rid: str
     ) -> tuple[dict, ChangeState] | None:
-        return await self._ws_service.find_in_merged_view(
-            DEFAULT_ONTOLOGY_RID, ResourceType.PROPERTY, rid
-        )
+        merged = await self._get_merged_properties(object_type_rid)
+        for data, state in merged:
+            if data.get("rid") == rid:
+                return (data, state)
+        return None
 
     async def _check_object_type_exists(self, object_type_rid: str) -> dict:
         """Verify object type exists in merged view, return its data dict."""
@@ -342,10 +344,15 @@ class PropertyService:
             extra_changes.extend(
                 await self._clear_old_key(object_type_rid, rid, "isPrimaryKey", now)
             )
-            extra_changes.append(self._build_ot_key_change(
-                object_type_rid, "primaryKeyPropertyId",
-                ot_data.get("primaryKeyPropertyId"), data.get("id", ""), now,
-            ))
+            extra_changes.append(
+                self._build_ot_key_change(
+                    object_type_rid,
+                    "primaryKeyPropertyId",
+                    ot_data.get("primaryKeyPropertyId"),
+                    data.get("id", ""),
+                    now,
+                )
+            )
 
         # Handle TK cascade (isTitleKey=true)
         if update_fields.get("isTitleKey") is True:
@@ -357,13 +364,16 @@ class PropertyService:
                     status_code=400,
                 )
             ot_data = await self._check_object_type_exists(object_type_rid)
-            extra_changes.extend(
-                await self._clear_old_key(object_type_rid, rid, "isTitleKey", now)
+            extra_changes.extend(await self._clear_old_key(object_type_rid, rid, "isTitleKey", now))
+            extra_changes.append(
+                self._build_ot_key_change(
+                    object_type_rid,
+                    "titleKeyPropertyId",
+                    ot_data.get("titleKeyPropertyId"),
+                    data.get("id", ""),
+                    now,
+                )
             )
-            extra_changes.append(self._build_ot_key_change(
-                object_type_rid, "titleKeyPropertyId",
-                ot_data.get("titleKeyPropertyId"), data.get("id", ""), now,
-            ))
 
         # Build main property update change
         before = {k: data.get(k) for k in update_fields}
