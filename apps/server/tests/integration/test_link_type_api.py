@@ -141,7 +141,7 @@ class TestLinkTypeCRUD:
         assert data["sideA"]["objectTypeRid"] == ot_a
         assert data["sideB"]["objectTypeRid"] == ot_b
 
-    async def test_create_self_link_returns_400(self, seeded_client: AsyncClient):
+    async def test_create_self_link_succeeds(self, seeded_client: AsyncClient):
         ot_a, _ = await _create_object_types(seeded_client)
 
         resp = await seeded_client.post(
@@ -150,19 +150,21 @@ class TestLinkTypeCRUD:
                 "id": "self-link",
                 "sideA": {
                     "objectTypeRid": ot_a,
-                    "displayName": "Self A",
-                    "apiName": "selfA",
+                    "displayName": "Manager",
+                    "apiName": "manager",
                 },
                 "sideB": {
                     "objectTypeRid": ot_a,
-                    "displayName": "Self B",
-                    "apiName": "selfB",
+                    "displayName": "Report",
+                    "apiName": "directReport",
                 },
-                "cardinality": "one-to-one",
+                "cardinality": "one-to-many",
             },
         )
-        assert resp.status_code == 400
-        assert resp.json()["error"]["code"] == "LINK_TYPE_SELF_LINK_NOT_ALLOWED"
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data["sideA"]["objectTypeRid"] == ot_a
+        assert data["sideB"]["objectTypeRid"] == ot_a
 
     async def test_create_duplicate_id_returns_409(self, seeded_client: AsyncClient):
         ot_a, ot_b = await _create_object_types(seeded_client)
