@@ -117,6 +117,27 @@ def validate_intended_actions(actions: list[str] | None) -> None:
             )
 
 
+def validate_cardinality_join_method_match(cardinality: str, join_method: str) -> None:
+    """Validate cardinality and join_method are compatible.
+
+    FK cardinalities (1:1, 1:N, N:1) → foreign-key only.
+    N:N → join-table only.
+    """
+    fk_cardinalities = {"one-to-one", "one-to-many", "many-to-one"}
+    if cardinality in fk_cardinalities and join_method != "foreign-key":
+        raise AppError(
+            code="LINK_TYPE_CARDINALITY_JOIN_METHOD_MISMATCH",
+            message=f"Cardinality '{cardinality}' requires join method 'foreign-key', got '{join_method}'",
+            status_code=400,
+        )
+    if cardinality == "many-to-many" and join_method != "join-table":
+        raise AppError(
+            code="LINK_TYPE_CARDINALITY_JOIN_METHOD_MISMATCH",
+            message=f"Cardinality 'many-to-many' requires join method 'join-table', got '{join_method}'",
+            status_code=400,
+        )
+
+
 def validate_link_side_api_name(api_name: str, side: str) -> None:
     """Validate link side apiName: camelCase, 1-100 chars, NFKC, no reserved words."""
     normalized = unicodedata.normalize("NFKC", api_name)
