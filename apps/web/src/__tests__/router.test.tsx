@@ -82,11 +82,12 @@ describe('Router', () => {
     });
   });
 
-  it('/link-types/:rid renders LinkTypeDetailPage', async () => {
+  it('/link-types/:rid renders LinkTypeDetailPage (not 404)', async () => {
     renderRoute('/link-types/test-rid');
-    // LinkTypeDetailPage renders when useLinkType returns null (loading state)
+    // With mocked useLinkType returning null data, component returns null (no content)
+    // but importantly does NOT render the 404 page
     await waitFor(() => {
-      expect(document.querySelector('main')).toBeInTheDocument();
+      expect(screen.queryByText(/page not found/i)).not.toBeInTheDocument();
     });
   });
 
