@@ -269,7 +269,7 @@ export default function LiveConnectionWizard() {
                 {columns?.map((col: MySQLColumnInfo) => (
                   <Checkbox key={col.name} value={col.name} disabled={col.isPrimaryKey}>
                     {col.name} <Tag>{col.dataType}</Tag>
-                    {col.isPrimaryKey && <Tag color="gold">PK</Tag>}
+                    {col.isPrimaryKey && <Tag color="gold">{t('dataConnection.pk')}</Tag>}
                   </Checkbox>
                 ))}
               </Checkbox.Group>
