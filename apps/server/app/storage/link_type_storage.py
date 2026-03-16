@@ -148,6 +148,8 @@ class LinkTypeStorage:
                 display_name=side_data.display_name,
                 api_name=side_data.api_name,
                 visibility=side_data.visibility.value,
+                foreign_key_property_id=side_data.foreign_key_property_id,
+                join_table_column=side_data.join_table_column,
             )
             session.add(ep)
         await session.flush()
