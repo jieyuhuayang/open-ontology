@@ -18,7 +18,7 @@
 
 ### T01: Alembic 迁移 — 新增 JT 字段 + 约束变更
 
-- [ ] **T01**
+- [x] **T01**
 - 文件:
   - `apps/server/alembic/versions/0007_link_type_join_table.py` — 新迁移脚本
 - 内容:
