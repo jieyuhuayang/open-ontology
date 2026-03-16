@@ -59,7 +59,10 @@ export default function LiveConnectionWizard() {
 
   const open = openModal === 'liveConnection';
 
-  const importedTableSet = useMemo(() => new Set(importedTables ?? []), [importedTables]);
+  const importedTableSet = useMemo(
+    () => new Set((importedTables ?? []).map((item) => item.table)),
+    [importedTables],
+  );
 
   const filteredTables = useMemo(() => {
     if (!tables) return [];
