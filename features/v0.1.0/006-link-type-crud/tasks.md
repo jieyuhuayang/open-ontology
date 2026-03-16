@@ -265,7 +265,7 @@
 
 ### T11: i18n 翻译更新
 
-- [ ] **T11**
+- [x] **T11**
 - 文件:
   - `apps/web/src/locales/en-US/common.json` — 更新翻译
   - `apps/web/src/locales/zh-CN/common.json` — 更新翻译
