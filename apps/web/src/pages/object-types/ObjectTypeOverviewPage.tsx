@@ -134,29 +134,31 @@ export default function ObjectTypeOverviewPage() {
           )}
         </Card>
 
-        {/* Backing Datasource Card */}
-        <Card>
-          <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
-            <Title level={5} style={{ margin: 0 }}>
-              {t('objectType.backingDatasource')}
-            </Title>
-          </Flex>
-          {data.backingDatasource ? (
-            <Flex align="center" gap={8}>
-              <DatabaseOutlined />
-              <Text>{JSON.stringify(data.backingDatasource)}</Text>
+        {/* Row 3: Datasource (half width, reserved for future Usage card) */}
+        <Flex gap={16}>
+          <Card style={{ flex: 1 }}>
+            <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
+              <Title level={5} style={{ margin: 0 }}>
+                {t('objectType.backingDatasource')}
+              </Title>
             </Flex>
-          ) : (
-            <Flex vertical align="flex-start" gap={8}>
-              <Text type="secondary">{t('objectType.noDatasource')}</Text>
-              <Tooltip title={t('common.comingSoon')}>
-                <Button size="small" icon={<PlusOutlined />} disabled>
-                  {t('objectType.addDatasource')}
-                </Button>
-              </Tooltip>
-            </Flex>
-          )}
-        </Card>
+            {data.backingDatasource ? (
+              <Flex align="center" gap={8}>
+                <DatabaseOutlined />
+                <Text>{JSON.stringify(data.backingDatasource)}</Text>
+              </Flex>
+            ) : (
+              <Flex vertical align="flex-start" gap={8}>
+                <Text type="secondary">{t('objectType.noDatasource')}</Text>
+                <Tooltip title={t('common.comingSoon')}>
+                  <Button size="small" icon={<PlusOutlined />} disabled>
+                    {t('objectType.addDatasource')}
+                  </Button>
+                </Tooltip>
+              </Flex>
+            )}
+          </Card>
+        </Flex>
       </Flex>
     </div>
   );
