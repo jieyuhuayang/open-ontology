@@ -245,7 +245,7 @@ class LinkTypeModel(Base):
     __tablename__ = "link_types"
 
     rid = Column(String, primary_key=True)
-    id = Column(String(255), nullable=False, unique=True)
+    id = Column(String(255), nullable=False)
     cardinality = Column(
         Enum(Cardinality, name="cardinality", create_type=False),
         nullable=False,
@@ -265,6 +265,11 @@ class LinkTypeModel(Base):
         ForeignKey("ontologies.rid", ondelete="CASCADE"),
         nullable=False,
     )
+    join_table_dataset_rid = Column(
+        String,
+        ForeignKey("datasets.rid", ondelete="SET NULL"),
+        nullable=True,
+    )
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     created_by = Column(String(255), nullable=False)
     last_modified_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
@@ -274,6 +279,8 @@ class LinkTypeModel(Base):
     endpoints = relationship(
         "LinkTypeEndpointModel", back_populates="link_type", cascade="all, delete-orphan"
     )
+
+    __table_args__ = (UniqueConstraint("ontology_rid", "id", name="uq_link_types_ontology_id"),)
 
 
 class LinkTypeEndpointModel(Base):
