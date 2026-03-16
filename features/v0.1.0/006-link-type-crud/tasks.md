@@ -125,7 +125,7 @@
 
 ### T06: OpenAPI 类型重生成 + API Hooks 更新
 
-- [ ] **T06**
+- [x] **T06**
 - 文件:
   - `apps/server/openapi.json` — 重新生成
   - `apps/web/src/generated/api.ts` — 自动生成
