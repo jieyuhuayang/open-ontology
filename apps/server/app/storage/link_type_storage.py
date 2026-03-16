@@ -54,6 +54,7 @@ class LinkTypeStorage:
             side_b=side_b,
             cardinality=Cardinality(card_val),
             join_method=JoinMethod(jm_val),
+            join_table_dataset_rid=orm.join_table_dataset_rid,
             status=ResourceStatus(st_val),
             project_rid=orm.project_rid,
             ontology_rid=orm.ontology_rid,
