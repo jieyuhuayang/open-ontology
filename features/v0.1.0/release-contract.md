@@ -44,6 +44,9 @@ Feature spec 只能引用不变量 ID，不能重新定义或覆盖。
 | INV-4 | 状态为 `active` 的 ObjectType 不可删除          | ObjectType            | 003       |
 | INV-5 | 保留关键字不可用作 apiName                       | ObjectType            | 003       |
 | INV-6 | 密码使用 AES-256 加密存储，API 响应和日志中不得出现明文      | DataSource Connection | 010       |
+| INV-7 | LinkType 一端的 `apiName` 在关联 OT 的所有链接类型中唯一 | LinkType              | 006       |
+| INV-8 | `many-to-many` 基数的 LinkType 必须关联一个 `joinTableDatasetRid` | LinkType, Dataset | 006       |
+| INV-9 | LinkType 的 `id` 在同一 Ontology 内唯一            | LinkType              | 006       |
 
 
 **规则**：
