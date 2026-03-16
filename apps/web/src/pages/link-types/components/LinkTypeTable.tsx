@@ -54,6 +54,16 @@ export default function LinkTypeTable({
       render: (val: string) => t(`linkType.cardinality.${val}`),
     },
     {
+      title: t('linkType.fields.joinMethod'),
+      dataIndex: 'joinMethod',
+      key: 'joinMethod',
+      width: 140,
+      render: (val: string) =>
+        val === 'join-table'
+          ? t('linkType.joinMethod.joinTable')
+          : t('linkType.joinMethod.foreignKey'),
+    },
+    {
       title: t('linkType.fields.status'),
       dataIndex: 'status',
       key: 'status',
