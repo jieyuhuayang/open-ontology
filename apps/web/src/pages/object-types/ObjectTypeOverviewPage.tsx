@@ -32,35 +32,7 @@ export default function ObjectTypeOverviewPage() {
 
   const properties = propertiesData?.items ?? [];
   const intendedActions = data.intendedActions ?? [];
-
-  const linkTypeColumns: ColumnsType<LinkType> = [
-    {
-      title: t('linkType.fields.id'),
-      dataIndex: 'id',
-      key: 'id',
-    },
-    {
-      title: t('linkType.fields.sideA'),
-      key: 'sideA',
-      render: (_val, record) => (
-        <Tag>{record.sideA.objectTypeDisplayName ?? record.sideA.objectTypeRid}</Tag>
-      ),
-    },
-    {
-      title: t('linkType.fields.sideB'),
-      key: 'sideB',
-      render: (_val, record) => (
-        <Tag>{record.sideB.objectTypeDisplayName ?? record.sideB.objectTypeRid}</Tag>
-      ),
-    },
-    {
-      title: t('linkType.fields.status'),
-      dataIndex: 'status',
-      key: 'status',
-      width: 120,
-      render: (status: ResourceStatus) => <StatusBadge status={status} />,
-    },
-  ];
+  const linkTypes = linkTypesData?.items ?? [];
 
   return (
     <div>
