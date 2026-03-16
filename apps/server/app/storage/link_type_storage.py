@@ -128,6 +128,7 @@ class LinkTypeStorage:
             id=model.id,
             cardinality=model.cardinality.value,
             join_method=model.join_method.value,
+            join_table_dataset_rid=model.join_table_dataset_rid,
             status=model.status.value,
             project_rid=model.project_rid,
             ontology_rid=model.ontology_rid,
