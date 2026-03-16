@@ -157,16 +157,19 @@ cd apps/web && pnpm dev
 
 以下规则在编写或修改任何 backend/frontend 源代码时**强制生效**。
 
-**后端**
+**后端（Test-First）**
 
+- **开发顺序：先写测试（红），再写实现（绿）** — tasks.md 中后端测试任务必须排在对应实现任务之前
 - 新增 service function → 必须在 `tests/unit/` 中有单元测试（通过 `mock_db_session` mock 数据库）
 - 新增 API route → 必须在 `tests/integration/` 中有集成测试（用 `seeded_client`，覆盖 happy path + 主要 error path）
 - 完成前执行 `cd apps/server && uv run pytest <test_file> -v` 并展示通过输出
 
-**前端**
+**前端（Test-Alongside）**
 
+- 新增 page → 必须在 `pages/<Resource>/__tests__/` 中有渲染 + 核心交互测试（Testing Library）
 - 新增 Zustand store → 必须在 `stores/__tests__/` 中覆盖核心状态转换
 - 新增可复用 component → 必须在 `components/__tests__/` 中有渲染测试（Testing Library）
+- 前端测试与实现可在同一任务内完成（无需 test-first 分离）
 - 完成前执行 `cd apps/web && pnpm test --run` 并确认无失败
 
 **禁止行为**
@@ -230,7 +233,9 @@ cd apps/web && pnpm dev
    - 禁止在 spec.md 中写测试策略（由本文件 §测试要求统一管理）
    - 写 spec 前必须先阅读版本的 `release-contract.md`
 3. **审查 spec** — 写完 spec.md 后，调用 `/sdd-review <feature_dir> spec`；Claude 同时检查 PRD gap 和架构合规性，生成报告供用户参考；必须使用 `AskUserQuestion` 工具请求用户确认，用户确认后将 tasks.md 状态表中 spec.md 行更新为 ✅ 已评审（手动暂停点）
-4. **tasks.md** — 将 spec 拆解为自包含的原子任务（每个任务一次 AI 会话可完成）
+4. **tasks.md** — 将 spec 拆解为自包含的原子任务（模板：`features/_templates/tasks.md`）
+   - **后端 Test-First**：后端任务按「测试 → 实现」配对编排；基础设施任务（迁移、ORM、配置）无测试配对
+   - **前端 Test-Alongside**：前端实现任务内含测试，或在同 phase 末尾补充测试任务
    - 每个任务内联必要实现上下文（文件、逻辑、测试），实现阶段不需要回读 spec.md
    - 每个测试任务必须标注 `覆盖 AC: AC-NN, AC-NN`，追溯到 spec.md 的 AC 表格
    - 缺少 AC 标注的测试任务视为规格不完整，禁止开始对应的实现任务

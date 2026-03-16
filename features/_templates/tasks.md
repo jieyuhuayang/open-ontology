@@ -17,8 +17,11 @@
 
 ## 开发模式
 
-**Test-First（奇数=测试，偶数=实现）**：先写测试（红），再写实现（绿）。
+**后端 Test-First（测试在前，实现在后）**：后端任务按「测试 → 实现」配对编排，先写测试（红），再写实现（绿）。
 基础设施任务（数据库迁移、ORM 模型、配置）无测试配对，单独编号。
+
+**前端 Test-Alongside**：前端实现任务内含测试，或在同 phase 末尾补充测试任务。
+前端组件依赖较多，严格 test-first 不实际。
 
 **自包含任务**：每个任务内联文件、逻辑、测试上下文，实现阶段不需要回读 spec.md。
 
@@ -67,19 +70,12 @@
 
 ### 前端
 
-- [ ] **T006**: 前端组件测试
-  **文件**: `apps/web/src/pages/<Resource>Page/__tests__/`
-  **逻辑**: 测试组件渲染和交互
-  **测试**: `renders list correctly` → AC-01, `shows error state` → AC-02
+- [ ] **T006**: 前端页面实现 + 测试
+  **文件**: `apps/web/src/pages/<Resource>Page/index.tsx`, `apps/web/src/pages/<Resource>Page/__tests__/`
+  **逻辑**: <组件结构、数据获取方式、用户交互流程>
+  **测试**: 渲染测试 + 核心交互测试
   **覆盖 AC**: AC-01, AC-02
   **依赖**: T005（API 已实现）
-
-- [ ] **T007**: 前端页面实现
-  **文件**: `apps/web/src/pages/<Resource>Page/index.tsx`
-  **逻辑**: <组件结构、数据获取方式、用户交互流程>
-  **测试**: T006 全部通过
-  **覆盖 AC**: AC-01, AC-02
-  **依赖**: T005
 
 ---
 
