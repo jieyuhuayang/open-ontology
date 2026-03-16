@@ -7,7 +7,6 @@ import { useLinkTypes } from '@/api/link-types';
 import { useObjectTypes } from '@/api/object-types';
 import { useCreateLinkTypeModalStore } from '@/stores/create-link-type-modal-store';
 import LinkTypeTable from './components/LinkTypeTable';
-import CreateLinkTypeWizard from './components/CreateLinkTypeWizard';
 import type { ResourceStatus, Visibility } from '@/api/types';
 
 const { Title } = Typography;
@@ -154,7 +153,6 @@ export default function LinkTypeListPage() {
         </>
       )}
 
-      <CreateLinkTypeWizard />
     </div>
   );
 }
