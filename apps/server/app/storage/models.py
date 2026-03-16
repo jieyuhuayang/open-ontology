@@ -310,6 +310,7 @@ class LinkTypeEndpointModel(Base):
         server_default="normal",
     )
     foreign_key_property_id = Column(String(255), nullable=True)
+    join_table_column = Column(String(255), nullable=True)
 
     link_type = relationship("LinkTypeModel", back_populates="endpoints")
     object_type = relationship("ObjectTypeModel", back_populates="link_type_endpoints")
