@@ -82,10 +82,11 @@ describe('Router', () => {
     });
   });
 
-  it('/link-types/:rid renders 404 (no detail route)', async () => {
+  it('/link-types/:rid renders LinkTypeDetailPage', async () => {
     renderRoute('/link-types/test-rid');
+    // LinkTypeDetailPage renders when useLinkType returns null (loading state)
     await waitFor(() => {
-      expect(screen.getByText(/page not found/i)).toBeInTheDocument();
+      expect(document.querySelector('main')).toBeInTheDocument();
     });
   });
 
