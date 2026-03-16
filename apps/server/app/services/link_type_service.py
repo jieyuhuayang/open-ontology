@@ -314,6 +314,32 @@ class LinkTypeService:
             )
         data, current_state = found
 
+        # API Name lock: active status prevents apiName changes
+        current_status = data.get("status", "experimental")
+        if current_status == "active":
+            for side_key, side_input in [("sideA", req.side_a), ("sideB", req.side_b)]:
+                if side_input and side_input.api_name is not None:
+                    current_api_name = data.get(side_key, {}).get("apiName")
+                    if side_input.api_name != current_api_name:
+                        raise AppError(
+                            code="LINK_TYPE_ACTIVE_CANNOT_MODIFY_API_NAME",
+                            message="Cannot modify apiName of an active link type",
+                            status_code=400,
+                        )
+
+        # Validate new apiNames if provided
+        for side_key, side_input, side_label in [
+            ("sideA", req.side_a, "A"),
+            ("sideB", req.side_b, "B"),
+        ]:
+            if side_input and side_input.api_name is not None:
+                validate_link_side_api_name(side_input.api_name, side_label)
+                ot_rid = data.get(side_key, {}).get("objectTypeRid")
+                if ot_rid:
+                    await self._check_api_name_uniqueness(
+                        ot_rid, side_input.api_name, side_label, exclude_link_type_rid=rid
+                    )
+
         now = datetime.now(timezone.utc)
         update_fields = req.model_dump(mode="json", by_alias=True, exclude_none=True)
         update_fields["lastModifiedAt"] = now.isoformat()
