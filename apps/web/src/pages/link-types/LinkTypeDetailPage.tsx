@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Layout, Dropdown, Button, Spin, Tabs } from 'antd';
+import { Layout, Dropdown, Button, Spin } from 'antd';
 import {
   FileTextOutlined,
   DatabaseOutlined,
