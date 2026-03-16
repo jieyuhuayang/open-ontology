@@ -67,30 +67,13 @@ export function useFileImportConfirm() {
   });
 }
 
-export interface LiveDatasetCreateRequest {
-  connectionRid: string;
-  tableName: string;
-  datasetName: string;
-  selectedColumns: string[];
-}
-
-export interface LiveDataset {
-  rid: string;
-  name: string;
-  mode: string;
-  sourceType: string;
-  connectionRid: string | null;
-  sourceTable: string | null;
-  columnCount: number;
-  rowCount: number | null;
-  status: string;
-  importedAt: string;
-}
+type LiveDatasetCreateRequest = components['schemas']['LiveDatasetCreateRequest'];
+type Dataset = components['schemas']['Dataset'];
 
 export function useRegisterLiveDataset() {
   return useMutation({
     mutationFn: async (req: LiveDatasetCreateRequest) => {
-      const { data } = await apiClient.post<LiveDataset>('/datasets/register/live', req);
+      const { data } = await apiClient.post<Dataset>('/datasets/register/live', req);
       return data;
     },
     meta: { skipGlobalError: true },
