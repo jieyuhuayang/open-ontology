@@ -82,7 +82,11 @@
       "back": "Back",
       "sideA": "Side A",
       "sideB": "Side B",
-      "selectObjectType": "Select an object type"
+      "selectObjectType": "Select an object type",
+      "fkGroup": "Foreign Key",
+      "jtGroup": "Join Table",
+      "selectDataset": "Select join table dataset",
+      "columnMapping": "Select column"
     },
     "fields": {
       "id": "ID",
@@ -90,6 +94,7 @@
       "sideA": "Side A",
       "sideB": "Side B",
       "cardinality": "Cardinality",
+      "joinMethod": "Join Method",
       "status": "Status",
       "visibility": "Visibility",
       "changeState": "Change State",
@@ -104,15 +109,33 @@
     "filters": {
       "objectType": "Object Type"
     },
+    "joinMethod": {
+      "foreignKey": "Foreign Key",
+      "joinTable": "Join Table"
+    },
     "cardinality": {
       "one-to-one": "One to One",
       "one-to-many": "One to Many",
-      "many-to-one": "Many to One"
+      "many-to-one": "Many to One",
+      "many-to-many": "Many to Many"
     },
     "cardinalityDesc": {
       "one-to-one": "Each instance on both sides has exactly one counterpart",
       "one-to-many": "One instance on Side A links to many on Side B",
-      "many-to-one": "Many instances on Side A link to one on Side B"
+      "many-to-one": "Many instances on Side A link to one on Side B",
+      "many-to-many": "Multiple instances on both sides can link to each other"
+    },
+    "detail": {
+      "overviewTab": "Overview",
+      "datasetsTab": "Datasets",
+      "cannotModifyApiNameActive": "Cannot modify API Name of an active link type",
+      "fkProperty": "FK Property",
+      "jtColumn": "Join Table Column",
+      "joinTableConfig": "Join Table Configuration",
+      "datasetRid": "Dataset RID",
+      "columnMapping": "Column Mapping",
+      "side": "Side",
+      "noJoinTable": "This link type does not use a join table"
     },
     "validation": {
       "required": "This field is required",
@@ -120,7 +143,7 @@
       "apiNameFormat": "API Name must start with a lowercase letter and contain only letters and digits (1-100 chars)",
       "idConflict": "A link type with this ID already exists",
       "apiNameConflict": "This API Name already exists for the associated object type",
-      "selfLinkNotAllowed": "Side A and Side B cannot reference the same object type"
+      "joinTableRequired": "Many-to-many cardinality requires a join table dataset"
     }
   },
   "property": {
