@@ -1,4 +1,4 @@
-import { Button, Card, Empty, Flex, List, Table, Tag, Tooltip, Typography } from 'antd';
+import { Button, Card, Empty, Flex, List, Tag, Tooltip, Typography } from 'antd';
 import { PlusOutlined, DatabaseOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -8,9 +8,8 @@ import { useLinkTypes } from '@/api/link-types';
 import { useCreateLinkTypeModalStore } from '@/stores/create-link-type-modal-store';
 import MetadataSection from './components/MetadataSection';
 import PropertyTypeIcon from '@/components/PropertyTypeIcon';
-import StatusBadge from '@/components/StatusBadge';
-import type { LinkType, Property, ResourceStatus } from '@/api/types';
-import type { ColumnsType } from 'antd/es/table';
+import LinkTypeGraph from './components/LinkTypeGraph';
+import type { Property } from '@/api/types';
 
 const { Title, Text } = Typography;
 
