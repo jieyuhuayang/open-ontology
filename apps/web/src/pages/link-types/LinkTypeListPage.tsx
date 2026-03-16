@@ -2,12 +2,11 @@ import { useState, useMemo, useCallback } from 'react';
 import { Button, Empty, Flex, Select, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useLinkTypes } from '@/api/link-types';
 import { useObjectTypes } from '@/api/object-types';
 import { useCreateLinkTypeModalStore } from '@/stores/create-link-type-modal-store';
 import LinkTypeTable from './components/LinkTypeTable';
-import LinkTypeDetailDrawer from './components/LinkTypeDetailDrawer';
 import CreateLinkTypeWizard from './components/CreateLinkTypeWizard';
 import type { ResourceStatus, Visibility } from '@/api/types';
 
@@ -15,15 +14,14 @@ const { Title } = Typography;
 
 export default function LinkTypeListPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const openCreateModal = useCreateLinkTypeModalStore((s) => s.open);
-  const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [statusFilter, setStatusFilter] = useState<ResourceStatus[]>([]);
   const [visibilityFilter, setVisibilityFilter] = useState<Visibility[]>([]);
   const [objectTypeFilter, setObjectTypeFilter] = useState<string | undefined>(undefined);
 
-  const selectedRid = searchParams.get('selected');
   const { data, isLoading } = useLinkTypes(page, pageSize);
   const { data: objectTypesData } = useObjectTypes(1, 100);
 
@@ -64,14 +62,10 @@ export default function LinkTypeListPage() {
 
   const handleRowClick = useCallback(
     (rid: string) => {
-      setSearchParams({ selected: rid });
+      navigate(`/link-types/${rid}`);
     },
-    [setSearchParams],
+    [navigate],
   );
-
-  const handleDrawerClose = useCallback(() => {
-    setSearchParams({});
-  }, [setSearchParams]);
 
   const isGlobalEmpty = !isLoading && data?.total === 0;
   const isFilterEmpty = !isLoading && !isGlobalEmpty && filteredItems.length === 0;
@@ -160,7 +154,6 @@ export default function LinkTypeListPage() {
         </>
       )}
 
-      <LinkTypeDetailDrawer rid={selectedRid} onClose={handleDrawerClose} />
       <CreateLinkTypeWizard />
     </div>
   );
