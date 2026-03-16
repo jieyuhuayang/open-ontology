@@ -98,7 +98,7 @@
 
 ### T05: 后端集成测试更新
 
-- [ ] **T05**
+- [x] **T05**
 - 文件:
   - `apps/server/tests/integration/test_link_type_api.py` — 扩展测试用例
 - 内容:
