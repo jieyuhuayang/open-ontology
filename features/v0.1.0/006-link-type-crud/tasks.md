@@ -172,7 +172,7 @@
 
 ### T08: LinkTypeListPage 更新 — 导航到详情页
 
-- [ ] **T08**
+- [x] **T08**
 - 文件:
   - `apps/web/src/pages/link-types/LinkTypeListPage.tsx` — 重构
   - `apps/web/src/pages/link-types/components/LinkTypeTable.tsx` — 更新列
