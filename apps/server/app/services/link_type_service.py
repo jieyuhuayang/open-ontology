@@ -148,22 +148,33 @@ class LinkTypeService:
             status_code=400,
         )
 
+    def _derive_join_method(self, cardinality: str) -> JoinMethod:
+        """Derive join_method from cardinality."""
+        if cardinality == "many-to-many":
+            return JoinMethod.JOIN_TABLE
+        return JoinMethod.FOREIGN_KEY
+
     async def create(self, req: LinkTypeCreateRequest) -> LinkTypeWithChangeState:
         validate_link_type_id(req.id)
         validate_link_side_api_name(req.side_a.api_name, "A")
         validate_link_side_api_name(req.side_b.api_name, "B")
 
-        # Self-link check
-        if req.side_a.object_type_rid == req.side_b.object_type_rid:
+        # Derive join_method from cardinality
+        join_method = self._derive_join_method(req.cardinality.value)
+        validate_cardinality_join_method_match(req.cardinality.value, join_method.value)
+
+        # JT validation: many-to-many must have join_table_dataset_rid
+        if join_method == JoinMethod.JOIN_TABLE and not req.join_table_dataset_rid:
             raise AppError(
-                code="LINK_TYPE_SELF_LINK_NOT_ALLOWED",
-                message="Side A and Side B cannot reference the same object type",
+                code="LINK_TYPE_JOIN_TABLE_REQUIRED",
+                message="Many-to-many cardinality requires a join table dataset",
                 status_code=400,
             )
 
-        # Verify both ObjectTypes exist
+        # Verify both ObjectTypes exist (self-link is allowed)
         await self._validate_object_type_exists(req.side_a.object_type_rid, "A")
-        await self._validate_object_type_exists(req.side_b.object_type_rid, "B")
+        if req.side_b.object_type_rid != req.side_a.object_type_rid:
+            await self._validate_object_type_exists(req.side_b.object_type_rid, "B")
 
         # Uniqueness checks
         await self._check_id_uniqueness(DEFAULT_ONTOLOGY_RID, req.id)
@@ -172,6 +183,7 @@ class LinkTypeService:
 
         now = datetime.now(timezone.utc)
         rid = generate_rid("ontology", "link-type")
+        project_rid = req.project_rid or DEFAULT_PROJECT_RID
 
         lt = LinkTypeWithChangeState(
             rid=rid,
@@ -181,17 +193,22 @@ class LinkTypeService:
                 display_name=req.side_a.display_name,
                 api_name=req.side_a.api_name,
                 visibility=req.side_a.visibility,
+                foreign_key_property_id=req.side_a.foreign_key_property_id,
+                join_table_column=req.side_a.join_table_column,
             ),
             side_b=LinkSide(
                 object_type_rid=req.side_b.object_type_rid,
                 display_name=req.side_b.display_name,
                 api_name=req.side_b.api_name,
                 visibility=req.side_b.visibility,
+                foreign_key_property_id=req.side_b.foreign_key_property_id,
+                join_table_column=req.side_b.join_table_column,
             ),
             cardinality=req.cardinality,
-            join_method=JoinMethod.FOREIGN_KEY,
+            join_method=join_method,
+            join_table_dataset_rid=req.join_table_dataset_rid,
             status=req.status,
-            project_rid=DEFAULT_PROJECT_RID,
+            project_rid=project_rid,
             ontology_rid=DEFAULT_ONTOLOGY_RID,
             created_at=now,
             created_by=DEFAULT_USER_ID,
