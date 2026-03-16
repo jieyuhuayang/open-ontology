@@ -190,7 +190,7 @@
 
 ### T09: CreateLinkTypeWizard 重构 — 4 步向导 + FK/JT 分支
 
-- [ ] **T09**
+- [x] **T09**
 - 文件:
   - `apps/web/src/pages/link-types/components/CreateLinkTypeWizard.tsx` — 重写
   - `apps/web/src/pages/link-types/components/ForeignKeyStep.tsx` — 新建（Step 2 FK 模式）
