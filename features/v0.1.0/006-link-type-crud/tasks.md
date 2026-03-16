@@ -231,7 +231,7 @@
 
 ### T10: OT Overview 链接类型关系图
 
-- [ ] **T10**
+- [x] **T10**
 - 文件:
   - `apps/web/src/pages/object-types/components/LinkTypeGraph.tsx` — 新建
   - `apps/web/src/pages/object-types/ObjectTypeOverviewPage.tsx` — 集成图组件
