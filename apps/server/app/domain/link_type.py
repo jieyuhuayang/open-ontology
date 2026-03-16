@@ -58,6 +58,8 @@ class LinkSideCreateInput(DomainModel):
     display_name: str
     api_name: str
     visibility: Visibility = Visibility.NORMAL
+    foreign_key_property_id: str | None = None
+    join_table_column: str | None = None
 
 
 class LinkTypeCreateRequest(DomainModel):
@@ -65,19 +67,24 @@ class LinkTypeCreateRequest(DomainModel):
     side_a: LinkSideCreateInput
     side_b: LinkSideCreateInput
     cardinality: Cardinality
+    join_table_dataset_rid: str | None = None
+    project_rid: str | None = None
     status: ResourceStatus = ResourceStatus.EXPERIMENTAL
 
 
 class LinkSideUpdateInput(DomainModel):
     display_name: str | None = None
+    api_name: str | None = None
     visibility: Visibility | None = None
+    foreign_key_property_id: str | None = None
+    join_table_column: str | None = None
 
 
 class LinkTypeUpdateRequest(DomainModel):
     side_a: LinkSideUpdateInput | None = None
     side_b: LinkSideUpdateInput | None = None
-    cardinality: Cardinality | None = None
     status: ResourceStatus | None = None
+    join_table_dataset_rid: str | None = None
 
 
 class LinkTypeListResponse(DomainModel):
