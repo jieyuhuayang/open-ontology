@@ -15,6 +15,7 @@ export type LinkTypeCreateRequest = components['schemas']['LinkTypeCreateRequest
 export type LinkTypeUpdateRequest = components['schemas']['LinkTypeUpdateRequest'];
 export type LinkTypeListResponse = components['schemas']['LinkTypeListResponse'];
 export type Cardinality = components['schemas']['Cardinality'];
+export type JoinMethod = components['schemas']['JoinMethod'];
 
 export type Property = components['schemas']['PropertyWithChangeState'];
 export type PropertyCreateRequest = components['schemas']['PropertyCreateRequest'];
