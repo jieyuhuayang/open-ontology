@@ -267,7 +267,8 @@
       "icon": "Icon",
       "status": "Status",
       "visibility": "Visibility",
-      "changeState": "Change State"
+      "changeState": "Change State",
+      "pluralDisplayName": "Plural Name"
     },
     "status": {
       "active": "Active",
