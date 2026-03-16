@@ -38,6 +38,14 @@ export default function MetadataSection({ data }: MetadataSectionProps) {
                 style={{ fontSize: 18, fontWeight: 600 }}
               />
             </div>
+            <div style={{ minWidth: 160 }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>{t('objectType.fields.pluralDisplayName')}</Text>
+              <InlineEditText
+                value={data.pluralDisplayName ?? ''}
+                onSave={(pluralDisplayName) => save({ pluralDisplayName })}
+                placeholder={t('objectType.fields.pluralDisplayName')}
+              />
+            </div>
           </Flex>
           <InlineEditText
             value={data.description ?? ''}
