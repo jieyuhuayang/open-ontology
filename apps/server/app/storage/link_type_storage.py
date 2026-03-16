@@ -32,6 +32,8 @@ class LinkTypeStorage:
                 display_name=ep.display_name,
                 api_name=ep.api_name,
                 visibility=Visibility(vis_val),
+                foreign_key_property_id=ep.foreign_key_property_id,
+                join_table_column=ep.join_table_column,
             )
             if side_val == "A":
                 side_a = link_side
@@ -52,6 +54,7 @@ class LinkTypeStorage:
             side_b=side_b,
             cardinality=Cardinality(card_val),
             join_method=JoinMethod(jm_val),
+            join_table_dataset_rid=orm.join_table_dataset_rid,
             status=ResourceStatus(st_val),
             project_rid=orm.project_rid,
             ontology_rid=orm.ontology_rid,
@@ -125,6 +128,7 @@ class LinkTypeStorage:
             id=model.id,
             cardinality=model.cardinality.value,
             join_method=model.join_method.value,
+            join_table_dataset_rid=model.join_table_dataset_rid,
             status=model.status.value,
             project_rid=model.project_rid,
             ontology_rid=model.ontology_rid,
@@ -144,6 +148,8 @@ class LinkTypeStorage:
                 display_name=side_data.display_name,
                 api_name=side_data.api_name,
                 visibility=side_data.visibility.value,
+                foreign_key_property_id=side_data.foreign_key_property_id,
+                join_table_column=side_data.join_table_column,
             )
             session.add(ep)
         await session.flush()
@@ -159,9 +165,8 @@ class LinkTypeStorage:
 
         # Update main table fields
         main_fields = {
-            "cardinality",
-            "join_method",
             "status",
+            "join_table_dataset_rid",
             "last_modified_at",
             "last_modified_by",
         }

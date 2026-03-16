@@ -420,8 +420,8 @@ class WorkingStateService:
             after = change.after or {}
             update_data: dict = {}
             key_map = {
-                "cardinality": "cardinality",
                 "status": "status",
+                "joinTableDatasetRid": "join_table_dataset_rid",
                 "lastModifiedAt": "last_modified_at",
                 "lastModifiedBy": "last_modified_by",
             }
@@ -435,7 +435,10 @@ class WorkingStateService:
                     ep_update = {}
                     side_key_map = {
                         "displayName": "display_name",
+                        "apiName": "api_name",
                         "visibility": "visibility",
+                        "foreignKeyPropertyId": "foreign_key_property_id",
+                        "joinTableColumn": "join_table_column",
                     }
                     for ck, sk in side_key_map.items():
                         if ck in side_data:

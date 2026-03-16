@@ -345,19 +345,20 @@ class MySQLImportService:
             from app.services.dataset_service import DatasetService
 
             ds_service = DatasetService(self._session)
-            # Check in_use status for each live dataset
+            # Check in_use status for each live dataset (single query)
+            full_list = await ds_service.list()
+            in_use_map = {item.rid: item for item in full_list.items if item.in_use}
             for ds in live_datasets:
-                full_list = await ds_service.list()
-                for item in full_list.items:
-                    if item.rid == ds.rid and item.in_use:
-                        raise AppError(
-                            code="CONNECTION_HAS_IN_USE_LIVE_DATASETS",
-                            message=(
-                                f"Cannot delete connection: Live Dataset '{item.name}' "
-                                f"is in use by ObjectType '{item.linked_object_type_name}'"
-                            ),
-                            status_code=409,
-                        )
+                item = in_use_map.get(ds.rid)
+                if item:
+                    raise AppError(
+                        code="CONNECTION_HAS_IN_USE_LIVE_DATASETS",
+                        message=(
+                            f"Cannot delete connection: Live Dataset '{item.name}' "
+                            f"is in use by ObjectType '{item.linked_object_type_name}'"
+                        ),
+                        status_code=409,
+                    )
 
             # Mark all Live Datasets as disconnected
             await DatasetStorage.mark_disconnected(self._session, rid)

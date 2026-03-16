@@ -11,6 +11,7 @@ import ObjectTypeDetailLayout from '@/pages/object-types/ObjectTypeDetailLayout'
 import ObjectTypeOverviewPage from '@/pages/object-types/ObjectTypeOverviewPage';
 import ObjectTypePropertiesPage from '@/pages/object-types/ObjectTypePropertiesPage';
 import LinkTypeListPage from '@/pages/link-types/LinkTypeListPage';
+import LinkTypeDetailPage from '@/pages/link-types/LinkTypeDetailPage';
 import DataConnectionPage from '@/pages/data-connection/DataConnectionPage';
 export const routeConfig: RouteObject[] = [
   {
@@ -43,6 +44,7 @@ export const routeConfig: RouteObject[] = [
           { path: 'datasources', element: <PlaceholderPage title="Object Type Datasources" /> },
         ],
       },
+      { path: 'link-types/:rid', element: <LinkTypeDetailPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

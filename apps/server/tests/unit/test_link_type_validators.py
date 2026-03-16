@@ -2,8 +2,27 @@
 
 import pytest
 
-from app.domain.validators import validate_link_side_api_name, validate_link_type_id
+from app.domain.link_type import Cardinality, JoinMethod
+from app.domain.validators import (
+    validate_cardinality_join_method_match,
+    validate_link_side_api_name,
+    validate_link_type_id,
+)
 from app.exceptions import AppError
+
+
+class TestLinkTypeEnums:
+    """Verify enum values include new members."""
+
+    def test_cardinality_many_to_many(self):
+        assert Cardinality.MANY_TO_MANY.value == "many-to-many"
+
+    def test_join_method_join_table(self):
+        assert JoinMethod.JOIN_TABLE.value == "join-table"
+
+    def test_all_cardinalities(self):
+        values = {c.value for c in Cardinality}
+        assert values == {"one-to-one", "one-to-many", "many-to-one", "many-to-many"}
 
 
 class TestValidateLinkTypeId:
@@ -89,3 +108,31 @@ class TestValidateLinkSideApiName:
         with pytest.raises(AppError) as exc_info:
             validate_link_side_api_name("\uff41bc", "A")
         assert exc_info.value.code == "LINK_TYPE_API_NAME_NOT_NFKC"
+
+
+class TestValidateCardinalityJoinMethodMatch:
+    """Cardinality and join_method compatibility validation."""
+
+    @pytest.mark.parametrize(
+        "cardinality",
+        ["one-to-one", "one-to-many", "many-to-one"],
+    )
+    def test_fk_cardinalities_with_fk_method_pass(self, cardinality: str):
+        validate_cardinality_join_method_match(cardinality, "foreign-key")
+
+    def test_many_to_many_with_join_table_pass(self):
+        validate_cardinality_join_method_match("many-to-many", "join-table")
+
+    @pytest.mark.parametrize(
+        "cardinality",
+        ["one-to-one", "one-to-many", "many-to-one"],
+    )
+    def test_fk_cardinalities_with_join_table_reject(self, cardinality: str):
+        with pytest.raises(AppError) as exc_info:
+            validate_cardinality_join_method_match(cardinality, "join-table")
+        assert exc_info.value.code == "LINK_TYPE_CARDINALITY_JOIN_METHOD_MISMATCH"
+
+    def test_many_to_many_with_fk_reject(self):
+        with pytest.raises(AppError) as exc_info:
+            validate_cardinality_join_method_match("many-to-many", "foreign-key")
+        assert exc_info.value.code == "LINK_TYPE_CARDINALITY_JOIN_METHOD_MISMATCH"

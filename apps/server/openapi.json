@@ -1653,7 +1653,8 @@
         "enum": [
           "one-to-one",
           "one-to-many",
-          "many-to-one"
+          "many-to-one",
+          "many-to-many"
         ],
         "title": "Cardinality"
       },
@@ -2339,7 +2340,8 @@
       "JoinMethod": {
         "type": "string",
         "enum": [
-          "foreign-key"
+          "foreign-key",
+          "join-table"
         ],
         "title": "JoinMethod"
       },
@@ -2371,6 +2373,28 @@
               }
             ],
             "title": "Objecttypedisplayname"
+          },
+          "foreignKeyPropertyId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Foreignkeypropertyid"
+          },
+          "joinTableColumn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jointablecolumn"
           }
         },
         "type": "object",
@@ -2398,6 +2422,28 @@
           "visibility": {
             "$ref": "#/components/schemas/Visibility",
             "default": "normal"
+          },
+          "foreignKeyPropertyId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Foreignkeypropertyid"
+          },
+          "joinTableColumn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jointablecolumn"
           }
         },
         "type": "object",
@@ -2421,6 +2467,17 @@
             ],
             "title": "Displayname"
           },
+          "apiName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apiname"
+          },
           "visibility": {
             "anyOf": [
               {
@@ -2430,6 +2487,28 @@
                 "type": "null"
               }
             ]
+          },
+          "foreignKeyPropertyId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Foreignkeypropertyid"
+          },
+          "joinTableColumn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jointablecolumn"
           }
         },
         "type": "object",
@@ -2449,6 +2528,28 @@
           },
           "cardinality": {
             "$ref": "#/components/schemas/Cardinality"
+          },
+          "joinTableDatasetRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jointabledatasetrid"
+          },
+          "projectRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Projectrid"
           },
           "status": {
             "$ref": "#/components/schemas/ResourceStatus",
@@ -2517,16 +2618,6 @@
               }
             ]
           },
-          "cardinality": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Cardinality"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
           "status": {
             "anyOf": [
               {
@@ -2536,6 +2627,17 @@
                 "type": "null"
               }
             ]
+          },
+          "joinTableDatasetRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jointabledatasetrid"
           }
         },
         "type": "object",
@@ -2563,6 +2665,17 @@
           "joinMethod": {
             "$ref": "#/components/schemas/JoinMethod",
             "default": "foreign-key"
+          },
+          "joinTableDatasetRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jointabledatasetrid"
           },
           "status": {
             "$ref": "#/components/schemas/ResourceStatus",
