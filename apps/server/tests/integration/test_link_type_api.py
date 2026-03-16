@@ -359,6 +359,151 @@ class TestLinkTypeCRUD:
         resp = await seeded_client.get("/api/v1/link-types/ri.ontology.link-type.nonexistent")
         assert resp.status_code == 404
 
+    async def test_create_many_to_many_with_join_table(
+        self, seeded_client: AsyncClient, db_session: AsyncSession
+    ):
+        ot_a, ot_b = await _create_object_types(seeded_client)
+
+        # Create a dataset to use as join table
+        ds_rid = "ri.ontology.dataset.jt-test"
+        await DatasetStorage.create(
+            db_session,
+            dataset_rid=ds_rid,
+            name="JT Dataset",
+            source_type="csv",
+            source_metadata={},
+            ontology_rid=ONTOLOGY_RID,
+            created_by="default",
+            columns=[
+                {"name": "employee_id", "inferred_type": "integer"},
+                {"name": "company_id", "inferred_type": "integer"},
+            ],
+            rows=[],
+        )
+
+        resp = await seeded_client.post(
+            "/api/v1/link-types",
+            json={
+                "id": "many-to-many-link",
+                "sideA": {
+                    "objectTypeRid": ot_a,
+                    "displayName": "Companies",
+                    "apiName": "companies",
+                    "joinTableColumn": "employee_id",
+                },
+                "sideB": {
+                    "objectTypeRid": ot_b,
+                    "displayName": "Employees",
+                    "apiName": "employees",
+                    "joinTableColumn": "company_id",
+                },
+                "cardinality": "many-to-many",
+                "joinTableDatasetRid": ds_rid,
+            },
+        )
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data["cardinality"] == "many-to-many"
+        assert data["joinMethod"] == "join-table"
+        assert data["joinTableDatasetRid"] == ds_rid
+        assert data["sideA"]["joinTableColumn"] == "employee_id"
+        assert data["sideB"]["joinTableColumn"] == "company_id"
+
+    async def test_create_many_to_many_without_dataset_returns_400(
+        self, seeded_client: AsyncClient
+    ):
+        ot_a, ot_b = await _create_object_types(seeded_client)
+
+        resp = await seeded_client.post(
+            "/api/v1/link-types",
+            json={
+                "id": "m2m-no-ds",
+                "sideA": {
+                    "objectTypeRid": ot_a,
+                    "displayName": "A",
+                    "apiName": "nodsA",
+                },
+                "sideB": {
+                    "objectTypeRid": ot_b,
+                    "displayName": "B",
+                    "apiName": "nodsB",
+                },
+                "cardinality": "many-to-many",
+            },
+        )
+        assert resp.status_code == 400
+        assert resp.json()["error"]["code"] == "LINK_TYPE_JOIN_TABLE_REQUIRED"
+
+    async def test_create_fk_with_property_mapping(self, seeded_client: AsyncClient):
+        ot_a, ot_b = await _create_object_types(seeded_client)
+
+        resp = await seeded_client.post(
+            "/api/v1/link-types",
+            json={
+                "id": "fk-mapped",
+                "sideA": {
+                    "objectTypeRid": ot_a,
+                    "displayName": "Company",
+                    "apiName": "fkCompany",
+                    "foreignKeyPropertyId": "company-fk-prop",
+                },
+                "sideB": {
+                    "objectTypeRid": ot_b,
+                    "displayName": "Employee",
+                    "apiName": "fkEmployee",
+                },
+                "cardinality": "many-to-one",
+            },
+        )
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data["sideA"]["foreignKeyPropertyId"] == "company-fk-prop"
+
+    async def test_update_api_name_experimental_succeeds(self, seeded_client: AsyncClient):
+        ot_a, ot_b = await _create_object_types(seeded_client)
+
+        create_resp = await seeded_client.post(
+            "/api/v1/link-types",
+            json={
+                "id": "apiname-exp",
+                "sideA": {"objectTypeRid": ot_a, "displayName": "A", "apiName": "expNameA"},
+                "sideB": {"objectTypeRid": ot_b, "displayName": "B", "apiName": "expNameB"},
+                "cardinality": "one-to-many",
+            },
+        )
+        rid = create_resp.json()["rid"]
+
+        resp = await seeded_client.put(
+            f"/api/v1/link-types/{rid}",
+            json={"sideA": {"apiName": "renamedA"}},
+        )
+        assert resp.status_code == 200
+        assert resp.json()["sideA"]["apiName"] == "renamedA"
+
+    async def test_update_api_name_active_returns_400(self, seeded_client: AsyncClient):
+        ot_a, ot_b = await _create_object_types(seeded_client)
+
+        create_resp = await seeded_client.post(
+            "/api/v1/link-types",
+            json={
+                "id": "apiname-active",
+                "sideA": {"objectTypeRid": ot_a, "displayName": "A", "apiName": "activeNameA"},
+                "sideB": {"objectTypeRid": ot_b, "displayName": "B", "apiName": "activeNameB"},
+                "cardinality": "one-to-many",
+            },
+        )
+        rid = create_resp.json()["rid"]
+
+        # Set to active
+        await seeded_client.put(f"/api/v1/link-types/{rid}", json={"status": "active"})
+
+        resp = await seeded_client.put(
+            f"/api/v1/link-types/{rid}",
+            json={"sideA": {"apiName": "changedName"}},
+        )
+        assert resp.status_code == 400
+        assert resp.json()["error"]["code"] == "LINK_TYPE_ACTIVE_CANNOT_MODIFY_API_NAME"
+
     async def test_publish_writes_to_main_table(self, seeded_client: AsyncClient, db_session):
         from sqlalchemy import select
 
@@ -389,3 +534,71 @@ class TestLinkTypeCRUD:
         result = await db_session.execute(select(LinkTypeEndpointModel))
         eps = result.scalars().all()
         assert len(eps) == 2
+
+    async def test_publish_join_table_link_type(
+        self, seeded_client: AsyncClient, db_session: AsyncSession
+    ):
+        from sqlalchemy import select
+
+        from app.storage.models import LinkTypeEndpointModel, LinkTypeModel
+
+        ot_a, ot_b = await _create_complete_object_types(seeded_client, db_session)
+
+        # Create JT dataset
+        ds_rid = "ri.ontology.dataset.jt-pub"
+        await DatasetStorage.create(
+            db_session,
+            dataset_rid=ds_rid,
+            name="JT Pub Dataset",
+            source_type="csv",
+            source_metadata={},
+            ontology_rid=ONTOLOGY_RID,
+            created_by="default",
+            columns=[
+                {"name": "emp_id", "inferred_type": "integer"},
+                {"name": "comp_id", "inferred_type": "integer"},
+            ],
+            rows=[],
+        )
+
+        await seeded_client.post(
+            "/api/v1/link-types",
+            json={
+                "id": "jt-publish",
+                "sideA": {
+                    "objectTypeRid": ot_a,
+                    "displayName": "Cos",
+                    "apiName": "jtCos",
+                    "joinTableColumn": "emp_id",
+                },
+                "sideB": {
+                    "objectTypeRid": ot_b,
+                    "displayName": "Emps",
+                    "apiName": "jtEmps",
+                    "joinTableColumn": "comp_id",
+                },
+                "cardinality": "many-to-many",
+                "joinTableDatasetRid": ds_rid,
+            },
+        )
+
+        pub_resp = await seeded_client.post(f"/api/v1/ontologies/{ONTOLOGY_RID}/save")
+        assert pub_resp.status_code == 200
+
+        # Verify main table has JT fields
+        result = await db_session.execute(select(LinkTypeModel))
+        lt = result.scalars().first()
+        assert lt.join_table_dataset_rid == ds_rid
+        assert lt.join_method.value == "join-table"
+
+        # Verify endpoints have join_table_column
+        result = await db_session.execute(
+            select(LinkTypeEndpointModel).order_by(LinkTypeEndpointModel.side)
+        )
+        eps = result.scalars().all()
+        cols = {
+            ep.side.value if hasattr(ep.side, "value") else ep.side: ep.join_table_column
+            for ep in eps
+        }
+        assert cols["A"] == "emp_id"
+        assert cols["B"] == "comp_id"
