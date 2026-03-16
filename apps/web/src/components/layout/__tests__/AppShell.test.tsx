@@ -1,7 +1,15 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import AppShell from '@/components/layout/AppShell';
+
+vi.mock('@/pages/object-types/components/CreateObjectTypeWizard', () => ({
+  default: () => null,
+}));
+
+vi.mock('@/pages/link-types/components/CreateLinkTypeWizard', () => ({
+  default: () => null,
+}));
 
 describe('AppShell', () => {
   it('renders TopBar and outlet content', () => {
