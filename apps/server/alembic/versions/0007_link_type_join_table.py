@@ -35,7 +35,7 @@ def upgrade() -> None:
 
     # 3. Change link_types.id unique constraint from global to composite (ontology_rid, id)
     # Drop the existing unique constraint on id alone
-    op.drop_constraint("uq_link_types_id", "link_types", type_="unique")
+    op.drop_constraint("link_types_id_key", "link_types", type_="unique")
     # Create composite unique constraint
     op.create_unique_constraint("uq_link_types_ontology_id", "link_types", ["ontology_rid", "id"])
 
