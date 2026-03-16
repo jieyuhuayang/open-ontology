@@ -117,13 +117,11 @@ export default function ObjectTypeOverviewPage() {
               {t('linkType.newLinkType')}
             </Button>
           </Flex>
-          {linkTypesData && linkTypesData.items.length > 0 ? (
-            <Table<LinkType>
-              columns={linkTypeColumns}
-              dataSource={linkTypesData.items}
-              rowKey="rid"
-              size="small"
-              pagination={false}
+          {linkTypes.length > 0 ? (
+            <LinkTypeGraph
+              objectTypeRid={rid ?? ''}
+              objectTypeDisplayName={data.displayName}
+              linkTypes={linkTypes}
             />
           ) : (
             <Empty
