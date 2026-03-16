@@ -296,14 +296,13 @@ class TestLinkTypeCRUD:
             f"/api/v1/link-types/{rid}",
             json={
                 "sideA": {"displayName": "After A"},
-                "cardinality": "one-to-one",
                 "status": "deprecated",
             },
         )
         assert resp.status_code == 200
         data = resp.json()
         assert data["sideA"]["displayName"] == "After A"
-        assert data["cardinality"] == "one-to-one"
+        assert data["cardinality"] == "one-to-many"  # cardinality is immutable
         assert data["status"] == "deprecated"
 
     async def test_delete_active_returns_400(self, seeded_client: AsyncClient):
