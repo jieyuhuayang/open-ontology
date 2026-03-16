@@ -12,7 +12,6 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useNavigate } from 'react-router-dom';
-import { Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import type { LinkType } from '@/api/types';
 
