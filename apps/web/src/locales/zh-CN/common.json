@@ -82,7 +82,11 @@
       "back": "上一步",
       "sideA": "A 端",
       "sideB": "B 端",
-      "selectObjectType": "选择对象类型"
+      "selectObjectType": "选择对象类型",
+      "fkGroup": "外键",
+      "jtGroup": "连接表",
+      "selectDataset": "选择连接表数据集",
+      "columnMapping": "选择列"
     },
     "fields": {
       "id": "ID",
@@ -90,6 +94,7 @@
       "sideA": "A 端",
       "sideB": "B 端",
       "cardinality": "基数",
+      "joinMethod": "连接方式",
       "status": "状态",
       "visibility": "可见性",
       "changeState": "变更状态",
@@ -104,15 +109,33 @@
     "filters": {
       "objectType": "对象类型"
     },
+    "joinMethod": {
+      "foreignKey": "外键",
+      "joinTable": "连接表"
+    },
     "cardinality": {
       "one-to-one": "一对一",
       "one-to-many": "一对多",
-      "many-to-one": "多对一"
+      "many-to-one": "多对一",
+      "many-to-many": "多对多"
     },
     "cardinalityDesc": {
       "one-to-one": "两端的每个实例都恰好有一个对应实例",
       "one-to-many": "A 端的一个实例链接到 B 端的多个实例",
-      "many-to-one": "A 端的多个实例链接到 B 端的一个实例"
+      "many-to-one": "A 端的多个实例链接到 B 端的一个实例",
+      "many-to-many": "两端的多个实例可以相互链接"
+    },
+    "detail": {
+      "overviewTab": "概览",
+      "datasetsTab": "数据集",
+      "cannotModifyApiNameActive": "无法修改活跃状态链接类型的 API Name",
+      "fkProperty": "外键属性",
+      "jtColumn": "连接表列",
+      "joinTableConfig": "连接表配置",
+      "datasetRid": "数据集 RID",
+      "columnMapping": "列映射",
+      "side": "端",
+      "noJoinTable": "此链接类型不使用连接表"
     },
     "validation": {
       "required": "此字段为必填项",
@@ -120,7 +143,7 @@
       "apiNameFormat": "API Name 必须以小写字母开头，只能包含字母和数字（1-100 个字符）",
       "idConflict": "已存在相同 ID 的链接类型",
       "apiNameConflict": "此 API Name 在关联的对象类型下已存在",
-      "selfLinkNotAllowed": "A 端和 B 端不能引用同一个对象类型"
+      "joinTableRequired": "多对多基数需要连接表数据集"
     }
   },
   "property": {
