@@ -34,7 +34,7 @@
 
 ### T02: Domain 模型 + 校验器更新 + 单元测试
 
-- [ ] **T02**
+- [x] **T02**
 - 文件:
   - `apps/server/app/domain/link_type.py` — 扩展枚举 + 模型字段
   - `apps/server/app/domain/validators.py` — 新增校验器
