@@ -2,12 +2,27 @@
 
 import pytest
 
+from app.domain.link_type import Cardinality, JoinMethod
 from app.domain.validators import (
     validate_cardinality_join_method_match,
     validate_link_side_api_name,
     validate_link_type_id,
 )
 from app.exceptions import AppError
+
+
+class TestLinkTypeEnums:
+    """Verify enum values include new members."""
+
+    def test_cardinality_many_to_many(self):
+        assert Cardinality.MANY_TO_MANY.value == "many-to-many"
+
+    def test_join_method_join_table(self):
+        assert JoinMethod.JOIN_TABLE.value == "join-table"
+
+    def test_all_cardinalities(self):
+        values = {c.value for c in Cardinality}
+        assert values == {"one-to-one", "one-to-many", "many-to-one", "many-to-many"}
 
 
 class TestValidateLinkTypeId:
