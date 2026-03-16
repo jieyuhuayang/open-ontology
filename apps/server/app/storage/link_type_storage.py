@@ -165,9 +165,8 @@ class LinkTypeStorage:
 
         # Update main table fields
         main_fields = {
-            "cardinality",
-            "join_method",
             "status",
+            "join_table_dataset_rid",
             "last_modified_at",
             "last_modified_by",
         }
