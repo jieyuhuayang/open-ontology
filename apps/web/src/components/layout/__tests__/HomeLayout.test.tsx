@@ -8,6 +8,10 @@ vi.mock('@/pages/object-types/components/CreateObjectTypeWizard', () => ({
   default: () => null,
 }));
 
+vi.mock('@/pages/link-types/components/CreateLinkTypeWizard', () => ({
+  default: () => null,
+}));
+
 vi.mock('@/api/object-types', () => ({
   useObjectTypes: () => ({ data: { items: [], total: 0 }, isLoading: false }),
 }));
