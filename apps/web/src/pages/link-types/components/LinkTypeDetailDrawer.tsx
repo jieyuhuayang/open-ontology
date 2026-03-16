@@ -36,8 +36,8 @@ export default function LinkTypeDetailDrawer({ rid, onClose }: LinkTypeDetailDra
     updateMutation.mutate(update);
   };
 
-  const handleCardinalityChange = (val: Cardinality) => {
-    handleUpdate({ cardinality: val });
+  const handleCardinalityChange = (_val: Cardinality) => {
+    // Cardinality is immutable after creation
   };
 
   const handleStatusChange = (val: ResourceStatus) => {
