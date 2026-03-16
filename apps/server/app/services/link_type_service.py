@@ -16,7 +16,11 @@ from app.domain.link_type import (
     LinkTypeUpdateRequest,
     LinkTypeWithChangeState,
 )
-from app.domain.validators import validate_link_side_api_name, validate_link_type_id
+from app.domain.validators import (
+    validate_cardinality_join_method_match,
+    validate_link_side_api_name,
+    validate_link_type_id,
+)
 from app.domain.working_state import (
     Change,
     ChangeState,
