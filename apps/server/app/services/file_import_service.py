@@ -24,7 +24,8 @@ logger = logging.getLogger(__name__)
 _ALLOWED_EXTENSIONS = {".csv", ".xlsx", ".xls"}
 _PREVIEW_TTL_SECONDS = 30 * 60  # 30 minutes
 
-# Module-level preview cache: {token: (data_dict, created_at)}
+# TODO(post-MVP): Module-level preview cache is process-local and won't be shared
+# across multiple workers. Migrate to Redis or DB-backed cache for multi-worker deployments.
 _previews: dict[str, tuple[dict, datetime]] = {}
 
 

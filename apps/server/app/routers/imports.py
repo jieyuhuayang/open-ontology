@@ -13,7 +13,7 @@ from app.domain.import_task import (
 )
 from app.exceptions import AppError
 from app.services.file_import_service import FileImportService
-from app.services.import_task_service import shared_import_task_service as _import_task_service
+from app.services.import_task_service import ImportTaskService, shared_import_task_service
 from app.services.mysql_import_service import MySQLImportService
 
 router = APIRouter(prefix="/api/v1", tags=["imports"])
@@ -32,6 +32,10 @@ def _get_file_service(
     session: AsyncSession = Depends(get_db_session),
 ) -> FileImportService:
     return FileImportService(session)
+
+
+def _get_import_task_service() -> ImportTaskService:
+    return shared_import_task_service
 
 
 # --- Endpoints ---
@@ -87,8 +91,11 @@ async def upload_confirm(
 
 
 @router.get("/import-tasks/{task_id}", response_model=ImportTask)
-async def get_import_task(task_id: str):
-    task = _import_task_service.get_task(task_id)
+async def get_import_task(
+    task_id: str,
+    service: ImportTaskService = Depends(_get_import_task_service),
+):
+    task = service.get_task(task_id)
     if task is None:
         raise AppError(
             code="IMPORT_TASK_NOT_FOUND",

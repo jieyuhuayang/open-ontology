@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.common import generate_rid
-from app.domain.constants import DEFAULT_USER_ID
+from app.domain.constants import DEFAULT_ONTOLOGY_RID, DEFAULT_USER_ID
 from app.domain.link_type import LinkType
 from app.domain.object_type import ObjectType
 from app.domain.property import Property
@@ -136,6 +136,17 @@ class WorkingStateService:
         now = datetime.now(timezone.utc)
         await WorkingStateStorage.update_changes(self._session, ws.rid, collapsed, now)
 
+    async def add_changes(self, ontology_rid: str, changes: list[Change]) -> None:
+        """Batch add multiple changes with a single load→collapse→write cycle."""
+        if not changes:
+            return
+        ws = await self.get_or_create(ontology_rid)
+        collapsed = list(ws.changes)
+        for change in changes:
+            collapsed = self._collapse_change(collapsed, change)
+        now = datetime.now(timezone.utc)
+        await WorkingStateStorage.update_changes(self._session, ws.rid, collapsed, now)
+
     async def get_merged_view(
         self,
         ontology_rid: str,
@@ -190,6 +201,19 @@ class WorkingStateService:
 
         return result
 
+    async def find_in_merged_view(
+        self,
+        ontology_rid: str,
+        resource_type: ResourceType,
+        rid: str,
+    ) -> tuple[dict, ChangeState] | None:
+        """Find a single resource by RID in the merged view."""
+        merged = await self.get_merged_view(ontology_rid, resource_type)
+        for data, state in merged:
+            if data.get("rid") == rid:
+                return (data, state)
+        return None
+
     async def _has_mapped_properties(self, ot_rid: str, changes: list[Change]) -> bool:
         """Check if OT has at least one property with backingColumn set."""
         # Check WS CREATE properties for this OT
@@ -199,7 +223,7 @@ class WorkingStateService:
                 if after.get("objectTypeRid") == ot_rid and after.get("backingColumn"):
                     return True
         # Check published properties
-        published_props = await self._get_published_properties("ri.ontology.ontology.default")
+        published_props = await self._get_published_properties(DEFAULT_ONTOLOGY_RID)
         for p in published_props:
             data = p.model_dump(mode="json", by_alias=True)
             if data.get("objectTypeRid") == ot_rid and data.get("backingColumn"):

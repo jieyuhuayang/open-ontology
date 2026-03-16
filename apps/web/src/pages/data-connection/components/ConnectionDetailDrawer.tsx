@@ -51,18 +51,18 @@ export default function ConnectionDetailDrawer() {
     { title: t('mysqlConnection.fields.name'), dataIndex: 'name', key: 'name' },
     { title: t('dataConnection.type'), dataIndex: 'dataType', key: 'dataType' },
     {
-      title: 'PK',
+      title: t('dataConnection.pk'),
       dataIndex: 'isPrimaryKey',
       key: 'isPrimaryKey',
       width: 60,
-      render: (v: boolean) => (v ? <Tag color="gold">PK</Tag> : null),
+      render: (v: boolean) => (v ? <Tag color="gold">{t('dataConnection.pk')}</Tag> : null),
     },
     {
-      title: 'Nullable',
+      title: t('dataConnection.nullable'),
       dataIndex: 'isNullable',
       key: 'isNullable',
       width: 80,
-      render: (v: boolean) => (v ? 'NULL' : 'NOT NULL'),
+      render: (v: boolean) => (v ? t('dataConnection.nullValue') : t('dataConnection.notNull')),
     },
   ];
 

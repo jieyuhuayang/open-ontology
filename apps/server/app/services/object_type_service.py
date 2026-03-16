@@ -78,13 +78,9 @@ class ObjectTypeService:
     # --- Existing methods ---
 
     async def _find_in_merged_view(self, rid: str) -> tuple[dict, ChangeState] | None:
-        merged = await self._ws_service.get_merged_view(
-            DEFAULT_ONTOLOGY_RID, ResourceType.OBJECT_TYPE
+        return await self._ws_service.find_in_merged_view(
+            DEFAULT_ONTOLOGY_RID, ResourceType.OBJECT_TYPE, rid
         )
-        for data, state in merged:
-            if data.get("rid") == rid:
-                return (data, state)
-        return None
 
     async def _check_uniqueness(
         self,

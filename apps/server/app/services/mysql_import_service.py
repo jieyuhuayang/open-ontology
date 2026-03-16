@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.common import generate_rid
 from app.domain.constants import DEFAULT_ONTOLOGY_RID, DEFAULT_USER_ID
+from app.domain.serialization import serialize_value
 from app.domain.dataset import Dataset, LiveDatasetCreateRequest
 from app.domain.import_task import ImportTask, ImportTaskStatus
 from app.domain.mysql_connection import (
@@ -475,7 +476,7 @@ class MySQLImportService:
                 # Convert to serializable dicts
                 rows_data = []
                 for row in all_rows:
-                    rows_data.append({k: _serialize_value(v) for k, v in row.items()})
+                    rows_data.append({k: serialize_value(v) for k, v in row.items()})
 
             finally:
                 conn.close()
@@ -522,19 +523,3 @@ class MySQLImportService:
                 error_message=str(e),
                 duration_ms=duration,
             )
-
-
-def _serialize_value(v: object) -> object:
-    """Convert MySQL values to JSON-serializable types."""
-    from datetime import date, datetime
-    from decimal import Decimal
-
-    if isinstance(v, datetime):
-        return v.isoformat()
-    if isinstance(v, date):
-        return v.isoformat()
-    if isinstance(v, Decimal):
-        return float(v)
-    if isinstance(v, bytes):
-        return v.hex()
-    return v

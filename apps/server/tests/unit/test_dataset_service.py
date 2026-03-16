@@ -210,12 +210,12 @@ class TestDatasetServiceLivePreview:
         with (
             patch.object(svc, "get_by_rid", return_value=ds),
             patch(
-                "app.storage.mysql_connection_storage.MySQLConnectionStorage.get_by_rid",
+                "app.services.dataset_service.MySQLConnectionStorage.get_by_rid",
                 new_callable=AsyncMock,
                 return_value=mock_conn_orm,
             ),
             patch(
-                "app.services.crypto_service.get_crypto_service",
+                "app.services.dataset_service.get_crypto_service",
                 return_value=AsyncMock(decrypt=lambda x: "secret"),
             ),
             patch(
@@ -249,7 +249,7 @@ class TestDatasetServiceLivePreview:
         mock_cursor.fetchall = AsyncMock(
             return_value=[{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]
         )
-        mock_cursor.fetchone = AsyncMock(return_value={"COUNT(*)": 42})
+        mock_cursor.fetchone = AsyncMock(return_value={"TABLE_ROWS": 42})
         mock_cursor.__aenter__ = AsyncMock(return_value=mock_cursor)
         mock_cursor.__aexit__ = AsyncMock(return_value=False)
 
@@ -262,12 +262,12 @@ class TestDatasetServiceLivePreview:
         with (
             patch.object(svc, "get_by_rid", return_value=ds),
             patch(
-                "app.storage.mysql_connection_storage.MySQLConnectionStorage.get_by_rid",
+                "app.services.dataset_service.MySQLConnectionStorage.get_by_rid",
                 new_callable=AsyncMock,
                 return_value=mock_conn_orm,
             ),
             patch(
-                "app.services.crypto_service.get_crypto_service",
+                "app.services.dataset_service.get_crypto_service",
                 return_value=MagicMock(decrypt=lambda x: "secret"),
             ),
             patch("asyncio.wait_for", new_callable=AsyncMock, return_value=mock_mysql_conn),

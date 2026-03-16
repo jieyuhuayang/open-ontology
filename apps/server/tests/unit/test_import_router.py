@@ -38,6 +38,10 @@ async def client(mock_mysql_import_service, mock_file_import_service, mock_impor
 
     app.dependency_overrides[get_db_session] = _mock_session
 
+    from app.routers.imports import _get_import_task_service
+
+    app.dependency_overrides[_get_import_task_service] = lambda: mock_import_task_service
+
     with (
         patch(
             "app.routers.imports.MySQLImportService",
@@ -46,10 +50,6 @@ async def client(mock_mysql_import_service, mock_file_import_service, mock_impor
         patch(
             "app.routers.imports.FileImportService",
             return_value=mock_file_import_service,
-        ),
-        patch(
-            "app.routers.imports._import_task_service",
-            mock_import_task_service,
         ),
     ):
         transport = ASGITransport(app=app)

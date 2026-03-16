@@ -43,7 +43,13 @@
     "noData": "暂无数据",
     "loading": "加载中...",
     "selectAll": "全选",
-    "deselectAll": "取消全选"
+    "deselectAll": "取消全选",
+    "time": {
+      "lessThanMinute": "不到 1 分钟",
+      "minutesAgo": "{{count}} 分钟前",
+      "hoursAgo": "{{count}} 小时前",
+      "daysAgo": "{{count}} 天前"
+    }
   },
   "error": {
     "pageNotFound": "页面未找到",
@@ -346,6 +352,10 @@
     "untested": "未测试",
     "type": "类型",
     "datasetCount": "数据集数",
+    "pk": "主键",
+    "nullable": "可空",
+    "nullValue": "允许 NULL",
+    "notNull": "NOT NULL",
     "schemaDrawerTitle": "Schema 浏览器",
     "searchTables": "搜索表...",
     "tableStructure": "表结构",

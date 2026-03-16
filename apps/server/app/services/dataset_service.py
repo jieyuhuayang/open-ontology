@@ -3,6 +3,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.constants import DEFAULT_ONTOLOGY_RID, DEFAULT_USER_ID
+from app.domain.serialization import serialize_value
 from app.domain.dataset import (
     Dataset,
     DatasetListItem,
@@ -11,7 +12,9 @@ from app.domain.dataset import (
 )
 from app.domain.working_state import ChangeType, ResourceType
 from app.exceptions import AppError
+from app.services.crypto_service import get_crypto_service
 from app.storage.dataset_storage import DatasetStorage
+from app.storage.mysql_connection_storage import MySQLConnectionStorage
 from app.storage.object_type_storage import ObjectTypeStorage
 from app.storage.working_state_storage import WorkingStateStorage
 
@@ -134,9 +137,6 @@ class DatasetService:
 
         import aiomysql
 
-        from app.services.crypto_service import get_crypto_service
-        from app.storage.mysql_connection_storage import MySQLConnectionStorage
-
         if ds.status == "disconnected":
             raise AppError(
                 code="LIVE_DATASET_DISCONNECTED",
@@ -202,10 +202,7 @@ class DatasetService:
                 stat_row = await cur.fetchone()
                 total = stat_row["TABLE_ROWS"] if stat_row else len(rows)
 
-            # Serialize values
-            from app.services.mysql_import_service import _serialize_value
-
-            serialized_rows = [{k: _serialize_value(v) for k, v in row.items()} for row in rows]
+            serialized_rows = [{k: serialize_value(v) for k, v in row.items()} for row in rows]
 
             return DatasetPreviewResponse(
                 rid=ds.rid,
