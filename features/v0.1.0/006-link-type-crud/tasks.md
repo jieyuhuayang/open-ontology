@@ -147,7 +147,7 @@
 
 ### T07: LinkTypeDetailPage — 独立详情页（Overview + Datasets Tab）
 
-- [ ] **T07**
+- [x] **T07**
 - 文件:
   - `apps/web/src/pages/link-types/LinkTypeDetailPage.tsx` — 新建
   - `apps/web/src/pages/link-types/components/LinkTypeOverviewTab.tsx` — 新建
