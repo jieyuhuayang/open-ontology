@@ -110,7 +110,9 @@ export function useMySQLImportedTables(rid: string) {
   return useQuery({
     queryKey: mysqlConnectionKeys.importedTables(rid),
     queryFn: async () => {
-      const { data } = await apiClient.get<string[]>(`/mysql-connections/${rid}/imported-tables`);
+      const { data } = await apiClient.get<{ table: string; mode: string }[]>(
+        `/mysql-connections/${rid}/imported-tables`,
+      );
       return data;
     },
     enabled: !!rid,
