@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import apiClient from '@/api/client';
 import type { ImportTask, MySQLImportRequest, FileConfirmRequest } from '@/api/types';
+import type { components } from '@/generated/api';
 
 export interface UploadPreviewColumn {
   name: string;
