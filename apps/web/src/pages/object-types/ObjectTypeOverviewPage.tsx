@@ -38,72 +38,75 @@ export default function ObjectTypeOverviewPage() {
     <div>
       <MetadataSection data={data} />
       <Flex vertical gap={16}>
-        {/* Properties Card */}
-        <Card>
-          <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
-            <Title level={5} style={{ margin: 0 }}>
-              {t('objectType.placeholders.properties')}{' '}
-              <Text type="secondary">({properties.length})</Text>
-            </Title>
-            <Button
-              size="small"
-              icon={<PlusOutlined />}
-              onClick={() => navigate(`/object-types/${rid}/properties`)}
-            >
-              {t('property.addProperty')}
-            </Button>
-          </Flex>
-          {properties.length > 0 ? (
-            <List<Property>
-              dataSource={properties}
-              size="small"
-              renderItem={(p) => (
-                <List.Item key={p.rid}>
-                  <Flex align="center" gap={8}>
-                    <PropertyTypeIcon baseType={p.baseType} />
-                    <Text>{p.displayName}</Text>
-                    {p.isPrimaryKey && <Tag color="orange">{t('objectType.properties.primaryKey')}</Tag>}
-                    {p.isTitleKey && <Tag color="blue">{t('objectType.properties.titleKey')}</Tag>}
-                  </Flex>
-                </List.Item>
-              )}
-            />
-          ) : (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={t('objectType.placeholders.propertiesEmpty')}
-            />
-          )}
-        </Card>
-
-        {/* Action Types Card */}
-        <Card>
-          <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
-            <Title level={5} style={{ margin: 0 }}>
-              {t('objectType.placeholders.actionTypes')}{' '}
-              <Text type="secondary">({intendedActions.length})</Text>
-            </Title>
-          </Flex>
-          {intendedActions.length > 0 ? (
-            <Flex gap={8} wrap="wrap">
-              {intendedActions.map((action) => {
-                const config = ACTION_LABELS[action];
-                return (
-                  <Tag key={action} color={config?.color ?? 'default'}>
-                    {config ? t(config.labelKey, { name: data.displayName }) : action}
-                  </Tag>
-                );
-              })}
+        {/* Row 1: Properties + Action Types side by side */}
+        <Flex gap={16}>
+          {/* Properties Card */}
+          <Card style={{ flex: 1 }}>
+            <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
+              <Title level={5} style={{ margin: 0 }}>
+                {t('objectType.placeholders.properties')}{' '}
+                <Text type="secondary">({properties.length})</Text>
+              </Title>
+              <Button
+                size="small"
+                icon={<PlusOutlined />}
+                onClick={() => navigate(`/object-types/${rid}/properties`)}
+              >
+                {t('property.addProperty')}
+              </Button>
             </Flex>
-          ) : (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={t('objectType.placeholders.actionTypesEmpty')}
-            />
-          )}
-        </Card>
+            {properties.length > 0 ? (
+              <List<Property>
+                dataSource={properties}
+                size="small"
+                renderItem={(p) => (
+                  <List.Item key={p.rid}>
+                    <Flex align="center" gap={8}>
+                      <PropertyTypeIcon baseType={p.baseType} />
+                      <Text>{p.displayName}</Text>
+                      {p.isPrimaryKey && <Tag color="orange">{t('objectType.properties.primaryKey')}</Tag>}
+                      {p.isTitleKey && <Tag color="blue">{t('objectType.properties.titleKey')}</Tag>}
+                    </Flex>
+                  </List.Item>
+                )}
+              />
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={t('objectType.placeholders.propertiesEmpty')}
+              />
+            )}
+          </Card>
 
-        {/* Link Types Card */}
+          {/* Action Types Card */}
+          <Card style={{ flex: 1 }}>
+            <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
+              <Title level={5} style={{ margin: 0 }}>
+                {t('objectType.placeholders.actionTypes')}{' '}
+                <Text type="secondary">({intendedActions.length})</Text>
+              </Title>
+            </Flex>
+            {intendedActions.length > 0 ? (
+              <Flex gap={8} wrap="wrap">
+                {intendedActions.map((action) => {
+                  const config = ACTION_LABELS[action];
+                  return (
+                    <Tag key={action} color={config?.color ?? 'default'}>
+                      {config ? t(config.labelKey, { name: data.displayName }) : action}
+                    </Tag>
+                  );
+                })}
+              </Flex>
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={t('objectType.placeholders.actionTypesEmpty')}
+              />
+            )}
+          </Card>
+        </Flex>
+
+        {/* Row 2: Link Types (full width) */}
         <Card>
           <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
             <Title level={5} style={{ margin: 0 }}>
