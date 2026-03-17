@@ -617,5 +617,20 @@
       "previewHint": "仅预览前 {{count}} 行，共 {{total}} 行"
     },
     "columnsSelected": "已选 {{selected}}/{{total}} 列"
+  },
+  "search": {
+    "results": "搜索结果 ({{count}})",
+    "noResults": "未找到与 '{{query}}' 匹配的结果",
+    "showAll": "查看全部",
+    "allResults": "所有结果",
+    "matchedFields": "匹配: {{fields}}",
+    "fieldName": "名称",
+    "fieldDescription": "描述",
+    "fieldApiName": "API 名称",
+    "fieldId": "ID",
+    "objectTypes": "对象类型",
+    "properties": "属性",
+    "linkTypes": "链接类型",
+    "clear": "清除"
   }
 }
