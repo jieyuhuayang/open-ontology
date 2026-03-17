@@ -602,3 +602,227 @@ class TestLinkTypeCRUD:
         }
         assert cols["A"] == "emp_id"
         assert cols["B"] == "comp_id"
+
+
+class TestBackingObject:
+    """Tests for Backing Object (BO) link type support."""
+
+    async def _setup_bo_scenario(self, client: AsyncClient):
+        """Create 3 OTs (A, B, Backing) and 2 many-to-one links to backing OT."""
+        # Create 3 object types
+        ot_a_resp = await client.post(
+            "/api/v1/object-types",
+            json={
+                "id": "aircraft",
+                "apiName": "Aircraft",
+                "displayName": "Aircraft",
+                "icon": {"name": "plane", "color": "#1890ff"},
+            },
+        )
+        ot_b_resp = await client.post(
+            "/api/v1/object-types",
+            json={
+                "id": "flight",
+                "apiName": "Flight",
+                "displayName": "Flight",
+                "icon": {"name": "rocket", "color": "#1890ff"},
+            },
+        )
+        bo_resp = await client.post(
+            "/api/v1/object-types",
+            json={
+                "id": "flight-manifest",
+                "apiName": "FlightManifest",
+                "displayName": "Flight Manifest",
+                "icon": {"name": "file", "color": "#1890ff"},
+            },
+        )
+        ot_a = ot_a_resp.json()["rid"]
+        ot_b = ot_b_resp.json()["rid"]
+        bo = bo_resp.json()["rid"]
+
+        # Create many-to-one link: Aircraft → Flight Manifest
+        link_a_resp = await client.post(
+            "/api/v1/link-types",
+            json={
+                "id": "aircraft-manifest",
+                "sideA": {
+                    "objectTypeRid": ot_a,
+                    "displayName": "Flight Manifest",
+                    "apiName": "manifests",
+                },
+                "sideB": {
+                    "objectTypeRid": bo,
+                    "displayName": "Aircraft",
+                    "apiName": "aircraft",
+                },
+                "cardinality": "many-to-one",
+            },
+        )
+        # Create many-to-one link: Flight → Flight Manifest
+        link_b_resp = await client.post(
+            "/api/v1/link-types",
+            json={
+                "id": "flight-manifest",
+                "sideA": {
+                    "objectTypeRid": ot_b,
+                    "displayName": "Flight Manifest",
+                    "apiName": "flightManifests",
+                },
+                "sideB": {
+                    "objectTypeRid": bo,
+                    "displayName": "Flight",
+                    "apiName": "flights",
+                },
+                "cardinality": "many-to-one",
+            },
+        )
+
+        link_a_rid = link_a_resp.json()["rid"]
+        link_b_rid = link_b_resp.json()["rid"]
+        return ot_a, ot_b, bo, link_a_rid, link_b_rid
+
+    async def test_create_bo_link_success(self, seeded_client: AsyncClient):
+        ot_a, ot_b, bo, link_a_rid, link_b_rid = await self._setup_bo_scenario(seeded_client)
+
+        resp = await seeded_client.post(
+            "/api/v1/link-types",
+            json={
+                "id": "aircraft-flight-bo",
+                "sideA": {
+                    "objectTypeRid": ot_a,
+                    "displayName": "Flights",
+                    "apiName": "boFlights",
+                },
+                "sideB": {
+                    "objectTypeRid": ot_b,
+                    "displayName": "Aircraft",
+                    "apiName": "boAircraft",
+                },
+                "cardinality": "many-to-many",
+                "backingObjectTypeRid": bo,
+                "sideALinkTypeRid": link_a_rid,
+                "sideBLinkTypeRid": link_b_rid,
+            },
+        )
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data["joinMethod"] == "backing-object"
+        assert data["cardinality"] == "many-to-many"
+        assert data["backingObjectTypeRid"] == bo
+        assert data["sideALinkTypeRid"] == link_a_rid
+        assert data["sideBLinkTypeRid"] == link_b_rid
+        assert data["backingObjectTypeDisplayName"] == "Flight Manifest"
+        assert data["sideALinkTypeId"] == "aircraft-manifest"
+        assert data["sideBLinkTypeId"] == "flight-manifest"
+
+    async def test_create_bo_missing_side_link_returns_400(self, seeded_client: AsyncClient):
+        ot_a, ot_b, bo, link_a_rid, _link_b_rid = await self._setup_bo_scenario(seeded_client)
+
+        resp = await seeded_client.post(
+            "/api/v1/link-types",
+            json={
+                "id": "bo-missing-side",
+                "sideA": {
+                    "objectTypeRid": ot_a,
+                    "displayName": "Flights",
+                    "apiName": "missingSideA",
+                },
+                "sideB": {
+                    "objectTypeRid": ot_b,
+                    "displayName": "Aircraft",
+                    "apiName": "missingSideB",
+                },
+                "cardinality": "many-to-many",
+                "backingObjectTypeRid": bo,
+                "sideALinkTypeRid": link_a_rid,
+                # Missing sideBLinkTypeRid
+            },
+        )
+        assert resp.status_code == 400
+        assert resp.json()["error"]["code"] == "LINK_TYPE_BACKING_OT_REQUIRED"
+
+    async def test_create_bo_invalid_side_link_returns_400(self, seeded_client: AsyncClient):
+        ot_a, ot_b, bo, link_a_rid, _link_b_rid = await self._setup_bo_scenario(seeded_client)
+
+        resp = await seeded_client.post(
+            "/api/v1/link-types",
+            json={
+                "id": "bo-invalid-side",
+                "sideA": {
+                    "objectTypeRid": ot_a,
+                    "displayName": "Flights",
+                    "apiName": "invalidSideA",
+                },
+                "sideB": {
+                    "objectTypeRid": ot_b,
+                    "displayName": "Aircraft",
+                    "apiName": "invalidSideB",
+                },
+                "cardinality": "many-to-many",
+                "backingObjectTypeRid": bo,
+                "sideALinkTypeRid": link_a_rid,
+                "sideBLinkTypeRid": "ri.ontology.link-type.nonexistent",
+            },
+        )
+        assert resp.status_code == 400
+        assert resp.json()["error"]["code"] == "LINK_TYPE_SIDE_LINK_NOT_FOUND"
+
+    async def test_get_bo_detail_includes_display_fields(self, seeded_client: AsyncClient):
+        ot_a, ot_b, bo, link_a_rid, link_b_rid = await self._setup_bo_scenario(seeded_client)
+
+        create_resp = await seeded_client.post(
+            "/api/v1/link-types",
+            json={
+                "id": "bo-detail-test",
+                "sideA": {
+                    "objectTypeRid": ot_a,
+                    "displayName": "Flights",
+                    "apiName": "detailBoFlights",
+                },
+                "sideB": {
+                    "objectTypeRid": ot_b,
+                    "displayName": "Aircraft",
+                    "apiName": "detailBoAircraft",
+                },
+                "cardinality": "many-to-many",
+                "backingObjectTypeRid": bo,
+                "sideALinkTypeRid": link_a_rid,
+                "sideBLinkTypeRid": link_b_rid,
+            },
+        )
+        rid = create_resp.json()["rid"]
+
+        resp = await seeded_client.get(f"/api/v1/link-types/{rid}")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["backingObjectTypeDisplayName"] == "Flight Manifest"
+        assert data["sideALinkTypeId"] == "aircraft-manifest"
+        assert data["sideBLinkTypeId"] == "flight-manifest"
+
+    async def test_eligible_side_links_endpoint(self, seeded_client: AsyncClient):
+        ot_a, ot_b, bo, _link_a_rid, _link_b_rid = await self._setup_bo_scenario(seeded_client)
+
+        # Query eligible links from aircraft → flight manifest
+        resp = await seeded_client.get(
+            "/api/v1/link-types/eligible-side-links",
+            params={
+                "sideObjectTypeRid": ot_a,
+                "backingObjectTypeRid": bo,
+            },
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert len(data) == 1
+        assert data[0]["id"] == "aircraft-manifest"
+
+        # Query for a pair with no links
+        resp2 = await seeded_client.get(
+            "/api/v1/link-types/eligible-side-links",
+            params={
+                "sideObjectTypeRid": ot_a,
+                "backingObjectTypeRid": ot_b,
+            },
+        )
+        assert resp2.status_code == 200
+        assert len(resp2.json()) == 0
