@@ -8,12 +8,15 @@ import {
   DatabaseOutlined,
   LeftOutlined,
   RightOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSidebarStore } from '@/stores/sidebar-store';
+import { useSearchStore, type SearchActiveType } from '@/stores/search-store';
 import { useObjectTypes } from '@/api/object-types';
 import { useLinkTypes } from '@/api/link-types';
+import { useSearch } from '@/api/search';
 import type { MenuProps } from 'antd';
 
 const { Sider } = Layout;
