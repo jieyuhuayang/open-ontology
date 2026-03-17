@@ -35,6 +35,7 @@ const STEPS = ['connection', 'tables', 'config', 'result'] as const;
 export default function MySQLImportWizard() {
   const { t } = useTranslation();
   const { message } = App.useApp();
+  const queryClient = useQueryClient();
   const openModal = useDataConnectionStore((s) => s.openModal);
   const setOpenModal = useDataConnectionStore((s) => s.setOpenModal);
 
