@@ -473,6 +473,7 @@
     "columns": {
       "name": "名称",
       "source": "来源",
+      "type": "类型",
       "rows": "行数",
       "columns": "列数",
       "importedAt": "导入时间"
