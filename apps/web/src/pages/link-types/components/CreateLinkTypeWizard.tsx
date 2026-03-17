@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Modal, Steps, Flex, Select, Form, Input, Radio, Typography, message, Divider, Alert } from 'antd';
+// Card removed — replaced by RelationshipCard
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useCreateLinkTypeModalStore } from '@/stores/create-link-type-modal-store';
