@@ -85,6 +85,7 @@
       "selectObjectType": "Select an object type",
       "fkGroup": "Foreign Key",
       "jtGroup": "Join Table",
+      "boGroup": "Backing Object",
       "selectDataset": "Select join table dataset",
       "columnMapping": "Select column"
     },
