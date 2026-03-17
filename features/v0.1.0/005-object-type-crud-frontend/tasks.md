@@ -40,9 +40,11 @@
   - 新建 `src/pages/object-types/components/ObjectTypeTable.tsx`
   - 重写 `src/pages/object-types/ObjectTypeListPage.tsx`（表格 + 筛选 + 空状态 + 分页）
 
-- [x] **T7: CreateObjectTypeModal**
-  - 新建 `src/pages/object-types/components/CreateObjectTypeModal.tsx`
-  - 包含 IconSelector、表单校验、服务器错误码映射
+- [x] **T7: CreateObjectTypeWizard（5 步 Wizard Modal）**
+  - 新建 `src/pages/object-types/components/CreateObjectTypeWizard.tsx`（原计划 `CreateObjectTypeModal.tsx` 单步 Modal）
+  - 实际实现为 5 步 Wizard：WizardStepDatasource → WizardStepMetadata → WizardStepProperties → WizardStepActions → WizardStepSaveLocation
+  - 在 AppShell 层全局渲染（`AppShell.tsx` 中引用）
+  - 包含 IconSelector、属性管理、动作选择、项目选择
 
 - [x] **T8: DeleteObjectTypeModal + DetailLayout 改造**
   - 新建 `src/pages/object-types/components/DeleteObjectTypeModal.tsx`
