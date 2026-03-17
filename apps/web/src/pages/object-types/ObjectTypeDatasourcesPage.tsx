@@ -57,7 +57,7 @@ export default function ObjectTypeDatasourcesPage() {
       key: 'name',
     },
     {
-      title: t('dataset.columns.source'),
+      title: t('dataset.columns.type'),
       dataIndex: 'inferredType',
       key: 'inferredType',
     },
