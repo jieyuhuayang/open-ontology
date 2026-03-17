@@ -27,8 +27,10 @@ export default function HomeSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { collapsed, toggleCollapsed } = useSidebarStore();
+  const { isSearchMode, query, activeType, setActiveType } = useSearchStore();
   const { data: objectTypesData } = useObjectTypes(1, 1);
   const { data: linkTypesData } = useLinkTypes(1, 1, {});
+  const { data: searchData } = useSearch(query);
 
   const selectedKey = getSelectedKey(location.pathname);
 
