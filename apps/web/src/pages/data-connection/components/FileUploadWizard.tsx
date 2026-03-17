@@ -4,6 +4,8 @@ import { InboxOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useFileUploadPreview, useFileImportConfirm, useImportTask } from '@/api/imports';
 import type { UploadPreviewResponse } from '@/api/imports';
+import { useQueryClient } from '@tanstack/react-query';
+import { datasetKeys } from '@/api/datasets';
 import { useDataConnectionStore } from '@/stores/data-connection-store';
 
 const { Dragger } = Upload;
