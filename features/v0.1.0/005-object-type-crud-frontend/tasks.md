@@ -60,9 +60,9 @@
 
 - [x] **T10: 路由与布局更新**
   - 修改 `src/router.tsx`：删除 `/object-types/new`，替换 overview placeholder
-  - 修改 `src/components/layout/CreateMenu.tsx`：navigate → Zustand store.open()
+  - 修改 `src/components/layout/CreateMenu.tsx`：navigate → `useCreateWizardStore.open()`
   - 修改 `src/components/layout/DetailSidebarLayout.tsx`：增加 `extra` + `onNavClick` props
-  - 修改 `src/components/layout/HomeLayout.tsx`：增加 CreateObjectTypeModal
+  - 修改 `src/components/layout/AppShell.tsx`：增加 `CreateObjectTypeWizard` 全局渲染（而非 HomeLayout）
 
 - [x] **T11: i18n 翻译**
   - 修改 `src/locales/en-US/common.json`：增加 objectType.* 命名空间
