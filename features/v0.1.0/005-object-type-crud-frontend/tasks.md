@@ -16,8 +16,8 @@
   - 修改 `src/queryClient.ts`：MutationCache.onError 增加 `meta.skipGlobalError` 支持
 
 - [x] **T3: 校验工具 + Zustand Store**
-  - 新建 `src/utils/validation.ts`：validateObjectTypeId, validateApiName
-  - 新建 `src/stores/create-object-type-modal-store.ts`：isOpen + open() / close()
+  - 新建 `src/utils/validation.ts`：validateObjectTypeId, validateApiName ✅ 已实现
+  - 新建 `src/stores/create-wizard-store.ts`（原计划 `create-object-type-modal-store.ts`）：5 步 Wizard 状态管理（isOpen, currentStep, formData, open/close/reset/nextStep/prevStep 等）
 
 ---
 
