@@ -401,7 +401,7 @@ cd apps/web && pnpm dev
 1. 首页 `/` 显示 Discover 页面（空状态）
 2. 侧边栏导航可点击，路由正确跳转
 3. 侧边栏折叠/展开正常，刷新后状态保持
-4. TopBar "New" 下拉菜单导航到创建占位页
+4. TopBar "New" 下拉菜单打开对应的创建 Wizard 模态框
 5. 语言切换中英文正常
 6. 访问不存在路由显示 404
 7. `/object-types/test-rid` 自动重定向到 `/object-types/test-rid/overview`
