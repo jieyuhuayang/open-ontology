@@ -75,7 +75,7 @@
     "emptyTitle": "Create your first link type",
     "emptyDescription": "Link types define semantic relationships between object types.",
     "wizard": {
-      "step1": "Cardinality",
+      "step1": "Relationship",
       "step2": "Object Types",
       "step3": "Details",
       "next": "Next",
@@ -87,7 +87,16 @@
       "jtGroup": "Join Table",
       "boGroup": "Backing Object",
       "selectDataset": "Select join table dataset",
-      "columnMapping": "Select column"
+      "columnMapping": "Select column",
+      "selectRelationType": "Select the relationship type between objects",
+      "nnSubQuestion": "Does this relationship need to carry additional information?",
+      "nnSimple": "Simple Relationship",
+      "nnSimpleDesc": "Only records \"who links to whom\" — no extra attributes on the relationship",
+      "nnSimpleExample": "e.g. Tags ↔ Articles",
+      "nnRich": "Rich Relationship",
+      "nnRichDesc": "The relationship itself can have properties, carried by an intermediate object type",
+      "nnRichExample": "e.g. Enrollment (with grade, semester)",
+      "nnRichNote": "Requires creating an intermediate object type first"
     },
     "fields": {
       "id": "ID",
