@@ -341,9 +341,7 @@
 **验收**:
 - `/` 渲染 DiscoverPage
 - `/object-types` 渲染 ObjectTypeListPage
-- `/object-types/new` 渲染 CreateObjectType 占位页
 - `/link-types` 渲染 LinkTypeListPage
-- `/link-types/new` 渲染 CreateLinkType 占位页
 - `/properties` 渲染 Properties 占位页（含 Coming Soon）
 - `/action-types` 渲染 ActionTypes 占位页（含 Coming Soon）
 - `/object-types/:rid` 重定向到 `/object-types/:rid/overview`
