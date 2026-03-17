@@ -473,6 +473,7 @@
     "columns": {
       "name": "Name",
       "source": "Source",
+      "type": "Type",
       "rows": "Rows",
       "columns": "Columns",
       "importedAt": "Imported At"
