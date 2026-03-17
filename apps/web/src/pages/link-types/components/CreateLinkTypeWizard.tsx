@@ -101,14 +101,14 @@ export default function CreateLinkTypeWizard() {
 
   // Auto-select when only one link is available
   useEffect(() => {
-    if (sideALinks?.length === 1) {
-      setSideALinkRid(sideALinks[0].rid);
+    if (sideALinks && sideALinks.length === 1) {
+      setSideALinkRid(sideALinks[0]?.rid);
     }
   }, [sideALinks]);
 
   useEffect(() => {
-    if (sideBLinks?.length === 1) {
-      setSideBLinkRid(sideBLinks[0].rid);
+    if (sideBLinks && sideBLinks.length === 1) {
+      setSideBLinkRid(sideBLinks[0]?.rid);
     }
   }, [sideBLinks]);
 
