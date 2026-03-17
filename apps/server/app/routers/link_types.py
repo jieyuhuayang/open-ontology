@@ -68,6 +68,15 @@ async def update_link_type(
     return await service.update(rid, req)
 
 
+@router.get("/link-types/eligible-side-links")
+async def get_eligible_side_links(
+    side_object_type_rid: str = Query(alias="sideObjectTypeRid"),
+    backing_object_type_rid: str = Query(alias="backingObjectTypeRid"),
+    service: LinkTypeService = Depends(_get_service),
+):
+    return await service.get_eligible_side_links(side_object_type_rid, backing_object_type_rid)
+
+
 @router.delete("/link-types/{rid}", status_code=204)
 async def delete_link_type(
     rid: str,
