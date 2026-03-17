@@ -31,7 +31,7 @@
 
 - **AC4**: 顶栏左侧显示应用 Logo + "Ontology Management" 标题
 - **AC5**: 顶栏中部包含全局搜索框占位（仅 UI 壳，显示 placeholder "Search by name, RID, aliases..." 及 ⌘K 快捷键提示；搜索逻辑由 F008 实现）
-- **AC6**: 顶栏右侧包含 "New" 创建按钮（下拉菜单：创建对象类型、创建链接类型），点击菜单项后导航到对应的创建流程页面（创建逻辑由 F005/F006 实现，此处仅提供导航入口）
+- **AC6**: 顶栏右侧包含 "New" 创建按钮（下拉菜单：创建对象类型、创建链接类型），点击菜单项后打开对应的 Zustand store 模态向导（`useCreateWizardStore.open()` / `useCreateLinkTypeModalStore.open()`），创建逻辑由 F005/F006 实现，此处仅提供触发入口
 - **AC7**: 顶栏右侧预留变更状态区域（用于显示 "N edits" + "Discard" + "Save" 按钮，实际逻辑与 UI 由 F009 变更管理特性填充）
 - **AC8**: 顶栏右侧包含语言切换入口
 
