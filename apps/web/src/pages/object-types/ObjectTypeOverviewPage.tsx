@@ -28,6 +28,7 @@ export default function ObjectTypeOverviewPage() {
   const { data: propertiesData } = useProperties(rid ?? '');
   const { data: linkTypesData } = useLinkTypes(1, 100, { objectTypeRid: rid });
   const openCreateLinkType = useCreateLinkTypeModalStore((s) => s.open);
+  const { data: datasetData } = useDataset(data?.backingDatasource?.rid ?? '');
 
   if (!data) return null;
 
