@@ -630,6 +630,14 @@
     "objectTypes": "Object Types",
     "properties": "Properties",
     "linkTypes": "Link Types",
-    "clear": "Clear"
+    "clear": "Clear",
+    "exitSearch": "Exit search",
+    "columnName": "NAME",
+    "columnStatus": "STATUS",
+    "columnVisibility": "VISIBILITY",
+    "columnObjectType": "OBJECT TYPE",
+    "columnBaseType": "BASE TYPE",
+    "columnSideA": "SIDE A",
+    "columnSideB": "SIDE B"
   }
 }
