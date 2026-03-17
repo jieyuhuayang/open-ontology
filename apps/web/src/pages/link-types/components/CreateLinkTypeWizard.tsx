@@ -1,18 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import {
-  Modal,
-  Steps,
-  Card,
-  Flex,
-  Select,
-  Form,
-  Input,
-  Radio,
-  Typography,
-  message,
-  Divider,
-  Alert,
-} from 'antd';
+import { Modal, Steps, Flex, Select, Form, Input, Radio, Typography, message, Divider, Alert } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useCreateLinkTypeModalStore } from '@/stores/create-link-type-modal-store';
@@ -21,6 +8,8 @@ import { useObjectTypes } from '@/api/object-types';
 import { useDatasets, useDataset } from '@/api/datasets';
 import type { Cardinality } from '@/api/types';
 import type { AxiosError } from 'axios';
+import RelationshipCard from './RelationshipCard';
+import NNSubSelector from './NNSubSelector';
 
 const { Text } = Typography;
 
