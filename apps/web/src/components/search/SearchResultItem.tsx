@@ -73,7 +73,7 @@ export default function SearchResultItemComponent({ item, query }: Props) {
             <Text strong ellipsis style={{ maxWidth: 300 }}>
               <SearchHighlight text={item.displayName} query={query} />
             </Text>
-            {stateConfig && <Tag color={stateConfig.color}>{stateConfig.label}</Tag>}
+            {stateColor && stateI18nKey && <Tag color={stateColor}>{t(stateI18nKey)}</Tag>}
           </Flex>
           {item.description && (
             <Text type="secondary" ellipsis style={{ fontSize: 12 }}>
