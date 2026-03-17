@@ -94,7 +94,7 @@ TARGET_COMPANY_CODES = [
     "300413",
     # 军工
     "600893",
-    "002049",
+    "000977",
 ]
 assert len(TARGET_COMPANY_CODES) == 50, (
     f"Need exactly 50 codes, got {len(TARGET_COMPANY_CODES)}"
