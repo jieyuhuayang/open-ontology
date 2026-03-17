@@ -45,10 +45,14 @@ export default function SearchBar() {
         e.preventDefault();
         inputRef.current?.focus();
       }
+      if (e.key === 'Escape') {
+        exitSearchMode();
+        inputRef.current?.blur();
+      }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [exitSearchMode]);
 
   useEffect(() => {
     return () => {
