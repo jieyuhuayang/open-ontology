@@ -61,7 +61,9 @@ export default function LinkTypeTable({
       render: (val: string) =>
         val === 'join-table'
           ? t('linkType.joinMethod.joinTable')
-          : t('linkType.joinMethod.foreignKey'),
+          : val === 'backing-object'
+            ? t('linkType.joinMethod.backingObject')
+            : t('linkType.joinMethod.foreignKey'),
     },
     {
       title: t('linkType.fields.status'),
