@@ -148,11 +148,89 @@ class LinkTypeService:
             status_code=400,
         )
 
-    def _derive_join_method(self, cardinality: str) -> JoinMethod:
-        """Derive join_method from cardinality."""
+    def _derive_join_method(
+        self, cardinality: str, backing_object_type_rid: str | None = None
+    ) -> JoinMethod:
+        """Derive join_method from cardinality and BO presence."""
         if cardinality == "many-to-many":
+            if backing_object_type_rid:
+                return JoinMethod.BACKING_OBJECT
             return JoinMethod.JOIN_TABLE
         return JoinMethod.FOREIGN_KEY
+
+    async def _validate_backing_object(
+        self,
+        req: "LinkTypeCreateRequest",
+    ) -> None:
+        """Validate BO-specific fields: backing OT exists, side links exist and are valid many-to-one."""
+        # Backing OT must exist
+        await self._validate_object_type_exists(req.backing_object_type_rid, "Backing OT")  # type: ignore[arg-type]
+
+        # Side A link must exist and be valid
+        if not req.side_a_link_type_rid:
+            raise AppError(
+                code="LINK_TYPE_BACKING_OT_REQUIRED",
+                message="Backing object connection requires sideALinkTypeRid",
+                status_code=400,
+            )
+        if not req.side_b_link_type_rid:
+            raise AppError(
+                code="LINK_TYPE_BACKING_OT_REQUIRED",
+                message="Backing object connection requires sideBLinkTypeRid",
+                status_code=400,
+            )
+
+        await self._validate_side_link(
+            req.side_a_link_type_rid,
+            req.side_a.object_type_rid,
+            req.backing_object_type_rid,  # type: ignore[arg-type]
+            "A",
+        )
+        await self._validate_side_link(
+            req.side_b_link_type_rid,
+            req.side_b.object_type_rid,
+            req.backing_object_type_rid,  # type: ignore[arg-type]
+            "B",
+        )
+
+    async def _validate_side_link(
+        self,
+        link_rid: str,
+        side_ot_rid: str,
+        backing_ot_rid: str,
+        side_label: str,
+    ) -> None:
+        """Validate a side link is a valid many-to-one from side OT to backing OT."""
+        found = await self._find_in_merged_view(link_rid)
+        if not found:
+            raise AppError(
+                code="LINK_TYPE_SIDE_LINK_NOT_FOUND",
+                message=f"Side {side_label} link type '{link_rid}' not found",
+                status_code=400,
+            )
+        data, state = found
+        if state == ChangeState.DELETED:
+            raise AppError(
+                code="LINK_TYPE_SIDE_LINK_NOT_FOUND",
+                message=f"Side {side_label} link type '{link_rid}' is deleted",
+                status_code=400,
+            )
+        # Must be many-to-one with FK
+        if data.get("cardinality") != "many-to-one" or data.get("joinMethod") != "foreign-key":
+            raise AppError(
+                code="LINK_TYPE_SIDE_LINK_INVALID",
+                message=f"Side {side_label} link must be many-to-one with foreign-key join method",
+                status_code=400,
+            )
+        # Side A of the link (FK side) must be the side OT, side B (PK side) must be backing OT
+        link_side_a_ot = data.get("sideA", {}).get("objectTypeRid")
+        link_side_b_ot = data.get("sideB", {}).get("objectTypeRid")
+        if link_side_a_ot != side_ot_rid or link_side_b_ot != backing_ot_rid:
+            raise AppError(
+                code="LINK_TYPE_SIDE_LINK_INVALID",
+                message=f"Side {side_label} link must connect from side OT to backing OT (many-to-one)",
+                status_code=400,
+            )
 
     async def create(self, req: LinkTypeCreateRequest) -> LinkTypeWithChangeState:
         validate_link_type_id(req.id)
