@@ -51,6 +51,7 @@ export default function FileUploadWizard() {
     if (taskData.status === 'completed' && toastShownRef.current !== 'completed') {
       toastShownRef.current = 'completed';
       message.success(t('mysqlConnection.importSuccess'));
+      queryClient.invalidateQueries({ queryKey: datasetKeys.all });
     } else if (taskData.status === 'failed' && toastShownRef.current !== 'failed') {
       toastShownRef.current = 'failed';
       message.error(t('mysqlConnection.importFailed'));
