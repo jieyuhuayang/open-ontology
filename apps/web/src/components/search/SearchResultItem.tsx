@@ -3,8 +3,10 @@ import { LinkOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { SearchResultItem as SearchResultItemType } from '@/api/types';
+import { useSearchStore } from '@/stores/search-store';
 import SearchHighlight from './SearchHighlight';
 import DynamicIcon from '@/components/DynamicIcon';
+import './SearchResultItem.css';
 
 const { Text } = Typography;
 
@@ -13,43 +15,48 @@ interface Props {
   query: string;
 }
 
-const changeStateColors: Record<string, { color: string; label: string }> = {
-  created: { color: 'green', label: 'New' },
-  modified: { color: 'blue', label: 'Modified' },
-  deleted: { color: 'red', label: 'Deleted' },
+const changeStateColorMap: Record<string, string> = {
+  created: 'green',
+  modified: 'blue',
+  deleted: 'red',
 };
+
+const changeStateI18nMap: Record<string, string> = {
+  created: 'objectType.changeState.new',
+  modified: 'objectType.changeState.modified',
+  deleted: 'objectType.changeState.deleted',
+};
+
+export function navigateToSearchResult(
+  item: SearchResultItemType,
+  navigate: (path: string) => void,
+) {
+  if (item.resourceType === 'objectType') {
+    navigate(`/object-types/${item.rid}/overview`);
+  } else if (item.resourceType === 'linkType') {
+    navigate(`/link-types/${item.rid}`);
+  } else if (item.resourceType === 'property' && item.objectTypeRid) {
+    navigate(`/object-types/${item.objectTypeRid}/properties`);
+  }
+}
 
 export default function SearchResultItemComponent({ item, query }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const exitSearchMode = useSearchStore((s) => s.exitSearchMode);
 
   const handleClick = () => {
-    if (item.resourceType === 'objectType') {
-      navigate(`/object-types/${item.rid}/overview`);
-    } else if (item.resourceType === 'linkType') {
-      navigate(`/link-types/${item.rid}`);
-    } else if (item.resourceType === 'property' && item.objectTypeRid) {
-      navigate(`/object-types/${item.objectTypeRid}/properties`);
-    }
+    exitSearchMode();
+    navigateToSearchResult(item, navigate);
   };
 
-  const stateConfig = changeStateColors[item.changeState];
+  const stateColor = changeStateColorMap[item.changeState];
+  const stateI18nKey = changeStateI18nMap[item.changeState];
 
   return (
     <div
       onClick={handleClick}
-      style={{
-        padding: '8px 12px',
-        cursor: 'pointer',
-        borderRadius: 6,
-        transition: 'background 0.2s',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = '#f5f5f5';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = 'transparent';
-      }}
+      className="search-result-item"
     >
       <Flex align="center" gap={8}>
         <span style={{ fontSize: 16, flexShrink: 0 }}>
