@@ -85,12 +85,12 @@
     - `/object-types/:rid/properties` — 属性列表
     - `/object-types/:rid/datasources` — 数据源
   - `/link-types` — 链接类型列表
-  - `/link-types/:rid` — 链接类型详情（嵌套子路由）
-    - `/link-types/:rid/overview` — 概览（默认）
-    - `/link-types/:rid/datasources` — 数据源
+  - `/link-types/:rid` — 链接类型详情（独立页面模式，内部通过 tab 状态切换）
+  - `/data-connection` — 数据连接管理
   - `/properties` — 属性列表页（占位）
   - `/action-types` — 动作类型列表页（占位）
   - `*` — 404 页面
+  > **实现备注**：创建流程通过 AppShell 层的全局模态 Wizard 实现（`CreateObjectTypeWizard` / `CreateLinkTypeWizard`），无需独立的 `/object-types/new` 或 `/link-types/new` 路由。
 - **AC24**: 每个路由目标有对应的占位组件（显示页面名称即可），后续特性替换
 - **AC25**: 对象类型和链接类型详情页访问 `/object-types/:rid` 时自动重定向到 `/object-types/:rid/overview`
 
