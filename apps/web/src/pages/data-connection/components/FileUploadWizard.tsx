@@ -24,6 +24,7 @@ const COLUMN_TYPE_OPTIONS = [
 export default function FileUploadWizard() {
   const { t } = useTranslation();
   const { message } = App.useApp();
+  const queryClient = useQueryClient();
   const openModal = useDataConnectionStore((s) => s.openModal);
   const setOpenModal = useDataConnectionStore((s) => s.setOpenModal);
 
