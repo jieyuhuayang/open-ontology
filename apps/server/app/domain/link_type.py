@@ -18,6 +18,7 @@ class Cardinality(str, enum.Enum):
 class JoinMethod(str, enum.Enum):
     FOREIGN_KEY = "foreign-key"
     JOIN_TABLE = "join-table"
+    BACKING_OBJECT = "backing-object"
 
 
 class LinkSide(DomainModel):
