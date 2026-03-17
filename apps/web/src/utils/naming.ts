@@ -22,7 +22,7 @@ function splitCaseBoundaries(str: string): string {
 }
 
 export function toKebabCase(str: string): string {
-  const converted = convertChineseToPinyin(str);
+  const converted = splitCaseBoundaries(convertChineseToPinyin(str));
   return converted
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
@@ -30,7 +30,7 @@ export function toKebabCase(str: string): string {
 }
 
 export function toCamelCase(str: string): string {
-  const converted = convertChineseToPinyin(str);
+  const converted = splitCaseBoundaries(convertChineseToPinyin(str));
   const parts = converted.split(/[^a-zA-Z0-9]+/).filter(Boolean);
   if (parts.length === 0) return '';
   return (
