@@ -16,6 +16,7 @@ export default function LinkTypeOverviewTab({ linkType }: LinkTypeOverviewTabPro
 
   const isActive = linkType.status === 'active';
   const isJoinTable = linkType.joinMethod === 'join-table';
+  const isBackingObject = linkType.joinMethod === 'backing-object';
 
   const handleStatusChange = (val: ResourceStatus) => {
     updateMutation.mutate({ status: val });
