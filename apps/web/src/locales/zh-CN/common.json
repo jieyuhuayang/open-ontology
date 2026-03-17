@@ -631,6 +631,14 @@
     "objectTypes": "对象类型",
     "properties": "属性",
     "linkTypes": "链接类型",
-    "clear": "清除"
+    "clear": "清除",
+    "exitSearch": "退出搜索",
+    "columnName": "名称",
+    "columnStatus": "状态",
+    "columnVisibility": "可见性",
+    "columnObjectType": "对象类型",
+    "columnBaseType": "基础类型",
+    "columnSideA": "A 端",
+    "columnSideB": "B 端"
   }
 }
