@@ -318,89 +318,31 @@ export default function CreateLinkTypeWizard() {
         ]}
       />
 
-      {/* Step 0: Cardinality & Join Method */}
+      {/* Step 0: Relationship Type Selection */}
       {currentStep === 0 && (
-        <Flex vertical gap={16}>
-          <div>
-            <Text strong style={{ display: 'block', marginBottom: 8 }}>
-              {t('linkType.wizard.fkGroup')}
-            </Text>
-            <Flex gap={12}>
-              {fkOptions.map((opt) => (
-                <Card
-                  key={opt.value}
-                  hoverable
-                  style={{
-                    flex: 1,
-                    cursor: 'pointer',
-                    border: isCardActive(opt) ? '2px solid #1677ff' : undefined,
-                  }}
-                  onClick={() => handleCardinalitySelect(opt)}
-                >
-                  <Flex vertical align="center" gap={4}>
-                    <Text strong>{t(`linkType.cardinality.${opt.value}`)}</Text>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {t(`linkType.cardinalityDesc.${opt.value}`)}
-                    </Text>
-                  </Flex>
-                </Card>
-              ))}
-            </Flex>
-          </div>
-
-          <div>
-            <Text strong style={{ display: 'block', marginBottom: 8 }}>
-              {t('linkType.wizard.jtGroup')}
-            </Text>
-            <Flex gap={12}>
-              {jtOptions.map((opt) => (
-                <Card
-                  key={`jt-${opt.value}`}
-                  hoverable
-                  style={{
-                    flex: 1,
-                    cursor: 'pointer',
-                    border: isCardActive(opt) ? '2px solid #1677ff' : undefined,
-                  }}
-                  onClick={() => handleCardinalitySelect(opt)}
-                >
-                  <Flex vertical align="center" gap={4}>
-                    <Text strong>{t(`linkType.cardinality.${opt.value}`)}</Text>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {t(`linkType.cardinalityDesc.${opt.value}`)}
-                    </Text>
-                  </Flex>
-                </Card>
-              ))}
-            </Flex>
-          </div>
-
-          <div>
-            <Text strong style={{ display: 'block', marginBottom: 8 }}>
-              {t('linkType.wizard.boGroup')}
-            </Text>
-            <Flex gap={12}>
-              {boOptions.map((opt) => (
-                <Card
-                  key={`bo-${opt.value}`}
-                  hoverable
-                  style={{
-                    flex: 1,
-                    cursor: 'pointer',
-                    border: isCardActive(opt) ? '2px solid #1677ff' : undefined,
-                  }}
-                  onClick={() => handleCardinalitySelect(opt)}
-                >
-                  <Flex vertical align="center" gap={4}>
-                    <Text strong>{t('linkType.bo.cardTitle')}</Text>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {t('linkType.bo.cardDesc')}
-                    </Text>
-                  </Flex>
-                </Card>
-              ))}
-            </Flex>
-          </div>
+        <Flex vertical gap={8}>
+          <Text type="secondary" style={{ marginBottom: 4 }}>
+            {t('linkType.wizard.selectRelationType')}
+          </Text>
+          <Flex gap={12}>
+            {CARDINALITY_CHOICES.map((c) => (
+              <RelationshipCard
+                key={c}
+                diagramType={CARDINALITY_DIAGRAM_TYPES[c]}
+                title={t(`linkType.cardinality.${c}`)}
+                description={t(`linkType.relationCard.${CARDINALITY_HELP_KEYS[c]}.desc`)}
+                example={t(`linkType.relationCard.${CARDINALITY_HELP_KEYS[c]}.example`)}
+                helpKey={CARDINALITY_HELP_KEYS[c]}
+                selected={cardinality === c}
+                onClick={() => handleCardinalitySelect(c)}
+              />
+            ))}
+          </Flex>
+          <NNSubSelector
+            visible={cardinality === 'many-to-many'}
+            isBackingObject={isBackingObject}
+            onChange={handleNNSubChange}
+          />
         </Flex>
       )}
 
