@@ -1,9 +1,10 @@
 import { Alert, Button, Divider, Spin, Table, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useSearch } from '@/api/search';
 import { useSearchStore } from '@/stores/search-store';
 import type { SearchResultItem as SearchResultItemType, SearchTypeResult } from '@/api/types';
-import SearchResultItemComponent from './SearchResultItem';
+import SearchResultItemComponent, { navigateToSearchResult } from './SearchResultItem';
 import SearchHighlight from './SearchHighlight';
 
 const { Title, Text } = Typography;
