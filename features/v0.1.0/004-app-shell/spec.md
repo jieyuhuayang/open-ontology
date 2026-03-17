@@ -40,9 +40,10 @@
 首页模式在用户位于首页（Discover）或资源列表页面时展示。
 
 - **AC9**: 侧边栏顶部显示 Ontology 名称（MVP 固定显示默认 Ontology 名称）
-- **AC10**: 导航菜单包含以下项目，分为两组：
+- **AC10**: 导航菜单包含以下项目，分为三组：
   - **主导航**：Discover（发现页）
   - **Resources（资源）**：Object Types（对象类型）、Properties（属性）、Link Types（链接类型）、Action Types（动作类型）
+  - **Data Connection（数据连接）**：Data Connection（数据连接管理入口）
 - **AC11**: Object Types 和 Link Types 导航项旁显示对应资源总数（从 API 获取，API 就绪前显示为 "—"）
 - **AC12**: Properties 和 Action Types 导航项可正常点击，进入各自的占位页面（显示资源类型名称 + "Coming Soon" 或空列表提示），后续由对应特性（F007 / 未来 Action Type 特性）替换
 - **AC13**: 当前激活的导航项高亮显示
