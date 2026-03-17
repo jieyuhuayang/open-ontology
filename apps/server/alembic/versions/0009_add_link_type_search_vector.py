@@ -57,7 +57,7 @@ def upgrade() -> None:
     op.execute("""
         CREATE OR REPLACE FUNCTION link_type_endpoints_cascade_search_update() RETURNS trigger AS $$
         BEGIN
-            UPDATE link_types SET updated_at = now()
+            UPDATE link_types SET last_modified_at = now()
             WHERE rid = coalesce(NEW.link_type_rid, OLD.link_type_rid);
             RETURN coalesce(NEW, OLD);
         END;
