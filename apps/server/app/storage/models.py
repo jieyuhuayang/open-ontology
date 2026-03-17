@@ -270,6 +270,21 @@ class LinkTypeModel(Base):
         ForeignKey("datasets.rid", ondelete="SET NULL"),
         nullable=True,
     )
+    backing_object_type_rid = Column(
+        String,
+        ForeignKey("object_types.rid", ondelete="SET NULL"),
+        nullable=True,
+    )
+    side_a_link_type_rid = Column(
+        String,
+        ForeignKey("link_types.rid", ondelete="SET NULL"),
+        nullable=True,
+    )
+    side_b_link_type_rid = Column(
+        String,
+        ForeignKey("link_types.rid", ondelete="SET NULL"),
+        nullable=True,
+    )
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     created_by = Column(String(255), nullable=False)
     last_modified_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
