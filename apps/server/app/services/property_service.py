@@ -403,6 +403,19 @@ class PropertyService:
                 )
             )
 
+        # Handle TK unset cascade (isTitleKey=false)
+        if update_fields.get("isTitleKey") is False and data.get("isTitleKey") is True:
+            ot_data = await self._check_object_type_exists(object_type_rid)
+            extra_changes.append(
+                self._build_ot_key_change(
+                    object_type_rid,
+                    "titleKeyPropertyId",
+                    ot_data.get("titleKeyPropertyId"),
+                    None,
+                    now,
+                )
+            )
+
         # Build main property update change
         before = {k: data.get(k) for k in update_fields}
         change = Change(
