@@ -29,6 +29,10 @@ vi.mock('@/api/link-types', () => ({
   useDeleteLinkType: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }));
 
+vi.mock('@/api/search', () => ({
+  useSearch: () => ({ data: null, isLoading: false, error: null }),
+}));
+
 let testQueryClient: QueryClient;
 
 beforeEach(() => {
