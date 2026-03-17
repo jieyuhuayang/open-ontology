@@ -115,16 +115,30 @@ export default function HomeSidebar() {
       <nav style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         {!collapsed && (
           <div style={{ padding: '16px 24px 8px' }}>
-            <Text strong>{t('sidebar.ontologyName')}</Text>
+            <Text strong>
+              {isSearchMode
+                ? t('search.results', { count: searchData?.totalCount ?? 0 })
+                : t('sidebar.ontologyName')}
+            </Text>
           </div>
         )}
-        <Menu
-          mode="inline"
-          selectedKeys={[selectedKey]}
-          items={menuItems}
-          onClick={onClick}
-          style={{ border: 'none', flex: 1 }}
-        />
+        {isSearchMode ? (
+          <Menu
+            mode="inline"
+            selectedKeys={[activeType]}
+            items={searchMenuItems}
+            onClick={({ key }) => setActiveType(key as SearchActiveType)}
+            style={{ border: 'none', flex: 1 }}
+          />
+        ) : (
+          <Menu
+            mode="inline"
+            selectedKeys={[selectedKey]}
+            items={menuItems}
+            onClick={onClick}
+            style={{ border: 'none', flex: 1 }}
+          />
+        )}
         <div
           role="button"
           tabIndex={0}
