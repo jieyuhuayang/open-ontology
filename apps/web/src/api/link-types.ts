@@ -81,6 +81,30 @@ export function useUpdateLinkType(rid: string) {
   });
 }
 
+export interface EligibleSideLink {
+  rid: string;
+  id: string;
+  sideADisplayName: string;
+  sideBDisplayName: string;
+}
+
+export function useEligibleSideLinks(
+  sideObjectTypeRid: string | undefined,
+  backingObjectTypeRid: string | undefined,
+) {
+  return useQuery({
+    queryKey: [...linkTypeKeys.all, 'eligible-side-links', sideObjectTypeRid, backingObjectTypeRid],
+    queryFn: async () => {
+      const { data } = await apiClient.get<EligibleSideLink[]>(
+        '/link-types/eligible-side-links',
+        { params: { sideObjectTypeRid, backingObjectTypeRid } },
+      );
+      return data;
+    },
+    enabled: !!sideObjectTypeRid && !!backingObjectTypeRid,
+  });
+}
+
 export function useDeleteLinkType() {
   const queryClient = useQueryClient();
   return useMutation({
