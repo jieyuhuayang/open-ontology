@@ -134,7 +134,7 @@
 **要点**:
 - LanguageSwitcher: Ant Design Dropdown/Select，选项为 English / 中文，调用 `i18n.changeLanguage('en-US')` / `i18n.changeLanguage('zh-CN')`
 - SearchBarPlaceholder: `<Input prefix={<SearchOutlined />} placeholder={t('topBar.searchPlaceholder')} suffix="⌘K" disabled />`
-- CreateMenu: `<Dropdown>` + `<Button>` "New"，菜单项 navigate 到对应路由
+- CreateMenu: `<Dropdown>` + `<Button>` "New"，菜单项调用 `useCreateWizardStore.open()` / `useCreateLinkTypeModalStore.open()` 打开模态 Wizard
 
 **关联 AC**: AC5, AC6, AC8, AC29
 
