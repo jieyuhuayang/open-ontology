@@ -1,5 +1,6 @@
 import { Layout, Menu, Typography } from 'antd';
 import {
+  CloseOutlined,
   CompassOutlined,
   AppstoreOutlined,
   UnorderedListOutlined,
