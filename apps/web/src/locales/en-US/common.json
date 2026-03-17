@@ -146,6 +146,19 @@
       "idConflict": "A link type with this ID already exists",
       "apiNameConflict": "This API Name already exists for the associated object type",
       "joinTableRequired": "Many-to-many cardinality requires a join table dataset"
+    },
+    "bo": {
+      "cardTitle": "N:N (Object-backed)",
+      "cardDesc": "A backing object type mediates the many-to-many relationship",
+      "backingOt": "Backing Object Type",
+      "selectBackingOt": "Select backing object type",
+      "sideALink": "Side A Link Type",
+      "sideBLink": "Side B Link Type",
+      "selectSideLink": "Select link type",
+      "noSideLink": "No many-to-one link from {{side}} to backing OT. Please create one first.",
+      "sectionTitle": "Backing Object",
+      "deleted": "Deleted",
+      "validationError": "Backing object validation failed"
     }
   },
   "property": {
