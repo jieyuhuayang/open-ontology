@@ -12,6 +12,10 @@ vi.mock('@/api/link-types', () => ({
   useLinkTypes: () => ({ data: { items: [], total: 3 }, isLoading: false }),
 }));
 
+vi.mock('@/api/search', () => ({
+  useSearch: () => ({ data: null, isLoading: false, error: null }),
+}));
+
 function renderSidebar(initialRoute = '/') {
   return render(
     <MemoryRouter initialEntries={[initialRoute]}>

@@ -372,6 +372,14 @@
     "backingDatasource": "Backing Datasource",
     "addDatasource": "Add Backing Datasource",
     "noDatasource": "No datasource linked",
+    "changeDatasource": "Change Datasource",
+    "removeDatasource": "Remove Datasource",
+    "removeDatasourceConfirm": "Are you sure you want to remove the currently linked datasource?",
+    "selectDatasource": "Select Datasource",
+    "datasourceInfo": "Datasource Information",
+    "dataPreview": "Data Preview",
+    "columnSchema": "Column Schema",
+    "goToDataConnection": "Go to Data Connection to import new datasets",
     "intendedActions": "Intended Actions",
     "incomplete": "Incomplete",
     "incompleteWarning": "This object type has not been fully configured",
@@ -465,6 +473,7 @@
     "columns": {
       "name": "Name",
       "source": "Source",
+      "type": "Type",
       "rows": "Rows",
       "columns": "Columns",
       "importedAt": "Imported At"
@@ -616,5 +625,28 @@
       "previewHint": "Showing first {{count}} of {{total}} rows"
     },
     "columnsSelected": "{{selected}}/{{total}} columns selected"
+  },
+  "search": {
+    "results": "Search results ({{count}})",
+    "noResults": "No results found for '{{query}}'",
+    "showAll": "Show all",
+    "allResults": "All results",
+    "matchedFields": "Matched: {{fields}}",
+    "fieldName": "Name",
+    "fieldDescription": "Description",
+    "fieldApiName": "API Name",
+    "fieldId": "ID",
+    "objectTypes": "Object Types",
+    "properties": "Properties",
+    "linkTypes": "Link Types",
+    "clear": "Clear",
+    "exitSearch": "Exit search",
+    "columnName": "NAME",
+    "columnStatus": "STATUS",
+    "columnVisibility": "VISIBILITY",
+    "columnObjectType": "OBJECT TYPE",
+    "columnBaseType": "BASE TYPE",
+    "columnSideA": "SIDE A",
+    "columnSideB": "SIDE B"
   }
 }

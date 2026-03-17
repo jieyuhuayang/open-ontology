@@ -17,6 +17,7 @@ from app.routers import (
     object_types,
     ontology,
     properties,
+    search,
 )
 
 
@@ -53,3 +54,4 @@ app.include_router(ontology.router)
 app.include_router(datasets.router)
 app.include_router(mysql_connections.router)
 app.include_router(imports.router)
+app.include_router(search.router)

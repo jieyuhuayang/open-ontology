@@ -21,6 +21,14 @@ describe('toKebabCase', () => {
   it('returns empty string for empty input', () => {
     expect(toKebabCase('')).toBe('');
   });
+
+  it('splits PascalCase boundaries (BUG-5)', () => {
+    expect(toKebabCase('EmployeeName')).toBe('employee-name');
+  });
+
+  it('splits acronym boundaries', () => {
+    expect(toKebabCase('myHTTPClient')).toBe('my-http-client');
+  });
 });
 
 describe('toCamelCase', () => {
@@ -42,5 +50,13 @@ describe('toCamelCase', () => {
 
   it('returns empty string for empty input', () => {
     expect(toCamelCase('')).toBe('');
+  });
+
+  it('splits PascalCase input (BUG-5)', () => {
+    expect(toCamelCase('EmployeeName')).toBe('employeeName');
+  });
+
+  it('splits acronym boundaries', () => {
+    expect(toCamelCase('myHTTPClient')).toBe('myHttpClient');
   });
 });

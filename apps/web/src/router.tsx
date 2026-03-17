@@ -10,6 +10,7 @@ import ObjectTypeListPage from '@/pages/object-types/ObjectTypeListPage';
 import ObjectTypeDetailLayout from '@/pages/object-types/ObjectTypeDetailLayout';
 import ObjectTypeOverviewPage from '@/pages/object-types/ObjectTypeOverviewPage';
 import ObjectTypePropertiesPage from '@/pages/object-types/ObjectTypePropertiesPage';
+import ObjectTypeDatasourcesPage from '@/pages/object-types/ObjectTypeDatasourcesPage';
 import LinkTypeListPage from '@/pages/link-types/LinkTypeListPage';
 import LinkTypeDetailPage from '@/pages/link-types/LinkTypeDetailPage';
 import DataConnectionPage from '@/pages/data-connection/DataConnectionPage';
@@ -41,7 +42,7 @@ export const routeConfig: RouteObject[] = [
           { index: true, element: <Navigate to="overview" replace /> },
           { path: 'overview', element: <ObjectTypeOverviewPage /> },
           { path: 'properties', element: <ObjectTypePropertiesPage /> },
-          { path: 'datasources', element: <PlaceholderPage title="Object Type Datasources" /> },
+          { path: 'datasources', element: <ObjectTypeDatasourcesPage /> },
         ],
       },
       { path: 'link-types/:rid', element: <LinkTypeDetailPage /> },

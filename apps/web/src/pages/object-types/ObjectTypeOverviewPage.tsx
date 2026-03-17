@@ -1,8 +1,9 @@
-import { Button, Card, Empty, Flex, List, Tag, Tooltip, Typography } from 'antd';
+import { Button, Card, Empty, Flex, List, Tag, Typography } from 'antd';
 import { PlusOutlined, DatabaseOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useObjectType } from '@/api/object-types';
+import { useDataset } from '@/api/datasets';
 import { useProperties } from '@/api/properties';
 import { useLinkTypes } from '@/api/link-types';
 import { useCreateLinkTypeModalStore } from '@/stores/create-link-type-modal-store';
@@ -27,6 +28,7 @@ export default function ObjectTypeOverviewPage() {
   const { data: propertiesData } = useProperties(rid ?? '');
   const { data: linkTypesData } = useLinkTypes(1, 100, { objectTypeRid: rid });
   const openCreateLinkType = useCreateLinkTypeModalStore((s) => s.open);
+  const { data: datasetData } = useDataset(data?.backingDatasource?.rid ?? '');
 
   if (!data) return null;
 
@@ -145,16 +147,30 @@ export default function ObjectTypeOverviewPage() {
             {data.backingDatasource ? (
               <Flex align="center" gap={8}>
                 <DatabaseOutlined />
-                <Text>{JSON.stringify(data.backingDatasource)}</Text>
+                <Text
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => navigate(`/object-types/${rid}/datasources`)}
+                >
+                  {datasetData?.name ?? data.backingDatasource.rid}
+                </Text>
+                {datasetData && (
+                  <Tag color={datasetData.mode === 'live' ? 'green' : 'blue'}>
+                    {datasetData.mode === 'live'
+                      ? t('dataset.modeLive')
+                      : t('dataset.modeSnapshot')}
+                  </Tag>
+                )}
               </Flex>
             ) : (
               <Flex vertical align="flex-start" gap={8}>
                 <Text type="secondary">{t('objectType.noDatasource')}</Text>
-                <Tooltip title={t('common.comingSoon')}>
-                  <Button size="small" icon={<PlusOutlined />} disabled>
-                    {t('objectType.addDatasource')}
-                  </Button>
-                </Tooltip>
+                <Button
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={() => navigate(`/object-types/${rid}/datasources`)}
+                >
+                  {t('objectType.addDatasource')}
+                </Button>
               </Flex>
             )}
           </Card>

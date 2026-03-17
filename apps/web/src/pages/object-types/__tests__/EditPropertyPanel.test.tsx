@@ -98,69 +98,68 @@ describe('EditPropertyPanel', () => {
   it('renders property details', () => {
     const prop = makeProperty({ displayName: 'Employee Name', id: 'emp-name' });
     renderPanel(prop);
-    expect(screen.getByText('Employee Name')).toBeInTheDocument();
+    // displayName appears as drawer title + detail value, so use getAllByText
+    expect(screen.getAllByText('Employee Name').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('emp-name')).toBeInTheDocument();
-    expect(screen.getByText('property.fields.rid')).toBeInTheDocument();
-    expect(screen.getByText('property.fields.baseType')).toBeInTheDocument();
+    expect(screen.getByText('RID')).toBeInTheDocument();
+    expect(screen.getByText('Base Type')).toBeInTheDocument();
   });
 
   it('shows PK set button for valid PK type', () => {
     const prop = makeProperty({ baseType: 'string', isPrimaryKey: false });
     renderPanel(prop);
-    expect(screen.getByText('property.primaryKey.set')).toBeInTheDocument();
+    expect(screen.getByText('Set as Primary Key')).toBeInTheDocument();
   });
 
   it('shows PK unset button when property is PK', () => {
     const prop = makeProperty({ baseType: 'string', isPrimaryKey: true });
     renderPanel(prop);
-    expect(screen.getByText('property.primaryKey.unset')).toBeInTheDocument();
+    expect(screen.getByText('Unset Primary Key')).toBeInTheDocument();
   });
 
   it('does not show PK set button for invalid PK type (struct)', () => {
     const prop = makeProperty({ baseType: 'struct', isPrimaryKey: false });
     renderPanel(prop);
-    // Should show invalid type message instead of set button
-    expect(screen.getByText(/property\.primaryKey\.invalidType/)).toBeInTheDocument();
-    expect(screen.queryByText('property.primaryKey.set')).not.toBeInTheDocument();
+    expect(screen.getByText(/cannot be used as a primary key/)).toBeInTheDocument();
+    expect(screen.queryByText('Set as Primary Key')).not.toBeInTheDocument();
   });
 
   it('disables PK set button when OT is active', () => {
     const prop = makeProperty({ baseType: 'string', isPrimaryKey: false });
     renderPanel(prop, 'active');
-    const setBtn = screen.getByText('property.primaryKey.set').closest('button');
+    const setBtn = screen.getByText('Set as Primary Key').closest('button');
     expect(setBtn).toBeDisabled();
   });
 
   it('shows TK set button for valid TK type', () => {
     const prop = makeProperty({ baseType: 'decimal', isPrimaryKey: false, isTitleKey: false });
     renderPanel(prop);
-    expect(screen.getByText('property.titleKey.set')).toBeInTheDocument();
+    expect(screen.getByText('Set as Title Key')).toBeInTheDocument();
   });
 
   it('shows TK unset button when property is TK', () => {
     const prop = makeProperty({ baseType: 'string', isTitleKey: true });
     renderPanel(prop);
-    expect(screen.getByText('property.titleKey.unset')).toBeInTheDocument();
+    expect(screen.getByText('Unset Title Key')).toBeInTheDocument();
   });
 
   it('disables delete button for active property', () => {
     const prop = makeProperty({ status: 'active' });
     renderPanel(prop);
-    const deleteBtn = screen.getByRole('button', { name: /common\.delete/ });
+    const deleteBtn = screen.getByRole('button', { name: /Delete/ });
     expect(deleteBtn).toBeDisabled();
   });
 
   it('disables delete button for PK property', () => {
     const prop = makeProperty({ isPrimaryKey: true });
     renderPanel(prop);
-    const deleteBtn = screen.getByRole('button', { name: /common\.delete/ });
+    const deleteBtn = screen.getByRole('button', { name: /Delete/ });
     expect(deleteBtn).toBeDisabled();
   });
 
-  it('shows apiName as disabled when property is active', () => {
+  it('shows apiName field label', () => {
     const prop = makeProperty({ status: 'active', apiName: 'activeField' });
     renderPanel(prop);
-    // The apiName field should show with active indicator
-    expect(screen.getByText('property.fields.apiName')).toBeInTheDocument();
+    expect(screen.getByText('API Name')).toBeInTheDocument();
   });
 });

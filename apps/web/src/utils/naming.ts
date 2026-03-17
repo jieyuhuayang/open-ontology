@@ -10,8 +10,19 @@ function convertChineseToPinyin(str: string): string {
   return pinyin(str, { toneType: 'none', type: 'array' }).join(' ');
 }
 
+/**
+ * Insert a space before uppercase boundaries so that PascalCase/camelCase
+ * strings are split into words.
+ * "EmployeeName" → "Employee Name", "myHTTPClient" → "my HTTP Client"
+ */
+function splitCaseBoundaries(str: string): string {
+  return str
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2') // camelCase → camel Case
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2'); // HTTPClient → HTTP Client
+}
+
 export function toKebabCase(str: string): string {
-  const converted = convertChineseToPinyin(str);
+  const converted = splitCaseBoundaries(convertChineseToPinyin(str));
   return converted
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
@@ -19,7 +30,7 @@ export function toKebabCase(str: string): string {
 }
 
 export function toCamelCase(str: string): string {
-  const converted = convertChineseToPinyin(str);
+  const converted = splitCaseBoundaries(convertChineseToPinyin(str));
   const parts = converted.split(/[^a-zA-Z0-9]+/).filter(Boolean);
   if (parts.length === 0) return '';
   return (

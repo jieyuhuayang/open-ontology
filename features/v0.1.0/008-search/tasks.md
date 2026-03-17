@@ -11,7 +11,7 @@
 |------|------|------|
 | spec.md | ✅ 已评审 | 2026-03-17 用户确认通过 |
 | tasks.md | ✅ 已拆解 | 2026-03-17 自动审查通过 |
-| 实现 | 🔲 未开始 | 0 / 15 完成 |
+| 实现 | ✅ 已完成 | 15 / 15 完成 |
 
 ---
 
@@ -30,7 +30,7 @@
 
 ### T01: Alembic 迁移 — link_types 添加 search_vector
 
-- [ ] **T01**
+- [x] **T01**
 - 文件:
   - `apps/server/alembic/versions/XXXX_add_link_type_search_vector.py` — 新迁移脚本
 - 内容:
@@ -53,7 +53,7 @@
 
 ### T02: ORM 模型更新 — LinkTypeModel.search_vector
 
-- [ ] **T02**
+- [x] **T02**
 - 文件:
   - `apps/server/app/storage/models.py` — 修改 LinkTypeModel
 - 内容:
@@ -67,7 +67,7 @@
 
 ### T03: Search Domain 模型
 
-- [ ] **T03**
+- [x] **T03**
 - 文件:
   - `apps/server/app/domain/search.py` — 新建
 - 内容:
@@ -92,7 +92,7 @@
 
 ### T04: SearchStorage 实现
 
-- [ ] **T04**
+- [x] **T04**
 - 文件:
   - `apps/server/app/storage/search_storage.py` — 新建
 - 内容:
@@ -117,7 +117,7 @@
 
 ### T05: SearchService 单元测试
 
-- [ ] **T05**
+- [x] **T05**
 - 文件:
   - `apps/server/tests/unit/test_search_service.py` — 新建
 - 内容:
@@ -143,7 +143,7 @@
 
 ### T06: SearchService 实现
 
-- [ ] **T06**
+- [x] **T06**
 - 文件:
   - `apps/server/app/services/search_service.py` — 新建
 - 内容:
@@ -177,7 +177,7 @@
 
 ### T07: Search Router 集成测试
 
-- [ ] **T07**
+- [x] **T07**
 - 文件:
   - `apps/server/tests/integration/test_search_router.py` — 新建
 - 内容:
@@ -206,7 +206,7 @@
 
 ### T08: Search Router 实现 + openapi.json 重新生成
 
-- [ ] **T08**
+- [x] **T08**
 - 文件:
   - `apps/server/app/routers/search.py` — 新建
   - `apps/server/app/routers/__init__.py` — 修改：注册 search router
@@ -231,7 +231,7 @@
 
 ### T09: 前端类型生成 + Search API Hook
 
-- [ ] **T09**
+- [x] **T09**
 - 文件:
   - `apps/web/src/generated/api.ts` — 重新生成（`pnpm run generate:api`）
   - `apps/web/src/api/search.ts` — 新建
@@ -252,7 +252,7 @@
 
 ### T10: Search Zustand Store
 
-- [ ] **T10**
+- [x] **T10**
 - 文件:
   - `apps/web/src/stores/search-store.ts` — 新建
 - 内容:
@@ -273,7 +273,7 @@
 
 ### T11: SearchBar 组件（替换 SearchBarPlaceholder）
 
-- [ ] **T11**
+- [x] **T11**
 - 文件:
   - `apps/web/src/components/layout/SearchBar.tsx` — 新建
   - `apps/web/src/components/layout/SearchBarPlaceholder.tsx` — 删除
@@ -298,7 +298,7 @@
 
 ### T12: SearchResultItem + SearchHighlight 组件
 
-- [ ] **T12**
+- [x] **T12**
 - 文件:
   - `apps/web/src/components/search/SearchResultItem.tsx` — 新建
   - `apps/web/src/components/search/SearchHighlight.tsx` — 新建
@@ -330,7 +330,7 @@
 
 ### T13: SearchResultsPanel + HomeSidebar/HomeLayout 搜索模式
 
-- [ ] **T13**
+- [x] **T13**
 - 文件:
   - `apps/web/src/components/search/SearchResultsPanel.tsx` — 新建
   - `apps/web/src/components/layout/HomeSidebar.tsx` — 修改
@@ -374,7 +374,7 @@
 
 ### T14: i18n 国际化
 
-- [ ] **T14**
+- [x] **T14**
 - 文件:
   - `apps/web/src/locales/en-US/common.json` — 修改
   - `apps/web/src/locales/zh-CN/common.json` — 修改
@@ -402,7 +402,7 @@
 
 ### T15: 前端测试
 
-- [ ] **T15**
+- [x] **T15**
 - 文件:
   - `apps/web/src/stores/__tests__/search-store.test.ts` — 新建
   - `apps/web/src/components/search/__tests__/SearchHighlight.test.tsx` — 新建

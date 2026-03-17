@@ -1,7 +1,7 @@
 import { Layout, Typography, Flex } from 'antd';
 import { DeploymentUnitOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import SearchBarPlaceholder from './SearchBarPlaceholder';
+import SearchBar from './SearchBar';
 import CreateMenu from './CreateMenu';
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -27,7 +27,7 @@ export default function TopBar() {
       </Flex>
 
       <Flex align="center" justify="center" style={{ flex: 1, padding: '0 24px' }}>
-        <SearchBarPlaceholder />
+        <SearchBar />
       </Flex>
 
       <Flex align="center" gap={16} style={{ flexShrink: 0 }}>

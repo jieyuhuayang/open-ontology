@@ -372,6 +372,14 @@
     "backingDatasource": "底层数据源",
     "addDatasource": "添加底层数据源",
     "noDatasource": "暂未关联数据源",
+    "changeDatasource": "更换数据源",
+    "removeDatasource": "移除数据源",
+    "removeDatasourceConfirm": "确定要移除当前关联的数据源吗？",
+    "selectDatasource": "选择数据源",
+    "datasourceInfo": "数据源信息",
+    "dataPreview": "数据预览",
+    "columnSchema": "列结构",
+    "goToDataConnection": "前往数据连接页导入新数据集",
     "intendedActions": "可用动作",
     "incomplete": "待补全",
     "incompleteWarning": "此对象类型尚未完成配置",
@@ -465,6 +473,7 @@
     "columns": {
       "name": "名称",
       "source": "来源",
+      "type": "类型",
       "rows": "行数",
       "columns": "列数",
       "importedAt": "导入时间"
@@ -617,5 +626,28 @@
       "previewHint": "仅预览前 {{count}} 行，共 {{total}} 行"
     },
     "columnsSelected": "已选 {{selected}}/{{total}} 列"
+  },
+  "search": {
+    "results": "搜索结果 ({{count}})",
+    "noResults": "未找到与 '{{query}}' 匹配的结果",
+    "showAll": "查看全部",
+    "allResults": "所有结果",
+    "matchedFields": "匹配: {{fields}}",
+    "fieldName": "名称",
+    "fieldDescription": "描述",
+    "fieldApiName": "API 名称",
+    "fieldId": "ID",
+    "objectTypes": "对象类型",
+    "properties": "属性",
+    "linkTypes": "链接类型",
+    "clear": "清除",
+    "exitSearch": "退出搜索",
+    "columnName": "名称",
+    "columnStatus": "状态",
+    "columnVisibility": "可见性",
+    "columnObjectType": "对象类型",
+    "columnBaseType": "基础类型",
+    "columnSideA": "A 端",
+    "columnSideB": "B 端"
   }
 }

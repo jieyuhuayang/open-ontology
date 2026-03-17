@@ -20,6 +20,10 @@ vi.mock('@/api/link-types', () => ({
   useLinkTypes: () => ({ data: { items: [], total: 0 }, isLoading: false }),
 }));
 
+vi.mock('@/api/search', () => ({
+  useSearch: () => ({ data: null, isLoading: false, error: null }),
+}));
+
 describe('HomeLayout', () => {
   function renderWithRouter() {
     const router = createMemoryRouter([
