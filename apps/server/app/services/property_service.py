@@ -114,6 +114,12 @@ class PropertyService:
                     message="Nested arrays are not allowed (arrayInnerType cannot be 'array')",
                     status_code=400,
                 )
+            if req.array_inner_type not in ALL_BASE_TYPES:
+                raise AppError(
+                    code="PROPERTY_INVALID_BASE_TYPE",
+                    message=f"Invalid array inner type: '{req.array_inner_type}'",
+                    status_code=400,
+                )
         if req.base_type == "struct":
             if not req.struct_schema:
                 raise AppError(
