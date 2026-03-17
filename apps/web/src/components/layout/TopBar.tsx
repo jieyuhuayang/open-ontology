@@ -1,7 +1,7 @@
 import { Layout, Typography, Flex } from 'antd';
 import { DeploymentUnitOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import SearchBarPlaceholder from './SearchBarPlaceholder';
+import SearchBar from './SearchBar';
 import CreateMenu from './CreateMenu';
 import LanguageSwitcher from './LanguageSwitcher';
 
