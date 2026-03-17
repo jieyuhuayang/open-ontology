@@ -124,6 +124,36 @@ class LinkTypeStorage:
         return list(result.tuples().all())
 
     @staticmethod
+    async def get_many_to_one_links(
+        session: AsyncSession,
+        fk_object_type_rid: str,
+        pk_object_type_rid: str,
+    ) -> list[LinkType]:
+        """Return many-to-one link types where side A (FK side) = fk_object_type_rid
+        and side B (PK side) = pk_object_type_rid."""
+        stmt = (
+            select(LinkTypeModel)
+            .join(
+                LinkTypeEndpointModel,
+                LinkTypeModel.rid == LinkTypeEndpointModel.link_type_rid,
+            )
+            .where(
+                LinkTypeModel.join_method == "foreign-key",
+                LinkTypeModel.cardinality == "many-to-one",
+            )
+            .options(selectinload(LinkTypeModel.endpoints))
+        )
+        result = await session.execute(stmt)
+        all_links = [LinkTypeStorage._to_domain(orm) for orm in result.unique().scalars().all()]
+        # Filter: side A OT = fk_object_type_rid AND side B OT = pk_object_type_rid
+        return [
+            lt
+            for lt in all_links
+            if lt.side_a.object_type_rid == fk_object_type_rid
+            and lt.side_b.object_type_rid == pk_object_type_rid
+        ]
+
+    @staticmethod
     async def create(session: AsyncSession, model: LinkType) -> LinkType:
         """Insert link_types row + 2 link_type_endpoints rows."""
         orm = LinkTypeModel(
