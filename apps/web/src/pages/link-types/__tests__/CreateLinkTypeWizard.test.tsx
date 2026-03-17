@@ -103,7 +103,6 @@ describe('CreateLinkTypeWizard', () => {
     useCreateLinkTypeModalStore.getState().open();
     renderWizard();
 
-    expect(screen.getByText(/backing object/i)).toBeInTheDocument();
-    expect(screen.getByText(/object-backed/i)).toBeInTheDocument();
+    expect(screen.getByText(/N:N \(Object-backed\)/i)).toBeInTheDocument();
   });
 });
