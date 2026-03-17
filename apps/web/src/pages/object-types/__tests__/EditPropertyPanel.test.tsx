@@ -98,7 +98,8 @@ describe('EditPropertyPanel', () => {
   it('renders property details', () => {
     const prop = makeProperty({ displayName: 'Employee Name', id: 'emp-name' });
     renderPanel(prop);
-    expect(screen.getByText('Employee Name')).toBeInTheDocument();
+    // displayName appears as drawer title + detail value, so use getAllByText
+    expect(screen.getAllByText('Employee Name').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('emp-name')).toBeInTheDocument();
     expect(screen.getByText('RID')).toBeInTheDocument();
     expect(screen.getByText('Base Type')).toBeInTheDocument();
