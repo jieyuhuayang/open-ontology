@@ -496,13 +496,19 @@ class PropertyService:
                 )
 
         now = datetime.now(timezone.utc)
+        # Build mapping of rid → current sortOrder for accurate before values
+        rid_to_sort_order = {
+            data["rid"]: data.get("sortOrder", 0)
+            for data, state in merged
+            if state != ChangeState.DELETED
+        }
         changes = [
             Change(
                 id=uuid.uuid4().hex[:12],
                 resource_type=ResourceType.PROPERTY,
                 resource_rid=item.rid,
                 change_type=ChangeType.UPDATE,
-                before={"sortOrder": None},
+                before={"sortOrder": rid_to_sort_order.get(item.rid)},
                 after={
                     "sortOrder": item.sort_order,
                     "lastModifiedAt": now.isoformat(),
