@@ -391,6 +391,15 @@ class PropertyService:
                     message=f"Property type '{base_type}' cannot be used as a title key",
                     status_code=400,
                 )
+            # BUG-4: Array TK must have a valid inner type for title key
+            if base_type == "array":
+                inner_type = data.get("arrayInnerType", "")
+                if inner_type not in TITLE_KEY_TYPES:
+                    raise AppError(
+                        code="PROPERTY_TYPE_INVALID_FOR_TITLE_KEY",
+                        message=f"Array inner type '{inner_type}' cannot be used as a title key",
+                        status_code=400,
+                    )
             ot_data = await self._check_object_type_exists(object_type_rid)
             extra_changes.extend(await self._clear_old_key(object_type_rid, rid, "isTitleKey", now))
             extra_changes.append(
