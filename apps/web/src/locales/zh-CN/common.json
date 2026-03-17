@@ -85,6 +85,7 @@
       "selectObjectType": "选择对象类型",
       "fkGroup": "外键",
       "jtGroup": "连接表",
+      "boGroup": "支撑对象",
       "selectDataset": "选择连接表数据集",
       "columnMapping": "选择列"
     },
