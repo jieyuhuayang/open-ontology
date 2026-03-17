@@ -9,6 +9,7 @@ from app.domain.common import generate_rid
 from app.domain.constants import DEFAULT_ONTOLOGY_RID, DEFAULT_USER_ID
 from app.domain.object_type import ResourceStatus
 from app.domain.property import (
+    ALL_BASE_TYPES,
     MAX_PROPERTIES_PER_OBJECT_TYPE,
     PRIMARY_KEY_TYPES,
     STRUCT_FIELD_TYPES,
