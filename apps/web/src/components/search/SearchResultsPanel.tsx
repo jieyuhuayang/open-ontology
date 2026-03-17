@@ -98,38 +98,38 @@ export default function SearchResultsPanel() {
 
   const baseColumns = [
     {
-      title: 'NAME',
+      title: t('search.columnName'),
       dataIndex: 'displayName',
       key: 'name',
       render: (_: string, record: SearchResultItemType) => (
         <SearchHighlight text={record.displayName} query={query} />
       ),
     },
-    { title: 'STATUS', dataIndex: 'status', key: 'status', width: 120 },
-    { title: 'VISIBILITY', dataIndex: 'visibility', key: 'visibility', width: 120 },
+    { title: t('search.columnStatus'), dataIndex: 'status', key: 'status', width: 120 },
+    { title: t('search.columnVisibility'), dataIndex: 'visibility', key: 'visibility', width: 120 },
   ];
 
   const extraColumns =
     activeType === 'property'
       ? [
           {
-            title: 'OBJECT TYPE',
+            title: t('search.columnObjectType'),
             dataIndex: 'objectTypeDisplayName',
             key: 'objectType',
             width: 160,
           },
-          { title: 'BASE TYPE', dataIndex: 'baseType', key: 'baseType', width: 120 },
+          { title: t('search.columnBaseType'), dataIndex: 'baseType', key: 'baseType', width: 120 },
         ]
       : activeType === 'linkType'
         ? [
             {
-              title: 'SIDE A',
+              title: t('search.columnSideA'),
               dataIndex: 'sideADisplayName',
               key: 'sideA',
               width: 160,
             },
             {
-              title: 'SIDE B',
+              title: t('search.columnSideB'),
               dataIndex: 'sideBDisplayName',
               key: 'sideB',
               width: 160,
@@ -144,6 +144,13 @@ export default function SearchResultsPanel() {
       rowKey="rid"
       pagination={false}
       size="small"
+      onRow={(record: SearchResultItemType) => ({
+        onClick: () => {
+          exitSearchMode();
+          navigateToSearchResult(record, navigate);
+        },
+        style: { cursor: 'pointer' },
+      })}
     />
   );
 }
