@@ -289,13 +289,17 @@ class LinkTypeModel(Base):
     created_by = Column(String(255), nullable=False)
     last_modified_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     last_modified_by = Column(String(255), nullable=False)
+    search_vector = Column(TSVECTOR)
 
     ontology = relationship("OntologyModel", back_populates="link_types")
     endpoints = relationship(
         "LinkTypeEndpointModel", back_populates="link_type", cascade="all, delete-orphan"
     )
 
-    __table_args__ = (UniqueConstraint("ontology_rid", "id", name="uq_link_types_ontology_id"),)
+    __table_args__ = (
+        UniqueConstraint("ontology_rid", "id", name="uq_link_types_ontology_id"),
+        Index("ix_link_types_search_vector", "search_vector", postgresql_using="gin"),
+    )
 
 
 class LinkTypeEndpointModel(Base):
