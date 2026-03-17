@@ -114,8 +114,7 @@ describe('ObjectTypePropertiesPage', () => {
   it('renders empty state when no properties', () => {
     mockPropertiesData = { items: [], total: 0 };
     renderPage();
-    // Empty state message should be present
-    expect(screen.getByText(/property\.empty/)).toBeInTheDocument();
+    expect(screen.getByText(/No properties yet/)).toBeInTheDocument();
   });
 
   it('renders property list when properties exist', () => {
@@ -134,7 +133,6 @@ describe('ObjectTypePropertiesPage', () => {
   it('renders filter selects', () => {
     mockPropertiesData = { items: [], total: 0 };
     renderPage();
-    // Should have 3 filter selects + add button
     const comboboxes = screen.getAllByRole('combobox');
     expect(comboboxes.length).toBeGreaterThanOrEqual(3);
   });
@@ -142,7 +140,7 @@ describe('ObjectTypePropertiesPage', () => {
   it('renders add button', () => {
     mockPropertiesData = { items: [], total: 0 };
     renderPage();
-    expect(screen.getByRole('button', { name: /property\.addProperty/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Add Property/ })).toBeInTheDocument();
   });
 
   it('disables add button when at 200 limit', () => {
@@ -151,7 +149,7 @@ describe('ObjectTypePropertiesPage', () => {
     );
     mockPropertiesData = { items, total: 200 };
     renderPage();
-    const addBtn = screen.getByRole('button', { name: /property\.addProperty/ });
+    const addBtn = screen.getByRole('button', { name: /Add Property/ });
     expect(addBtn).toBeDisabled();
   });
 });
