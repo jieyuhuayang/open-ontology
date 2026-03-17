@@ -27,7 +27,7 @@ export default function TopBar() {
       </Flex>
 
       <Flex align="center" justify="center" style={{ flex: 1, padding: '0 24px' }}>
-        <SearchBarPlaceholder />
+        <SearchBar />
       </Flex>
 
       <Flex align="center" gap={16} style={{ flexShrink: 0 }}>
