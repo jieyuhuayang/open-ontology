@@ -121,7 +121,7 @@ def validate_cardinality_join_method_match(cardinality: str, join_method: str) -
     """Validate cardinality and join_method are compatible.
 
     FK cardinalities (1:1, 1:N, N:1) → foreign-key only.
-    N:N → join-table only.
+    N:N → join-table or backing-object.
     """
     fk_cardinalities = {"one-to-one", "one-to-many", "many-to-one"}
     if cardinality in fk_cardinalities and join_method != "foreign-key":
@@ -130,10 +130,11 @@ def validate_cardinality_join_method_match(cardinality: str, join_method: str) -
             message=f"Cardinality '{cardinality}' requires join method 'foreign-key', got '{join_method}'",
             status_code=400,
         )
-    if cardinality == "many-to-many" and join_method != "join-table":
+    nn_methods = {"join-table", "backing-object"}
+    if cardinality == "many-to-many" and join_method not in nn_methods:
         raise AppError(
             code="LINK_TYPE_CARDINALITY_JOIN_METHOD_MISMATCH",
-            message=f"Cardinality 'many-to-many' requires join method 'join-table', got '{join_method}'",
+            message=f"Cardinality 'many-to-many' requires join method 'join-table' or 'backing-object', got '{join_method}'",
             status_code=400,
         )
 
