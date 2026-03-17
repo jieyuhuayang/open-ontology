@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { SearchResultItem as SearchResultItemType } from '@/api/types';
 import SearchHighlight from './SearchHighlight';
-import IconDisplay from '@/components/common/IconDisplay';
+import DynamicIcon from '@/components/DynamicIcon';
 
 const { Text } = Typography;
 
