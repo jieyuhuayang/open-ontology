@@ -112,7 +112,13 @@ export default function LinkTypeOverviewTab({ linkType }: LinkTypeOverviewTabPro
           <Tag>{t(`linkType.cardinality.${linkType.cardinality}`)}</Tag>
         </Descriptions.Item>
         <Descriptions.Item label={t('linkType.fields.joinMethod')}>
-          <Tag>{isJoinTable ? t('linkType.joinMethod.joinTable') : t('linkType.joinMethod.foreignKey')}</Tag>
+          <Tag>
+            {isBackingObject
+              ? t('linkType.joinMethod.backingObject')
+              : isJoinTable
+                ? t('linkType.joinMethod.joinTable')
+                : t('linkType.joinMethod.foreignKey')}
+          </Tag>
         </Descriptions.Item>
         <Descriptions.Item label={t('linkType.fields.status')}>
           <Radio.Group
