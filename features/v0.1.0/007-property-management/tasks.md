@@ -1,7 +1,7 @@
 # Tasks: F007 Property Management（属性管理）
 
 **关联 Plan**: `features/v0.1.0/007-property-management/design.md`
-**状态**: 已完成
+**状态**: 已完成（含回溯审查修复）
 
 ---
 
