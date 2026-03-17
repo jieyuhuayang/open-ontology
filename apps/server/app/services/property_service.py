@@ -369,6 +369,19 @@ class PropertyService:
                 )
             )
 
+        # Handle PK unset cascade (isPrimaryKey=false)
+        if update_fields.get("isPrimaryKey") is False and data.get("isPrimaryKey") is True:
+            ot_data = await self._check_object_type_exists(object_type_rid)
+            extra_changes.append(
+                self._build_ot_key_change(
+                    object_type_rid,
+                    "primaryKeyPropertyId",
+                    ot_data.get("primaryKeyPropertyId"),
+                    None,
+                    now,
+                )
+            )
+
         # Handle TK cascade (isTitleKey=true)
         if update_fields.get("isTitleKey") is True:
             base_type = data.get("baseType", "")
