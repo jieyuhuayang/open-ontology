@@ -38,7 +38,7 @@ echo "🏦 Loading finance sample data into MySQL container '${CONTAINER}'..."
 
 # ── Recreate database (idempotent) ────────────────────────────
 echo "  → Recreating database '${DB_NAME}'..."
-docker exec -i "$CONTAINER" mysql -uroot -p"${ROOT_PWD}" <<SQL
+docker exec -i "$CONTAINER" mysql --default-character-set=utf8mb4 -uroot -p"${ROOT_PWD}" <<SQL
 DROP DATABASE IF EXISTS \`${DB_NAME}\`;
 CREATE DATABASE \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO 'oo_sample'@'%';
