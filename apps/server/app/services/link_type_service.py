@@ -375,7 +375,7 @@ class LinkTypeService:
             lt = LinkTypeWithChangeState(
                 **{**LinkType.model_validate(data).model_dump(), "change_state": state}
             )
-            self._fill_display_fields(lt, ot_map)
+            await self._fill_display_fields(lt, ot_map)
             items.append(lt)
 
         return LinkTypeListResponse(
