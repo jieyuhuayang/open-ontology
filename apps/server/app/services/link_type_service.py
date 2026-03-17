@@ -326,7 +326,7 @@ class LinkTypeService:
 
         # Fill OT display names for response
         ot_map = await self._get_ot_display_name_map()
-        return self._fill_display_fields(lt, ot_map)
+        return await self._fill_display_fields(lt, ot_map)
 
     async def list(
         self,
