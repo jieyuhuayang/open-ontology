@@ -17,6 +17,7 @@ from app.routers import (
     object_types,
     ontology,
     properties,
+    search,
 )
 
 
