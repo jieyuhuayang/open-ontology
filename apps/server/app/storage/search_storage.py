@@ -2,8 +2,20 @@
 
 import re
 
-from sqlalchemy import String, case, func, literal, or_, select, text, union_all
+from sqlalchemy import (
+    String,
+    case,
+    cast,
+    func,
+    literal,
+    literal_column,
+    or_,
+    select,
+    text,
+    union_all,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.dialects.postgresql import REGCONFIG
 
 from app.storage.models import (
     LinkTypeEndpointModel,
