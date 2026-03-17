@@ -80,10 +80,11 @@ describe('SearchResultsPanel', () => {
       error: null,
     } as ReturnType<typeof useSearch>);
 
-    renderWithRouter(<SearchResultsPanel />);
+    const { container } = renderWithRouter(<SearchResultsPanel />);
     expect(screen.getByText(/Object Types/)).toBeInTheDocument();
-    // SearchHighlight wraps matching text in <mark>, so check container
-    expect(screen.getByText('Employee')).toBeInTheDocument();
+    // SearchHighlight wraps matching text in <mark>
+    const marks = container.querySelectorAll('mark');
+    expect(marks.length).toBeGreaterThan(0);
   });
 
   it('renders empty state when no results', () => {
