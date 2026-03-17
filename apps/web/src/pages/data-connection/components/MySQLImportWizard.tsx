@@ -25,6 +25,8 @@ import {
   useMySQLImportedTables,
 } from '@/api/mysql-connections';
 import { useMySQLImport, useImportTask } from '@/api/imports';
+import { useQueryClient } from '@tanstack/react-query';
+import { datasetKeys } from '@/api/datasets';
 import { useDataConnectionStore } from '@/stores/data-connection-store';
 import type { MySQLTableInfo, MySQLColumnInfo } from '@/api/types';
 
