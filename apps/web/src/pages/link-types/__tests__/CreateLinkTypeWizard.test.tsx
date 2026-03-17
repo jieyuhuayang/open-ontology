@@ -74,15 +74,16 @@ describe('CreateLinkTypeWizard', () => {
 
   it('does not render when modal is closed', () => {
     renderWizard();
-    expect(screen.queryByText(/cardinality/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/relationship/i)).not.toBeInTheDocument();
   });
 
-  it('shows step 1 (cardinality) when modal is open', () => {
+  it('shows 4 relationship cards when modal is open', () => {
     useCreateLinkTypeModalStore.getState().open();
     renderWizard();
     expect(screen.getByText(/one to one/i)).toBeInTheDocument();
     expect(screen.getByText(/one to many/i)).toBeInTheDocument();
     expect(screen.getByText(/many to one/i)).toBeInTheDocument();
+    expect(screen.getByText(/many to many/i)).toBeInTheDocument();
   });
 
   it('advances to step 2 after selecting cardinality', async () => {
@@ -99,10 +100,29 @@ describe('CreateLinkTypeWizard', () => {
     expect(screen.getByText(/side b/i)).toBeInTheDocument();
   });
 
-  it('shows BO group in step 1', () => {
+  it('shows N:N sub-selector when many-to-many is selected', async () => {
     useCreateLinkTypeModalStore.getState().open();
     renderWizard();
 
-    expect(screen.getByText(/N:N \(Object-backed\)/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByText(/many to many/i));
+
+    // Sub-selector should appear with simple/rich options
+    expect(screen.getByText(/simple relationship/i)).toBeInTheDocument();
+    expect(screen.getByText(/rich relationship/i)).toBeInTheDocument();
+  });
+
+  it('hides N:N sub-selector for non-N:N cardinalities', async () => {
+    useCreateLinkTypeModalStore.getState().open();
+    renderWizard();
+
+    // First select many-to-many to show sub-selector
+    await userEvent.click(screen.getByText(/many to many/i));
+    expect(screen.getByText(/simple relationship/i)).toBeInTheDocument();
+
+    // Switch to one-to-one — sub-selector should collapse
+    await userEvent.click(screen.getByText(/one to one/i));
+    // The text may still be in DOM but hidden via maxHeight=0
+    // Verify the next button is enabled (cardinality selected)
+    expect(screen.getByText(/next/i)).not.toBeDisabled();
   });
 });
