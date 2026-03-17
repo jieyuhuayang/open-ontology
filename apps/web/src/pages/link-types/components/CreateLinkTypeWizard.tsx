@@ -253,31 +253,30 @@ export default function CreateLinkTypeWizard() {
         (isJoinTable && !joinTableDatasetRid) ||
         (isBackingObject && (!backingOtRid || !sideALinkRid || !sideBLinkRid))));
 
-  const fkOptions = CARDINALITY_OPTIONS.filter((o) => o.group === 'fk');
-  const jtOptions = CARDINALITY_OPTIONS.filter((o) => o.group === 'jt');
-  const boOptions = CARDINALITY_OPTIONS.filter((o) => o.group === 'bo');
-
-  const handleCardinalitySelect = (opt: CardinalityOption) => {
-    setCardinality(opt.value);
-    setIsBackingObject(opt.group === 'bo');
-    // Reset BO/JT state when switching groups
-    if (opt.group !== 'bo') {
+  const handleCardinalitySelect = (value: Cardinality) => {
+    setCardinality(value);
+    if (value !== 'many-to-many') {
+      setIsBackingObject(false);
       setBackingOtRid(undefined);
       setSideALinkRid(undefined);
       setSideBLinkRid(undefined);
-    }
-    if (opt.group !== 'jt') {
       setJoinTableDatasetRid(undefined);
       setSideAJtColumn(undefined);
       setSideBJtColumn(undefined);
     }
   };
 
-  // Distinguish active cardinality card: need both value AND group match
-  const isCardActive = (opt: CardinalityOption) => {
-    if (opt.group === 'bo') return isBackingObject;
-    if (opt.group === 'jt') return cardinality === opt.value && !isBackingObject;
-    return cardinality === opt.value;
+  const handleNNSubChange = (bo: boolean) => {
+    setIsBackingObject(bo);
+    if (bo) {
+      setJoinTableDatasetRid(undefined);
+      setSideAJtColumn(undefined);
+      setSideBJtColumn(undefined);
+    } else {
+      setBackingOtRid(undefined);
+      setSideALinkRid(undefined);
+      setSideBLinkRid(undefined);
+    }
   };
 
   const sideALinkOptions = useMemo(() => {
