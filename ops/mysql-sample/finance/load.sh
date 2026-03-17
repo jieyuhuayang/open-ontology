@@ -55,7 +55,7 @@ done
 # ── Verify ────────────────────────────────────────────────────
 echo ""
 echo "✅ Done! Verifying row counts:"
-docker exec -i "$CONTAINER" mysql -uroot -p"${ROOT_PWD}" "$DB_NAME" <<'SQL'
+docker exec -i "$CONTAINER" mysql --default-character-set=utf8mb4 -uroot -p"${ROOT_PWD}" "$DB_NAME" <<'SQL'
 SELECT 'companies' AS tbl, COUNT(*) AS cnt FROM companies
 UNION ALL SELECT 'analysts', COUNT(*) FROM analysts
 UNION ALL SELECT 'rating_reports', COUNT(*) FROM rating_reports
