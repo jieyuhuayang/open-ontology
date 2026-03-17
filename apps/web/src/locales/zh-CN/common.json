@@ -136,6 +136,47 @@
       "many-to-one": "A 端的多个实例链接到 B 端的一个实例",
       "many-to-many": "两端的多个实例可以相互链接"
     },
+    "relationCard": {
+      "oneToOne": {
+        "desc": "每个 A 恰好对应一个 B",
+        "example": "例：员工 ↔ 工位"
+      },
+      "oneToMany": {
+        "desc": "一个 A 对应多个 B",
+        "example": "例：部门 → 员工"
+      },
+      "manyToOne": {
+        "desc": "多个 A 对应一个 B",
+        "example": "例：员工 → 部门"
+      },
+      "manyToMany": {
+        "desc": "两端的多个对象互相关联",
+        "example": "例：学生 ↔ 课程"
+      }
+    },
+    "relationHelp": {
+      "oneToOne": {
+        "body": "一个 A 端对象有且仅有一个对应的 B 端对象，反之亦然。",
+        "example": "例：每名员工有且仅有一个工位。",
+        "technical": "通过外键（Foreign Key）实现，关系数据存储在对象属性中"
+      },
+      "oneToMany": {
+        "body": "一个 A 端对象可以关联多个 B 端对象，但每个 B 端只关联一个 A 端。",
+        "example": "例：一个部门有多名员工，每名员工只属于一个部门。",
+        "technical": "通过外键（Foreign Key）实现，关系数据存储在 B 端对象上"
+      },
+      "manyToOne": {
+        "body": "多个 A 端对象可以关联同一个 B 端对象，每个 A 端只关联一个 B 端。",
+        "example": "例：多名员工属于同一个部门。",
+        "technical": "通过外键（Foreign Key）实现，关系数据存储在 A 端对象上"
+      },
+      "manyToMany": {
+        "body": "两端的对象可以自由关联，不限数量。",
+        "example": "例：学生可以选多门课程，每门课程也有多名学生。",
+        "technical": "通过连接表（Join Table）或支撑对象（Backing Object）实现"
+      },
+      "technicalLabel": "技术细节"
+    },
     "detail": {
       "overviewTab": "概览",
       "datasetsTab": "数据集",
