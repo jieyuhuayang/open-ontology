@@ -118,7 +118,7 @@
 **验收**:
 - LanguageSwitcher: 渲染语言切换入口；点击后可切换语言（调用 i18n.changeLanguage）；显示当前语言名称
 - SearchBarPlaceholder: 渲染带 placeholder "Search by name, RID, aliases..." 的输入框；显示 ⌘K 快捷键提示；输入框为 disabled 状态
-- CreateMenu: 渲染 "New" 按钮；下拉菜单包含 "Create Object Type" 和 "Create Link Type" 两项；点击菜单项后导航到 `/object-types/new` 和 `/link-types/new`
+- CreateMenu: 渲染 "New" 按钮；下拉菜单包含 "Create Object Type" 和 "Create Link Type" 两项；点击菜单项后调用对应 Zustand store 的 `open()` 方法打开模态 Wizard
 
 **关联 AC**: AC5, AC6, AC8, AC29
 
