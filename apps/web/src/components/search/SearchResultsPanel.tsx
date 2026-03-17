@@ -23,7 +23,8 @@ const TYPE_KEYS: Record<string, 'objectType' | 'property' | 'linkType'> = {
 
 export default function SearchResultsPanel() {
   const { t } = useTranslation();
-  const { query, activeType, setActiveType } = useSearchStore();
+  const { query, activeType, setActiveType, exitSearchMode } = useSearchStore();
+  const navigate = useNavigate();
   const { data, isLoading, error } = useSearch(query);
 
   if (isLoading) {
