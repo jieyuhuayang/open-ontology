@@ -42,7 +42,7 @@ export const routeConfig: RouteObject[] = [
           { index: true, element: <Navigate to="overview" replace /> },
           { path: 'overview', element: <ObjectTypeOverviewPage /> },
           { path: 'properties', element: <ObjectTypePropertiesPage /> },
-          { path: 'datasources', element: <PlaceholderPage title="Object Type Datasources" /> },
+          { path: 'datasources', element: <ObjectTypeDatasourcesPage /> },
         ],
       },
       { path: 'link-types/:rid', element: <LinkTypeDetailPage /> },
