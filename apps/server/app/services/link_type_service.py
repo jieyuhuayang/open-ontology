@@ -237,17 +237,21 @@ class LinkTypeService:
         validate_link_side_api_name(req.side_a.api_name, "A")
         validate_link_side_api_name(req.side_b.api_name, "B")
 
-        # Derive join_method from cardinality
-        join_method = self._derive_join_method(req.cardinality.value)
+        # Derive join_method from cardinality + BO presence
+        join_method = self._derive_join_method(req.cardinality.value, req.backing_object_type_rid)
         validate_cardinality_join_method_match(req.cardinality.value, join_method.value)
 
-        # JT validation: many-to-many must have join_table_dataset_rid
+        # JT validation: many-to-many + join-table must have join_table_dataset_rid
         if join_method == JoinMethod.JOIN_TABLE and not req.join_table_dataset_rid:
             raise AppError(
                 code="LINK_TYPE_JOIN_TABLE_REQUIRED",
                 message="Many-to-many cardinality requires a join table dataset",
                 status_code=400,
             )
+
+        # BO validation
+        if join_method == JoinMethod.BACKING_OBJECT:
+            await self._validate_backing_object(req)
 
         # Verify both ObjectTypes exist (self-link is allowed)
         await self._validate_object_type_exists(req.side_a.object_type_rid, "A")
