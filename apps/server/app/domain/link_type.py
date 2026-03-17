@@ -75,6 +75,9 @@ class LinkTypeCreateRequest(DomainModel):
     side_b: LinkSideCreateInput
     cardinality: Cardinality
     join_table_dataset_rid: str | None = None
+    backing_object_type_rid: str | None = None
+    side_a_link_type_rid: str | None = None
+    side_b_link_type_rid: str | None = None
     project_rid: str | None = None
     status: ResourceStatus = ResourceStatus.EXPERIMENTAL
 
