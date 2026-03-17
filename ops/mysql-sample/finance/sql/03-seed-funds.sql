@@ -1,0 +1,32 @@
+-- 03-seed-funds.sql — 30 real mutual funds
+
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000001', '华夏成长混合', '混合型-灵活', NULL, NULL, '刘睿聪 郑晓辉', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000002', '华夏成长混合(后端)', '混合型-灵活', NULL, NULL, NULL, TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000003', '中海可转债债券A', '债券型-混合二级', NULL, NULL, '梅寓寒', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000004', '中海可转债债券C', '债券型-混合二级', NULL, NULL, '梅寓寒', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000005', '嘉实增强信用定期债券', '债券型-混合一级', NULL, NULL, '吴翠', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000006', '西部利得量化成长混合A', '混合型-偏股', NULL, NULL, '盛丰衍', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000008', '嘉实中证500ETF联接A', '指数型-股票', NULL, NULL, '李直', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000011', '华夏大盘精选混合A', '混合型-灵活', NULL, NULL, '屠环宇', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000012', '华夏大盘精选混合A(后端)', '混合型-灵活', NULL, NULL, NULL, TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000014', '华夏聚利债券A', '债券型-混合一级', NULL, NULL, '陆晓天 武文琦', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000017', '财通可持续混合', '混合型-偏股', NULL, NULL, '夏钦', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000020', '景顺长城品质投资混合A', '混合型-偏股', NULL, NULL, '詹成', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000021', '华夏优势增长混合', '混合型-偏股', NULL, NULL, '郑晓辉', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000024', '大摩双利增强债券A', '债券型-混合一级', NULL, NULL, '吴慧文', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000025', '大摩双利增强债券C', '债券型-混合一级', NULL, NULL, '吴慧文', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000028', '华富安鑫债券A', '债券型-混合二级', NULL, NULL, '戴弘毅', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000029', '富国宏观策略灵活配置混合A', '混合型-灵活', NULL, NULL, '袁宜', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000030', '长城核心优选混合A', '混合型-灵活', NULL, NULL, '向晨', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000031', '华夏复兴混合A', '混合型-偏股', NULL, NULL, '郑煜 黄皓', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000039', '农银高增长混合', '混合型-偏股', NULL, NULL, '左腾飞', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000041', '华夏全球股票(QDII)(人民币)', 'QDII-普通股票', NULL, NULL, '李湘杰 潘中宁 姜征昊', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000042', '财通中证ESG100指数增强A', '指数型-股票', NULL, NULL, '顾弘原', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000043', '嘉实美国成长股票人民币', 'QDII-普通股票', NULL, NULL, '张自力 张楠', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000044', '嘉实美国成长股票美元现汇', 'QDII-普通股票', NULL, NULL, '张自力 张楠', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000045', '工银产业债债券A', '债券型-混合二级', NULL, NULL, '何秀红 谷青春 张玮升', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000046', '工银产业债债券B', '债券型-混合二级', NULL, NULL, '何秀红 谷青春 张玮升', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000047', '华夏双债债券A', '债券型-混合一级', NULL, NULL, '柳万军', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000048', '华夏双债债券C', '债券型-混合一级', NULL, NULL, '柳万军', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000051', '华夏沪深300ETF联接A', '指数型-股票', NULL, NULL, '赵宗庭', TRUE);
+INSERT INTO funds (id, name, fund_type, aum, inception_date, manager, is_active) VALUES ('000054', '鹏华双债增利债券A', '债券型-混合二级', NULL, NULL, '杨雅洁', TRUE);
