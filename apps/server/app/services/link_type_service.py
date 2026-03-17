@@ -498,3 +498,32 @@ class LinkTypeService:
             timestamp=now,
         )
         await self._ws_service.add_change(DEFAULT_ONTOLOGY_RID, change)
+
+    async def get_eligible_side_links(
+        self,
+        side_object_type_rid: str,
+        backing_object_type_rid: str,
+    ) -> list[dict]:
+        """Return eligible many-to-one links from side OT to backing OT."""
+        merged = await self._ws_service.get_merged_view(
+            DEFAULT_ONTOLOGY_RID, ResourceType.LINK_TYPE
+        )
+        results = []
+        for data, state in merged:
+            if state == ChangeState.DELETED:
+                continue
+            if (
+                data.get("cardinality") == "many-to-one"
+                and data.get("joinMethod") == "foreign-key"
+                and data.get("sideA", {}).get("objectTypeRid") == side_object_type_rid
+                and data.get("sideB", {}).get("objectTypeRid") == backing_object_type_rid
+            ):
+                results.append(
+                    {
+                        "rid": data.get("rid"),
+                        "id": data.get("id"),
+                        "sideADisplayName": data.get("sideA", {}).get("displayName"),
+                        "sideBDisplayName": data.get("sideB", {}).get("displayName"),
+                    }
+                )
+        return results
