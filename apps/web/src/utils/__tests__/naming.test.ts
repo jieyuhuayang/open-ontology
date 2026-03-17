@@ -51,4 +51,12 @@ describe('toCamelCase', () => {
   it('returns empty string for empty input', () => {
     expect(toCamelCase('')).toBe('');
   });
+
+  it('splits PascalCase input (BUG-5)', () => {
+    expect(toCamelCase('EmployeeName')).toBe('employeeName');
+  });
+
+  it('splits acronym boundaries', () => {
+    expect(toCamelCase('myHTTPClient')).toBe('myHttpClient');
+  });
 });
