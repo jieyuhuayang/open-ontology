@@ -40,7 +40,7 @@ class SearchStorage:
     ) -> list[tuple[ObjectTypeModel, list[str]]]:
         escaped = _escape_like(query)
         pattern = f"{escaped}%"
-        tsquery = func.plainto_tsquery(literal("simple"), query)
+        tsquery = func.plainto_tsquery(literal_column("'simple'::regconfig"), query)
 
         # FTS query
         fts_stmt = (
@@ -99,7 +99,7 @@ class SearchStorage:
     ) -> list[tuple[PropertyModel, list[str]]]:
         escaped = _escape_like(query)
         pattern = f"{escaped}%"
-        tsquery = func.plainto_tsquery(literal("simple"), query)
+        tsquery = func.plainto_tsquery(literal_column("'simple'::regconfig"), query)
 
         # FTS
         fts_stmt = (
@@ -155,7 +155,7 @@ class SearchStorage:
     ) -> list[tuple[LinkTypeModel, list[str]]]:
         escaped = _escape_like(query)
         pattern = f"{escaped}%"
-        tsquery = func.plainto_tsquery(literal("simple"), query)
+        tsquery = func.plainto_tsquery(literal_column("'simple'::regconfig"), query)
 
         # FTS on link_types.search_vector
         fts_stmt = (
