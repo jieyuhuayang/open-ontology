@@ -136,6 +136,47 @@
       "many-to-one": "Many instances on Side A link to one on Side B",
       "many-to-many": "Multiple instances on both sides can link to each other"
     },
+    "relationCard": {
+      "oneToOne": {
+        "desc": "Each A maps to exactly one B",
+        "example": "e.g. Employee ↔ Desk"
+      },
+      "oneToMany": {
+        "desc": "One A maps to many Bs",
+        "example": "e.g. Department → Employees"
+      },
+      "manyToOne": {
+        "desc": "Many As map to one B",
+        "example": "e.g. Employees → Department"
+      },
+      "manyToMany": {
+        "desc": "Many objects on both sides are interconnected",
+        "example": "e.g. Students ↔ Courses"
+      }
+    },
+    "relationHelp": {
+      "oneToOne": {
+        "body": "One Side A object has exactly one corresponding Side B object, and vice versa.",
+        "example": "e.g. Each employee has exactly one desk.",
+        "technical": "Implemented via Foreign Key — relationship data is stored as an object property"
+      },
+      "oneToMany": {
+        "body": "One Side A object can link to multiple Side B objects, but each Side B links to only one Side A.",
+        "example": "e.g. A department has many employees; each employee belongs to one department.",
+        "technical": "Implemented via Foreign Key — relationship data is stored on the Side B object"
+      },
+      "manyToOne": {
+        "body": "Multiple Side A objects can link to the same Side B object; each Side A links to only one Side B.",
+        "example": "e.g. Many employees belong to the same department.",
+        "technical": "Implemented via Foreign Key — relationship data is stored on the Side A object"
+      },
+      "manyToMany": {
+        "body": "Objects on both sides can freely link to each other without quantity limits.",
+        "example": "e.g. Students can enroll in multiple courses; each course has multiple students.",
+        "technical": "Implemented via Join Table or Backing Object"
+      },
+      "technicalLabel": "Technical Details"
+    },
     "detail": {
       "overviewTab": "Overview",
       "datasetsTab": "Datasets",
