@@ -41,19 +41,21 @@ function toCamelCase(str: string): string {
     .join('');
 }
 
-interface CardinalityOption {
-  value: Cardinality;
-  group: 'fk' | 'jt' | 'bo';
-  disabled?: boolean;
-}
+const CARDINALITY_CHOICES: Cardinality[] = ['one-to-one', 'one-to-many', 'many-to-one', 'many-to-many'];
 
-const CARDINALITY_OPTIONS: CardinalityOption[] = [
-  { value: 'one-to-one', group: 'fk' },
-  { value: 'one-to-many', group: 'fk' },
-  { value: 'many-to-one', group: 'fk' },
-  { value: 'many-to-many', group: 'jt' },
-  { value: 'many-to-many', group: 'bo' },
-];
+const CARDINALITY_HELP_KEYS: Record<Cardinality, string> = {
+  'one-to-one': 'oneToOne',
+  'one-to-many': 'oneToMany',
+  'many-to-one': 'manyToOne',
+  'many-to-many': 'manyToMany',
+};
+
+const CARDINALITY_DIAGRAM_TYPES: Record<Cardinality, 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many'> = {
+  'one-to-one': 'one-to-one',
+  'one-to-many': 'one-to-many',
+  'many-to-one': 'many-to-one',
+  'many-to-many': 'many-to-many',
+};
 
 export default function CreateLinkTypeWizard() {
   const { t } = useTranslation();
