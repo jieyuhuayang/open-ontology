@@ -467,7 +467,7 @@ class LinkTypeService:
             **{**LinkType.model_validate(merged_data).model_dump(), "change_state": new_state}
         )
         ot_map = await self._get_ot_display_name_map()
-        return self._fill_display_fields(lt, ot_map)
+        return await self._fill_display_fields(lt, ot_map)
 
     async def delete(self, rid: str) -> None:
         found = await self._find_in_merged_view(rid)
