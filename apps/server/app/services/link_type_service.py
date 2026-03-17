@@ -53,12 +53,23 @@ class LinkTypeService:
             if state != ChangeState.DELETED
         }
 
-    def _fill_ot_display_names(
+    async def _fill_display_fields(
         self, lt: LinkTypeWithChangeState, ot_map: dict[str, str]
     ) -> LinkTypeWithChangeState:
-        """Fill objectTypeDisplayName on both sides from OT map."""
+        """Fill objectTypeDisplayName on both sides + BO display fields."""
         lt.side_a.object_type_display_name = ot_map.get(lt.side_a.object_type_rid)
         lt.side_b.object_type_display_name = ot_map.get(lt.side_b.object_type_rid)
+
+        # Fill BO display fields
+        if lt.backing_object_type_rid:
+            lt.backing_object_type_display_name = ot_map.get(lt.backing_object_type_rid)
+        if lt.side_a_link_type_rid:
+            found = await self._find_in_merged_view(lt.side_a_link_type_rid)
+            lt.side_a_link_type_id = found[0].get("id") if found else None
+        if lt.side_b_link_type_rid:
+            found = await self._find_in_merged_view(lt.side_b_link_type_rid)
+            lt.side_b_link_type_id = found[0].get("id") if found else None
+
         return lt
 
     async def _check_id_uniqueness(
