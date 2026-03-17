@@ -16,8 +16,8 @@
   - 修改 `src/queryClient.ts`：MutationCache.onError 增加 `meta.skipGlobalError` 支持
 
 - [x] **T3: 校验工具 + Zustand Store**
-  - 新建 `src/utils/validation.ts`：validateObjectTypeId, validateApiName
-  - 新建 `src/stores/create-object-type-modal-store.ts`：isOpen + open() / close()
+  - 新建 `src/utils/validation.ts`：validateObjectTypeId, validateApiName ✅ 已实现
+  - 新建 `src/stores/create-wizard-store.ts`（原计划 `create-object-type-modal-store.ts`）：5 步 Wizard 状态管理（isOpen, currentStep, formData, open/close/reset/nextStep/prevStep 等）
 
 ---
 
@@ -40,9 +40,11 @@
   - 新建 `src/pages/object-types/components/ObjectTypeTable.tsx`
   - 重写 `src/pages/object-types/ObjectTypeListPage.tsx`（表格 + 筛选 + 空状态 + 分页）
 
-- [x] **T7: CreateObjectTypeModal**
-  - 新建 `src/pages/object-types/components/CreateObjectTypeModal.tsx`
-  - 包含 IconSelector、表单校验、服务器错误码映射
+- [x] **T7: CreateObjectTypeWizard（5 步 Wizard Modal）**
+  - 新建 `src/pages/object-types/components/CreateObjectTypeWizard.tsx`（原计划 `CreateObjectTypeModal.tsx` 单步 Modal）
+  - 实际实现为 5 步 Wizard：WizardStepDatasource → WizardStepMetadata → WizardStepProperties → WizardStepActions → WizardStepSaveLocation
+  - 在 AppShell 层全局渲染（`AppShell.tsx` 中引用）
+  - 包含 IconSelector、属性管理、动作选择、项目选择
 
 - [x] **T8: DeleteObjectTypeModal + DetailLayout 改造**
   - 新建 `src/pages/object-types/components/DeleteObjectTypeModal.tsx`
@@ -58,9 +60,9 @@
 
 - [x] **T10: 路由与布局更新**
   - 修改 `src/router.tsx`：删除 `/object-types/new`，替换 overview placeholder
-  - 修改 `src/components/layout/CreateMenu.tsx`：navigate → Zustand store.open()
+  - 修改 `src/components/layout/CreateMenu.tsx`：navigate → `useCreateWizardStore.open()`
   - 修改 `src/components/layout/DetailSidebarLayout.tsx`：增加 `extra` + `onNavClick` props
-  - 修改 `src/components/layout/HomeLayout.tsx`：增加 CreateObjectTypeModal
+  - 修改 `src/components/layout/AppShell.tsx`：增加 `CreateObjectTypeWizard` 全局渲染（而非 HomeLayout）
 
 - [x] **T11: i18n 翻译**
   - 修改 `src/locales/en-US/common.json`：增加 objectType.* 命名空间

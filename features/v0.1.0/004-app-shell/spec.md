@@ -31,7 +31,7 @@
 
 - **AC4**: 顶栏左侧显示应用 Logo + "Ontology Management" 标题
 - **AC5**: 顶栏中部包含全局搜索框占位（仅 UI 壳，显示 placeholder "Search by name, RID, aliases..." 及 ⌘K 快捷键提示；搜索逻辑由 F008 实现）
-- **AC6**: 顶栏右侧包含 "New" 创建按钮（下拉菜单：创建对象类型、创建链接类型），点击菜单项后导航到对应的创建流程页面（创建逻辑由 F005/F006 实现，此处仅提供导航入口）
+- **AC6**: 顶栏右侧包含 "New" 创建按钮（下拉菜单：创建对象类型、创建链接类型），点击菜单项后打开对应的 Zustand store 模态向导（`useCreateWizardStore.open()` / `useCreateLinkTypeModalStore.open()`），创建逻辑由 F005/F006 实现，此处仅提供触发入口
 - **AC7**: 顶栏右侧预留变更状态区域（用于显示 "N edits" + "Discard" + "Save" 按钮，实际逻辑与 UI 由 F009 变更管理特性填充）
 - **AC8**: 顶栏右侧包含语言切换入口
 
@@ -40,9 +40,10 @@
 首页模式在用户位于首页（Discover）或资源列表页面时展示。
 
 - **AC9**: 侧边栏顶部显示 Ontology 名称（MVP 固定显示默认 Ontology 名称）
-- **AC10**: 导航菜单包含以下项目，分为两组：
+- **AC10**: 导航菜单包含以下项目，分为三组：
   - **主导航**：Discover（发现页）
   - **Resources（资源）**：Object Types（对象类型）、Properties（属性）、Link Types（链接类型）、Action Types（动作类型）
+  - **Data Connection（数据连接）**：Data Connection（数据连接管理入口）
 - **AC11**: Object Types 和 Link Types 导航项旁显示对应资源总数（从 API 获取，API 就绪前显示为 "—"）
 - **AC12**: Properties 和 Action Types 导航项可正常点击，进入各自的占位页面（显示资源类型名称 + "Coming Soon" 或空列表提示），后续由对应特性（F007 / 未来 Action Type 特性）替换
 - **AC13**: 当前激活的导航项高亮显示
@@ -59,7 +60,8 @@
   - Datasources（数据源）
 - **AC17**: 链接类型详情侧边栏包含以下子页面导航项：
   - Overview（概览）— 默认选中
-  - Datasources（数据源）
+  - Datasets（数据集）— 仅 join-table 类型的链接显示
+  > **实现备注**：当前 LinkTypeDetailPage 采用独立页面模式（单页面内通过 `activeTab` 状态切换 tab 内容），而非嵌套路由 + `<Outlet />`。仍使用 `DetailSidebarLayout` 组件渲染侧边栏，但不走路由切换。
 - **AC18**: 详情侧边栏框架作为可复用布局组件（`DetailSidebarLayout`），接受子页面导航配置作为 props，各 CRUD 特性可灵活定义自己的子页面列表
 - **AC19**: 当前激活的子页面导航项高亮显示
 
@@ -83,12 +85,12 @@
     - `/object-types/:rid/properties` — 属性列表
     - `/object-types/:rid/datasources` — 数据源
   - `/link-types` — 链接类型列表
-  - `/link-types/:rid` — 链接类型详情（嵌套子路由）
-    - `/link-types/:rid/overview` — 概览（默认）
-    - `/link-types/:rid/datasources` — 数据源
+  - `/link-types/:rid` — 链接类型详情（独立页面模式，内部通过 tab 状态切换）
+  - `/data-connection` — 数据连接管理
   - `/properties` — 属性列表页（占位）
   - `/action-types` — 动作类型列表页（占位）
   - `*` — 404 页面
+  > **实现备注**：创建流程通过 AppShell 层的全局模态 Wizard 实现（`CreateObjectTypeWizard` / `CreateLinkTypeWizard`），无需独立的 `/object-types/new` 或 `/link-types/new` 路由。
 - **AC24**: 每个路由目标有对应的占位组件（显示页面名称即可），后续特性替换
 - **AC25**: 对象类型和链接类型详情页访问 `/object-types/:rid` 时自动重定向到 `/object-types/:rid/overview`
 

@@ -75,7 +75,7 @@
     "emptyTitle": "创建你的第一个链接类型",
     "emptyDescription": "链接类型定义对象类型之间的语义关系。",
     "wizard": {
-      "step1": "基数",
+      "step1": "关系类型",
       "step2": "对象类型",
       "step3": "详情",
       "next": "下一步",
@@ -85,8 +85,18 @@
       "selectObjectType": "选择对象类型",
       "fkGroup": "外键",
       "jtGroup": "连接表",
+      "boGroup": "支撑对象",
       "selectDataset": "选择连接表数据集",
-      "columnMapping": "选择列"
+      "columnMapping": "选择列",
+      "selectRelationType": "选择对象之间的关系类型",
+      "nnSubQuestion": "这段关系本身是否需要携带额外信息？",
+      "nnSimple": "简单关系",
+      "nnSimpleDesc": "只记录\"谁和谁关联\"，关系本身没有额外属性",
+      "nnSimpleExample": "例：标签 ↔ 文章",
+      "nnRich": "丰富关系",
+      "nnRichDesc": "关系本身可以拥有属性，通过一个中间对象类型承载",
+      "nnRichExample": "例：选课记录（含成绩、学期）",
+      "nnRichNote": "需要先创建一个中间对象类型"
     },
     "fields": {
       "id": "ID",
@@ -111,7 +121,8 @@
     },
     "joinMethod": {
       "foreignKey": "外键",
-      "joinTable": "连接表"
+      "joinTable": "连接表",
+      "backingObject": "支撑对象"
     },
     "cardinality": {
       "one-to-one": "一对一",
@@ -124,6 +135,47 @@
       "one-to-many": "A 端的一个实例链接到 B 端的多个实例",
       "many-to-one": "A 端的多个实例链接到 B 端的一个实例",
       "many-to-many": "两端的多个实例可以相互链接"
+    },
+    "relationCard": {
+      "oneToOne": {
+        "desc": "每个 A 恰好对应一个 B",
+        "example": "例：员工 ↔ 工位"
+      },
+      "oneToMany": {
+        "desc": "一个 A 对应多个 B",
+        "example": "例：部门 → 员工"
+      },
+      "manyToOne": {
+        "desc": "多个 A 对应一个 B",
+        "example": "例：员工 → 部门"
+      },
+      "manyToMany": {
+        "desc": "两端的多个对象互相关联",
+        "example": "例：学生 ↔ 课程"
+      }
+    },
+    "relationHelp": {
+      "oneToOne": {
+        "body": "一个 A 端对象有且仅有一个对应的 B 端对象，反之亦然。",
+        "example": "例：每名员工有且仅有一个工位。",
+        "technical": "通过外键（Foreign Key）实现，关系数据存储在对象属性中"
+      },
+      "oneToMany": {
+        "body": "一个 A 端对象可以关联多个 B 端对象，但每个 B 端只关联一个 A 端。",
+        "example": "例：一个部门有多名员工，每名员工只属于一个部门。",
+        "technical": "通过外键（Foreign Key）实现，关系数据存储在 B 端对象上"
+      },
+      "manyToOne": {
+        "body": "多个 A 端对象可以关联同一个 B 端对象，每个 A 端只关联一个 B 端。",
+        "example": "例：多名员工属于同一个部门。",
+        "technical": "通过外键（Foreign Key）实现，关系数据存储在 A 端对象上"
+      },
+      "manyToMany": {
+        "body": "两端的对象可以自由关联，不限数量。",
+        "example": "例：学生可以选多门课程，每门课程也有多名学生。",
+        "technical": "通过连接表（Join Table）或支撑对象（Backing Object）实现"
+      },
+      "technicalLabel": "技术细节"
     },
     "detail": {
       "overviewTab": "概览",
@@ -144,6 +196,19 @@
       "idConflict": "已存在相同 ID 的链接类型",
       "apiNameConflict": "此 API Name 在关联的对象类型下已存在",
       "joinTableRequired": "多对多基数需要连接表数据集"
+    },
+    "bo": {
+      "cardTitle": "多对多（支撑对象）",
+      "cardDesc": "通过一个中介对象类型承载多对多关系",
+      "backingOt": "支撑对象类型",
+      "selectBackingOt": "选择支撑对象类型",
+      "sideALink": "A 端链接类型",
+      "sideBLink": "B 端链接类型",
+      "selectSideLink": "选择链接类型",
+      "noSideLink": "{{side}}到支撑对象类型没有多对一链接，请先创建。",
+      "sectionTitle": "支撑对象",
+      "deleted": "已删除",
+      "validationError": "支撑对象校验失败"
     }
   },
   "property": {

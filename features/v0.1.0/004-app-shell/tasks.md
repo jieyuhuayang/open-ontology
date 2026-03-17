@@ -118,7 +118,7 @@
 **验收**:
 - LanguageSwitcher: 渲染语言切换入口；点击后可切换语言（调用 i18n.changeLanguage）；显示当前语言名称
 - SearchBarPlaceholder: 渲染带 placeholder "Search by name, RID, aliases..." 的输入框；显示 ⌘K 快捷键提示；输入框为 disabled 状态
-- CreateMenu: 渲染 "New" 按钮；下拉菜单包含 "Create Object Type" 和 "Create Link Type" 两项；点击菜单项后导航到 `/object-types/new` 和 `/link-types/new`
+- CreateMenu: 渲染 "New" 按钮；下拉菜单包含 "Create Object Type" 和 "Create Link Type" 两项；点击菜单项后调用对应 Zustand store 的 `open()` 方法打开模态 Wizard
 
 **关联 AC**: AC5, AC6, AC8, AC29
 
@@ -134,7 +134,7 @@
 **要点**:
 - LanguageSwitcher: Ant Design Dropdown/Select，选项为 English / 中文，调用 `i18n.changeLanguage('en-US')` / `i18n.changeLanguage('zh-CN')`
 - SearchBarPlaceholder: `<Input prefix={<SearchOutlined />} placeholder={t('topBar.searchPlaceholder')} suffix="⌘K" disabled />`
-- CreateMenu: `<Dropdown>` + `<Button>` "New"，菜单项 navigate 到对应路由
+- CreateMenu: `<Dropdown>` + `<Button>` "New"，菜单项调用 `useCreateWizardStore.open()` / `useCreateLinkTypeModalStore.open()` 打开模态 Wizard
 
 **关联 AC**: AC5, AC6, AC8, AC29
 
@@ -341,9 +341,7 @@
 **验收**:
 - `/` 渲染 DiscoverPage
 - `/object-types` 渲染 ObjectTypeListPage
-- `/object-types/new` 渲染 CreateObjectType 占位页
 - `/link-types` 渲染 LinkTypeListPage
-- `/link-types/new` 渲染 CreateLinkType 占位页
 - `/properties` 渲染 Properties 占位页（含 Coming Soon）
 - `/action-types` 渲染 ActionTypes 占位页（含 Coming Soon）
 - `/object-types/:rid` 重定向到 `/object-types/:rid/overview`
@@ -403,7 +401,7 @@ cd apps/web && pnpm dev
 1. 首页 `/` 显示 Discover 页面（空状态）
 2. 侧边栏导航可点击，路由正确跳转
 3. 侧边栏折叠/展开正常，刷新后状态保持
-4. TopBar "New" 下拉菜单导航到创建占位页
+4. TopBar "New" 下拉菜单打开对应的创建 Wizard 模态框
 5. 语言切换中英文正常
 6. 访问不存在路由显示 404
 7. `/object-types/test-rid` 自动重定向到 `/object-types/test-rid/overview`

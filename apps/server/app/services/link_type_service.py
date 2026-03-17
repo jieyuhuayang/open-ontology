@@ -1,5 +1,7 @@
 """LinkType CRUD business logic."""
 
+from __future__ import annotations
+
 import uuid
 from datetime import datetime, timezone
 
@@ -53,12 +55,23 @@ class LinkTypeService:
             if state != ChangeState.DELETED
         }
 
-    def _fill_ot_display_names(
+    async def _fill_display_fields(
         self, lt: LinkTypeWithChangeState, ot_map: dict[str, str]
     ) -> LinkTypeWithChangeState:
-        """Fill objectTypeDisplayName on both sides from OT map."""
+        """Fill objectTypeDisplayName on both sides + BO display fields."""
         lt.side_a.object_type_display_name = ot_map.get(lt.side_a.object_type_rid)
         lt.side_b.object_type_display_name = ot_map.get(lt.side_b.object_type_rid)
+
+        # Fill BO display fields
+        if lt.backing_object_type_rid:
+            lt.backing_object_type_display_name = ot_map.get(lt.backing_object_type_rid)
+        if lt.side_a_link_type_rid:
+            found = await self._find_in_merged_view(lt.side_a_link_type_rid)
+            lt.side_a_link_type_id = found[0].get("id") if found else None
+        if lt.side_b_link_type_rid:
+            found = await self._find_in_merged_view(lt.side_b_link_type_rid)
+            lt.side_b_link_type_id = found[0].get("id") if found else None
+
         return lt
 
     async def _check_id_uniqueness(
@@ -148,28 +161,110 @@ class LinkTypeService:
             status_code=400,
         )
 
-    def _derive_join_method(self, cardinality: str) -> JoinMethod:
-        """Derive join_method from cardinality."""
+    def _derive_join_method(
+        self, cardinality: str, backing_object_type_rid: str | None = None
+    ) -> JoinMethod:
+        """Derive join_method from cardinality and BO presence."""
         if cardinality == "many-to-many":
+            if backing_object_type_rid:
+                return JoinMethod.BACKING_OBJECT
             return JoinMethod.JOIN_TABLE
         return JoinMethod.FOREIGN_KEY
+
+    async def _validate_backing_object(
+        self,
+        req: "LinkTypeCreateRequest",
+    ) -> None:
+        """Validate BO-specific fields: backing OT exists, side links exist and are valid many-to-one."""
+        # Backing OT must exist
+        await self._validate_object_type_exists(req.backing_object_type_rid, "Backing OT")  # type: ignore[arg-type]
+
+        # Side A link must exist and be valid
+        if not req.side_a_link_type_rid:
+            raise AppError(
+                code="LINK_TYPE_BACKING_OT_REQUIRED",
+                message="Backing object connection requires sideALinkTypeRid",
+                status_code=400,
+            )
+        if not req.side_b_link_type_rid:
+            raise AppError(
+                code="LINK_TYPE_BACKING_OT_REQUIRED",
+                message="Backing object connection requires sideBLinkTypeRid",
+                status_code=400,
+            )
+
+        await self._validate_side_link(
+            req.side_a_link_type_rid,
+            req.side_a.object_type_rid,
+            req.backing_object_type_rid,  # type: ignore[arg-type]
+            "A",
+        )
+        await self._validate_side_link(
+            req.side_b_link_type_rid,
+            req.side_b.object_type_rid,
+            req.backing_object_type_rid,  # type: ignore[arg-type]
+            "B",
+        )
+
+    async def _validate_side_link(
+        self,
+        link_rid: str,
+        side_ot_rid: str,
+        backing_ot_rid: str,
+        side_label: str,
+    ) -> None:
+        """Validate a side link is a valid many-to-one from side OT to backing OT."""
+        found = await self._find_in_merged_view(link_rid)
+        if not found:
+            raise AppError(
+                code="LINK_TYPE_SIDE_LINK_NOT_FOUND",
+                message=f"Side {side_label} link type '{link_rid}' not found",
+                status_code=400,
+            )
+        data, state = found
+        if state == ChangeState.DELETED:
+            raise AppError(
+                code="LINK_TYPE_SIDE_LINK_NOT_FOUND",
+                message=f"Side {side_label} link type '{link_rid}' is deleted",
+                status_code=400,
+            )
+        # Must be many-to-one with FK
+        if data.get("cardinality") != "many-to-one" or data.get("joinMethod") != "foreign-key":
+            raise AppError(
+                code="LINK_TYPE_SIDE_LINK_INVALID",
+                message=f"Side {side_label} link must be many-to-one with foreign-key join method",
+                status_code=400,
+            )
+        # Side A of the link (FK side) must be the side OT, side B (PK side) must be backing OT
+        link_side_a_ot = data.get("sideA", {}).get("objectTypeRid")
+        link_side_b_ot = data.get("sideB", {}).get("objectTypeRid")
+        if link_side_a_ot != side_ot_rid or link_side_b_ot != backing_ot_rid:
+            raise AppError(
+                code="LINK_TYPE_SIDE_LINK_INVALID",
+                message=f"Side {side_label} link must connect from side OT to backing OT (many-to-one)",
+                status_code=400,
+            )
 
     async def create(self, req: LinkTypeCreateRequest) -> LinkTypeWithChangeState:
         validate_link_type_id(req.id)
         validate_link_side_api_name(req.side_a.api_name, "A")
         validate_link_side_api_name(req.side_b.api_name, "B")
 
-        # Derive join_method from cardinality
-        join_method = self._derive_join_method(req.cardinality.value)
+        # Derive join_method from cardinality + BO presence
+        join_method = self._derive_join_method(req.cardinality.value, req.backing_object_type_rid)
         validate_cardinality_join_method_match(req.cardinality.value, join_method.value)
 
-        # JT validation: many-to-many must have join_table_dataset_rid
+        # JT validation: many-to-many + join-table must have join_table_dataset_rid
         if join_method == JoinMethod.JOIN_TABLE and not req.join_table_dataset_rid:
             raise AppError(
                 code="LINK_TYPE_JOIN_TABLE_REQUIRED",
                 message="Many-to-many cardinality requires a join table dataset",
                 status_code=400,
             )
+
+        # BO validation
+        if join_method == JoinMethod.BACKING_OBJECT:
+            await self._validate_backing_object(req)
 
         # Verify both ObjectTypes exist (self-link is allowed)
         await self._validate_object_type_exists(req.side_a.object_type_rid, "A")
@@ -207,6 +302,9 @@ class LinkTypeService:
             cardinality=req.cardinality,
             join_method=join_method,
             join_table_dataset_rid=req.join_table_dataset_rid,
+            backing_object_type_rid=req.backing_object_type_rid,
+            side_a_link_type_rid=req.side_a_link_type_rid,
+            side_b_link_type_rid=req.side_b_link_type_rid,
             status=req.status,
             project_rid=project_rid,
             ontology_rid=DEFAULT_ONTOLOGY_RID,
@@ -230,7 +328,7 @@ class LinkTypeService:
 
         # Fill OT display names for response
         ot_map = await self._get_ot_display_name_map()
-        return self._fill_ot_display_names(lt, ot_map)
+        return await self._fill_display_fields(lt, ot_map)
 
     async def list(
         self,
@@ -279,7 +377,7 @@ class LinkTypeService:
             lt = LinkTypeWithChangeState(
                 **{**LinkType.model_validate(data).model_dump(), "change_state": state}
             )
-            self._fill_ot_display_names(lt, ot_map)
+            await self._fill_display_fields(lt, ot_map)
             items.append(lt)
 
         return LinkTypeListResponse(
@@ -302,7 +400,7 @@ class LinkTypeService:
             **{**LinkType.model_validate(data).model_dump(), "change_state": state}
         )
         ot_map = await self._get_ot_display_name_map()
-        return self._fill_ot_display_names(lt, ot_map)
+        return await self._fill_display_fields(lt, ot_map)
 
     async def update(self, rid: str, req: LinkTypeUpdateRequest) -> LinkTypeWithChangeState:
         found = await self._find_in_merged_view(rid)
@@ -371,7 +469,7 @@ class LinkTypeService:
             **{**LinkType.model_validate(merged_data).model_dump(), "change_state": new_state}
         )
         ot_map = await self._get_ot_display_name_map()
-        return self._fill_ot_display_names(lt, ot_map)
+        return await self._fill_display_fields(lt, ot_map)
 
     async def delete(self, rid: str) -> None:
         found = await self._find_in_merged_view(rid)
@@ -402,3 +500,32 @@ class LinkTypeService:
             timestamp=now,
         )
         await self._ws_service.add_change(DEFAULT_ONTOLOGY_RID, change)
+
+    async def get_eligible_side_links(
+        self,
+        side_object_type_rid: str,
+        backing_object_type_rid: str,
+    ) -> list[dict]:
+        """Return eligible many-to-one links from side OT to backing OT."""
+        merged = await self._ws_service.get_merged_view(
+            DEFAULT_ONTOLOGY_RID, ResourceType.LINK_TYPE
+        )
+        results = []
+        for data, state in merged:
+            if state == ChangeState.DELETED:
+                continue
+            if (
+                data.get("cardinality") == "many-to-one"
+                and data.get("joinMethod") == "foreign-key"
+                and data.get("sideA", {}).get("objectTypeRid") == side_object_type_rid
+                and data.get("sideB", {}).get("objectTypeRid") == backing_object_type_rid
+            ):
+                results.append(
+                    {
+                        "rid": data.get("rid"),
+                        "id": data.get("id"),
+                        "sideADisplayName": data.get("sideA", {}).get("displayName"),
+                        "sideBDisplayName": data.get("sideB", {}).get("displayName"),
+                    }
+                )
+        return results

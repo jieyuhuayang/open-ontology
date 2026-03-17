@@ -1,0 +1,32 @@
+-- 04-seed-analysts.sql — 30 fictional analysts at real brokerages
+
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-001', '张超桂', '中信证券', '白酒', '600519', '2019-02-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-002', '李平磊', '海通证券', '银行', '000858', '2018-05-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-003', '陈昊娟', '国泰君安', '保险', '000568', '2011-04-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-004', '孙艳强', '华泰证券', '券商', '601398', '2017-09-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-005', '宋艳桂', '广发证券', '地产', '601288', '2022-11-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-006', '何伟华', '招商证券', '新能源', '600036', '2023-09-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-007', '吴昊华', '申万宏源', '汽车', '601166', '2011-03-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-008', '周敏嘉', '中金公司', '医药', '601818', '2011-12-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-009', '林静勇', '银河证券', '科技', '601318', '2014-10-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-010', '杨鑫杰', '国信证券', '家电', '601601', '2013-11-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-011', '梁瑞勇', '兴业证券', '食品饮料', '600030', '2018-08-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-012', '周嘉昊', '东方证券', '钢铁有色', '601688', '2023-01-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-013', '李文明', '光大证券', '电力公用', '000002', '2023-05-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-014', '王伟杰', '中泰证券', '通信电子', '001979', '2022-03-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-015', '梁勇强', '天风证券', '建材化工', '300750', '2021-08-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-016', '林鑫明', '中信证券', '白酒', '601012', '2018-01-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-017', '赵娜嘉', '海通证券', '银行', '600438', '2021-03-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-018', '林芳博', '国泰君安', '保险', '600104', '2015-10-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-019', '林静明', '华泰证券', '券商', '002594', '2012-01-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-020', '吴娟嘉', '广发证券', '地产', '601238', '2022-01-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-021', '冯娟磊', '招商证券', '新能源', '600276', '2020-04-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-022', '谢敏娟', '申万宏源', '汽车', '000538', '2022-09-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-023', '冯瑞明', '中金公司', '医药', '300760', '2019-12-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-024', '陈昊昊', '银河证券', '科技', '603259', '2013-03-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-025', '曹峰强', '国信证券', '家电', '002415', '2016-01-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-026', '刘宇昊', '兴业证券', '食品饮料', '600588', '2015-07-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-027', '曹华瑞', '东方证券', '钢铁有色', '603501', '2021-04-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-028', '周强峰', '光大证券', '电力公用', '002230', '2021-02-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-029', '马瑞芳', '中泰证券', '通信电子', '000651', '2023-08-01', TRUE);
+INSERT INTO analysts (id, name, firm, specialty, company_id, hire_date, is_active) VALUES ('ANL-030', '黄磊博', '天风证券', '建材化工', '000333', '2017-06-01', TRUE);

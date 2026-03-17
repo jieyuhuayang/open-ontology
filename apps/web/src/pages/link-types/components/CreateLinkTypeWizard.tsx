@@ -1,25 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
-import {
-  Modal,
-  Steps,
-  Card,
-  Flex,
-  Select,
-  Form,
-  Input,
-  Radio,
-  Typography,
-  message,
-  Divider,
-} from 'antd';
+import { Modal, Steps, Flex, Select, Form, Input, Radio, Typography, message, Divider, Alert } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useCreateLinkTypeModalStore } from '@/stores/create-link-type-modal-store';
-import { useCreateLinkType } from '@/api/link-types';
+import { useCreateLinkType, useEligibleSideLinks } from '@/api/link-types';
 import { useObjectTypes } from '@/api/object-types';
 import { useDatasets, useDataset } from '@/api/datasets';
 import type { Cardinality } from '@/api/types';
 import type { AxiosError } from 'axios';
+import RelationshipCard from './RelationshipCard';
+import NNSubSelector from './NNSubSelector';
 
 const { Text } = Typography;
 
@@ -51,18 +41,21 @@ function toCamelCase(str: string): string {
     .join('');
 }
 
-interface CardinalityOption {
-  value: Cardinality;
-  group: 'fk' | 'jt' | 'bo';
-  disabled?: boolean;
-}
+const CARDINALITY_CHOICES: Cardinality[] = ['one-to-one', 'one-to-many', 'many-to-one', 'many-to-many'];
 
-const CARDINALITY_OPTIONS: CardinalityOption[] = [
-  { value: 'one-to-one', group: 'fk' },
-  { value: 'one-to-many', group: 'fk' },
-  { value: 'many-to-one', group: 'fk' },
-  { value: 'many-to-many', group: 'jt' },
-];
+const CARDINALITY_HELP_KEYS: Record<Cardinality, string> = {
+  'one-to-one': 'oneToOne',
+  'one-to-many': 'oneToMany',
+  'many-to-one': 'manyToOne',
+  'many-to-many': 'manyToMany',
+};
+
+const CARDINALITY_DIAGRAM_TYPES: Record<Cardinality, 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many'> = {
+  'one-to-one': 'one-to-one',
+  'one-to-many': 'one-to-many',
+  'many-to-one': 'many-to-one',
+  'many-to-many': 'many-to-many',
+};
 
 export default function CreateLinkTypeWizard() {
   const { t } = useTranslation();
@@ -75,6 +68,7 @@ export default function CreateLinkTypeWizard() {
 
   const [currentStep, setCurrentStep] = useState(0);
   const [cardinality, setCardinality] = useState<Cardinality | null>(null);
+  const [isBackingObject, setIsBackingObject] = useState(false);
   const [sideARid, setSideARid] = useState<string | undefined>(undefined);
   const [sideBRid, setSideBRid] = useState<string | undefined>(undefined);
   const [joinTableDatasetRid, setJoinTableDatasetRid] = useState<string | undefined>(undefined);
@@ -82,10 +76,32 @@ export default function CreateLinkTypeWizard() {
   const [sideBJtColumn, setSideBJtColumn] = useState<string | undefined>(undefined);
   const [sideAFkPropId, setSideAFkPropId] = useState<string | undefined>(undefined);
 
-  const isJoinTable = cardinality === 'many-to-many';
+  // BO-specific state
+  const [backingOtRid, setBackingOtRid] = useState<string | undefined>(undefined);
+  const [sideALinkRid, setSideALinkRid] = useState<string | undefined>(undefined);
+  const [sideBLinkRid, setSideBLinkRid] = useState<string | undefined>(undefined);
+
+  const isJoinTable = cardinality === 'many-to-many' && !isBackingObject;
 
   // Load dataset columns when a JT dataset is selected
   const { data: selectedDataset } = useDataset(joinTableDatasetRid ?? '');
+
+  // Load eligible side links for BO mode
+  const { data: sideALinks } = useEligibleSideLinks(sideARid, backingOtRid);
+  const { data: sideBLinks } = useEligibleSideLinks(sideBRid, backingOtRid);
+
+  // Auto-select when only one link is available
+  useEffect(() => {
+    if (sideALinks && sideALinks.length === 1) {
+      setSideALinkRid(sideALinks[0]?.rid);
+    }
+  }, [sideALinks]);
+
+  useEffect(() => {
+    if (sideBLinks && sideBLinks.length === 1) {
+      setSideBLinkRid(sideBLinks[0]?.rid);
+    }
+  }, [sideBLinks]);
 
   const objectTypeOptions = useMemo(() => {
     if (!objectTypesData?.items) return [];
@@ -122,12 +138,16 @@ export default function CreateLinkTypeWizard() {
   const handleClose = () => {
     setCurrentStep(0);
     setCardinality(null);
+    setIsBackingObject(false);
     setSideARid(undefined);
     setSideBRid(undefined);
     setJoinTableDatasetRid(undefined);
     setSideAJtColumn(undefined);
     setSideBJtColumn(undefined);
     setSideAFkPropId(undefined);
+    setBackingOtRid(undefined);
+    setSideALinkRid(undefined);
+    setSideBLinkRid(undefined);
     form.resetFields();
     close();
   };
@@ -137,6 +157,7 @@ export default function CreateLinkTypeWizard() {
     if (currentStep === 1) {
       if (!sideARid || !sideBRid) return;
       if (isJoinTable && !joinTableDatasetRid) return;
+      if (isBackingObject && (!backingOtRid || !sideALinkRid || !sideBLinkRid)) return;
 
       // Auto-populate form defaults based on selected OTs
       const sideAOt = objectTypesData?.items.find((ot) => ot.rid === sideARid);
@@ -187,6 +208,13 @@ export default function CreateLinkTypeWizard() {
         ...(isJoinTable && joinTableDatasetRid
           ? { joinTableDatasetRid: joinTableDatasetRid }
           : {}),
+        ...(isBackingObject
+          ? {
+              backingObjectTypeRid: backingOtRid,
+              sideALinkTypeRid: sideALinkRid,
+              sideBLinkTypeRid: sideBLinkRid,
+            }
+          : {}),
         status: values.status as 'active' | 'experimental' | 'deprecated',
       });
       message.success(t('linkType.createSuccess'));
@@ -201,6 +229,14 @@ export default function CreateLinkTypeWizard() {
         message.error(t('linkType.validation.apiNameConflict'));
       } else if (code === 'LINK_TYPE_JOIN_TABLE_REQUIRED') {
         message.error(t('linkType.validation.joinTableRequired'));
+      } else if (
+        code === 'LINK_TYPE_SIDE_LINK_NOT_FOUND' ||
+        code === 'LINK_TYPE_SIDE_LINK_INVALID' ||
+        code === 'LINK_TYPE_BACKING_OT_NOT_FOUND' ||
+        code === 'LINK_TYPE_BACKING_OT_REQUIRED'
+      ) {
+        const serverMessage = axiosErr.response?.data?.error?.message;
+        message.error(serverMessage ?? t('linkType.bo.validationError'));
       } else if (code) {
         const serverMessage = axiosErr.response?.data?.error?.message;
         message.error(serverMessage ?? t('error.somethingWentWrong'));
@@ -208,14 +244,54 @@ export default function CreateLinkTypeWizard() {
     }
   };
 
-  const totalSteps = 3; // Step 0: Cardinality, Step 1: Resources, Step 2: Details
+  const totalSteps = 3;
   const isNextDisabled =
     (currentStep === 0 && !cardinality) ||
     (currentStep === 1 &&
-      (!sideARid || !sideBRid || (isJoinTable && !joinTableDatasetRid)));
+      (!sideARid ||
+        !sideBRid ||
+        (isJoinTable && !joinTableDatasetRid) ||
+        (isBackingObject && (!backingOtRid || !sideALinkRid || !sideBLinkRid))));
 
-  const fkOptions = CARDINALITY_OPTIONS.filter((o) => o.group === 'fk');
-  const jtOptions = CARDINALITY_OPTIONS.filter((o) => o.group === 'jt');
+  const handleCardinalitySelect = (value: Cardinality) => {
+    setCardinality(value);
+    if (value !== 'many-to-many') {
+      setIsBackingObject(false);
+      setBackingOtRid(undefined);
+      setSideALinkRid(undefined);
+      setSideBLinkRid(undefined);
+      setJoinTableDatasetRid(undefined);
+      setSideAJtColumn(undefined);
+      setSideBJtColumn(undefined);
+    }
+  };
+
+  const handleNNSubChange = (bo: boolean) => {
+    setIsBackingObject(bo);
+    if (bo) {
+      setJoinTableDatasetRid(undefined);
+      setSideAJtColumn(undefined);
+      setSideBJtColumn(undefined);
+    } else {
+      setBackingOtRid(undefined);
+      setSideALinkRid(undefined);
+      setSideBLinkRid(undefined);
+    }
+  };
+
+  const sideALinkOptions = useMemo(() => {
+    return (sideALinks ?? []).map((l) => ({
+      value: l.rid,
+      label: `${l.id} (${l.sideADisplayName} → ${l.sideBDisplayName})`,
+    }));
+  }, [sideALinks]);
+
+  const sideBLinkOptions = useMemo(() => {
+    return (sideBLinks ?? []).map((l) => ({
+      value: l.rid,
+      label: `${l.id} (${l.sideADisplayName} → ${l.sideBDisplayName})`,
+    }));
+  }, [sideBLinks]);
 
   return (
     <Modal
@@ -242,66 +318,35 @@ export default function CreateLinkTypeWizard() {
         ]}
       />
 
-      {/* Step 0: Cardinality & Join Method */}
+      {/* Step 0: Relationship Type Selection */}
       {currentStep === 0 && (
-        <Flex vertical gap={16}>
-          <div>
-            <Text strong style={{ display: 'block', marginBottom: 8 }}>
-              {t('linkType.wizard.fkGroup')}
-            </Text>
-            <Flex gap={12}>
-              {fkOptions.map((opt) => (
-                <Card
-                  key={opt.value}
-                  hoverable
-                  style={{
-                    flex: 1,
-                    cursor: 'pointer',
-                    border: cardinality === opt.value ? '2px solid #1677ff' : undefined,
-                  }}
-                  onClick={() => setCardinality(opt.value)}
-                >
-                  <Flex vertical align="center" gap={4}>
-                    <Text strong>{t(`linkType.cardinality.${opt.value}`)}</Text>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {t(`linkType.cardinalityDesc.${opt.value}`)}
-                    </Text>
-                  </Flex>
-                </Card>
-              ))}
-            </Flex>
-          </div>
-
-          <div>
-            <Text strong style={{ display: 'block', marginBottom: 8 }}>
-              {t('linkType.wizard.jtGroup')}
-            </Text>
-            <Flex gap={12}>
-              {jtOptions.map((opt) => (
-                <Card
-                  key={opt.value}
-                  hoverable
-                  style={{
-                    flex: 1,
-                    cursor: 'pointer',
-                    border: cardinality === opt.value ? '2px solid #1677ff' : undefined,
-                  }}
-                  onClick={() => setCardinality(opt.value)}
-                >
-                  <Flex vertical align="center" gap={4}>
-                    <Text strong>{t(`linkType.cardinality.${opt.value}`)}</Text>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {t(`linkType.cardinalityDesc.${opt.value}`)}
-                    </Text>
-                  </Flex>
-                </Card>
-              ))}
-            </Flex>
-          </div>
+        <Flex vertical gap={8}>
+          <Text type="secondary" style={{ marginBottom: 4 }}>
+            {t('linkType.wizard.selectRelationType')}
+          </Text>
+          <Flex gap={12}>
+            {CARDINALITY_CHOICES.map((c) => (
+              <RelationshipCard
+                key={c}
+                diagramType={CARDINALITY_DIAGRAM_TYPES[c]}
+                title={t(`linkType.cardinality.${c}`)}
+                description={t(`linkType.relationCard.${CARDINALITY_HELP_KEYS[c]}.desc`)}
+                example={t(`linkType.relationCard.${CARDINALITY_HELP_KEYS[c]}.example`)}
+                helpKey={CARDINALITY_HELP_KEYS[c]}
+                selected={cardinality === c}
+                onClick={() => handleCardinalitySelect(c)}
+              />
+            ))}
+          </Flex>
+          <NNSubSelector
+            visible={cardinality === 'many-to-many'}
+            isBackingObject={isBackingObject}
+            onChange={handleNNSubChange}
+          />
         </Flex>
       )}
 
-      {/* Step 1: Object Types + FK/JT Config */}
+      {/* Step 1: Object Types + FK/JT/BO Config */}
       {currentStep === 1 && (
         <Flex vertical gap={16}>
           <Flex gap={16}>
@@ -314,12 +359,35 @@ export default function CreateLinkTypeWizard() {
                 }
                 placeholder={t('linkType.wizard.selectObjectType')}
                 value={sideARid}
-                onChange={setSideARid}
+                onChange={(val) => {
+                  setSideARid(val);
+                  setSideALinkRid(undefined);
+                }}
                 options={objectTypeOptions}
                 style={{ width: '100%', marginTop: 8 }}
                 disabled={!!prefilledSideA}
               />
             </div>
+            {isBackingObject && (
+              <div style={{ flex: 1 }}>
+                <Text strong>{t('linkType.bo.backingOt')}</Text>
+                <Select
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
+                  }
+                  placeholder={t('linkType.bo.selectBackingOt')}
+                  value={backingOtRid}
+                  onChange={(val) => {
+                    setBackingOtRid(val);
+                    setSideALinkRid(undefined);
+                    setSideBLinkRid(undefined);
+                  }}
+                  options={objectTypeOptions}
+                  style={{ width: '100%', marginTop: 8 }}
+                />
+              </div>
+            )}
             <div style={{ flex: 1 }}>
               <Text strong>{t('linkType.wizard.sideB')}</Text>
               <Select
@@ -329,12 +397,69 @@ export default function CreateLinkTypeWizard() {
                 }
                 placeholder={t('linkType.wizard.selectObjectType')}
                 value={sideBRid}
-                onChange={setSideBRid}
+                onChange={(val) => {
+                  setSideBRid(val);
+                  setSideBLinkRid(undefined);
+                }}
                 options={objectTypeOptions}
                 style={{ width: '100%', marginTop: 8 }}
               />
             </div>
           </Flex>
+
+          {isBackingObject && backingOtRid && sideARid && sideBRid && (
+            <>
+              <Divider style={{ margin: '8px 0' }} />
+              <Flex gap={16}>
+                <div style={{ flex: 1 }}>
+                  <Text type="secondary">
+                    {t('linkType.wizard.sideA')} → {t('linkType.bo.backingOt')}
+                  </Text>
+                  {sideALinks && sideALinks.length === 0 ? (
+                    <Alert
+                      type="warning"
+                      showIcon
+                      message={t('linkType.bo.noSideLink', {
+                        side: t('linkType.wizard.sideA'),
+                      })}
+                      style={{ marginTop: 8 }}
+                    />
+                  ) : (
+                    <Select
+                      placeholder={t('linkType.bo.selectSideLink')}
+                      value={sideALinkRid}
+                      onChange={setSideALinkRid}
+                      options={sideALinkOptions}
+                      style={{ width: '100%', marginTop: 4 }}
+                    />
+                  )}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <Text type="secondary">
+                    {t('linkType.wizard.sideB')} → {t('linkType.bo.backingOt')}
+                  </Text>
+                  {sideBLinks && sideBLinks.length === 0 ? (
+                    <Alert
+                      type="warning"
+                      showIcon
+                      message={t('linkType.bo.noSideLink', {
+                        side: t('linkType.wizard.sideB'),
+                      })}
+                      style={{ marginTop: 8 }}
+                    />
+                  ) : (
+                    <Select
+                      placeholder={t('linkType.bo.selectSideLink')}
+                      value={sideBLinkRid}
+                      onChange={setSideBLinkRid}
+                      options={sideBLinkOptions}
+                      style={{ width: '100%', marginTop: 4 }}
+                    />
+                  )}
+                </div>
+              </Flex>
+            </>
+          )}
 
           {isJoinTable && (
             <>
@@ -360,7 +485,9 @@ export default function CreateLinkTypeWizard() {
               {joinTableDatasetRid && datasetColumnOptions.length > 0 && (
                 <Flex gap={16}>
                   <div style={{ flex: 1 }}>
-                    <Text type="secondary">{t('linkType.wizard.sideA')} → {t('linkType.detail.jtColumn')}</Text>
+                    <Text type="secondary">
+                      {t('linkType.wizard.sideA')} → {t('linkType.detail.jtColumn')}
+                    </Text>
                     <Select
                       placeholder={t('linkType.wizard.columnMapping')}
                       value={sideAJtColumn}
@@ -370,7 +497,9 @@ export default function CreateLinkTypeWizard() {
                     />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <Text type="secondary">{t('linkType.wizard.sideB')} → {t('linkType.detail.jtColumn')}</Text>
+                    <Text type="secondary">
+                      {t('linkType.wizard.sideB')} → {t('linkType.detail.jtColumn')}
+                    </Text>
                     <Select
                       placeholder={t('linkType.wizard.columnMapping')}
                       value={sideBJtColumn}

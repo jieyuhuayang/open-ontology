@@ -25,6 +25,8 @@ import {
   useMySQLImportedTables,
 } from '@/api/mysql-connections';
 import { useMySQLImport, useImportTask } from '@/api/imports';
+import { useQueryClient } from '@tanstack/react-query';
+import { datasetKeys } from '@/api/datasets';
 import { useDataConnectionStore } from '@/stores/data-connection-store';
 import type { MySQLTableInfo, MySQLColumnInfo } from '@/api/types';
 
@@ -33,6 +35,7 @@ const STEPS = ['connection', 'tables', 'config', 'result'] as const;
 export default function MySQLImportWizard() {
   const { t } = useTranslation();
   const { message } = App.useApp();
+  const queryClient = useQueryClient();
   const openModal = useDataConnectionStore((s) => s.openModal);
   const setOpenModal = useDataConnectionStore((s) => s.setOpenModal);
 
@@ -73,6 +76,7 @@ export default function MySQLImportWizard() {
     if (taskData.status === 'completed' && toastShownRef.current !== 'completed') {
       toastShownRef.current = 'completed';
       message.success(t('mysqlConnection.importSuccess'));
+      queryClient.invalidateQueries({ queryKey: datasetKeys.all });
     } else if (taskData.status === 'failed' && toastShownRef.current !== 'failed') {
       toastShownRef.current = 'failed';
       message.error(t('mysqlConnection.importFailed'));

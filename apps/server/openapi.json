@@ -627,6 +627,55 @@
         }
       }
     },
+    "/api/v1/link-types/eligible-side-links": {
+      "get": {
+        "tags": [
+          "link-types"
+        ],
+        "summary": "Get Eligible Side Links",
+        "operationId": "get_eligible_side_links_api_v1_link_types_eligible_side_links_get",
+        "parameters": [
+          {
+            "name": "sideObjectTypeRid",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sideobjecttyperid"
+            }
+          },
+          {
+            "name": "backingObjectTypeRid",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Backingobjecttyperid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/link-types/{rid}": {
       "get": {
         "tags": [
@@ -2341,7 +2390,8 @@
         "type": "string",
         "enum": [
           "foreign-key",
-          "join-table"
+          "join-table",
+          "backing-object"
         ],
         "title": "JoinMethod"
       },
@@ -2540,6 +2590,39 @@
             ],
             "title": "Jointabledatasetrid"
           },
+          "backingObjectTypeRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backingobjecttyperid"
+          },
+          "sideALinkTypeRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sidealinktyperid"
+          },
+          "sideBLinkTypeRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sideblinktyperid"
+          },
           "projectRid": {
             "anyOf": [
               {
@@ -2676,6 +2759,72 @@
               }
             ],
             "title": "Jointabledatasetrid"
+          },
+          "backingObjectTypeRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backingobjecttyperid"
+          },
+          "sideALinkTypeRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sidealinktyperid"
+          },
+          "sideBLinkTypeRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sideblinktyperid"
+          },
+          "backingObjectTypeDisplayName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backingobjecttypedisplayname"
+          },
+          "sideALinkTypeId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sidealinktypeid"
+          },
+          "sideBLinkTypeId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sideblinktypeid"
           },
           "status": {
             "$ref": "#/components/schemas/ResourceStatus",

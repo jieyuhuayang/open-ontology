@@ -18,6 +18,7 @@ class Cardinality(str, enum.Enum):
 class JoinMethod(str, enum.Enum):
     FOREIGN_KEY = "foreign-key"
     JOIN_TABLE = "join-table"
+    BACKING_OBJECT = "backing-object"
 
 
 class LinkSide(DomainModel):
@@ -38,6 +39,12 @@ class LinkType(DomainModel):
     cardinality: Cardinality
     join_method: JoinMethod = JoinMethod.FOREIGN_KEY
     join_table_dataset_rid: str | None = None
+    backing_object_type_rid: str | None = None
+    side_a_link_type_rid: str | None = None
+    side_b_link_type_rid: str | None = None
+    backing_object_type_display_name: str | None = None
+    side_a_link_type_id: str | None = None
+    side_b_link_type_id: str | None = None
     status: ResourceStatus = ResourceStatus.EXPERIMENTAL
     project_rid: str
     ontology_rid: str
@@ -68,6 +75,9 @@ class LinkTypeCreateRequest(DomainModel):
     side_b: LinkSideCreateInput
     cardinality: Cardinality
     join_table_dataset_rid: str | None = None
+    backing_object_type_rid: str | None = None
+    side_a_link_type_rid: str | None = None
+    side_b_link_type_rid: str | None = None
     project_rid: str | None = None
     status: ResourceStatus = ResourceStatus.EXPERIMENTAL
 

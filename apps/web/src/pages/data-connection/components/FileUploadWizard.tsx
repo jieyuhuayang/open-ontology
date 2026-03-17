@@ -4,6 +4,8 @@ import { InboxOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useFileUploadPreview, useFileImportConfirm, useImportTask } from '@/api/imports';
 import type { UploadPreviewResponse } from '@/api/imports';
+import { useQueryClient } from '@tanstack/react-query';
+import { datasetKeys } from '@/api/datasets';
 import { useDataConnectionStore } from '@/stores/data-connection-store';
 
 const { Dragger } = Upload;
@@ -22,6 +24,7 @@ const COLUMN_TYPE_OPTIONS = [
 export default function FileUploadWizard() {
   const { t } = useTranslation();
   const { message } = App.useApp();
+  const queryClient = useQueryClient();
   const openModal = useDataConnectionStore((s) => s.openModal);
   const setOpenModal = useDataConnectionStore((s) => s.setOpenModal);
 
@@ -48,6 +51,7 @@ export default function FileUploadWizard() {
     if (taskData.status === 'completed' && toastShownRef.current !== 'completed') {
       toastShownRef.current = 'completed';
       message.success(t('mysqlConnection.importSuccess'));
+      queryClient.invalidateQueries({ queryKey: datasetKeys.all });
     } else if (taskData.status === 'failed' && toastShownRef.current !== 'failed') {
       toastShownRef.current = 'failed';
       message.error(t('mysqlConnection.importFailed'));

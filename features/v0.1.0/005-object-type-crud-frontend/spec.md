@@ -64,28 +64,26 @@ F003（003-object-type-crud）的后端部分已完成，包含 API + Service + 
   - 筛选器以下拉/弹出面板形式呈现，点击漏斗图标触发
 - **AC-L6**: 空状态：当无对象类型时，显示引导提示"Create your first object type"及创建按钮（参考 PRD-image-4.png）
 
-### 创建（单步表单，Modal 对话框）
+### 创建（5 步 Wizard Modal）
 
-- **AC-C1**: 点击"New object type"或空状态引导按钮，打开 Modal 对话框
-- **AC-C2**: 创建表单字段：
-  | 字段 | 类型 | 必填 | 说明 |
-  |------|------|------|------|
-  | Icon | 图标选择器 | 是 | 默认提供一个预设图标，用户可更改 |
-  | Display Name | 文本输入 | 是 | 对象类型的显示名称 |
-  | Description | 多行文本输入 | 否 | 对象类型的描述 |
-  | ID | 文本输入 | 是 | 对象类型唯一标识 |
-  | API Name | 文本输入 | 是 | 编程引用名称 |
-- **AC-C3**: ID 实时校验规则：
-  - 格式：`^[a-z][a-z0-9-]*$`（小写字母开头，仅允许小写字母、数字、连字符）
-  - 输入时实时提示格式错误
-  - 提交后若后端返回 `OBJECT_TYPE_ID_CONFLICT`，展示唯一性冲突提示
-- **AC-C4**: API Name 实时校验规则：
-  - 格式：`^[A-Z][a-zA-Z0-9_]*$`（PascalCase，大写字母开头，仅允许字母、数字、下划线）
-  - 保留关键字检查（前端拦截）：`ontology`, `object`, `property`, `link`, `relation`, `rid`, `primaryKey`, `typeId`, `ontologyObject`（不区分大小写）
-  - 输入时实时提示格式/保留字错误
-  - 提交后若后端返回 `OBJECT_TYPE_API_NAME_CONFLICT`，展示唯一性冲突提示；若返回 `OBJECT_TYPE_RESERVED_API_NAME`，展示保留字提示
+- **AC-C1**: 点击"New object type"（列表页按钮、空状态引导按钮、或顶栏 CreateMenu）后，通过 `useCreateWizardStore.open()` 打开 5 步 Wizard Modal 对话框。Wizard 组件（`CreateObjectTypeWizard`）在 AppShell 层全局渲染。
+- **AC-C2**: Wizard 包含 5 个步骤：
+  | 步骤 | 名称 | 内容 |
+  |------|------|------|
+  | Step 0 | Datasource | 可选选择已有数据集（`selectedDatasetRid`），可跳过 |
+  | Step 1 | Metadata | Icon（图标选择器）+ Display Name（必填）+ Description（可选） |
+  | Step 2 | Properties | 从数据集导入或手动添加属性，设置 Primary Key / Title Key |
+  | Step 3 | Actions | 选择 Create/Modify/Delete 标准动作（`intendedActions`） |
+  | Step 4 | Save Location | 选择 Project（`projectRid`，默认 `ri.ontology.space.default`） |
+- **AC-C3**: ~~ID 实时校验规则~~ — **待补充**：当前 Wizard 不含 ID 字段输入。ID 和 API Name 由后端根据 Display Name 自动生成，后续可在 Step 1 中补充手动输入。校验工具 `validateObjectTypeId` / `validateApiName` 已实现（`utils/validation.ts`），可在 Overview 编辑时使用。
+- **AC-C4**: ~~API Name 实时校验规则~~ — **待补充**：同 AC-C3，当前 Wizard 中不含 API Name 字段。校验逻辑已就绪，待 Wizard 或 Overview 编辑中集成。
 - **AC-C5**: 创建成功后自动导航到新对象类型的 Overview 页面
 - **AC-C6**: 创建成功后列表页的 TanStack Query 缓存自动失效并刷新
+
+**Wizard Store 说明**：创建流程状态由 `useCreateWizardStore`（`stores/create-wizard-store.ts`）管理，包含：
+  - 状态：`isOpen`, `currentStep`（0-4）
+  - 表单数据：`selectedDatasetRid`, `displayName`, `description`, `icon`, `properties: WizardProperty[]`, `intendedActions`, `projectRid`
+  - 操作：`open()`, `close()`, `reset()`, `nextStep()`, `prevStep()`, `setMetadata()`, `addProperty()`, `removeProperty()`, `updateProperty()`, `setProperties()`, `setIntendedActions()`, `setProjectRid()`
 
 ### 详情页（`/object-types/:rid`）
 

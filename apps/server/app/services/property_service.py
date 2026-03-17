@@ -9,6 +9,7 @@ from app.domain.common import generate_rid
 from app.domain.constants import DEFAULT_ONTOLOGY_RID, DEFAULT_USER_ID
 from app.domain.object_type import ResourceStatus
 from app.domain.property import (
+    ALL_BASE_TYPES,
     MAX_PROPERTIES_PER_OBJECT_TYPE,
     PRIMARY_KEY_TYPES,
     STRUCT_FIELD_TYPES,
@@ -113,6 +114,12 @@ class PropertyService:
                     message="Nested arrays are not allowed (arrayInnerType cannot be 'array')",
                     status_code=400,
                 )
+            if req.array_inner_type not in ALL_BASE_TYPES:
+                raise AppError(
+                    code="PROPERTY_INVALID_BASE_TYPE",
+                    message=f"Invalid array inner type: '{req.array_inner_type}'",
+                    status_code=400,
+                )
         if req.base_type == "struct":
             if not req.struct_schema:
                 raise AppError(
@@ -175,7 +182,7 @@ class PropertyService:
         object_type_rid: str,
         ot_field: str,
         old_value: str | None,
-        new_value: str,
+        new_value: str | None,
         now: datetime,
     ) -> Change:
         """Build an UPDATE change for ObjectType's primaryKeyPropertyId or titleKeyPropertyId."""
@@ -230,6 +237,14 @@ class PropertyService:
             raise AppError(
                 code="PROPERTY_LIMIT_EXCEEDED",
                 message=f"Cannot add more than {MAX_PROPERTIES_PER_OBJECT_TYPE} properties per object type",
+                status_code=400,
+            )
+
+        # Validate base type is in allowed set
+        if req.base_type not in ALL_BASE_TYPES:
+            raise AppError(
+                code="PROPERTY_INVALID_BASE_TYPE",
+                message=f"Invalid base type: '{req.base_type}'",
                 status_code=400,
             )
 
@@ -354,6 +369,19 @@ class PropertyService:
                 )
             )
 
+        # Handle PK unset cascade (isPrimaryKey=false)
+        if update_fields.get("isPrimaryKey") is False and data.get("isPrimaryKey") is True:
+            ot_data = await self._check_object_type_exists(object_type_rid)
+            extra_changes.append(
+                self._build_ot_key_change(
+                    object_type_rid,
+                    "primaryKeyPropertyId",
+                    ot_data.get("primaryKeyPropertyId"),
+                    None,
+                    now,
+                )
+            )
+
         # Handle TK cascade (isTitleKey=true)
         if update_fields.get("isTitleKey") is True:
             base_type = data.get("baseType", "")
@@ -363,6 +391,15 @@ class PropertyService:
                     message=f"Property type '{base_type}' cannot be used as a title key",
                     status_code=400,
                 )
+            # BUG-4: Array TK must have a valid inner type for title key
+            if base_type == "array":
+                inner_type = data.get("arrayInnerType", "")
+                if inner_type not in TITLE_KEY_TYPES:
+                    raise AppError(
+                        code="PROPERTY_TYPE_INVALID_FOR_TITLE_KEY",
+                        message=f"Array inner type '{inner_type}' cannot be used as a title key",
+                        status_code=400,
+                    )
             ot_data = await self._check_object_type_exists(object_type_rid)
             extra_changes.extend(await self._clear_old_key(object_type_rid, rid, "isTitleKey", now))
             extra_changes.append(
@@ -371,6 +408,19 @@ class PropertyService:
                     "titleKeyPropertyId",
                     ot_data.get("titleKeyPropertyId"),
                     data.get("id", ""),
+                    now,
+                )
+            )
+
+        # Handle TK unset cascade (isTitleKey=false)
+        if update_fields.get("isTitleKey") is False and data.get("isTitleKey") is True:
+            ot_data = await self._check_object_type_exists(object_type_rid)
+            extra_changes.append(
+                self._build_ot_key_change(
+                    object_type_rid,
+                    "titleKeyPropertyId",
+                    ot_data.get("titleKeyPropertyId"),
+                    None,
                     now,
                 )
             )
@@ -455,13 +505,19 @@ class PropertyService:
                 )
 
         now = datetime.now(timezone.utc)
+        # Build mapping of rid → current sortOrder for accurate before values
+        rid_to_sort_order = {
+            data["rid"]: data.get("sortOrder", 0)
+            for data, state in merged
+            if state != ChangeState.DELETED
+        }
         changes = [
             Change(
                 id=uuid.uuid4().hex[:12],
                 resource_type=ResourceType.PROPERTY,
                 resource_rid=item.rid,
                 change_type=ChangeType.UPDATE,
-                before={"sortOrder": None},
+                before={"sortOrder": rid_to_sort_order.get(item.rid)},
                 after={
                     "sortOrder": item.sort_order,
                     "lastModifiedAt": now.isoformat(),
