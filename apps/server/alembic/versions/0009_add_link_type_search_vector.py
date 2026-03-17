@@ -71,7 +71,7 @@ def upgrade() -> None:
     """)
 
     # 5. Backfill existing data (touch updated_at to trigger search_vector rebuild)
-    op.execute("UPDATE link_types SET updated_at = now()")
+    op.execute("UPDATE link_types SET last_modified_at = now()")
 
 
 def downgrade() -> None:
