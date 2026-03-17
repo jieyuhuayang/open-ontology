@@ -146,6 +146,19 @@
       "idConflict": "已存在相同 ID 的链接类型",
       "apiNameConflict": "此 API Name 在关联的对象类型下已存在",
       "joinTableRequired": "多对多基数需要连接表数据集"
+    },
+    "bo": {
+      "cardTitle": "多对多（支撑对象）",
+      "cardDesc": "通过一个中介对象类型承载多对多关系",
+      "backingOt": "支撑对象类型",
+      "selectBackingOt": "选择支撑对象类型",
+      "sideALink": "A 端链接类型",
+      "sideBLink": "B 端链接类型",
+      "selectSideLink": "选择链接类型",
+      "noSideLink": "{{side}}到支撑对象类型没有多对一链接，请先创建。",
+      "sectionTitle": "支撑对象",
+      "deleted": "已删除",
+      "validationError": "支撑对象校验失败"
     }
   },
   "property": {
