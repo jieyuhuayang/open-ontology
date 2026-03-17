@@ -142,6 +142,48 @@ export default function LinkTypeOverviewTab({ linkType }: LinkTypeOverviewTabPro
       {renderSide('sideA', t('linkType.wizard.sideA'))}
       {renderSide('sideB', t('linkType.wizard.sideB'))}
 
+      {isBackingObject && (
+        <>
+          <Divider style={{ margin: '8px 0' }} />
+          <Title level={5}>{t('linkType.bo.sectionTitle')}</Title>
+          <Descriptions column={1} size="small" bordered>
+            <Descriptions.Item label={t('linkType.bo.backingOt')}>
+              {linkType.backingObjectTypeRid ? (
+                <Link to={`/object-types/${linkType.backingObjectTypeRid}`}>
+                  {linkType.backingObjectTypeDisplayName ?? linkType.backingObjectTypeRid}
+                </Link>
+              ) : (
+                <Text type="secondary" delete>
+                  {t('linkType.bo.deleted')}
+                </Text>
+              )}
+            </Descriptions.Item>
+            <Descriptions.Item label={t('linkType.bo.sideALink')}>
+              {linkType.sideALinkTypeRid ? (
+                <Link to={`/link-types/${linkType.sideALinkTypeRid}`}>
+                  {linkType.sideALinkTypeId ?? linkType.sideALinkTypeRid}
+                </Link>
+              ) : (
+                <Text type="secondary" delete>
+                  {t('linkType.bo.deleted')}
+                </Text>
+              )}
+            </Descriptions.Item>
+            <Descriptions.Item label={t('linkType.bo.sideBLink')}>
+              {linkType.sideBLinkTypeRid ? (
+                <Link to={`/link-types/${linkType.sideBLinkTypeRid}`}>
+                  {linkType.sideBLinkTypeId ?? linkType.sideBLinkTypeRid}
+                </Link>
+              ) : (
+                <Text type="secondary" delete>
+                  {t('linkType.bo.deleted')}
+                </Text>
+              )}
+            </Descriptions.Item>
+          </Descriptions>
+        </>
+      )}
+
       <Divider style={{ margin: '8px 0' }} />
 
       <Descriptions column={2} size="small">
