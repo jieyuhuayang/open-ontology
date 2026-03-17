@@ -26,9 +26,9 @@ describe('BackingColumnSection', () => {
     render(
       <BackingColumnSection backingColumn={null} propertyName="Name" onSave={onSave} />,
     );
-    expect(screen.getByText(/property\.backingColumn\.unmapped/)).toBeInTheDocument();
-    expect(screen.getByText(/property\.backingColumn\.setMapping/)).toBeInTheDocument();
-    expect(screen.queryByText(/property\.backingColumn\.removeMapping/)).not.toBeInTheDocument();
+    expect(screen.getByText('Unmapped')).toBeInTheDocument();
+    expect(screen.getByText('Map to Column')).toBeInTheDocument();
+    expect(screen.queryByText('Remove Mapping')).not.toBeInTheDocument();
   });
 
   it('renders mapped state with change and remove buttons', () => {
@@ -36,9 +36,9 @@ describe('BackingColumnSection', () => {
     render(
       <BackingColumnSection backingColumn="col_name" propertyName="Name" onSave={onSave} />,
     );
-    expect(screen.getByText(/property\.backingColumn\.mapped/)).toBeInTheDocument();
-    expect(screen.getByText(/property\.backingColumn\.changeMapping/)).toBeInTheDocument();
-    expect(screen.getByText(/property\.backingColumn\.removeMapping/)).toBeInTheDocument();
+    expect(screen.getByText(/Mapped to/)).toBeInTheDocument();
+    expect(screen.getByText('Change Mapping')).toBeInTheDocument();
+    expect(screen.getByText('Remove Mapping')).toBeInTheDocument();
   });
 
   it('opens set mapping modal on button click', () => {
@@ -46,9 +46,8 @@ describe('BackingColumnSection', () => {
     render(
       <BackingColumnSection backingColumn={null} propertyName="Name" onSave={onSave} />,
     );
-    fireEvent.click(screen.getByText(/property\.backingColumn\.setMapping/));
-    // Modal should open with save button
-    expect(screen.getByText(/common\.save/)).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Map to Column'));
+    expect(screen.getByText('Save')).toBeInTheDocument();
   });
 
   it('hides buttons when disabled', () => {
@@ -61,7 +60,7 @@ describe('BackingColumnSection', () => {
         disabled
       />,
     );
-    expect(screen.queryByText(/property\.backingColumn\.changeMapping/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Change Mapping')).not.toBeInTheDocument();
   });
 });
 
@@ -69,13 +68,13 @@ describe('StructFieldEditor', () => {
   it('renders empty state with add button', () => {
     const onChange = vi.fn();
     render(<StructFieldEditor value={[]} onChange={onChange} />);
-    expect(screen.getByText(/property\.structField\.addField/)).toBeInTheDocument();
+    expect(screen.getByText('Add Field')).toBeInTheDocument();
   });
 
   it('adds field on button click', () => {
     const onChange = vi.fn();
     render(<StructFieldEditor value={[]} onChange={onChange} />);
-    fireEvent.click(screen.getByText(/property\.structField\.addField/));
+    fireEvent.click(screen.getByText('Add Field'));
     expect(onChange).toHaveBeenCalledWith([{ name: '', type: 'string' }]);
   });
 
@@ -85,7 +84,6 @@ describe('StructFieldEditor', () => {
       { name: 'field2', type: 'integer' },
     ];
     render(<StructFieldEditor value={fields} />);
-    // Input fields should contain the names
     const inputs = screen.getAllByRole('textbox');
     expect(inputs).toHaveLength(2);
   });
@@ -97,7 +95,6 @@ describe('StructFieldEditor', () => {
       { name: 'f2', type: 'integer' },
     ];
     render(<StructFieldEditor value={fields} onChange={onChange} />);
-    // Find and click the first delete button
     const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
     fireEvent.click(deleteButtons[0]!);
     expect(onChange).toHaveBeenCalledWith([{ name: 'f2', type: 'integer' }]);
@@ -106,6 +103,6 @@ describe('StructFieldEditor', () => {
   it('hides add and delete buttons when disabled', () => {
     const fields: StructField[] = [{ name: 'f1', type: 'string' }];
     render(<StructFieldEditor value={fields} disabled />);
-    expect(screen.queryByText(/property\.structField\.addField/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Add Field')).not.toBeInTheDocument();
   });
 });
