@@ -111,7 +111,8 @@
     },
     "joinMethod": {
       "foreignKey": "外键",
-      "joinTable": "连接表"
+      "joinTable": "连接表",
+      "backingObject": "支撑对象"
     },
     "cardinality": {
       "one-to-one": "一对一",
