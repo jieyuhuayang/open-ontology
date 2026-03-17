@@ -60,7 +60,8 @@
   - Datasources（数据源）
 - **AC17**: 链接类型详情侧边栏包含以下子页面导航项：
   - Overview（概览）— 默认选中
-  - Datasources（数据源）
+  - Datasets（数据集）— 仅 join-table 类型的链接显示
+  > **实现备注**：当前 LinkTypeDetailPage 采用独立页面模式（单页面内通过 `activeTab` 状态切换 tab 内容），而非嵌套路由 + `<Outlet />`。仍使用 `DetailSidebarLayout` 组件渲染侧边栏，但不走路由切换。
 - **AC18**: 详情侧边栏框架作为可复用布局组件（`DetailSidebarLayout`），接受子页面导航配置作为 props，各 CRUD 特性可灵活定义自己的子页面列表
 - **AC19**: 当前激活的子页面导航项高亮显示
 
