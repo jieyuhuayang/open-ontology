@@ -12,10 +12,12 @@ export default function SearchHighlight({ text, query }: SearchHighlightProps) {
   const regex = new RegExp(`(${escapedQuery})`, 'gi');
   const parts = text.split(regex);
 
+  const queryLower = query.trim().toLowerCase();
+
   return (
     <>
       {parts.map((part, i) =>
-        regex.test(part) ? (
+        part.toLowerCase() === queryLower ? (
           <mark key={i} style={{ background: '#fff3cd', padding: 0 }}>
             {part}
           </mark>
