@@ -78,3 +78,72 @@
 ### F6: 主页面与路由 ✅
 - [x] 新建 `ObjectTypePropertiesPage.tsx`（客户端三级过滤、空状态处理）
 - [x] `router.tsx` 替换 Properties 占位路由为 `ObjectTypePropertiesPage`
+
+---
+
+## 回溯审查与修复（2026-03-17）
+
+> 本特性在 SDD 流程规范化前完成开发，以下任务为事后回溯审查补全。
+
+### R1: 后端 Bug 修复 ✅
+
+| ID | 严重度 | 问题 | 修复内容 |
+|----|--------|------|----------|
+| BUG-1 | HIGH | `base_type` 创建时未校验是否在 `ALL_BASE_TYPES` 中 | 在 `create()` 中增加 `base_type` 和 `array_inner_type` 合法性校验，新增错误码 `PROPERTY_INVALID_BASE_TYPE` |
+| BUG-2 | HIGH | 取消 PK/TK 时不级联清除 OT 的 `primaryKeyPropertyId`/`titleKeyPropertyId` | 在 `update()` 中增加 `isPrimaryKey: false` / `isTitleKey: false` 分支，级联设 OT 字段为 `None` |
+| BUG-3 | HIGH | `reorder()` 的 `before` 字段始终为 `{"sortOrder": None}` | 构建 `rid_to_sort_order` 映射，记录真实旧值 |
+| BUG-4 | HIGH | Array 类型设 TK 时未校验 `arrayInnerType` 是否为合法 TK 类型 | 在 TK 校验分支中，当 `base_type == "array"` 时额外检查 `arrayInnerType ∈ TITLE_KEY_TYPES` |
+
+- 修改文件：`apps/server/app/services/property_service.py`
+- 覆盖 AC：AC5（校验）、AC18-AC20（PK/TK 级联）、AC25（排序）
+
+### R2: 后端单元测试 ✅
+- [x] 新建 `tests/unit/test_property_service.py`（35 个测试）
+- **TestCreate**（15 个）：成功默认值、sortOrder 自增、id/apiName 格式校验、保留字拒绝、**非法 base_type 拒绝（BUG-1）**、id/apiName 唯一性、200 上限、Array 缺 innerType / 嵌套 / **非法 innerType（BUG-1）**、Struct 缺 schema / 非法字段类型 / 字段名重复
+  - 覆盖 AC：AC3-AC7, AC26-AC27
+- **TestUpdate**（14 个）：displayName 更新、active apiName 拒绝、apiName 格式/唯一性、backingColumn 空→null、**PK 设置级联 + 取消级联（BUG-2）**、PK 非法类型/active OT 拒绝、**TK 设置级联 + Array TK 校验（BUG-4）+ 取消级联（BUG-2）**、404
+  - 覆盖 AC：AC11-AC13, AC18-AC20
+- **TestDelete**（3 个）：成功、active 拒绝、PK 拒绝
+  - 覆盖 AC：AC8, AC20-AC22
+- **TestList**（1 个）：排序 + 排除已删除
+  - 覆盖 AC：AC23-AC25
+- **TestReorder**（2 个）：**before 记录旧值（BUG-3）**、非法 RID 404
+  - 覆盖 AC：AC29
+
+### R3: 后端集成测试 ✅
+- [x] 新建 `tests/integration/test_property_api.py`（13 个测试）
+- 创建 201 + **非法 base_type 400（BUG-1）**
+- 重复 id/apiName 409
+- list 合并视图
+- 更新 displayName、active apiName 400
+- **PK 设置级联 + 取消级联（BUG-2）**
+- 删除 active 400、删除 PK 400
+- reorder 204 + 验证排序结果
+- 完整生命周期（创建→更新→删除）
+
+### R4: 前端测试 ✅
+- [x] 新建 `ObjectTypePropertiesPage.test.tsx`（5 个测试）：空状态、属性列表、过滤器、Add 按钮、200 上限禁用
+  - 覆盖 AC：AC2, AC7, AC8, AC9
+- [x] 新建 `CreatePropertyDrawer.test.tsx`（5 个测试）：表单渲染、Create/Cancel 按钮、关闭状态、status/visibility、backingColumn/description
+  - 覆盖 AC：AC3, AC4, AC5, AC26, AC27
+- [x] 新建 `EditPropertyPanel.test.tsx`（11 个测试）：null 不渲染、详情展示、PK set/unset/invalid/active-OT、TK set/unset、删除 active 禁用、删除 PK 禁用、apiName 标签
+  - 覆盖 AC：AC10-AC13, AC18-AC20, AC22
+- [x] 新建 `BackingColumnAndStructField.test.tsx`（9 个测试）：映射/未映射状态、设置映射弹窗、disabled 隐藏按钮、字段增删、disabled 隐藏操作
+  - 覆盖 AC：AC14-AC16, AC27
+
+### R5: 前端 Bug 修复 ✅
+- [x] **BUG-5**（MEDIUM）：修复 `toCamelCase()` 不处理 PascalCase 边界分割
+  - 修改文件：`apps/web/src/utils/naming.ts`
+  - 新增 `splitCaseBoundaries()` 辅助函数，在 `toCamelCase` 和 `toKebabCase` 前插入
+  - `"EmployeeName"` → `"employeeName"` ✓ | `"myHTTPClient"` → `"myHttpClient"` ✓
+  - 新增 4 个回归测试于 `utils/__tests__/naming.test.ts`
+
+### 测试结果汇总
+
+| 测试类型 | 文件 | 测试数 | 状态 |
+|---------|------|--------|------|
+| 后端单元测试 | `tests/unit/test_property_service.py` | 35 | ✅ 全部通过 |
+| 后端集成测试 | `tests/integration/test_property_api.py` | 13 | ✅ 全部通过 |
+| 前端组件测试 | `pages/object-types/__tests__/` 4 个新文件 | 30 | ✅ 全部通过 |
+| 前端工具测试 | `utils/__tests__/naming.test.ts` | 14（含 4 个新增） | ✅ 全部通过 |
+| **合计** | | **92** | ✅ |
