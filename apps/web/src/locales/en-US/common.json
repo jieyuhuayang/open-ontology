@@ -616,5 +616,20 @@
       "previewHint": "Showing first {{count}} of {{total}} rows"
     },
     "columnsSelected": "{{selected}}/{{total}} columns selected"
+  },
+  "search": {
+    "results": "Search results ({{count}})",
+    "noResults": "No results found for '{{query}}'",
+    "showAll": "Show all",
+    "allResults": "All results",
+    "matchedFields": "Matched: {{fields}}",
+    "fieldName": "Name",
+    "fieldDescription": "Description",
+    "fieldApiName": "API Name",
+    "fieldId": "ID",
+    "objectTypes": "Object Types",
+    "properties": "Properties",
+    "linkTypes": "Link Types",
+    "clear": "Clear"
   }
 }
