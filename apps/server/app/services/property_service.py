@@ -234,6 +234,14 @@ class PropertyService:
                 status_code=400,
             )
 
+        # Validate base type is in allowed set
+        if req.base_type not in ALL_BASE_TYPES:
+            raise AppError(
+                code="PROPERTY_INVALID_BASE_TYPE",
+                message=f"Invalid base type: '{req.base_type}'",
+                status_code=400,
+            )
+
         # Validate base type config
         self._validate_base_type_config(req)
 
