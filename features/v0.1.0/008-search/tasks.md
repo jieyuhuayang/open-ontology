@@ -372,15 +372,12 @@
 
 ---
 
-### T14: i18n + 前端测试
+### T14: i18n 国际化
 
 - [ ] **T14**
 - 文件:
   - `apps/web/src/locales/en-US/common.json` — 修改
   - `apps/web/src/locales/zh-CN/common.json` — 修改
-  - `apps/web/src/stores/__tests__/search-store.test.ts` — 新建
-  - `apps/web/src/components/search/__tests__/SearchHighlight.test.tsx` — 新建
-  - `apps/web/src/components/search/__tests__/SearchResultsPanel.test.tsx` — 新建
 - 内容:
   - **i18n keys** (en-US + zh-CN):
     ```
@@ -398,6 +395,19 @@
     search.linkTypes: "Link Types" / "链接类型"
     search.clear: "Clear" / "清除"
     ```
+- 依赖: T13（确保组件已引用这些 key）
+- 覆盖 AC: 无（i18n 基础设施）
+
+---
+
+### T15: 前端测试
+
+- [ ] **T15**
+- 文件:
+  - `apps/web/src/stores/__tests__/search-store.test.ts` — 新建
+  - `apps/web/src/components/search/__tests__/SearchHighlight.test.tsx` — 新建
+  - `apps/web/src/components/search/__tests__/SearchResultsPanel.test.tsx` — 新建
+- 内容:
   - **search-store.test.ts**:
     - `test_enter_search_mode`: 设置 query + enterSearchMode → isSearchMode=true
     - `test_exit_search_mode`: exitSearchMode → query=""、isSearchMode=false、activeType='all'
@@ -415,7 +425,7 @@
     - `test_show_all_switches_view`: 点击 "Show all" 切换 activeType
     - 覆盖 AC: AC-03, AC-04, AC-14
   - 运行: `cd apps/web && pnpm test --run`
-- 依赖: T13
+- 依赖: T13, T14
 - 覆盖 AC: AC-03, AC-04, AC-09, AC-10, AC-12, AC-14
 
 ---
