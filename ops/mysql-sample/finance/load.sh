@@ -49,7 +49,7 @@ SQL
 for sql_file in "$SQL_DIR"/0*.sql; do
   fname="$(basename "$sql_file")"
   echo "  → Executing ${fname}..."
-  docker exec -i "$CONTAINER" mysql -uroot -p"${ROOT_PWD}" "$DB_NAME" < "$sql_file"
+  docker exec -i "$CONTAINER" mysql --default-character-set=utf8mb4 -uroot -p"${ROOT_PWD}" "$DB_NAME" < "$sql_file"
 done
 
 # ── Verify ────────────────────────────────────────────────────
