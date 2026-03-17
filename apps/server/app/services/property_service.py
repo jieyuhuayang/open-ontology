@@ -182,7 +182,7 @@ class PropertyService:
         object_type_rid: str,
         ot_field: str,
         old_value: str | None,
-        new_value: str,
+        new_value: str | None,
         now: datetime,
     ) -> Change:
         """Build an UPDATE change for ObjectType's primaryKeyPropertyId or titleKeyPropertyId."""
