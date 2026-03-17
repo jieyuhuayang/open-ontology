@@ -98,4 +98,12 @@ describe('CreateLinkTypeWizard', () => {
     expect(screen.getByText(/side a/i)).toBeInTheDocument();
     expect(screen.getByText(/side b/i)).toBeInTheDocument();
   });
+
+  it('shows BO group in step 1', () => {
+    useCreateLinkTypeModalStore.getState().open();
+    renderWizard();
+
+    expect(screen.getByText(/backing object/i)).toBeInTheDocument();
+    expect(screen.getByText(/object-backed/i)).toBeInTheDocument();
+  });
 });
