@@ -1,19 +1,36 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import SearchResultsPanel from '../SearchResultsPanel';
 import { useSearchStore } from '@/stores/search-store';
 
+// Mock window.matchMedia for Ant Design Table
+beforeAll(() => {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+});
+
 const mockSearchData = {
-  query: 'test',
+  query: 'Employee',
   results: {
     objectTypes: {
       items: [
         {
           rid: 'ri.ontology.object-type.1',
           resourceType: 'objectType' as const,
-          displayName: 'TestOT',
-          description: 'A test object type',
+          displayName: 'Employee',
+          description: 'Employee records',
           icon: { name: 'UserOutlined', color: '#000' },
           status: 'active',
           visibility: 'normal',
@@ -52,7 +69,7 @@ function renderWithRouter(ui: React.ReactElement) {
 
 describe('SearchResultsPanel', () => {
   beforeEach(() => {
-    useSearchStore.setState({ query: 'test', isSearchMode: true, activeType: 'all' });
+    useSearchStore.setState({ query: 'Employee', isSearchMode: true, activeType: 'all' });
     vi.clearAllMocks();
   });
 
@@ -65,7 +82,8 @@ describe('SearchResultsPanel', () => {
 
     renderWithRouter(<SearchResultsPanel />);
     expect(screen.getByText(/Object Types/)).toBeInTheDocument();
-    expect(screen.getByText('TestOT')).toBeInTheDocument();
+    // SearchHighlight wraps matching text in <mark>, so check container
+    expect(screen.getByText('Employee')).toBeInTheDocument();
   });
 
   it('renders empty state when no results', () => {
@@ -84,7 +102,7 @@ describe('SearchResultsPanel', () => {
     const manyItems = Array.from({ length: 6 }, (_, i) => ({
       rid: `ri.ontology.object-type.${i}`,
       resourceType: 'objectType' as const,
-      displayName: `Item${i}`,
+      displayName: `Employee${i}`,
       status: 'active',
       visibility: 'normal',
       changeState: 'published',
@@ -92,7 +110,7 @@ describe('SearchResultsPanel', () => {
     }));
     mockUseSearch.mockReturnValue({
       data: {
-        query: 'Item',
+        query: 'Employee',
         results: {
           objectTypes: { items: manyItems, total: 6 },
           properties: { items: [], total: 0 },
@@ -104,7 +122,7 @@ describe('SearchResultsPanel', () => {
       error: null,
     } as unknown as ReturnType<typeof useSearch>);
 
-    useSearchStore.setState({ query: 'Item' });
+    useSearchStore.setState({ query: 'Employee' });
     renderWithRouter(<SearchResultsPanel />);
 
     const showAllBtn = screen.getByText(/Show all/);
