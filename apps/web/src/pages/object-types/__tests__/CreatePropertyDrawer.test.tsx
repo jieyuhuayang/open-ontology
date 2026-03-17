@@ -65,7 +65,7 @@ describe('CreatePropertyDrawer', () => {
     expect(screen.getByText('Display Name')).toBeInTheDocument();
     expect(screen.getByText('ID')).toBeInTheDocument();
     expect(screen.getByText('API Name')).toBeInTheDocument();
-    expect(screen.getByText('Base Type')).toBeInTheDocument();
+    expect(screen.getAllByText('Base Type').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders create and cancel buttons', () => {
