@@ -54,7 +54,7 @@ export default function SearchResultItemComponent({ item, query }: Props) {
       <Flex align="center" gap={8}>
         <span style={{ fontSize: 16, flexShrink: 0 }}>
           {item.resourceType === 'objectType' && item.icon ? (
-            <IconDisplay name={item.icon.name} color={item.icon.color} size={16} />
+            <DynamicIcon name={item.icon.name} color={item.icon.color} size={16} />
           ) : item.resourceType === 'linkType' ? (
             <LinkOutlined />
           ) : (
