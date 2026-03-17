@@ -100,6 +100,33 @@ export default function HomeSidebar() {
     },
   ];
 
+  const otSearchCount = searchData?.results?.objectTypes?.total ?? 0;
+  const propSearchCount = searchData?.results?.properties?.total ?? 0;
+  const ltSearchCount = searchData?.results?.linkTypes?.total ?? 0;
+
+  const searchMenuItems: MenuProps['items'] = [
+    {
+      key: 'all',
+      icon: <SearchOutlined />,
+      label: t('search.allResults'),
+    },
+    {
+      key: 'objectType',
+      icon: <AppstoreOutlined />,
+      label: `${t('search.objectTypes')} (${otSearchCount})`,
+    },
+    {
+      key: 'property',
+      icon: <UnorderedListOutlined />,
+      label: `${t('search.properties')} (${propSearchCount})`,
+    },
+    {
+      key: 'linkType',
+      icon: <LinkOutlined />,
+      label: `${t('search.linkTypes')} (${ltSearchCount})`,
+    },
+  ];
+
   const onClick: MenuProps['onClick'] = ({ key }) => {
     navigate(key);
   };
