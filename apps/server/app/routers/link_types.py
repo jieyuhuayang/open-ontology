@@ -51,6 +51,15 @@ async def create_link_type(
     return await service.create(req)
 
 
+@router.get("/link-types/eligible-side-links")
+async def get_eligible_side_links(
+    side_object_type_rid: str = Query(alias="sideObjectTypeRid"),
+    backing_object_type_rid: str = Query(alias="backingObjectTypeRid"),
+    service: LinkTypeService = Depends(_get_service),
+):
+    return await service.get_eligible_side_links(side_object_type_rid, backing_object_type_rid)
+
+
 @router.get("/link-types/{rid}", response_model=LinkTypeWithChangeState)
 async def get_link_type(
     rid: str,
@@ -66,15 +75,6 @@ async def update_link_type(
     service: LinkTypeService = Depends(_get_service),
 ):
     return await service.update(rid, req)
-
-
-@router.get("/link-types/eligible-side-links")
-async def get_eligible_side_links(
-    side_object_type_rid: str = Query(alias="sideObjectTypeRid"),
-    backing_object_type_rid: str = Query(alias="backingObjectTypeRid"),
-    service: LinkTypeService = Depends(_get_service),
-):
-    return await service.get_eligible_side_links(side_object_type_rid, backing_object_type_rid)
 
 
 @router.delete("/link-types/{rid}", status_code=204)
