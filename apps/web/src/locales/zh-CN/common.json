@@ -75,7 +75,7 @@
     "emptyTitle": "创建你的第一个链接类型",
     "emptyDescription": "链接类型定义对象类型之间的语义关系。",
     "wizard": {
-      "step1": "基数",
+      "step1": "关系类型",
       "step2": "对象类型",
       "step3": "详情",
       "next": "下一步",
@@ -87,7 +87,16 @@
       "jtGroup": "连接表",
       "boGroup": "支撑对象",
       "selectDataset": "选择连接表数据集",
-      "columnMapping": "选择列"
+      "columnMapping": "选择列",
+      "selectRelationType": "选择对象之间的关系类型",
+      "nnSubQuestion": "这段关系本身是否需要携带额外信息？",
+      "nnSimple": "简单关系",
+      "nnSimpleDesc": "只记录\"谁和谁关联\"，关系本身没有额外属性",
+      "nnSimpleExample": "例：标签 ↔ 文章",
+      "nnRich": "丰富关系",
+      "nnRichDesc": "关系本身可以拥有属性，通过一个中间对象类型承载",
+      "nnRichExample": "例：选课记录（含成绩、学期）",
+      "nnRichNote": "需要先创建一个中间对象类型"
     },
     "fields": {
       "id": "ID",
