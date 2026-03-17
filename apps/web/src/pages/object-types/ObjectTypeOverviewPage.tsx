@@ -1,4 +1,4 @@
-import { Button, Card, Empty, Flex, List, Tag, Tooltip, Typography } from 'antd';
+import { Button, Card, Empty, Flex, List, Tag, Typography } from 'antd';
 import { PlusOutlined, DatabaseOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
