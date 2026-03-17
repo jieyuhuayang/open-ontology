@@ -24,6 +24,12 @@ beforeAll(() => {
 
 vi.mock('@/api/link-types', () => ({
   useCreateLinkType: vi.fn(() => ({ mutateAsync: vi.fn(), isPending: false })),
+  useEligibleSideLinks: vi.fn(() => ({ data: [] })),
+}));
+
+vi.mock('@/api/datasets', () => ({
+  useDatasets: vi.fn(() => ({ data: { items: [] } })),
+  useDataset: vi.fn(() => ({ data: null })),
 }));
 
 vi.mock('@/api/object-types', () => ({
