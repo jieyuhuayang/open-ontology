@@ -326,7 +326,7 @@ class LinkTypeService:
 
         # Fill OT display names for response
         ot_map = await self._get_ot_display_name_map()
-        return self._fill_ot_display_names(lt, ot_map)
+        return self._fill_display_fields(lt, ot_map)
 
     async def list(
         self,
@@ -375,7 +375,7 @@ class LinkTypeService:
             lt = LinkTypeWithChangeState(
                 **{**LinkType.model_validate(data).model_dump(), "change_state": state}
             )
-            self._fill_ot_display_names(lt, ot_map)
+            self._fill_display_fields(lt, ot_map)
             items.append(lt)
 
         return LinkTypeListResponse(
@@ -398,7 +398,7 @@ class LinkTypeService:
             **{**LinkType.model_validate(data).model_dump(), "change_state": state}
         )
         ot_map = await self._get_ot_display_name_map()
-        return self._fill_ot_display_names(lt, ot_map)
+        return self._fill_display_fields(lt, ot_map)
 
     async def update(self, rid: str, req: LinkTypeUpdateRequest) -> LinkTypeWithChangeState:
         found = await self._find_in_merged_view(rid)
@@ -467,7 +467,7 @@ class LinkTypeService:
             **{**LinkType.model_validate(merged_data).model_dump(), "change_state": new_state}
         )
         ot_map = await self._get_ot_display_name_map()
-        return self._fill_ot_display_names(lt, ot_map)
+        return self._fill_display_fields(lt, ot_map)
 
     async def delete(self, rid: str) -> None:
         found = await self._find_in_merged_view(rid)
