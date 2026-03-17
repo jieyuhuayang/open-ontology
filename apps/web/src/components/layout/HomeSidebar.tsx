@@ -142,12 +142,19 @@ export default function HomeSidebar() {
     >
       <nav style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         {!collapsed && (
-          <div style={{ padding: '16px 24px 8px' }}>
+          <div style={{ padding: '16px 24px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Text strong>
               {isSearchMode
                 ? t('search.results', { count: searchData?.totalCount ?? 0 })
                 : t('sidebar.ontologyName')}
             </Text>
+            {isSearchMode && (
+              <CloseOutlined
+                onClick={exitSearchMode}
+                style={{ cursor: 'pointer', color: '#999', fontSize: 12 }}
+                title={t('search.exitSearch')}
+              />
+            )}
           </div>
         )}
         {isSearchMode ? (
