@@ -111,7 +111,8 @@
     },
     "joinMethod": {
       "foreignKey": "Foreign Key",
-      "joinTable": "Join Table"
+      "joinTable": "Join Table",
+      "backingObject": "Backing Object"
     },
     "cardinality": {
       "one-to-one": "One to One",
