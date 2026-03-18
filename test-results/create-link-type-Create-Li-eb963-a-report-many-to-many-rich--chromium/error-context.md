@@ -43,12 +43,12 @@
                 - img "unordered-list" [ref=e55]:
                   - img [ref=e56]
                 - generic [ref=e58]: Properties
-              - menuitem "link Link Types 3" [ref=e59] [cursor=pointer]:
+              - menuitem "link Link Types 4" [ref=e59] [cursor=pointer]:
                 - img "link" [ref=e60]:
                   - img [ref=e61]
                 - generic [ref=e64]:
                   - text: Link Types
-                  - generic [ref=e65]: "3"
+                  - generic [ref=e65]: "4"
               - menuitem "thunderbolt Action Types" [ref=e66] [cursor=pointer]:
                 - img "thunderbolt" [ref=e67]:
                   - img [ref=e68]
@@ -141,105 +141,101 @@
                       - generic [ref=e171]: Experimental
                     - cell "New" [ref=e172]:
                       - generic [ref=e173]: New
-              - list [ref=e174]:
-                - listitem "Previous Page" [ref=e175]:
-                  - button "left" [disabled] [ref=e176]:
-                    - img "left" [ref=e177]:
-                      - img [ref=e178]
-                - listitem "1" [ref=e180] [cursor=pointer]:
-                  - generic [ref=e181]: "1"
-                - listitem "Next Page" [ref=e182]:
-                  - button "right" [disabled] [ref=e183]:
-                    - img "right" [ref=e184]:
-                      - img [ref=e185]
-                - listitem [ref=e187]:
-                  - generic "Page Size" [ref=e188] [cursor=pointer]:
-                    - generic [ref=e190]:
-                      - combobox "Page Size" [ref=e192]
-                      - generic "20 / page" [ref=e193]
+                  - row "fund-holding 基金 公司 Many to Many Join Table Experimental New" [ref=e174] [cursor=pointer]:
+                    - cell "fund-holding" [ref=e175]
+                    - cell "基金" [ref=e176]:
+                      - generic [ref=e177]: 基金
+                    - cell "公司" [ref=e178]:
+                      - generic [ref=e179]: 公司
+                    - cell "Many to Many" [ref=e180]
+                    - cell "Join Table" [ref=e181]
+                    - cell "Experimental" [ref=e182]:
+                      - generic [ref=e183]: Experimental
+                    - cell "New" [ref=e184]:
+                      - generic [ref=e185]: New
+              - list [ref=e186]:
+                - listitem "Previous Page" [ref=e187]:
+                  - button "left" [disabled] [ref=e188]:
+                    - img "left" [ref=e189]:
+                      - img [ref=e190]
+                - listitem "1" [ref=e192] [cursor=pointer]:
+                  - generic [ref=e193]: "1"
+                - listitem "Next Page" [ref=e194]:
+                  - button "right" [disabled] [ref=e195]:
+                    - img "right" [ref=e196]:
+                      - img [ref=e197]
+                - listitem [ref=e199]:
+                  - generic "Page Size" [ref=e200] [cursor=pointer]:
+                    - generic [ref=e202]:
+                      - combobox "Page Size" [ref=e204]
+                      - generic "20 / page" [ref=e205]
                     - generic:
                       - img:
                         - img
-  - generic [ref=e194]:
+  - generic [ref=e206]:
     - dialog "Create Link Type":
-      - generic [ref=e195]:
-        - button "Close" [ref=e196] [cursor=pointer]:
-          - generic "Close" [ref=e197]:
-            - img "close" [ref=e198]:
-              - img [ref=e199]
-        - generic [ref=e202]: Create Link Type
-        - generic [ref=e203]:
-          - generic [ref=e204]:
-            - generic [ref=e206]:
-              - img "check" [ref=e209]:
-                - img [ref=e210]
-              - generic [ref=e213]: Relationship
-            - generic [ref=e215]:
-              - generic [ref=e216]: "2"
-              - generic [ref=e218]: Object Types
-            - generic [ref=e220]:
-              - generic [ref=e221]: "3"
-              - generic [ref=e223]: Link Names
-          - generic [ref=e224]:
-            - generic [ref=e225]:
-              - generic [ref=e226]:
-                - strong [ref=e228]: Side A
-                - generic [ref=e229] [cursor=pointer]:
-                  - generic [ref=e231]:
-                    - combobox [ref=e233]
-                    - generic "基金" [ref=e234]
-                  - generic:
-                    - img:
-                      - img
-              - generic [ref=e235]:
-                - strong [ref=e237]: Side B
-                - generic [ref=e238] [cursor=pointer]:
-                  - generic [ref=e240]:
-                    - combobox [ref=e242]
-                    - generic "公司" [ref=e243]
-                  - generic:
-                    - img:
-                      - img
-            - separator [ref=e244]
-            - generic [ref=e245]:
-              - strong [ref=e247]: Select join table dataset
-              - generic [ref=e248] [cursor=pointer]:
-                - generic [ref=e250]:
-                  - combobox [ref=e252]
-                  - generic "fund_company_holdings" [ref=e253]
-                - generic:
-                  - img:
-                    - img
-            - generic [ref=e254]:
-              - generic [ref=e255]:
-                - generic [ref=e256]: Side A → Join Table Column
-                - generic [ref=e257] [cursor=pointer]:
-                  - generic [ref=e259]:
-                    - combobox [expanded] [active] [ref=e261]:
-                      - listbox:
-                        - option "fund_id (string)": fund_id
-                        - option "company_id (string)": company_id
-                    - generic: Select column
-                  - generic:
-                    - img:
-                      - img
-              - generic [ref=e262]:
-                - generic [ref=e263]: Side B → Join Table Column
-                - generic [ref=e264] [cursor=pointer]:
-                  - generic [ref=e266]:
-                    - combobox [ref=e268]
-                    - generic: Select column
-                  - generic:
-                    - img:
-                      - img
-        - generic [ref=e269]:
-          - button "Back" [ref=e270] [cursor=pointer]:
-            - generic [ref=e271]: Back
-          - button "Next" [ref=e272] [cursor=pointer]:
-            - generic [ref=e273]: Next
-  - generic [ref=e279]:
-    - generic "fund_id (string)" [ref=e280] [cursor=pointer]:
-      - generic [ref=e281]: fund_id (string)
-    - generic "company_id (string)" [ref=e282] [cursor=pointer]:
-      - generic [ref=e283]: company_id (string)
+      - generic [ref=e207]:
+        - button "Close" [ref=e208] [cursor=pointer]:
+          - generic "Close" [ref=e209]:
+            - img "close" [ref=e210]:
+              - img [ref=e211]
+        - generic [ref=e214]: Create Link Type
+        - generic [ref=e215]:
+          - generic [ref=e216]:
+            - generic [ref=e218]:
+              - img "check" [ref=e221]:
+                - img [ref=e222]
+              - generic [ref=e225]: Relationship
+            - generic [ref=e227]:
+              - img "check" [ref=e230]:
+                - img [ref=e231]
+              - generic [ref=e234]: Object Types
+            - generic [ref=e236]:
+              - generic [ref=e237]: "3"
+              - generic [ref=e239]: Link Names
+          - generic [ref=e240]:
+            - generic [ref=e242]:
+              - generic "ID" [ref=e244]: "* ID"
+              - textbox "* ID" [ref=e248]:
+                - /placeholder: e.g. employee-company
+                - text: analyst-company-via-report
+            - generic [ref=e249]:
+              - generic [ref=e252]: 研究员 → 公司
+              - generic [ref=e253]:
+                - generic [ref=e254]: "On 研究员, linked 公司 are shown as:"
+                - generic [ref=e255]:
+                  - generic [ref=e257]:
+                    - generic "Display Name" [ref=e259]: "* Display Name"
+                    - textbox "* Display Name" [ref=e263]: 公司
+                  - generic [ref=e265]:
+                    - generic "API Name" [ref=e267]: "* API Name"
+                    - textbox "* API Name" [ref=e271]: gongSi
+            - generic [ref=e272]:
+              - generic [ref=e275]: 公司 → 研究员
+              - generic [ref=e276]:
+                - generic [ref=e277]: "On 公司, linked 研究员 are shown as:"
+                - generic [ref=e278]:
+                  - generic [ref=e280]:
+                    - generic "Display Name" [ref=e282]: "* Display Name"
+                    - textbox "* Display Name" [ref=e286]: 研究员
+                  - generic [ref=e288]:
+                    - generic "API Name" [ref=e290]: "* API Name"
+                    - textbox "* API Name" [ref=e294]: yanJiuYuan
+            - generic [ref=e296]:
+              - generic "Status" [ref=e298]
+              - generic [ref=e302]:
+                - generic [ref=e303] [cursor=pointer]:
+                  - radio "Experimental" [checked] [ref=e305]
+                  - generic [ref=e307]: Experimental
+                - generic [ref=e308] [cursor=pointer]:
+                  - radio "Active" [ref=e310]
+                  - generic [ref=e312]: Active
+                - generic [ref=e313] [cursor=pointer]:
+                  - radio "Deprecated" [ref=e315]
+                  - generic [ref=e317]: Deprecated
+        - generic [ref=e318]:
+          - button "Back" [ref=e319] [cursor=pointer]:
+            - generic [ref=e320]: Back
+          - button "Create" [active] [ref=e321] [cursor=pointer]:
+            - generic [ref=e322]: Create
 ```

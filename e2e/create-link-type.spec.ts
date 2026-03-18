@@ -246,11 +246,23 @@ test.describe.serial('Create Link Types — ordered', () => {
 
     await clickNext(page);
 
-    // Step 2: Set ID
+    // Step 2: Set ID and fix API names to avoid conflicts with existing link types
     await page.waitForTimeout(500);
     const idInput = page.locator('input[placeholder*="e.g."]');
     await idInput.clear();
     await idInput.fill('analyst-company-via-report');
+
+    // Change API names to avoid conflicts (gongSi/yanJiuYuan may already exist from analyst-coverage)
+    const apiNameInputs = page.locator('.ant-card input').filter({ hasText: '' });
+    // Side A card: apiName input (2nd input in 1st card)
+    const sideAApiName = page.locator('.ant-card').nth(0).locator('input').nth(1);
+    await sideAApiName.clear();
+    await sideAApiName.fill('boCompany');
+
+    // Side B card: apiName input (2nd input in 2nd card)
+    const sideBApiName = page.locator('.ant-card').nth(1).locator('input').nth(1);
+    await sideBApiName.clear();
+    await sideBApiName.fill('boAnalyst');
 
     await clickNext(page);
     await expect(page).toHaveURL(/\/link-types\/ri\.ontology\.link-type\./, { timeout: 15000 });
