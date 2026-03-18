@@ -14,6 +14,7 @@ from app.domain.working_state import (
     ResourceType,
     WorkingState,
 )
+from app.services.working_state_service import _deep_merge_dicts
 
 
 def _make_change(
