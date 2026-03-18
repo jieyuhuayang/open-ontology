@@ -25,6 +25,26 @@ def _get_service(session: AsyncSession = Depends(get_db_session)) -> PropertySer
     return PropertyService(session)
 
 
+# ---------------------------------------------------------------------------
+# Top-level property endpoints (ontology-level)
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/properties",
+    response_model=PropertyListAllResponse,
+)
+async def list_all_properties(
+    service: PropertyService = Depends(_get_service),
+):
+    return await service.list_all()
+
+
+# ---------------------------------------------------------------------------
+# Object-type-scoped property endpoints
+# ---------------------------------------------------------------------------
+
+
 @router.get(
     "/object-types/{object_type_rid}/properties",
     response_model=PropertyListResponse,
@@ -49,7 +69,7 @@ async def create_property(
     return await service.create(object_type_rid, req)
 
 
-# NOTE: /sort-order must be registered BEFORE /{rid} to avoid path conflict
+# NOTE: /sort-order, /batch, /batch-delete must be registered BEFORE /{rid}
 @router.put(
     "/object-types/{object_type_rid}/properties/sort-order",
     status_code=204,
@@ -61,6 +81,30 @@ async def reorder_properties(
 ):
     await service.reorder(object_type_rid, req)
     return Response(status_code=204)
+
+
+@router.patch(
+    "/object-types/{object_type_rid}/properties/batch",
+    response_model=BatchOperationResponse,
+)
+async def batch_update_properties(
+    object_type_rid: str,
+    req: PropertyBatchUpdateRequest,
+    service: PropertyService = Depends(_get_service),
+):
+    return await service.batch_update(object_type_rid, req)
+
+
+@router.post(
+    "/object-types/{object_type_rid}/properties/batch-delete",
+    response_model=BatchOperationResponse,
+)
+async def batch_delete_properties(
+    object_type_rid: str,
+    req: PropertyBatchDeleteRequest,
+    service: PropertyService = Depends(_get_service),
+):
+    return await service.batch_delete(object_type_rid, req)
 
 
 @router.put(
