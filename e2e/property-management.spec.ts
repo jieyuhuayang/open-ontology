@@ -403,9 +403,9 @@ test.describe.serial('Property Management — E2E', () => {
     const drawer = page.locator('.ant-drawer');
     await expect(drawer).toBeVisible({ timeout: 5000 });
 
-    // Select "Struct" as base type
+    // Select "Struct" as base type using type-to-search
     const baseTypeSelect = drawer.locator('.ant-select').first();
-    await selectAntOption(page, baseTypeSelect, /Struct|结构体/);
+    await selectAntOption(page, baseTypeSelect, 'struct');
 
     // "Allow multiple" switch should NOT be visible for struct
     const allowMultipleSwitch = drawer.locator('.ant-switch');

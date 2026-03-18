@@ -182,23 +182,107 @@
                       - img "key" [ref=e239]:
                         - img [ref=e240]
                     - cell [ref=e242]
-              - status [ref=e243]
-  - dialog "Full-name" [ref=e245]:
-    - generic [ref=e246]:
-      - generic [ref=e247]:
-        - button "Close" [ref=e248] [cursor=pointer]:
-          - img "close" [ref=e249]:
-            - img [ref=e250]
-        - generic [ref=e252]: Full-name
-      - button "Delete" [ref=e254] [cursor=pointer]:
-        - generic [ref=e255]: Delete
-    - generic [ref=e257]:
-      - tablist [ref=e258]:
-        - generic [ref=e260]:
-          - tab "General" [ref=e262] [cursor=pointer]
-          - tab "Details" [ref=e264] [cursor=pointer]
-          - tab "Advanced" [ref=e266] [cursor=pointer]
-          - tab "Display" [ref=e268] [cursor=pointer]
-          - tab "Interaction" [active] [selected] [ref=e270] [cursor=pointer]
-      - tabpanel "Interaction" [ref=e273]: Conditional formatting — Coming Soon (P2)
+                  - button "holder Multi Values New multi-values multiValues Array Integer — Experimental normal key" [ref=e243] [cursor=pointer]:
+                    - cell [ref=e244]:
+                      - checkbox [ref=e247]
+                    - cell "holder" [ref=e249]:
+                      - img "holder" [ref=e251]:
+                        - img [ref=e252]
+                    - cell "Multi Values New" [ref=e254]:
+                      - generic [ref=e255]:
+                        - text: Multi Values
+                        - generic [ref=e256]: New
+                    - cell "multi-values" [ref=e257]
+                    - cell "multiValues" [ref=e258]
+                    - cell "Array Integer" [ref=e259]:
+                      - generic [ref=e260]:
+                        - text: Array
+                        - generic [ref=e261]: Integer
+                    - cell "—" [ref=e262]
+                    - cell "Experimental" [ref=e263]:
+                      - generic [ref=e264]: Experimental
+                    - cell "normal" [ref=e265]
+                    - cell "key" [ref=e266]:
+                      - img "key" [ref=e267]:
+                        - img [ref=e268]
+                    - cell [ref=e270]
+              - status [ref=e271]
+  - dialog "Add Property" [ref=e273]:
+    - generic [ref=e275]:
+      - button "Close" [ref=e276] [cursor=pointer]:
+        - img "close" [ref=e277]:
+          - img [ref=e278]
+      - generic [ref=e280]: Add Property
+    - generic [ref=e282]:
+      - generic [ref=e284]:
+        - generic "Display Name" [ref=e286]: "* Display Name"
+        - textbox "* Display Name" [ref=e290]
+      - generic [ref=e292]:
+        - generic "ID" [ref=e294]: "* ID"
+        - textbox "* ID" [ref=e298]
+      - generic [ref=e300]:
+        - generic "API Name" [ref=e302]: "* API Name"
+        - textbox "* API Name" [ref=e306]
+      - generic [ref=e308]:
+        - generic "Base Type" [ref=e310]: "* Base Type"
+        - generic [ref=e314] [cursor=pointer]:
+          - generic [ref=e316]:
+            - combobox [expanded] [active] [ref=e318]:
+              - listbox:
+                - option "String": string
+                - option "Integer": integer
+            - generic: Base Type
+          - generic:
+            - img:
+              - img
+      - generic [ref=e320]:
+        - generic "Backing Column" [ref=e322]
+        - textbox "Backing Column" [ref=e326]:
+          - /placeholder: e.g. employee_id
+      - generic [ref=e328]:
+        - generic "Description" [ref=e330]
+        - textbox "Description" [ref=e334]
+      - generic [ref=e336]:
+        - generic "Status" [ref=e338]
+        - generic [ref=e342] [cursor=pointer]:
+          - generic [ref=e344]:
+            - combobox "Status" [ref=e346]
+            - generic "Experimental" [ref=e347]
+          - generic:
+            - img:
+              - img
+      - generic [ref=e349]:
+        - generic "Visibility" [ref=e351]
+        - generic [ref=e355] [cursor=pointer]:
+          - generic [ref=e357]:
+            - combobox "Visibility" [ref=e359]
+            - generic "Normal" [ref=e360]
+          - generic:
+            - img:
+              - img
+    - generic [ref=e363]:
+      - button "Cancel" [ref=e365] [cursor=pointer]:
+        - generic [ref=e366]: Cancel
+      - button "Create" [ref=e368] [cursor=pointer]:
+        - generic [ref=e369]: Create
+  - generic [ref=e375]:
+    - generic "All Types" [ref=e376]
+    - generic "String" [ref=e377] [cursor=pointer]:
+      - generic [ref=e378]: String
+    - generic "Integer" [ref=e379] [cursor=pointer]:
+      - generic [ref=e380]: Integer
+    - generic "Long" [ref=e381] [cursor=pointer]:
+      - generic [ref=e382]: Long
+    - generic "Float" [ref=e383] [cursor=pointer]:
+      - generic [ref=e384]: Float
+    - generic "Double" [ref=e385] [cursor=pointer]:
+      - generic [ref=e386]: Double
+    - generic "Decimal" [ref=e387] [cursor=pointer]:
+      - generic [ref=e388]: Decimal
+    - generic "Boolean" [ref=e389] [cursor=pointer]:
+      - generic [ref=e390]: Boolean
+    - generic "Date" [ref=e391] [cursor=pointer]:
+      - generic [ref=e392]: Date
+    - generic "Timestamp" [ref=e393] [cursor=pointer]:
+      - generic [ref=e394]: Timestamp
 ```
