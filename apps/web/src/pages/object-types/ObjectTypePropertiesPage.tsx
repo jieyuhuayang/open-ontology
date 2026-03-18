@@ -126,6 +126,7 @@ export default function ObjectTypePropertiesPage() {
       ) : (
         <PropertyTable
           properties={filteredProperties}
+          objectTypeRid={rid ?? ''}
           objectTypeStatus={objectType?.status}
           onRowClick={setSelectedProperty}
           onReorder={(newOrder) => void handleReorder(newOrder)}
