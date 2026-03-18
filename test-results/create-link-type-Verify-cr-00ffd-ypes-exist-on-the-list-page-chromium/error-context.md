@@ -1,0 +1,138 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - img "deployment-unit" [ref=e7]:
+        - img [ref=e8]
+      - strong [ref=e11]: Ontology Management
+    - generic [ref=e13]:
+      - img "search" [ref=e15]:
+        - img [ref=e16]
+      - textbox "Search by name, RID, aliases..." [ref=e18]
+      - generic [ref=e20]: ⌘K
+    - generic [ref=e21]:
+      - button "plus New" [ref=e22] [cursor=pointer]:
+        - img "plus" [ref=e24]:
+          - img [ref=e25]
+        - generic [ref=e28]: New
+      - generic [ref=e29] [cursor=pointer]:
+        - img "global" [ref=e30]:
+          - img [ref=e31]
+        - text: English
+  - generic [ref=e33]:
+    - complementary [ref=e34]:
+      - navigation [ref=e36]:
+        - strong [ref=e39]: Default Ontology
+        - menu [ref=e40]:
+          - menuitem "compass Discover" [ref=e41] [cursor=pointer]:
+            - img "compass" [ref=e42]:
+              - img [ref=e43]
+            - generic [ref=e45]: Discover
+          - text: Resources
+          - group [ref=e46]:
+            - menuitem "appstore Object Types 7" [ref=e47] [cursor=pointer]:
+              - img "appstore" [ref=e48]:
+                - img [ref=e49]
+              - generic [ref=e52]:
+                - text: Object Types
+                - generic [ref=e53]: "7"
+            - menuitem "unordered-list Properties" [ref=e54] [cursor=pointer]:
+              - img "unordered-list" [ref=e55]:
+                - img [ref=e56]
+              - generic [ref=e58]: Properties
+            - menuitem "link Link Types 1" [ref=e59] [cursor=pointer]:
+              - img "link" [ref=e60]:
+                - img [ref=e61]
+              - generic [ref=e64]:
+                - text: Link Types
+                - generic [ref=e65]: "1"
+            - menuitem "thunderbolt Action Types" [ref=e66] [cursor=pointer]:
+              - img "thunderbolt" [ref=e67]:
+                - img [ref=e68]
+              - generic [ref=e70]: Action Types
+          - text: Data Connection
+          - group [ref=e71]:
+            - menuitem "database Data Connection" [ref=e72] [cursor=pointer]:
+              - img "database" [ref=e73]:
+                - img [ref=e74]
+              - generic [ref=e76]: Data Connection
+        - button "left" [ref=e77] [cursor=pointer]:
+          - img "left" [ref=e78]:
+            - img [ref=e79]
+    - main [ref=e81]:
+      - main [ref=e82]:
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - heading "Link Types" [level=4] [ref=e85]
+            - button "plus New link type" [ref=e86] [cursor=pointer]:
+              - img "plus" [ref=e88]:
+                - img [ref=e89]
+              - generic [ref=e92]: New link type
+          - generic [ref=e93]:
+            - generic [ref=e94] [cursor=pointer]:
+              - generic [ref=e96]:
+                - combobox [ref=e98]
+                - generic: Object Type
+              - generic:
+                - img:
+                  - img
+            - generic [ref=e99] [cursor=pointer]:
+              - generic [ref=e101]:
+                - combobox [ref=e105]
+                - generic: Status
+              - generic:
+                - img:
+                  - img
+            - generic [ref=e106] [cursor=pointer]:
+              - generic [ref=e108]:
+                - combobox [ref=e112]
+                - generic: Visibility
+              - generic:
+                - img:
+                  - img
+          - generic [ref=e115]:
+            - table [ref=e119]:
+              - rowgroup [ref=e128]:
+                - row "ID Side A Side B Cardinality Join Method Status Change State" [ref=e129]:
+                  - columnheader "ID" [ref=e130]
+                  - columnheader "Side A" [ref=e131]
+                  - columnheader "Side B" [ref=e132]
+                  - columnheader "Cardinality" [ref=e133]
+                  - columnheader "Join Method" [ref=e134]
+                  - columnheader "Status" [ref=e135]
+                  - columnheader "Change State" [ref=e136]
+              - rowgroup [ref=e137]:
+                - row "analyst-latest-report 研究员 评级报告 Many to One Foreign Key Experimental New" [ref=e138] [cursor=pointer]:
+                  - cell "analyst-latest-report" [ref=e139]
+                  - cell "研究员" [ref=e140]:
+                    - generic [ref=e141]: 研究员
+                  - cell "评级报告" [ref=e142]:
+                    - generic [ref=e143]: 评级报告
+                  - cell "Many to One" [ref=e144]
+                  - cell "Foreign Key" [ref=e145]
+                  - cell "Experimental" [ref=e146]:
+                    - generic [ref=e147]: Experimental
+                  - cell "New" [ref=e148]:
+                    - generic [ref=e149]: New
+            - list [ref=e150]:
+              - listitem "Previous Page" [ref=e151]:
+                - button "left" [disabled] [ref=e152]:
+                  - img "left" [ref=e153]:
+                    - img [ref=e154]
+              - listitem "1" [ref=e156] [cursor=pointer]:
+                - generic [ref=e157]: "1"
+              - listitem "Next Page" [ref=e158]:
+                - button "right" [disabled] [ref=e159]:
+                  - img "right" [ref=e160]:
+                    - img [ref=e161]
+              - listitem [ref=e163]:
+                - generic "Page Size" [ref=e164] [cursor=pointer]:
+                  - generic [ref=e166]:
+                    - combobox "Page Size" [ref=e168]
+                    - generic "20 / page" [ref=e169]
+                  - generic:
+                    - img:
+                      - img
+```

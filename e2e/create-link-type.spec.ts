@@ -10,12 +10,15 @@ import { test, expect, type Page } from '@playwright/test';
  * - 5 datasets exist: companies, analysts, rating_reports, funds, fund_company_holdings
  *
  * Creates 5 link types in order:
- * 1. analyst-latest-report (FK, many-to-one)
- * 2. company-latest-report (FK, many-to-one)
- * 3. analyst-coverage (FK, many-to-one)
- * 4. fund-holding (JT, many-to-many)
- * 5. analyst-company-via-report (BO, many-to-many) — depends on #1 and #2
+ * FK #4: analyst-latest-report (many-to-one) — BO prerequisite
+ * FK #5: company-latest-report (many-to-one) — BO prerequisite
+ * FK #1: analyst-coverage (many-to-one)
+ * JT #2: fund-holding (many-to-many simple)
+ * BO #3: analyst-company-via-report (many-to-many rich) — depends on #4 and #5
  */
+
+// Increase per-test timeout for wizard flows
+test.setTimeout(60_000);
 
 // ──────────── Helpers ────────────
 
@@ -25,17 +28,15 @@ async function navigateToLinkTypes(page: Page) {
 }
 
 async function openCreateWizard(page: Page) {
-  // Click the "New link type" button
   const btn = page.locator('button').filter({ hasText: /New link type|新建链接类型/ }).first();
   await expect(btn).toBeVisible({ timeout: 5000 });
   await btn.click();
-  // Wait for modal to appear
   await expect(page.locator('.ant-modal-content')).toBeVisible({ timeout: 5000 });
 }
 
 async function clickNext(page: Page) {
   const okBtn = page.locator('.ant-modal-footer .ant-btn-primary');
-  await expect(okBtn).toBeEnabled({ timeout: 3000 });
+  await expect(okBtn).toBeEnabled({ timeout: 5000 });
   await okBtn.click();
 }
 
@@ -46,286 +47,246 @@ async function selectCardinality(page: Page, label: RegExp) {
   await card.first().click();
 }
 
-/** Select an option from an Ant Design Select dropdown by typing to search */
+/** Select an option from an Ant Design Select dropdown */
 async function selectAntOption(page: Page, selectLocator: ReturnType<Page['locator']>, search: string) {
-  // Click the select to open dropdown and focus its internal search input
   await selectLocator.click();
   await page.waitForTimeout(200);
 
-  // Type into the select's own search input
   const input = selectLocator.locator('input.ant-select-selection-search-input');
   await input.fill(search);
   await page.waitForTimeout(500);
 
-  // Click the matching option in the visible dropdown
   const option = page.locator('.ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option')
     .filter({ hasText: search });
   await expect(option.first()).toBeVisible({ timeout: 5000 });
   await option.first().click();
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(300);
 }
 
-// ──────────── Tests ────────────
+/** Helper to complete a FK link type creation */
+async function createFkLink(
+  page: Page,
+  opts: {
+    sideAName: string;
+    sideBName: string;
+    fkProperty: string;
+    linkId: string;
+  },
+) {
+  await openCreateWizard(page);
+
+  // Step 0: many-to-one
+  await selectCardinality(page, /Many to One|多对一/);
+  await clickNext(page);
+
+  // Step 1: Select OTs
+  await page.waitForTimeout(500);
+  const modal = page.locator('.ant-modal-content');
+
+  await selectAntOption(page, modal.locator('.ant-select').nth(0), opts.sideAName);
+  await selectAntOption(page, modal.locator('.ant-select').nth(1), opts.sideBName);
+
+  // Wait for FK selector to appear
+  await page.waitForTimeout(800);
+
+  // Select FK property
+  await selectAntOption(page, modal.locator('.ant-select').nth(2), opts.fkProperty);
+
+  await clickNext(page);
+
+  // Step 2: Set ID
+  await page.waitForTimeout(500);
+  const idInput = page.locator('input[placeholder*="e.g."]');
+  await idInput.clear();
+  await idInput.fill(opts.linkId);
+
+  // Click Create
+  await clickNext(page);
+
+  // Wait for navigation to detail page
+  await expect(page).toHaveURL(/\/link-types\/ri\.ontology\.link-type\./, { timeout: 15000 });
+}
+
+// ──────────── Cleanup ────────────
 
 test.describe.serial('Create Link Types — ordered', () => {
-  test.beforeEach(async ({ page }) => {
+  // Clean up existing link types before the suite
+  test('cleanup: delete all existing link types', async ({ request }) => {
+    const resp = await request.get('http://localhost:8000/api/v1/link-types');
+    const data = await resp.json();
+    for (const lt of data.items) {
+      await request.delete(`http://localhost:8000/api/v1/link-types/${lt.rid}`);
+    }
+    // Verify clean state
+    const check = await request.get('http://localhost:8000/api/v1/link-types');
+    const checkData = await check.json();
+    expect(checkData.items).toHaveLength(0);
+  });
+
+  // ────── FK #4: analyst-latest-report ──────
+  test('FK #4: analyst-latest-report (many-to-one)', async ({ page }) => {
     await navigateToLinkTypes(page);
+    await createFkLink(page, {
+      sideAName: '研究员',
+      sideBName: '评级报告',
+      fkProperty: 'latest_report_id',
+      linkId: 'analyst-latest-report',
+    });
   });
 
-  // ────── Link #4: analyst-latest-report (FK, many-to-one) ──────
-  test('Link #4: analyst-latest-report (FK, many-to-one)', async ({ page }) => {
-    await openCreateWizard(page);
-
-    // Step 0: Select many-to-one
-    await selectCardinality(page, /Many to One|多对一/);
-    await clickNext(page);
-
-    // Step 1: Side A = 研究员 (Analyst), Side B = 评级报告 (RatingReport)
-    await page.waitForTimeout(500);
-    const step1 = page.locator('.ant-modal-content');
-
-    // Side A select (first select)
-    const sideASelect = step1.locator('.ant-select').nth(0);
-    await selectAntOption(page, sideASelect, '研究员');
-
-    // Side B select (second select — no backing OT in FK mode)
-    const sideBSelect = step1.locator('.ant-select').nth(1);
-    await selectAntOption(page, sideBSelect, '评级报告');
-
-    // Wait for FK property selector to appear
-    await page.waitForTimeout(500);
-
-    // FK property selector — select latest_report_id
-    const fkSelect = step1.locator('.ant-select').nth(2);
-    await selectAntOption(page, fkSelect, 'latest_report_id');
-
-    await clickNext(page);
-
-    // Step 2: Naming — fields should be auto-populated
-    await page.waitForTimeout(500);
-
-    // Change the ID
-    const idInput = page.locator('input[placeholder*="e.g."]');
-    await idInput.clear();
-    await idInput.fill('analyst-latest-report');
-
-    // Click Create
-    await clickNext(page);
-
-    // Should navigate to detail page
-    await expect(page).toHaveURL(/\/link-types\/ri\.ontology\.link-type\./, { timeout: 10000 });
+  // ────── FK #5: company-latest-report ──────
+  test('FK #5: company-latest-report (many-to-one)', async ({ page }) => {
+    await navigateToLinkTypes(page);
+    await createFkLink(page, {
+      sideAName: '公司',
+      sideBName: '评级报告',
+      fkProperty: 'latest_report_id',
+      linkId: 'company-latest-report',
+    });
   });
 
-  // ────── Link #5: company-latest-report (FK, many-to-one) ──────
-  test('Link #5: company-latest-report (FK, many-to-one)', async ({ page }) => {
-    await openCreateWizard(page);
-
-    // Step 0: Select many-to-one
-    await selectCardinality(page, /Many to One|多对一/);
-    await clickNext(page);
-
-    // Step 1: Side A = 公司 (Company), Side B = 评级报告 (RatingReport)
-    await page.waitForTimeout(500);
-    const step1 = page.locator('.ant-modal-content');
-
-    const sideASelect = step1.locator('.ant-select').nth(0);
-    await selectAntOption(page, sideASelect, '公司');
-
-    const sideBSelect = step1.locator('.ant-select').nth(1);
-    await selectAntOption(page, sideBSelect, '评级报告');
-
-    await page.waitForTimeout(500);
-
-    // FK property — latest_report_id on Company (Side A)
-    const fkSelect = step1.locator('.ant-select').nth(2);
-    await selectAntOption(page, fkSelect, 'latest_report_id');
-
-    await clickNext(page);
-
-    // Step 2: Change ID
-    await page.waitForTimeout(500);
-    const idInput = page.locator('input[placeholder*="e.g."]');
-    await idInput.clear();
-    await idInput.fill('company-latest-report');
-
-    await clickNext(page);
-    await expect(page).toHaveURL(/\/link-types\/ri\.ontology\.link-type\./, { timeout: 10000 });
+  // ────── FK #1: analyst-coverage ──────
+  test('FK #1: analyst-coverage (many-to-one)', async ({ page }) => {
+    await navigateToLinkTypes(page);
+    await createFkLink(page, {
+      sideAName: '研究员',
+      sideBName: '公司',
+      fkProperty: 'company_id',
+      linkId: 'analyst-coverage',
+    });
   });
 
-  // ────── Link #1: analyst-coverage (FK, many-to-one) ──────
-  test('Link #1: analyst-coverage (FK, many-to-one)', async ({ page }) => {
+  // ────── JT #2: fund-holding ──────
+  test('JT #2: fund-holding (many-to-many simple)', async ({ page }) => {
+    await navigateToLinkTypes(page);
     await openCreateWizard(page);
 
-    // Step 0: many-to-one
-    await selectCardinality(page, /Many to One|多对一/);
-    await clickNext(page);
-
-    // Step 1: Side A = 研究员, Side B = 公司
-    await page.waitForTimeout(500);
-    const step1 = page.locator('.ant-modal-content');
-
-    const sideASelect = step1.locator('.ant-select').nth(0);
-    await selectAntOption(page, sideASelect, '研究员');
-
-    const sideBSelect = step1.locator('.ant-select').nth(1);
-    await selectAntOption(page, sideBSelect, '公司');
-
-    await page.waitForTimeout(500);
-
-    // FK property — company_id on Analyst (Side A)
-    const fkSelect = step1.locator('.ant-select').nth(2);
-    await selectAntOption(page, fkSelect, 'company_id');
-
-    await clickNext(page);
-
-    // Step 2: Change ID
-    await page.waitForTimeout(500);
-    const idInput = page.locator('input[placeholder*="e.g."]');
-    await idInput.clear();
-    await idInput.fill('analyst-coverage');
-
-    await clickNext(page);
-    await expect(page).toHaveURL(/\/link-types\/ri\.ontology\.link-type\./, { timeout: 10000 });
-  });
-
-  // ────── Link #2: fund-holding (JT, many-to-many) ──────
-  test('Link #2: fund-holding (JT, many-to-many simple)', async ({ page }) => {
-    await openCreateWizard(page);
-
-    // Step 0: many-to-many
+    // Step 0: many-to-many + simple relationship
     await selectCardinality(page, /Many to Many|多对多/);
-
-    // Wait for N:N sub-selector
     await page.waitForTimeout(500);
-
-    // Select "Simple Relationship" (Join Table)
     const simpleCard = page.locator('[role="button"]').filter({ hasText: /Simple Relationship|简单关系/ });
     await expect(simpleCard.first()).toBeVisible({ timeout: 3000 });
     await simpleCard.first().click();
-
     await clickNext(page);
 
     // Step 1: Side A = 基金, Side B = 公司
     await page.waitForTimeout(500);
-    const step1 = page.locator('.ant-modal-content');
+    const modal = page.locator('.ant-modal-content');
 
-    const sideASelect = step1.locator('.ant-select').nth(0);
-    await selectAntOption(page, sideASelect, '基金');
+    await selectAntOption(page, modal.locator('.ant-select').nth(0), '基金');
+    await selectAntOption(page, modal.locator('.ant-select').nth(1), '公司');
 
-    const sideBSelect = step1.locator('.ant-select').nth(1);
-    await selectAntOption(page, sideBSelect, '公司');
+    // Select join table dataset
+    await page.waitForTimeout(800);
+    await selectAntOption(page, modal.locator('.ant-select').nth(2), 'fund_company_holdings');
 
-    // Select join table dataset: fund_company_holdings
-    await page.waitForTimeout(500);
-    const datasetSelect = step1.locator('.ant-select').nth(2);
-    await selectAntOption(page, datasetSelect, 'fund_company_holdings');
-
-    // Wait for column selectors to load
+    // Wait for column selectors
     await page.waitForTimeout(1000);
 
-    // Side A column mapping: fund_id
-    const sideAColSelect = step1.locator('.ant-select').nth(3);
-    await selectAntOption(page, sideAColSelect, 'fund_id');
-
-    // Side B column mapping: company_id
-    const sideBColSelect = step1.locator('.ant-select').nth(4);
-    await selectAntOption(page, sideBColSelect, 'company_id');
+    // Column mappings
+    await selectAntOption(page, modal.locator('.ant-select').nth(3), 'fund_id');
+    await selectAntOption(page, modal.locator('.ant-select').nth(4), 'company_id');
 
     await clickNext(page);
 
-    // Step 2: Change ID
+    // Step 2: Set ID
     await page.waitForTimeout(500);
     const idInput = page.locator('input[placeholder*="e.g."]');
     await idInput.clear();
     await idInput.fill('fund-holding');
 
     await clickNext(page);
-    await expect(page).toHaveURL(/\/link-types\/ri\.ontology\.link-type\./, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/link-types\/ri\.ontology\.link-type\./, { timeout: 15000 });
   });
 
-  // ────── Link #3: analyst-company-via-report (BO, many-to-many) ──────
-  test('Link #3: analyst-company-via-report (BO, many-to-many rich)', async ({ page }) => {
+  // ────── BO #3: analyst-company-via-report ──────
+  test('BO #3: analyst-company-via-report (many-to-many rich)', async ({ page }) => {
+    await navigateToLinkTypes(page);
     await openCreateWizard(page);
 
-    // Step 0: many-to-many
+    // Step 0: many-to-many + rich relationship
     await selectCardinality(page, /Many to Many|多对多/);
-
-    // Wait for N:N sub-selector
     await page.waitForTimeout(500);
-
-    // Select "Rich Relationship" (Backing Object)
     const richCard = page.locator('[role="button"]').filter({ hasText: /Rich Relationship|丰富关系/ });
     await expect(richCard.first()).toBeVisible({ timeout: 3000 });
     await richCard.first().click();
-
     await clickNext(page);
 
     // Step 1: Side A = 研究员, Backing OT = 评级报告, Side B = 公司
     await page.waitForTimeout(500);
-    const step1 = page.locator('.ant-modal-content');
+    const modal = page.locator('.ant-modal-content');
 
-    // In BO mode: Side A (0th), Backing OT (1st), Side B (2nd)
-    const sideASelect = step1.locator('.ant-select').nth(0);
-    await selectAntOption(page, sideASelect, '研究员');
+    // BO mode has 3 selects: Side A (0), Backing OT (1), Side B (2)
+    await selectAntOption(page, modal.locator('.ant-select').nth(0), '研究员');
+    await selectAntOption(page, modal.locator('.ant-select').nth(1), '评级报告');
+    await selectAntOption(page, modal.locator('.ant-select').nth(2), '公司');
 
-    const backingOtSelect = step1.locator('.ant-select').nth(1);
-    await selectAntOption(page, backingOtSelect, '评级报告');
+    // Wait for side link selectors to appear (they may auto-select if only one option)
+    await page.waitForTimeout(2000);
 
-    const sideBSelect = step1.locator('.ant-select').nth(2);
-    await selectAntOption(page, sideBSelect, '公司');
-
-    // Wait for side link selectors to appear
-    await page.waitForTimeout(1000);
-
-    // Side A → Backing OT link: should auto-select analyst-latest-report if only one
-    // Side B → Backing OT link: should auto-select company-latest-report if only one
-    // Check if they are already auto-selected; if not, select manually
-    const sideALinkSelect = step1.locator('.ant-select').nth(3);
-    const sideBLinkSelect = step1.locator('.ant-select').nth(4);
-
-    // Verify side A link has a value (auto-selected)
-    const sideALinkValue = await sideALinkSelect.locator('.ant-select-selection-item').textContent().catch(() => '');
-    if (!sideALinkValue) {
+    // Check if side A link is auto-selected, if not select it
+    const sideALinkSelect = modal.locator('.ant-select').nth(3);
+    const sideALinkHasValue = await sideALinkSelect.locator('.ant-select-selection-item').count();
+    if (sideALinkHasValue === 0) {
       await selectAntOption(page, sideALinkSelect, 'analyst-latest-report');
     }
 
-    const sideBLinkValue = await sideBLinkSelect.locator('.ant-select-selection-item').textContent().catch(() => '');
-    if (!sideBLinkValue) {
+    // Check if side B link is auto-selected
+    const sideBLinkSelect = modal.locator('.ant-select').nth(4);
+    const sideBLinkHasValue = await sideBLinkSelect.locator('.ant-select-selection-item').count();
+    if (sideBLinkHasValue === 0) {
       await selectAntOption(page, sideBLinkSelect, 'company-latest-report');
     }
 
     await clickNext(page);
 
-    // Step 2: Change ID
+    // Step 2: Set ID
     await page.waitForTimeout(500);
     const idInput = page.locator('input[placeholder*="e.g."]');
     await idInput.clear();
     await idInput.fill('analyst-company-via-report');
 
     await clickNext(page);
-    await expect(page).toHaveURL(/\/link-types\/ri\.ontology\.link-type\./, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/link-types\/ri\.ontology\.link-type\./, { timeout: 15000 });
   });
-});
 
-// ──────────── Verification ────────────
+  // ────── Verify all created ──────
+  test('verify: all 5 link types exist via API', async ({ request }) => {
+    const resp = await request.get('http://localhost:8000/api/v1/link-types');
+    const data = await resp.json();
 
-test.describe('Verify created link types', () => {
-  test('all 5 link types exist on the list page', async ({ page }) => {
-    await navigateToLinkTypes(page);
-
-    // Verify all 5 link types are visible in the table
-    const expectedIds = [
+    const ids = data.items.map((lt: { id: string }) => lt.id).sort();
+    expect(ids).toEqual([
+      'analyst-company-via-report',
+      'analyst-coverage',
       'analyst-latest-report',
       'company-latest-report',
-      'analyst-coverage',
       'fund-holding',
-      'analyst-company-via-report',
-    ];
+    ]);
 
-    for (const id of expectedIds) {
-      await expect(page.locator('td, .ant-table-cell').filter({ hasText: id })).toBeVisible({
-        timeout: 5000,
-      });
-    }
+    // Verify specific properties
+    const byId = Object.fromEntries(data.items.map((lt: { id: string }) => [lt.id, lt]));
+
+    // FK links should have cardinality many-to-one and joinMethod foreign-key
+    expect(byId['analyst-latest-report'].cardinality).toBe('many-to-one');
+    expect(byId['analyst-latest-report'].joinMethod).toBe('foreign-key');
+
+    expect(byId['company-latest-report'].cardinality).toBe('many-to-one');
+    expect(byId['company-latest-report'].joinMethod).toBe('foreign-key');
+
+    expect(byId['analyst-coverage'].cardinality).toBe('many-to-one');
+    expect(byId['analyst-coverage'].joinMethod).toBe('foreign-key');
+
+    // JT link
+    expect(byId['fund-holding'].cardinality).toBe('many-to-many');
+    expect(byId['fund-holding'].joinMethod).toBe('join-table');
+    expect(byId['fund-holding'].joinTableDatasetRid).toBeTruthy();
+
+    // BO link
+    expect(byId['analyst-company-via-report'].cardinality).toBe('many-to-many');
+    expect(byId['analyst-company-via-report'].joinMethod).toBe('backing-object');
+    expect(byId['analyst-company-via-report'].backingObjectTypeRid).toBeTruthy();
+    expect(byId['analyst-company-via-report'].sideALinkTypeRid).toBeTruthy();
+    expect(byId['analyst-company-via-report'].sideBLinkTypeRid).toBeTruthy();
   });
 });

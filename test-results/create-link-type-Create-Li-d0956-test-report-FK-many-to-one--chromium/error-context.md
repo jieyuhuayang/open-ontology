@@ -43,12 +43,12 @@
                 - img "unordered-list" [ref=e55]:
                   - img [ref=e56]
                 - generic [ref=e58]: Properties
-              - menuitem "link Link Types 0" [ref=e59] [cursor=pointer]:
+              - menuitem "link Link Types 1" [ref=e59] [cursor=pointer]:
                 - img "link" [ref=e60]:
                   - img [ref=e61]
                 - generic [ref=e64]:
                   - text: Link Types
-                  - generic [ref=e65]: "0"
+                  - generic [ref=e65]: "1"
               - menuitem "thunderbolt Action Types" [ref=e66] [cursor=pointer]:
                 - img "thunderbolt" [ref=e67]:
                   - img [ref=e68]
@@ -72,71 +72,136 @@
                   - img [ref=e89]
                 - generic [ref=e92]: New link type
             - generic [ref=e93]:
-              - img "No data" [ref=e95]
-              - generic [ref=e108]:
-                - generic [ref=e109]: Create your first link type
-                - generic [ref=e110]: Link types define semantic relationships between object types.
-              - button "plus New link type" [ref=e112] [cursor=pointer]:
-                - img "plus" [ref=e114]:
-                  - img [ref=e115]
-                - generic [ref=e118]: New link type
-  - generic [ref=e119]:
-    - dialog "Create Link Type":
-      - generic [ref=e120]:
-        - button "Close" [ref=e121] [cursor=pointer]:
-          - generic "Close" [ref=e122]:
-            - img "close" [ref=e123]:
-              - img [ref=e124]
-        - generic [ref=e127]: Create Link Type
-        - generic [ref=e128]:
-          - generic [ref=e129]:
-            - generic [ref=e131]:
-              - img "check" [ref=e134]:
-                - img [ref=e135]
-              - generic [ref=e138]: Relationship
-            - generic [ref=e140]:
-              - generic [ref=e141]: "2"
-              - generic [ref=e143]: Object Types
-            - generic [ref=e145]:
-              - generic [ref=e146]: "3"
-              - generic [ref=e148]: Link Names
-          - generic [ref=e149]:
-            - generic [ref=e150]:
-              - generic [ref=e151]:
-                - strong [ref=e153]: Side A
-                - generic [ref=e154] [cursor=pointer]:
-                  - generic [ref=e156]:
-                    - combobox [ref=e158]
-                    - generic "研究员" [ref=e159]
-                  - generic:
-                    - img:
-                      - img
-              - generic [ref=e160]:
-                - strong [ref=e162]: Side B
-                - generic [ref=e163] [cursor=pointer]:
-                  - combobox [expanded] [active] [ref=e167]:
-                    - text: latest_report_id
-                    - listbox [ref=e168]:
-                      - generic [ref=e169]:
-                        - img "No data" [ref=e171]
-                        - generic [ref=e177]: No data
-                  - generic:
-                    - img:
-                      - img
-            - separator [ref=e178]
-            - generic [ref=e179]:
-              - text: Foreign key property (on 研究员)
-              - generic [ref=e180] [cursor=pointer]:
-                - generic [ref=e182]:
-                  - combobox [ref=e184]
-                  - generic: Select property
+              - generic [ref=e94] [cursor=pointer]:
+                - generic [ref=e96]:
+                  - combobox [ref=e98]
+                  - generic: Object Type
                 - generic:
                   - img:
                     - img
-              - generic [ref=e185]: "Optional: specify the property used for linking"
-        - generic [ref=e186]:
-          - button "Back" [ref=e187] [cursor=pointer]:
-            - generic [ref=e188]: Back
-          - button "Next" [ref=e189] [cursor=pointer]:
-            - generic [ref=e190]: Next
+              - generic [ref=e99] [cursor=pointer]:
+                - generic [ref=e101]:
+                  - combobox [ref=e105]
+                  - generic: Status
+                - generic:
+                  - img:
+                    - img
+              - generic [ref=e106] [cursor=pointer]:
+                - generic [ref=e108]:
+                  - combobox [ref=e112]
+                  - generic: Visibility
+                - generic:
+                  - img:
+                    - img
+            - generic [ref=e115]:
+              - table [ref=e119]:
+                - rowgroup [ref=e128]:
+                  - row "ID Side A Side B Cardinality Join Method Status Change State" [ref=e129]:
+                    - columnheader "ID" [ref=e130]
+                    - columnheader "Side A" [ref=e131]
+                    - columnheader "Side B" [ref=e132]
+                    - columnheader "Cardinality" [ref=e133]
+                    - columnheader "Join Method" [ref=e134]
+                    - columnheader "Status" [ref=e135]
+                    - columnheader "Change State" [ref=e136]
+                - rowgroup [ref=e137]:
+                  - row "analyst-latest-report 研究员 评级报告 Many to One Foreign Key Experimental New" [ref=e138] [cursor=pointer]:
+                    - cell "analyst-latest-report" [ref=e139]
+                    - cell "研究员" [ref=e140]:
+                      - generic [ref=e141]: 研究员
+                    - cell "评级报告" [ref=e142]:
+                      - generic [ref=e143]: 评级报告
+                    - cell "Many to One" [ref=e144]
+                    - cell "Foreign Key" [ref=e145]
+                    - cell "Experimental" [ref=e146]:
+                      - generic [ref=e147]: Experimental
+                    - cell "New" [ref=e148]:
+                      - generic [ref=e149]: New
+              - list [ref=e150]:
+                - listitem "Previous Page" [ref=e151]:
+                  - button "left" [disabled] [ref=e152]:
+                    - img "left" [ref=e153]:
+                      - img [ref=e154]
+                - listitem "1" [ref=e156] [cursor=pointer]:
+                  - generic [ref=e157]: "1"
+                - listitem "Next Page" [ref=e158]:
+                  - button "right" [disabled] [ref=e159]:
+                    - img "right" [ref=e160]:
+                      - img [ref=e161]
+                - listitem [ref=e163]:
+                  - generic "Page Size" [ref=e164] [cursor=pointer]:
+                    - generic [ref=e166]:
+                      - combobox "Page Size" [ref=e168]
+                      - generic "20 / page" [ref=e169]
+                    - generic:
+                      - img:
+                        - img
+  - generic [ref=e170]:
+    - dialog "Create Link Type":
+      - generic [ref=e171]:
+        - button "Close" [ref=e172] [cursor=pointer]:
+          - generic "Close" [ref=e173]:
+            - img "close" [ref=e174]:
+              - img [ref=e175]
+        - generic [ref=e178]: Create Link Type
+        - generic [ref=e179]:
+          - generic [ref=e180]:
+            - generic [ref=e182]:
+              - img "check" [ref=e185]:
+                - img [ref=e186]
+              - generic [ref=e189]: Relationship
+            - generic [ref=e191]:
+              - img "check" [ref=e194]:
+                - img [ref=e195]
+              - generic [ref=e198]: Object Types
+            - generic [ref=e200]:
+              - generic [ref=e201]: "3"
+              - generic [ref=e203]: Link Names
+          - generic [ref=e204]:
+            - generic [ref=e206]:
+              - generic "ID" [ref=e208]: "* ID"
+              - generic [ref=e209]:
+                - textbox "* ID" [ref=e212]:
+                  - /placeholder: e.g. employee-company
+                  - text: analyst-latest-report
+                - generic [ref=e215]: A link type with this ID already exists
+            - generic [ref=e216]:
+              - generic [ref=e219]: 研究员 → 评级报告
+              - generic [ref=e220]:
+                - generic [ref=e221]: "On 研究员, linked 评级报告 are shown as:"
+                - generic [ref=e222]:
+                  - generic [ref=e224]:
+                    - generic "Display Name" [ref=e226]: "* Display Name"
+                    - textbox "* Display Name" [ref=e230]: 评级报告
+                  - generic [ref=e232]:
+                    - generic "API Name" [ref=e234]: "* API Name"
+                    - textbox "* API Name" [ref=e238]: pingJiBaoGao
+            - generic [ref=e239]:
+              - generic [ref=e242]: 评级报告 → 研究员
+              - generic [ref=e243]:
+                - generic [ref=e244]: "On 评级报告, linked 研究员 are shown as:"
+                - generic [ref=e245]:
+                  - generic [ref=e247]:
+                    - generic "Display Name" [ref=e249]: "* Display Name"
+                    - textbox "* Display Name" [ref=e253]: 研究员
+                  - generic [ref=e255]:
+                    - generic "API Name" [ref=e257]: "* API Name"
+                    - textbox "* API Name" [ref=e261]: yanJiuYuan
+            - generic [ref=e263]:
+              - generic "Status" [ref=e265]
+              - generic [ref=e269]:
+                - generic [ref=e270] [cursor=pointer]:
+                  - radio "Experimental" [checked] [ref=e272]
+                  - generic [ref=e274]: Experimental
+                - generic [ref=e275] [cursor=pointer]:
+                  - radio "Active" [ref=e277]
+                  - generic [ref=e279]: Active
+                - generic [ref=e280] [cursor=pointer]:
+                  - radio "Deprecated" [ref=e282]
+                  - generic [ref=e284]: Deprecated
+        - generic [ref=e285]:
+          - button "Back" [ref=e286] [cursor=pointer]:
+            - generic [ref=e287]: Back
+          - button "Create" [active] [ref=e288] [cursor=pointer]:
+            - generic [ref=e289]: Create
 ```
