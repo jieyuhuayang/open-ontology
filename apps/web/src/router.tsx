@@ -31,7 +31,7 @@ export const routeConfig: RouteObject[] = [
           { index: true, element: <DiscoverPage /> },
           { path: 'object-types', element: <ObjectTypeListPage /> },
           { path: 'link-types', element: <LinkTypeListPage /> },
-          { path: 'properties', element: <PlaceholderPage title="Properties" comingSoon /> },
+          { path: 'properties', element: <PropertiesPage /> },
           { path: 'action-types', element: <PlaceholderPage title="Action Types" comingSoon /> },
           { path: 'data-connection', element: <DataConnectionPage /> },
         ],
