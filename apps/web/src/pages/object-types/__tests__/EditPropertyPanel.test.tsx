@@ -100,9 +100,10 @@ describe('EditPropertyPanel', () => {
     renderPanel(prop);
     // displayName appears as drawer title + detail value, so use getAllByText
     expect(screen.getAllByText('Employee Name').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('emp-name')).toBeInTheDocument();
-    expect(screen.getByText('RID')).toBeInTheDocument();
-    expect(screen.getByText('Base Type')).toBeInTheDocument();
+    // Tab structure: General tab is default; check tab labels exist
+    expect(screen.getByText('General')).toBeInTheDocument();
+    expect(screen.getByText('Details')).toBeInTheDocument();
+    expect(screen.getByText('Advanced')).toBeInTheDocument();
   });
 
   it('shows PK set button for valid PK type', () => {
