@@ -15,6 +15,7 @@ import type {
 
 export const propertyKeys = {
   all: ['properties'] as const,
+  allProperties: () => [...propertyKeys.all, 'all'] as const,
   lists: () => [...propertyKeys.all, 'list'] as const,
   list: (objectTypeRid: string) => [...propertyKeys.lists(), objectTypeRid] as const,
   details: () => [...propertyKeys.all, 'detail'] as const,
