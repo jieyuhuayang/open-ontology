@@ -109,6 +109,8 @@
       "rid": "RID",
       "sideA": "Side A",
       "sideB": "Side B",
+      "relationship": "Relationship",
+      "linkNames": "Link Names",
       "cardinality": "Cardinality",
       "joinMethod": "Join Method",
       "status": "Status",
