@@ -206,10 +206,10 @@ test.describe.serial('Property Management — E2E', () => {
     const baseTypeFilter = page.locator('.ant-select').nth(3);
     await selectAntOption(page, baseTypeFilter, /Integer|整数/);
 
-    // Only 'age' property should be visible
-    await expect(page.getByText('Age')).toBeVisible({ timeout: 3000 });
+    // Only 'age' property should be visible in the table
     const rows = page.locator('.ant-table-row');
-    await expect(rows).toHaveCount(1);
+    await expect(rows).toHaveCount(1, { timeout: 3000 });
+    await expect(rows.first()).toContainText('Age');
   });
 
   test('AC-33: clicking a property row navigates to its OT properties tab', async ({ page }) => {
