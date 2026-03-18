@@ -109,6 +109,8 @@
       "rid": "RID",
       "sideA": "A 端",
       "sideB": "B 端",
+      "relationship": "关系",
+      "linkNames": "链接名称",
       "cardinality": "基数",
       "joinMethod": "连接方式",
       "status": "状态",
