@@ -1,4 +1,7 @@
 import { test, expect, type Page, type APIRequestContext } from '@playwright/test';
+import { selectAntOption, clickAntTab, confirmPopconfirm, waitForAntMessage } from './helpers/antd';
+import { API, createObjectType, createProperty } from './helpers/api';
+import { cleanupByPrefix } from './helpers/fixtures';
 
 /**
  * E2E tests for Property Management — GAP 1/2/3/4
@@ -14,106 +17,6 @@ import { test, expect, type Page, type APIRequestContext } from '@playwright/tes
  * - GAP 4: "Allow multiple" switch in create drawer (AC-40)
  */
 
-const API = 'http://localhost:8000/api/v1';
-
-// ──────────── API helpers ────────────
-
-async function createObjectType(
-  request: APIRequestContext,
-  id: string,
-  displayName: string,
-): Promise<string> {
-  const resp = await request.post(`${API}/object-types`, {
-    data: {
-      id,
-      apiName: id.replace(/-/g, '').replace(/^(.)/, (_, c: string) => c.toUpperCase()),
-      displayName,
-      icon: { name: 'box', color: '#1677ff' },
-    },
-  });
-  expect(resp.ok(), `Failed to create OT '${id}': ${resp.status()}`).toBeTruthy();
-  const data = await resp.json();
-  return data.rid;
-}
-
-async function createProperty(
-  request: APIRequestContext,
-  otRid: string,
-  id: string,
-  opts: {
-    apiName?: string;
-    baseType?: string;
-    arrayInnerType?: string;
-    status?: string;
-  } = {},
-): Promise<{ rid: string; [key: string]: unknown }> {
-  const apiName = opts.apiName ?? id.replace(/-/g, '');
-  const resp = await request.post(`${API}/object-types/${otRid}/properties`, {
-    data: {
-      id,
-      apiName,
-      displayName: id.charAt(0).toUpperCase() + id.slice(1),
-      baseType: opts.baseType ?? 'string',
-      arrayInnerType: opts.arrayInnerType ?? null,
-      status: opts.status ?? 'experimental',
-    },
-  });
-  expect(resp.ok(), `Failed to create property '${id}': ${resp.status()}`).toBeTruthy();
-  return resp.json();
-}
-
-/** Only delete OTs created by this test suite (id starts with "e2e-") */
-async function cleanupTestData(request: APIRequestContext) {
-  const resp = await request.get(`${API}/object-types`);
-  if (!resp.ok()) return;
-  const data = await resp.json();
-  for (const ot of data.items) {
-    if (!(ot.id as string).startsWith('e2e-')) continue;
-    // Delete properties first — skip PK/active ones by unsetting them
-    const propResp = await request.get(`${API}/object-types/${ot.rid}/properties`);
-    if (propResp.ok()) {
-      const propData = await propResp.json();
-      for (const prop of propData.items) {
-        // Unset PK if set
-        if (prop.isPrimaryKey) {
-          await request.put(`${API}/object-types/${ot.rid}/properties/${prop.rid}`, {
-            data: { isPrimaryKey: false },
-          });
-        }
-        // Set to deprecated if active
-        if (prop.status === 'active') {
-          await request.put(`${API}/object-types/${ot.rid}/properties/${prop.rid}`, {
-            data: { status: 'deprecated' },
-          });
-        }
-        await request.delete(`${API}/object-types/${ot.rid}/properties/${prop.rid}`);
-      }
-    }
-    await request.delete(`${API}/object-types/${ot.rid}`);
-  }
-}
-
-// ──────────── Ant Design helpers ────────────
-
-async function selectAntOption(page: Page, selectLocator: ReturnType<Page['locator']>, search: string | RegExp) {
-  await selectLocator.click();
-  await page.waitForTimeout(200);
-  const input = selectLocator.locator('input.ant-select-selection-search-input');
-  const isReadonly = await input.getAttribute('readonly');
-  if (isReadonly === null && typeof search === 'string') {
-    await input.fill(search);
-    await page.waitForTimeout(500);
-  } else {
-    await page.waitForTimeout(300);
-  }
-  const option = page
-    .locator('.ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option')
-    .filter({ hasText: search });
-  await expect(option.first()).toBeVisible({ timeout: 5000 });
-  await option.first().click();
-  await page.waitForTimeout(300);
-}
-
 // ──────────── Test suites ────────────
 
 test.describe.serial('Property Management — E2E', () => {
@@ -124,7 +27,7 @@ test.describe.serial('Property Management — E2E', () => {
   // ──────── Setup ────────
   test('setup: create object types and properties', async ({ request }) => {
     // Clean any leftover test data
-    await cleanupTestData(request);
+    await cleanupByPrefix(request, 'e2e-');
 
     // Create two object types
     otRidA = await createObjectType(request, 'e2e-employee', 'E2E Employee');
@@ -266,31 +169,23 @@ test.describe.serial('Property Management — E2E', () => {
     await expect(drawer.getByText(/Display Name|显示名称/)).toBeVisible();
 
     // Click Details tab
-    const detailsTab = drawer.locator('.ant-tabs-tab').filter({ hasText: /Details|详细信息/ });
-    await detailsTab.click();
-    await page.waitForTimeout(300);
+    await clickAntTab(drawer, /Details|详细信息/);
 
     // Should show base type info
     await expect(drawer.getByText(/Base Type|基础类型/)).toBeVisible();
 
     // Click Advanced tab
-    const advancedTab = drawer.locator('.ant-tabs-tab').filter({ hasText: /Advanced|高级/ });
-    await advancedTab.click();
-    await page.waitForTimeout(300);
+    await clickAntTab(drawer, /Advanced|高级/);
 
     // Should show RID
     await expect(drawer.getByText('RID')).toBeVisible();
 
     // Click Display tab — should show placeholder
-    const displayTab = drawer.locator('.ant-tabs-tab').filter({ hasText: /^Display$|^显示$/ });
-    await displayTab.click();
-    await page.waitForTimeout(300);
+    await clickAntTab(drawer, /^Display$|^显示$/);
     await expect(drawer.getByText(/Value formatting|值格式化/)).toBeVisible();
 
     // Click Interaction tab — should show placeholder
-    const interactionTab = drawer.locator('.ant-tabs-tab').filter({ hasText: /Interaction|交互/ });
-    await interactionTab.click();
-    await page.waitForTimeout(300);
+    await clickAntTab(drawer, /Interaction|交互/);
     await expect(drawer.getByText(/Conditional formatting|条件格式化/)).toBeVisible();
   });
 
@@ -307,9 +202,7 @@ test.describe.serial('Property Management — E2E', () => {
     await expect(drawer).toBeVisible({ timeout: 5000 });
 
     // Click Details tab
-    const detailsTab = drawer.locator('.ant-tabs-tab').filter({ hasText: /Details|详细信息/ });
-    await detailsTab.click();
-    await page.waitForTimeout(300);
+    await clickAntTab(drawer, /Details|详细信息/);
 
     // Should show "Allow multiple" as enabled
     await expect(
@@ -380,7 +273,7 @@ test.describe.serial('Property Management — E2E', () => {
     await createBtn.click();
 
     // Wait for success message
-    await expect(page.locator('.ant-message')).toBeVisible({ timeout: 5000 });
+    await waitForAntMessage(page);
 
     // Verify via API that the property was created as array type
     const resp = await page.request.get(
@@ -446,20 +339,13 @@ test.describe.serial('Property Management — E2E', () => {
     // Batch bar should be visible
     await expect(page.getByText(/selected|已选/)).toBeVisible({ timeout: 3000 });
 
-    // Click "Change Status" select and pick "Active"
-    const batchStatusSelect = page
-      .locator('.ant-select')
-      .filter({ has: page.locator(`[title*="Status"], [title*="状态"]`) })
-      .first();
-
     // Use the batch status select in the batch bar area
-    // Locate batch bar by its "selected" text, then find sibling selects
     const batchBar = page.getByText(/selected|已选/).locator('..');
     const statusSelect = batchBar.locator('.ant-select').first();
     await selectAntOption(page, statusSelect, /Active|活跃/);
 
     // Wait for success message
-    await expect(page.locator('.ant-message')).toBeVisible({ timeout: 5000 });
+    await waitForAntMessage(page);
 
     // Verify via API
     const resp = await page.request.get(`${API}/object-types/${otRidB}/properties`);
@@ -487,7 +373,7 @@ test.describe.serial('Property Management — E2E', () => {
     await selectAntOption(page, visibilitySelect, /Hidden|隐藏/);
 
     // Wait for success message
-    await expect(page.locator('.ant-message')).toBeVisible({ timeout: 5000 });
+    await waitForAntMessage(page);
   });
 
   test('AC-38: batch delete skips active and PK properties', async ({ request, page }) => {
@@ -524,9 +410,7 @@ test.describe.serial('Property Management — E2E', () => {
     await deleteBtn.click();
 
     // Confirm in popconfirm
-    const confirmBtn = page.locator('.ant-popconfirm .ant-btn-primary, .ant-popover .ant-btn-dangerous');
-    await expect(confirmBtn).toBeVisible({ timeout: 3000 });
-    await confirmBtn.click();
+    await confirmPopconfirm(page);
 
     // Wait for messages (success + skipped warning)
     await page.waitForTimeout(1500);
@@ -543,7 +427,7 @@ test.describe.serial('Property Management — E2E', () => {
 
   // ──────── Cleanup ────────
   test('cleanup: delete test object types', async ({ request }) => {
-    await cleanupTestData(request);
+    await cleanupByPrefix(request, 'e2e-');
 
     // Verify test OTs are gone
     const resp = await request.get(`${API}/object-types`);
