@@ -318,10 +318,40 @@
       "status": "Status",
       "visibility": "Visibility",
       "baseType": "Base Type",
+      "objectType": "Object Type",
       "allStatuses": "All Statuses",
       "allVisibilities": "All Visibilities",
-      "allTypes": "All Types"
-    }
+      "allTypes": "All Types",
+      "allObjectTypes": "All Object Types"
+    },
+    "summaryTitle": "Properties",
+    "summaryEmpty": "No properties yet. Create object types and add properties to get started.",
+    "summaryFilterEmpty": "No matching properties",
+    "columns": {
+      "objectType": "Object Type"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "updateStatus": "Change Status",
+      "updateVisibility": "Change Visibility",
+      "delete": "Delete",
+      "deleteConfirm": "Delete {{count}} selected properties? This action cannot be undone.",
+      "deleteSuccess": "{{count}} properties deleted",
+      "deleteSkipped": "{{count}} properties were skipped (active or primary key)",
+      "updateSuccess": "{{count}} properties updated"
+    },
+    "tabs": {
+      "general": "General",
+      "details": "Details",
+      "advanced": "Advanced",
+      "display": "Display",
+      "interaction": "Interaction",
+      "displayPlaceholder": "Value formatting — Coming Soon (P1)",
+      "interactionPlaceholder": "Conditional formatting — Coming Soon (P2)"
+    },
+    "allowMultiple": "Allow multiple",
+    "allowMultipleHint": "Enable to store multiple values (creates an Array property)",
+    "allowMultipleEnabled": "Multiple values enabled (Array)"
   },
   "objectType": {
     "listTitle": "Object Types",
