@@ -95,12 +95,12 @@ async function cleanupTestData(request: APIRequestContext) {
 
 // ──────────── Ant Design helpers ────────────
 
-async function selectAntOption(page: Page, selectLocator: ReturnType<Page['locator']>, search: string) {
+async function selectAntOption(page: Page, selectLocator: ReturnType<Page['locator']>, search: string | RegExp) {
   await selectLocator.click();
   await page.waitForTimeout(200);
   const input = selectLocator.locator('input.ant-select-selection-search-input');
   const isReadonly = await input.getAttribute('readonly');
-  if (isReadonly === null) {
+  if (isReadonly === null && typeof search === 'string') {
     await input.fill(search);
     await page.waitForTimeout(500);
   } else {
