@@ -123,8 +123,8 @@ test.describe.serial('Property Management — E2E', () => {
 
   // ──────── Setup ────────
   test('setup: create object types and properties', async ({ request }) => {
-    // Clean slate
-    await deleteAllObjectTypes(request);
+    // Clean any leftover test data
+    await cleanupTestData(request);
 
     // Create two object types
     otRidA = await createObjectType(request, 'e2e-employee', 'E2E Employee');
