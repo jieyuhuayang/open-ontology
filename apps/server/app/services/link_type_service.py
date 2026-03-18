@@ -30,7 +30,7 @@ from app.domain.working_state import (
     ResourceType,
 )
 from app.exceptions import AppError
-from app.services.working_state_service import WorkingStateService
+from app.services.working_state_service import WorkingStateService, _deep_merge_dicts
 from app.storage.link_type_storage import LinkTypeStorage
 
 
