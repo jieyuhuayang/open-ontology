@@ -196,7 +196,7 @@ class WorkingStateService:
                 change = change_index.pop(rid)
                 if change.change_type == ChangeType.UPDATE:
                     # Merge published + after
-                    merged = {**data, **(change.after or {})}
+                    merged = _deep_merge_dicts(data, change.after or {})
                     result.append((merged, ChangeState.MODIFIED))
                 elif change.change_type == ChangeType.DELETE:
                     result.append((data, ChangeState.DELETED))
