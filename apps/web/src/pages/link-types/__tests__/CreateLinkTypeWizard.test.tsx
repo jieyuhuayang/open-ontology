@@ -32,6 +32,10 @@ vi.mock('@/api/datasets', () => ({
   useDataset: vi.fn(() => ({ data: null })),
 }));
 
+vi.mock('@/api/properties', () => ({
+  useProperties: vi.fn(() => ({ data: { items: [] } })),
+}));
+
 vi.mock('@/api/object-types', () => ({
   useObjectTypes: vi.fn(() => ({
     data: {
@@ -121,7 +125,6 @@ describe('CreateLinkTypeWizard', () => {
 
     // Switch to one-to-one — sub-selector should collapse
     await userEvent.click(screen.getByText(/one to one/i));
-    // The text may still be in DOM but hidden via maxHeight=0
     // Verify the next button is enabled (cardinality selected)
     expect(screen.getByText(/next/i)).not.toBeDisabled();
   });
