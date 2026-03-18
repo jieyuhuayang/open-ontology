@@ -50,6 +50,17 @@ TYPE_COMPATIBILITY: dict[str, set[str]] = {
 }
 
 
+def _deep_merge_dicts(base: dict, override: dict) -> dict:
+    """Recursively merge override into base. Nested dicts are merged, not replaced."""
+    result = {**base}
+    for key, value in override.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            result[key] = _deep_merge_dicts(result[key], value)
+        else:
+            result[key] = value
+    return result
+
+
 class WorkingStateService:
     def __init__(self, session: AsyncSession):
         self._session = session
