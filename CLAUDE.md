@@ -33,6 +33,9 @@ docs/
 features/                             # SDD 特性目录
 ├── _templates/                       # spec / tasks 模板
 └── v0.1.0/                           # 001 ~ 009 特性包
+e2e/                                  # Playwright E2E 测试
+├── helpers/                          # 共享工具（antd.ts, api.ts, fixtures.ts）
+└── *.spec.ts                         # 测试文件
 ops/mysql-sample/                     # 本地 MySQL 样本副本脚本
 justfile                              # Monorepo 任务运行器
 ```
