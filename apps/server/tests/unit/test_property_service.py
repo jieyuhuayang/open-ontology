@@ -776,3 +776,227 @@ class TestReorder:
             with pytest.raises(AppError) as exc_info:
                 await service.reorder(OT_RID, req)
             assert exc_info.value.code == "PROPERTY_NOT_FOUND"
+
+
+# ===========================================================================
+# TestListAll — GAP 1 (AC-32)
+# ===========================================================================
+
+
+def _patch_ws_merged_view(service, side_effect_fn):
+    """Patch the WorkingStateService.get_merged_view to use a side effect function."""
+    return patch.object(
+        service._ws_service,
+        "get_merged_view",
+        new_callable=AsyncMock,
+        side_effect=side_effect_fn,
+    )
+
+
+class TestListAll:
+    """Covers AC-32."""
+
+    @pytest.mark.asyncio
+    async def test_list_all_returns_properties_with_ot_names(self, service):
+        """AC-32: list_all returns all properties with object type display names."""
+        ot1_dict = _make_ot_dict(rid="ot-1", displayName="Employee")
+        ot2_dict = _make_ot_dict(rid="ot-2", displayName="Department")
+        prop1 = _make_prop_dict(rid="p1", objectTypeRid="ot-1", displayName="Name")
+        prop2 = _make_prop_dict(rid="p2", objectTypeRid="ot-2", displayName="Code")
+
+        def side_effect(ontology_rid, resource_type):
+            if resource_type == ResourceType.PROPERTY:
+                return [
+                    (prop1, ChangeState.PUBLISHED),
+                    (prop2, ChangeState.CREATED),
+                ]
+            if resource_type == ResourceType.OBJECT_TYPE:
+                return [
+                    (ot1_dict, ChangeState.PUBLISHED),
+                    (ot2_dict, ChangeState.PUBLISHED),
+                ]
+            return []
+
+        with _patch_ws_merged_view(service, side_effect):
+            result = await service.list_all()
+
+        assert result.total == 2
+        # Sorted by OT name then property name: Department/Code, Employee/Name
+        assert result.items[0].object_type_display_name == "Department"
+        assert result.items[0].display_name == "Code"
+        assert result.items[1].object_type_display_name == "Employee"
+        assert result.items[1].display_name == "Name"
+
+    @pytest.mark.asyncio
+    async def test_list_all_excludes_deleted(self, service):
+        """list_all excludes deleted properties and properties of deleted OTs."""
+        ot_dict = _make_ot_dict(rid="ot-1", displayName="Employee")
+        deleted_ot = _make_ot_dict(rid="ot-del", displayName="Deleted")
+        prop_ok = _make_prop_dict(rid="p1", objectTypeRid="ot-1")
+        prop_deleted = _make_prop_dict(rid="p2", objectTypeRid="ot-1")
+        prop_orphan = _make_prop_dict(rid="p3", objectTypeRid="ot-del")
+
+        def side_effect(ontology_rid, resource_type):
+            if resource_type == ResourceType.PROPERTY:
+                return [
+                    (prop_ok, ChangeState.PUBLISHED),
+                    (prop_deleted, ChangeState.DELETED),
+                    (prop_orphan, ChangeState.PUBLISHED),
+                ]
+            if resource_type == ResourceType.OBJECT_TYPE:
+                return [
+                    (ot_dict, ChangeState.PUBLISHED),
+                    (deleted_ot, ChangeState.DELETED),
+                ]
+            return []
+
+        with _patch_ws_merged_view(service, side_effect):
+            result = await service.list_all()
+
+        assert result.total == 1
+        assert result.items[0].rid == "p1"
+
+    @pytest.mark.asyncio
+    async def test_list_all_empty(self, service):
+        """list_all returns empty when no properties exist."""
+
+        def side_effect(ontology_rid, resource_type):
+            return []
+
+        with _patch_ws_merged_view(service, side_effect):
+            result = await service.list_all()
+
+        assert result.total == 0
+        assert result.items == []
+
+
+# ===========================================================================
+# TestBatchUpdate + TestBatchDelete — GAP 2 (AC-36, AC-37, AC-38)
+# ===========================================================================
+
+
+OT2_RID = "ri.ontology.object-type.test-ot2"
+
+
+class TestBatchUpdate:
+    """Covers AC-36, AC-37."""
+
+    @pytest.mark.asyncio
+    async def test_batch_update_status(self, service):
+        """AC-36: Batch update status for multiple properties."""
+        props = [
+            (_make_prop_dict(rid="p1", status="experimental"), ChangeState.PUBLISHED),
+            (_make_prop_dict(rid="p2", status="experimental"), ChangeState.PUBLISHED),
+        ]
+        req = PropertyBatchUpdateRequest(rids=["p1", "p2"], status="active")
+        with (
+            _patch_ot_merged(service),
+            _patch_props_merged(service, props),
+            _patch_add_changes(service) as mock_add,
+        ):
+            result = await service.batch_update(OT_RID, req)
+
+        assert result.processed == ["p1", "p2"]
+        assert result.skipped == []
+        all_changes = mock_add.call_args[0][1]
+        assert len(all_changes) == 2
+        assert all_changes[0].after["status"] == "active"
+
+    @pytest.mark.asyncio
+    async def test_batch_update_visibility(self, service):
+        """AC-37: Batch update visibility."""
+        props = [
+            (_make_prop_dict(rid="p1", visibility="normal"), ChangeState.PUBLISHED),
+        ]
+        req = PropertyBatchUpdateRequest(rids=["p1"], visibility="hidden")
+        with (
+            _patch_ot_merged(service),
+            _patch_props_merged(service, props),
+            _patch_add_changes(service) as mock_add,
+        ):
+            result = await service.batch_update(OT_RID, req)
+
+        assert result.processed == ["p1"]
+        all_changes = mock_add.call_args[0][1]
+        assert all_changes[0].after["visibility"] == "hidden"
+
+    @pytest.mark.asyncio
+    async def test_batch_update_skips_not_found(self, service):
+        """Batch update skips unknown rids."""
+        props = [
+            (_make_prop_dict(rid="p1"), ChangeState.PUBLISHED),
+        ]
+        req = PropertyBatchUpdateRequest(rids=["p1", "unknown-rid"], status="active")
+        with (
+            _patch_ot_merged(service),
+            _patch_props_merged(service, props),
+            _patch_add_changes(service),
+        ):
+            result = await service.batch_update(OT_RID, req)
+
+        assert result.processed == ["p1"]
+        assert result.skipped == ["unknown-rid"]
+        assert result.skipped_reasons["unknown-rid"] == "not_found"
+
+
+class TestBatchDelete:
+    """Covers AC-38."""
+
+    @pytest.mark.asyncio
+    async def test_batch_delete_success(self, service):
+        """AC-38: Batch delete experimental properties."""
+        props = [
+            (_make_prop_dict(rid="p1"), ChangeState.PUBLISHED),
+            (_make_prop_dict(rid="p2"), ChangeState.PUBLISHED),
+        ]
+        req = PropertyBatchDeleteRequest(rids=["p1", "p2"])
+        with (
+            _patch_ot_merged(service),
+            _patch_props_merged(service, props),
+            _patch_add_changes(service) as mock_add,
+        ):
+            result = await service.batch_delete(OT_RID, req)
+
+        assert result.processed == ["p1", "p2"]
+        assert result.skipped == []
+        all_changes = mock_add.call_args[0][1]
+        assert len(all_changes) == 2
+        assert all_changes[0].change_type == ChangeType.DELETE
+
+    @pytest.mark.asyncio
+    async def test_batch_delete_skips_active(self, service):
+        """AC-38: Batch delete skips active properties."""
+        props = [
+            (_make_prop_dict(rid="p1", status="active"), ChangeState.PUBLISHED),
+            (_make_prop_dict(rid="p2", status="experimental"), ChangeState.PUBLISHED),
+        ]
+        req = PropertyBatchDeleteRequest(rids=["p1", "p2"])
+        with (
+            _patch_ot_merged(service),
+            _patch_props_merged(service, props),
+            _patch_add_changes(service),
+        ):
+            result = await service.batch_delete(OT_RID, req)
+
+        assert result.processed == ["p2"]
+        assert result.skipped == ["p1"]
+        assert result.skipped_reasons["p1"] == "active"
+
+    @pytest.mark.asyncio
+    async def test_batch_delete_skips_pk(self, service):
+        """AC-38: Batch delete skips primary key properties."""
+        props = [
+            (_make_prop_dict(rid="p1", isPrimaryKey=True), ChangeState.PUBLISHED),
+            (_make_prop_dict(rid="p2"), ChangeState.PUBLISHED),
+        ]
+        req = PropertyBatchDeleteRequest(rids=["p1", "p2"])
+        with (
+            _patch_ot_merged(service),
+            _patch_props_merged(service, props),
+            _patch_add_changes(service),
+        ):
+            result = await service.batch_delete(OT_RID, req)
+
+        assert result.processed == ["p2"]
+        assert result.skipped == ["p1"]
+        assert result.skipped_reasons["p1"] == "primary_key"
