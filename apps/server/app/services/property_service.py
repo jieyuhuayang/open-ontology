@@ -14,12 +14,17 @@ from app.domain.property import (
     PRIMARY_KEY_TYPES,
     STRUCT_FIELD_TYPES,
     TITLE_KEY_TYPES,
+    BatchOperationResponse,
     Property,
+    PropertyBatchDeleteRequest,
+    PropertyBatchUpdateRequest,
     PropertyCreateRequest,
+    PropertyListAllResponse,
     PropertyListResponse,
     PropertySortOrderRequest,
     PropertyUpdateRequest,
     PropertyWithChangeState,
+    PropertyWithObjectType,
 )
 from app.domain.validators import validate_property_api_name, validate_property_id
 from app.domain.working_state import (
