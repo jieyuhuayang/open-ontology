@@ -360,7 +360,7 @@ export default function PropertyTable({
             rowSelection={{
               selectedRowKeys,
               onChange: (keys) => setSelectedRowKeys(keys),
-              onClick: (e) => e.stopPropagation(),
+              onCell: () => ({ onClick: (e: React.MouseEvent) => e.stopPropagation() }),
             }}
             onRow={(record) => ({
               onClick: () => onRowClick?.(record),
