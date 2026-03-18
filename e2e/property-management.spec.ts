@@ -146,11 +146,14 @@ test.describe.serial('Property Management — E2E', () => {
 
     propRids = [p1.rid, p2.rid, p3.rid, p4.rid, p5.rid, p6.rid] as string[];
 
-    // Verify setup
-    const allResp = await request.get(`${API}/properties`);
-    expect(allResp.ok()).toBeTruthy();
-    const allData = await allResp.json();
-    expect(allData.total).toBe(6);
+    // Verify setup — our 2 OTs should have 6 properties total
+    const aResp = await request.get(`${API}/object-types/${otRidA}/properties`);
+    expect(aResp.ok()).toBeTruthy();
+    const bResp = await request.get(`${API}/object-types/${otRidB}/properties`);
+    expect(bResp.ok()).toBeTruthy();
+    const aData = await aResp.json();
+    const bData = await bResp.json();
+    expect(aData.total + bData.total).toBe(6);
   });
 
   // ════════════════════════════════════════════════
