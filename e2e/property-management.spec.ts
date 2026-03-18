@@ -174,8 +174,8 @@ test.describe.serial('Property Management — E2E', () => {
     await expect(page.getByText('Dept-code')).toBeVisible();
 
     // Should show object type names in the table
-    await expect(page.getByText('E2E Employee')).toBeVisible();
-    await expect(page.getByText('E2E Department')).toBeVisible();
+    await expect(page.getByText('E2E Employee').first()).toBeVisible();
+    await expect(page.getByText('E2E Department').first()).toBeVisible();
   });
 
   test('AC-34: /properties filters work (status, baseType, objectType)', async ({ page }) => {
