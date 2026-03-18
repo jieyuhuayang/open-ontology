@@ -1,13 +1,22 @@
 # Ontology-Aware AI Agent Framework — 研究与设计文档
 
-> **状态**: 研究草案
-> **作者**: Open Ontology Team
-> **日期**: 2026-03-17
+> **状态**: 综合方案（修订版）
+> **基于**: Claude / Gemini / OpenAI 三方独立调研 + 代码库审查
+> **日期**: 2026-03-18
 > **前置阅读**: `docs/architecture/03-agent-context-architecture.md`
+
+## 文档索引
+
+| 文档 | 说明 |
+|------|------|
+| **本文** | 综合技术方案（最终结论），整合三方调研精华 + 代码库审查修正 |
+| `research_by_claude.md` | Claude 独立调研 |
+| `research_by_gemini.md` | Gemini 独立调研 |
+| `research_by_openai.md` | OpenAI 独立调研 |
 
 ---
 
-## 1. 调研背景与目标
+## 一、调研背景与目标
 
 ### 1.1 为何构建 Agent 应用层
 
@@ -34,9 +43,225 @@ Open Ontology 的核心定位是"为 Agent 时代设计的 Ontology"。现有 `0
 
 ---
 
-## 2. 系统架构总览
+## 二、产品交互体验
 
-### 2.1 四层架构
+> 来源：修订版 §一，综合 Claude / Gemini / OpenAI 三方案精华
+
+### 2.1 布局：自适应三面板
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    顶部导航栏（复用现有 AppShell）             │
+├───────────────┬─────────────────────────┬────────────────────┤
+│  对话面板 30%  │   知识图谱画布 45%       │  实体详情面板 25%  │
+│               │                         │                    │
+│  · 聊天消息流  │  · React Flow 力导向     │  · 三层渐进披露    │
+│  · 实体锚点    │  · 自定义节点/边样式     │  · 属性/关系/溯源  │
+│  · 建议操作    │  · 推理轨迹动画          │  · 导航面包屑栈    │
+│  · 嵌入迷你图  │  · 双向高亮联动          │                    │
+├───────────────┴─────────────────────────┴────────────────────┤
+│  证据/溯源折叠面板（按需展开，底部 30%）                       │
+└──────────────────────────────────────────────────────────────┘
+```
+
+- 面板可拖拽调整：`react-resizable-panels`（新增依赖）
+- 图谱渲染：**React Flow**（`@xyflow/react` 已在 `package.json` 中，零新增依赖；MVP 够用，V1 如性能不足再迁移 AntV G6）
+- 实体详情：Ant Design `Drawer`
+- Agent 页面采用**独立全屏布局**（不嵌入 `HomeLayout` 侧边栏），类似 `/demo/canvas` 的独立路由
+
+### 2.2 三层渐进式实体探索（← Claude 方案精华）
+
+| 层级 | 触发 | 组件 | 内容 | 尺寸 |
+|------|------|------|------|------|
+| Tier 1 悬停预览 | 鼠标悬停 200ms | `Popover` | 名称+类型徽标+一行描述 | 280-320px |
+| Tier 2 侧面板 | 单击实体 | `Drawer` | 完整属性、关系分组、溯源、面包屑 | 400-480px |
+| Tier 3 全屏 | "展开详情" | 跳转现有 ObjectType Detail 页 | 完整编辑、关系图、审计 | 全屏路由 |
+
+### 2.3 对话 ↔ 图谱联动
+
+- **双向实体高亮**（← Claude）：对话悬停实体 → 图节点发光；图悬停节点 → 对话文本高亮。通过 Zustand store 共享（见 §9.4 Store 设计）
+- **推理轨迹可视化**（← Gemini）：Agent 多跳推理时图谱节点依次点亮，展示探索路径（V1）
+- **图操作驱动对话**（← Gemini A2UI 简化）：右键节点 → 上下文菜单"查看详情/解释关系"（MVP 先实现单节点操作，V1 再做框选多节点）
+
+### 2.4 Entity-Linked Citation（← Claude 方案精华）
+
+- `[E1]` 实体引用 | `[R1]` 关系引用 | `[I1]` 推理引用
+- 上标可点击，悬停预览，点击打开 Tier 2 面板
+- 区别于 URL 引用，本体原生溯源
+
+### 2.5 置信度 + 证据展示
+
+- **三色置信度**（← Claude + OpenAI）：绿色 直接事实 | 黄色 多跳推理 | 红色 需专家确认
+- **事实验证管线**（← Gemini）：回答 → 原子声明 → 本体三元组映射 → 路径验证（V1）
+- **证据折叠面板**（← OpenAI）：推理路径 + 数据来源 + 数据新鲜度（MVP 先做推理步骤展示，V1 补完整证据链）
+
+---
+
+## 三、技术架构
+
+> 来源：修订版 §二，基于代码库审查修正
+
+### 3.1 Agent 编排：LangGraph + PydanticAI
+
+```
+用户消息 → LangGraph StatefulGraph
+  ├── classify（查询分类）
+  │   ├── entity_lookup → 实体查找工具（PydanticAI）
+  │   ├── relationship → 关系遍历工具（PydanticAI）
+  │   ├── aggregation → 聚合查询工具（PydanticAI）
+  │   ├── hybrid → 混合检索工具（PydanticAI）
+  │   └── action → 动作执行（需人工确认，V2）
+  └── synthesize（结构化输出 + 实体标注）
+```
+
+Agent 状态模型：
+```python
+class OntologyAgentState(TypedDict):
+    messages: list                    # 对话历史
+    ontology_context: str             # 缓存 schema 上下文（见 §3.6）
+    query_results: list               # 原始查询结果
+    referenced_entities: list         # 引用的实体
+    reasoning_steps: list[str]        # 可解释推理链（← Claude）
+    subgraph: dict | None             # 子图（可视化用）
+    todos: list[str]                  # 任务规划（← Gemini DeepAgent）
+```
+
+### 3.2 检索策略（分阶段）
+
+**MVP — 两路检索**：
+```
+用户查询 ──┬─→ [路径1] 本体图查询（PG + SQLAlchemy async + 递归 CTE）
+           └─→ [路径2] PG 全文索引（tsvector，复用现有 search_vector 基础设施）
+                       │
+                       └─→ 结果融合 → 统一上下文
+```
+
+**V1 — 三路并行混合检索**（新增 pgvector）：
+```
+用户查询 ──┬─→ [路径1] 本体图查询（递归 CTE）
+           ├─→ [路径2] 向量语义搜索（pgvector 扩展）  ← V1 新增
+           └─→ [路径3] PG 全文索引（tsvector）
+                       │
+                       └─→ RRF 结果融合重排 → 统一上下文
+```
+
+关键决策：
+- 不引入 Neo4j，PostgreSQL 递归 CTE + JSONB 处理图查询
+- **MVP 不引入 pgvector**：两路检索（tsvector + CTE）已覆盖大部分场景，降低部署复杂度
+- **V1 引入 pgvector**：配合 embedding 模型选择一起决策
+- 全文搜索复用现有基础设施：`object_types.search_vector`（tsvector）和 `search_storage.py` 已有实现
+
+### 3.3 结构化输出（← Claude 方案精华）
+
+**Instructor + Pydantic** 两阶段：阶段1 Agent 自由推理，阶段2 Instructor 提取实体标注
+
+```python
+# 继承现有 DomainModel 基类（apps/server/app/domain/common.py）
+# 自动获得 alias_generator=to_camel, populate_by_name=True
+
+class EntityReference(DomainModel):
+    entity_id: str          # RID（格式：ri.ontology.<type>.<12hex>）
+    entity_label: str
+    entity_type: EntityType # object_type | property | link_type
+    confidence: float       # 0-1
+    span_start: int | None  # 文本字符偏移
+    span_end: int | None
+
+class AgentResponse(DomainModel):
+    answer_text: str
+    referenced_entities: list[EntityReference]
+    evidence_subgraph: dict | None
+    reasoning_steps: list[str]
+    confidence: float
+```
+
+> 注意：继承 `DomainModel` 而非重复声明 `ConfigDict`，与项目现有模式一致。
+
+### 3.4 流式传输：SSE
+
+**API 端点设计**：
+```
+POST /api/v1/agent/chat           → text/event-stream（SSE 流式对话）
+  Body: { sessionRid?: string, message: string, ontologyRid: string }
+
+GET  /api/v1/agent/sessions       → 会话列表
+GET  /api/v1/agent/sessions/{rid} → 会话详情（含消息历史）
+DELETE /api/v1/agent/sessions/{rid} → 删除会话
+```
+
+**SSE 事件类型**（kebab-case 命名）：
+```
+event: text-delta        # 文本增量（data: { text: "..." }）
+event: entity-ref        # 实体引用标注（data: { entityId, label, type, spanStart, spanEnd }）
+event: subgraph          # 子图数据（data: { nodes: [...], edges: [...] }）
+event: reasoning-step    # 推理步骤（data: { step: "...", index: N }）
+event: done              # 流结束（data: { confidence, sessionRid }）
+event: error             # 错误（data: { code, message }）
+```
+
+**实现方案**：
+- 后端：FastAPI `StreamingResponse`（`media_type="text/event-stream"`），无需额外 SSE 库
+- 前端：自定义 hook `useAgentChat()` 基于 `fetch` + `ReadableStream` + `useReducer`
+  - 流式数据**不**走 TanStack Query（不适合长连接）
+  - 会话列表/历史走 TanStack Query（标准 REST）
+
+### 3.5 安全分层
+
+| 层 | 防护 | 阶段 |
+|----|------|------|
+| L1 输入检验 | 长度限制（4096 字符）、prompt 注入检测 | MVP |
+| L2 权限关卡 | 实体级权限验证 | V1 |
+| L3 Agent 约束 | 工具白名单，禁止直接 SQL，语义层隔离 | MVP |
+| L4 输出过滤 | 敏感字段脱敏、PII 检测 | V1 |
+| L5 审计日志 | 完整对话链路日志 | MVP |
+
+### 3.6 本体上下文构建策略
+
+Agent 需要理解当前本体的 schema 才能准确回答。关键设计：
+
+**Schema 序列化**：将 ontology 的 object types + properties + link types 序列化为结构化文本（类似 SQL DDL），作为 system prompt 的一部分。
+
+```
+Ontology: <ontology_name>
+Object Types:
+  - Employee (ri.ontology.object-type.abc123)
+    Properties: name (string), age (integer), department (string)
+    Links: reports_to → Manager (many-to-one)
+  - Manager (ri.ontology.object-type.def456)
+    Properties: name (string), level (integer)
+    ...
+```
+
+**Token 预算管理**：
+- 小型本体（< 50 object types）：完整 schema 内联
+- 大型本体：按相关性截断，优先包含用户查询涉及的 object types 及其 1-hop 关联
+- schema 在会话级别缓存（`OntologyAgentState.ontology_context`），ontology 变更时失效
+
+**数据来源**：复用现有 `ObjectTypeStorage.list_by_ontology()` + `PropertyStorage` + `LinkTypeStorage`
+
+### 3.7 LLM 模型配置
+
+MVP 即支持 Anthropic 和 OpenAI 两个提供商，通过配置切换：
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `LLM_PROVIDER` | `anthropic` | 提供商：`anthropic` / `openai` |
+| `ANTHROPIC_API_KEY` | 环境变量 | Anthropic API 密钥 |
+| `OPENAI_API_KEY` | 环境变量 | OpenAI API 密钥（可选） |
+| `LLM_MODEL` | `claude-sonnet-4-20250514` | 模型 ID（按提供商不同填对应模型名） |
+| `LLM_MAX_TOKENS` | `4096` | 最大输出 token |
+| `LLM_TEMPERATURE` | `0.3` | 温度（低温提高准确性） |
+
+通过 `app/config.py` 的 `Settings` 类管理（pydantic-settings），与现有配置模式一致。
+实现层封装统一的 `LLMClient` 接口，屏蔽提供商差异。V2 再做运行时动态路由。
+
+---
+
+## 四、系统架构总览
+
+> 来源：原 README §2-§3，修订版中未覆盖的架构视图
+
+### 4.1 四层架构
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -95,16 +320,14 @@ Open Ontology 的核心定位是"为 Agent 时代设计的 Ontology"。现有 `0
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 核心设计原则
+### 4.2 核心设计原则
 
 1. **Agent 是 Service 的消费者，不是替代者** — Agent 通过包装现有 Service 获取能力，不绕过 Domain 层
 2. **结构化优于纯文本** — Agent 返回的每一段文本都可以关联到 Ontology 实体
 3. **流式优先** — SSE 流式输出，前端实时渲染文本 + 本体注解
 4. **渐进式复杂度** — 从纯文本聊天开始，逐步增加实体引用、关系图、交互式导航
 
----
-
-## 3. 核心数据流
+### 4.3 核心数据流
 
 ```
 User Query                  "哪些对象类型之间有订单关系？"
@@ -152,8 +375,8 @@ User Query                  "哪些对象类型之间有订单关系？"
          ▼             │
 ┌─────────────────────────────────────────────────────┐
 │  4. Response Assembly (assemble node)                │
-│     - 文本流式输出 (text_delta events)               │
-│     - 提取实体引用 (entity_ref events)               │
+│     - 文本流式输出 (text-delta events)               │
+│     - 提取实体引用 (entity-ref events)               │
 │     - 提取关系描述 (relationship events)              │
 │     - 标注信息来源 (source events)                   │
 │     - 完成信号 (done event)                          │
@@ -163,109 +386,65 @@ User Query                  "哪些对象类型之间有订单关系？"
 ┌─────────────────────────────────────────────────────┐
 │  5. Frontend Rendering                               │
 │     - ChatPanel: 实时渲染文本 + 内联实体芯片          │
-│     - OntologyContextPanel: 渲染 Entity Cards +      │
-│       ReactFlow 关系图                               │
+│     - GraphPanel: 渲染 ReactFlow 关系图              │
+│     - EntityDrawer: 实体详情侧面板                    │
 └─────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 4. 后端 Agent 框架设计
+## 五、后端详细设计
 
-### 4.1 框架选型：LangGraph
+### 5.1 目录结构
 
-**选型理由**：
-
-| 框架 | 优势 | 劣势 | 适配度 |
-|------|------|------|--------|
-| **LangGraph** | 显式状态图、支持循环/分支/人机交互、原生流式、与 langchain 工具生态兼容 | 学习曲线较陡 | ★★★★★ |
-| LangChain (LCEL) | 生态丰富、社区大 | 链式抽象对复杂流程不够灵活、调试困难 | ★★★☆☆ |
-| AutoGen | 多 Agent 对话、角色扮演 | 重量级、偏多 Agent 场景、对单 Agent 工具调用场景过度设计 | ★★☆☆☆ |
-| 原生实现 | 完全可控、无依赖 | 需要自己实现状态管理、工具调用循环、流式输出 | ★★★☆☆ |
-| CrewAI | 简洁的任务编排 | 抽象层次过高、不适合需要精细控制的场景 | ★★☆☆☆ |
-
-**LangGraph 的关键优势**：
-
-1. **显式状态图** — 每个节点（load_context → agent → tools → assemble）的职责清晰，便于调试和观测
-2. **条件边** — agent 节点可根据是否需要工具调用决定下一步走向
-3. **原生流式** — 内置 `astream_events` 支持逐 token 流式输出
-4. **人机协作** — 内置 `interrupt` 机制，支持 Agent 请求用户确认
-5. **检查点** — 自动保存图执行状态，支持会话恢复
-
-### 4.2 目录结构
+**采用修订版标准分层**（routers → services → domain → storage）：
 
 ```
-apps/server/app/agent/
-├── __init__.py
-├── graph.py                 # LangGraph 状态图定义（核心）
-├── state.py                 # AgentState TypedDict
-├── nodes/
-│   ├── __init__.py
-│   ├── load_context.py      # 加载 OAG + 对话历史
-│   ├── agent.py             # LLM 推理节点
-│   ├── tools.py             # 工具执行节点
-│   └── assemble.py          # 响应组装 + 实体提取
-├── tools/
-│   ├── __init__.py
-│   ├── ontology_tools.py    # 包装 Service 的 Agent Tools
-│   └── search_tools.py      # 搜索相关 Tools
-├── oag/
-│   ├── __init__.py
-│   └── generator.py         # OAG (Schema-as-Context) L0/L1/L2 生成
-├── llm/
-│   ├── __init__.py
-│   ├── provider.py          # Multi-provider LLM 适配器
-│   └── config.py            # LLM 配置（model, temperature, etc.）
-├── conversation/
-│   ├── __init__.py
-│   └── manager.py           # 对话历史管理
-└── models/
-    ├── __init__.py
-    ├── agent_message.py     # AgentMessage 结构化响应模型
-    └── sse_events.py        # SSE 事件类型定义
+apps/server/
+├── app/
+│   ├── routers/agent.py              # Agent REST + SSE 端点
+│   ├── services/
+│   │   ├── agent_service.py          # LangGraph 编排 + 工具调用
+│   │   ├── retrieval_service.py      # 本体检索（CTE + tsvector 融合）
+│   │   └── schema_service.py         # 本体 schema 序列化（上下文构建）
+│   ├── domain/agent.py               # Agent Pydantic 模型（继承 DomainModel）
+│   └── storage/agent_storage.py      # 会话/消息/审计日志的 CRUD
+└── alembic/versions/0010_agent_tables.py  # 会话 + 消息 + 审计日志表迁移
 ```
 
-### 4.3 LangGraph 状态图定义
+> **备选参考**：原方案设计了 `app/agent/` 子包结构（graph.py, state.py, nodes/, tools/, oag/, llm/, conversation/, models/），该方案将 Agent 所有逻辑集中在独立子包内。在实现阶段可根据代码体量决定是否抽取子包，但对外 API 入口必须遵循标准分层。
+
+### 5.2 LangGraph 状态图定义
 
 ```python
-# app/agent/state.py
+# Agent 状态定义
 from typing import TypedDict, Annotated
 from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
 
 class AgentState(TypedDict):
     """Agent 状态，在图的各节点间传递。"""
-    # 对话消息（LangGraph 自动管理追加逻辑）
     messages: Annotated[list[BaseMessage], add_messages]
-    # OAG 上下文（L0/L1/L2 Schema 摘要）
     ontology_context: str
-    # 当前对话 ID
     conversation_id: str
-    # 本轮提取的实体引用
     entity_refs: list[dict]
-    # 本轮提取的关系
     relationships: list[dict]
-    # 信息来源
     sources: list[dict]
 ```
 
 ```python
-# app/agent/graph.py
+# 状态图构建
 from langgraph.graph import StateGraph, END
-from app.agent.state import AgentState
-from app.agent.nodes import load_context, agent, tools, assemble
 
 def build_agent_graph() -> StateGraph:
     """构建 Ontology Agent 的 LangGraph 状态图。"""
     graph = StateGraph(AgentState)
 
-    # 添加节点
     graph.add_node("load_context", load_context.run)
     graph.add_node("agent", agent.run)
     graph.add_node("tools", tools.run)
     graph.add_node("assemble", assemble.run)
 
-    # 定义边
     graph.set_entry_point("load_context")
     graph.add_edge("load_context", "agent")
 
@@ -281,8 +460,6 @@ def build_agent_graph() -> StateGraph:
 
     # 工具执行后回到 agent（支持多轮工具调用）
     graph.add_edge("tools", "agent")
-
-    # 组装完成 → 结束
     graph.add_edge("assemble", END)
 
     return graph.compile()
@@ -313,16 +490,14 @@ def build_agent_graph() -> StateGraph:
                              [END]
 ```
 
-### 4.4 Ontology Tool 定义
+### 5.3 Ontology Tool 定义
 
 将现有 Service 包装为 LangGraph/LangChain 兼容的 Tool：
 
 ```python
-# app/agent/tools/ontology_tools.py
 from langchain_core.tools import tool
 from app.services.object_type_service import ObjectTypeService
 from app.services.link_type_service import LinkTypeService
-from app.services.property_service import PropertyService
 from app.services.search_service import SearchService
 
 @tool
@@ -331,35 +506,21 @@ async def search_ontology(
     resource_type: str | None = None,
     status: str | None = None,
 ) -> dict:
-    """搜索 Ontology 中的对象类型、链接类型等资源。
-
-    Args:
-        query: 搜索关键词
-        resource_type: 资源类型过滤（object_type / link_type / property）
-        status: 状态过滤（active / draft / deprecated）
-    """
+    """搜索 Ontology 中的对象类型、链接类型等资源。"""
     results = await SearchService.search(
-        query=query,
-        resource_type=resource_type,
-        status=status,
+        query=query, resource_type=resource_type, status=status,
     )
     return {"results": [r.model_dump(by_alias=True) for r in results]}
 
-
 @tool
 async def get_object_type(object_type_rid: str) -> dict:
-    """获取指定对象类型的完整定义，包含所有属性。
-
-    Args:
-        object_type_rid: 对象类型的 RID（如 ri.ontology.object-type.xxx）
-    """
+    """获取指定对象类型的完整定义，包含所有属性。"""
     ot = await ObjectTypeService.get_by_rid(object_type_rid)
     return ot.model_dump(by_alias=True)
 
-
 @tool
 async def list_object_types() -> dict:
-    """列出所有对象类型的概要信息（名称、描述、属性数量）。"""
+    """列出所有对象类型的概要信息。"""
     types = await ObjectTypeService.list_all()
     return {
         "objectTypes": [
@@ -374,14 +535,9 @@ async def list_object_types() -> dict:
         ]
     }
 
-
 @tool
 async def list_link_types(object_type_rid: str | None = None) -> dict:
-    """列出链接类型。可选按对象类型过滤，只返回与该对象类型相关的链接。
-
-    Args:
-        object_type_rid: 可选，过滤与此对象类型相关的链接类型
-    """
+    """列出链接类型。可选按对象类型过滤。"""
     links = await LinkTypeService.list_all(object_type_rid=object_type_rid)
     return {
         "linkTypes": [
@@ -398,31 +554,17 @@ async def list_link_types(object_type_rid: str | None = None) -> dict:
         ]
     }
 
-
 @tool
 async def get_object_type_properties(object_type_rid: str) -> dict:
-    """获取指定对象类型的所有属性定义。
-
-    Args:
-        object_type_rid: 对象类型的 RID
-    """
+    """获取指定对象类型的所有属性定义。"""
     props = await PropertyService.list_by_object_type(object_type_rid)
-    return {
-        "properties": [p.model_dump(by_alias=True) for p in props]
-    }
-
+    return {"properties": [p.model_dump(by_alias=True) for p in props]}
 
 @tool
 async def describe_relationship(
-    object_type_a_rid: str,
-    object_type_b_rid: str,
+    object_type_a_rid: str, object_type_b_rid: str,
 ) -> dict:
-    """描述两个对象类型之间的所有链接关系。
-
-    Args:
-        object_type_a_rid: 第一个对象类型的 RID
-        object_type_b_rid: 第二个对象类型的 RID
-    """
+    """描述两个对象类型之间的所有链接关系。"""
     links = await LinkTypeService.find_between(
         object_type_a_rid, object_type_b_rid
     )
@@ -439,28 +581,18 @@ async def describe_relationship(
         ]
     }
 
-
 # 工具注册表
 ONTOLOGY_TOOLS = [
-    search_ontology,
-    get_object_type,
-    list_object_types,
-    list_link_types,
-    get_object_type_properties,
-    describe_relationship,
+    search_ontology, get_object_type, list_object_types,
+    list_link_types, get_object_type_properties, describe_relationship,
 ]
 ```
 
-### 4.5 OAG 实现（Schema-as-Context）
+### 5.4 OAG 实现（Schema-as-Context）
 
 OAG（Ontology-Aware Generation）将 Ontology Schema 注入 LLM system prompt，遵循 `03-agent-context-architecture.md` 定义的 L0/L1/L2 分层模型：
 
 ```python
-# app/agent/oag/generator.py
-from app.services.object_type_service import ObjectTypeService
-from app.services.link_type_service import LinkTypeService
-
-
 class OAGGenerator:
     """生成 Ontology Schema 的分层上下文摘要。"""
 
@@ -469,10 +601,7 @@ class OAGGenerator:
         """L0 — Abstract (~100 tokens): 一句话概括本体规模和覆盖域。"""
         obj_count = await ObjectTypeService.count()
         link_count = await LinkTypeService.count()
-        return (
-            f"当前本体包含 {obj_count} 个对象类型、"
-            f"{link_count} 个链接类型。"
-        )
+        return f"当前本体包含 {obj_count} 个对象类型、{link_count} 个链接类型。"
 
     @staticmethod
     async def generate_l1() -> str:
@@ -521,10 +650,9 @@ class OAGGenerator:
         )
 ```
 
-### 4.6 多 LLM 提供商支持
+### 5.5 多 LLM 提供商支持
 
 ```python
-# app/agent/llm/provider.py
 from langchain_core.language_models import BaseChatModel
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
@@ -556,14 +684,9 @@ class LLMProvider:
         return factory(config)
 ```
 
-### 4.7 对话管理
+### 5.6 对话管理
 
 ```python
-# app/agent/conversation/manager.py
-from datetime import datetime
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
-
-
 class ConversationManager:
     """管理对话历史，支持持久化和上下文窗口管理。"""
 
@@ -573,8 +696,6 @@ class ConversationManager:
 
     async def load_history(self) -> list:
         """从存储加载对话历史。MVP 阶段使用内存存储。"""
-        # MVP: 内存字典存储
-        # 后续: PostgreSQL conversations / messages 表
         ...
 
     async def save_message(self, role: str, content: str, metadata: dict | None = None):
@@ -583,50 +704,33 @@ class ConversationManager:
 
     async def get_context_window(self, max_tokens: int = 8000) -> list:
         """获取适合 LLM 上下文窗口的消息子集。
-
-        策略：保留最近 N 条消息 + 第一条系统消息。
-        """
+        策略：保留最近 N 条消息 + 第一条系统消息。"""
         ...
 ```
 
 ---
 
-## 5. 结构化响应格式设计
+## 六、结构化响应与 SSE 协议
 
-### 5.1 AgentMessage 模型
+> 整合原 README §5 详细代码模型 + 修订版 §3.3/§3.4 决策
 
-Agent 返回的不是纯文本字符串，而是一个包含文本 + 实体引用 + 关系 + 来源的结构化消息：
+### 6.1 AgentMessage 模型
+
+Agent 返回的不是纯文本字符串，而是包含文本 + 实体引用 + 关系 + 来源的结构化消息：
 
 ```python
-# app/agent/models/agent_message.py
-from pydantic import BaseModel, ConfigDict
-from humps import camelize
-
-
-class EntityRef(BaseModel):
+class EntityRef(DomainModel):
     """对话中引用的 Ontology 实体。"""
-    model_config = ConfigDict(
-        alias_generator=camelize,
-        populate_by_name=True,
-    )
-
     rid: str                    # 实体 RID
     entity_type: str            # "object_type" | "link_type" | "property"
-    display_name: str           # 显示名称
-    api_name: str               # API 名称
+    display_name: str
+    api_name: str
     description: str | None = None
-    # 在文本中的位置（用于内联芯片渲染）
-    text_offset_start: int | None = None
+    text_offset_start: int | None = None  # 在文本中的位置（用于内联芯片渲染）
     text_offset_end: int | None = None
 
-
-class Relationship(BaseModel):
+class Relationship(DomainModel):
     """对话中提及的实体间关系。"""
-    model_config = ConfigDict(
-        alias_generator=camelize,
-        populate_by_name=True,
-    )
-
     source_rid: str
     source_display_name: str
     target_rid: str
@@ -635,53 +739,38 @@ class Relationship(BaseModel):
     link_display_name: str
     cardinality: str
 
-
-class Source(BaseModel):
+class Source(DomainModel):
     """信息来源追踪。"""
-    model_config = ConfigDict(
-        alias_generator=camelize,
-        populate_by_name=True,
-    )
+    tool_name: str
+    tool_args: dict
+    result_summary: str
 
-    tool_name: str              # 来源 Tool 名称
-    tool_args: dict             # Tool 调用参数
-    result_summary: str         # 结果摘要
-
-
-class AgentMessage(BaseModel):
+class AgentMessage(DomainModel):
     """Agent 的结构化响应。"""
-    model_config = ConfigDict(
-        alias_generator=camelize,
-        populate_by_name=True,
-    )
-
-    text: str                                # 主体文本
-    entity_refs: list[EntityRef] = []        # 引用的实体
-    relationships: list[Relationship] = []   # 涉及的关系
-    sources: list[Source] = []               # 信息来源
-    conversation_id: str                     # 对话 ID
-    message_id: str                          # 消息 ID
+    text: str
+    entity_refs: list[EntityRef] = []
+    relationships: list[Relationship] = []
+    sources: list[Source] = []
+    conversation_id: str
+    message_id: str
 ```
 
-### 5.2 SSE 流式协议
+> 注意：所有模型继承 `DomainModel`（`app/domain/common.py`），自动获得 `alias_generator=to_camel, populate_by_name=True`。
 
-使用 Server-Sent Events (SSE) 实现流式输出，前端实时渲染：
+### 6.2 SSE 事件类型定义
 
 ```python
-# app/agent/models/sse_events.py
-from pydantic import BaseModel, ConfigDict
-from humps import camelize
 from enum import Enum
 
-
 class SSEEventType(str, Enum):
-    """SSE 事件类型。"""
-    TEXT_DELTA = "text_delta"         # 增量文本
-    ENTITY_REF = "entity_ref"        # 实体引用
+    TEXT_DELTA = "text-delta"         # 增量文本
+    ENTITY_REF = "entity-ref"        # 实体引用
     RELATIONSHIP = "relationship"    # 关系
     SOURCE = "source"                # 信息来源
-    TOOL_START = "tool_start"        # 工具调用开始（用于 UI loading 状态）
-    TOOL_END = "tool_end"            # 工具调用完成
+    SUBGRAPH = "subgraph"            # 子图数据
+    REASONING_STEP = "reasoning-step"# 推理步骤
+    TOOL_START = "tool-start"        # 工具调用开始
+    TOOL_END = "tool-end"            # 工具调用完成
     ERROR = "error"                  # 错误
     DONE = "done"                    # 完成
 ```
@@ -689,19 +778,19 @@ class SSEEventType(str, Enum):
 **SSE 流示例**：
 
 ```
-event: text_delta
+event: text-delta
 data: {"delta": "根据本体定义，"}
 
-event: text_delta
+event: text-delta
 data: {"delta": "**Customer** 和 **Order** 之间"}
 
-event: entity_ref
+event: entity-ref
 data: {"rid": "ri.ontology.object-type.abc", "entityType": "object_type", "displayName": "Customer", "apiName": "Customer", "textOffsetStart": 8, "textOffsetEnd": 16}
 
-event: entity_ref
+event: entity-ref
 data: {"rid": "ri.ontology.object-type.def", "entityType": "object_type", "displayName": "Order", "apiName": "Order", "textOffsetStart": 19, "textOffsetEnd": 24}
 
-event: text_delta
+event: text-delta
 data: {"delta": "存在 places 链接关系。"}
 
 event: relationship
@@ -711,67 +800,31 @@ event: source
 data: {"toolName": "list_link_types", "toolArgs": {}, "resultSummary": "Found 3 link types"}
 
 event: done
-data: {"messageId": "msg_xxx", "conversationId": "conv_yyy"}
+data: {"messageId": "msg_xxx", "sessionRid": "sess_yyy"}
 ```
 
-**API 端点设计**：
-
-```python
-# app/routers/agent_router.py
-from fastapi import APIRouter
-from fastapi.responses import StreamingResponse
-
-router = APIRouter(prefix="/api/v1/agent", tags=["agent"])
-
-@router.post("/chat")
-async def chat(request: ChatRequest) -> StreamingResponse:
-    """发送消息并接收流式响应。"""
-    return StreamingResponse(
-        agent_stream(request),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "X-Accel-Buffering": "no",  # Nginx SSE 支持
-        },
-    )
-
-@router.get("/conversations/{conversation_id}")
-async def get_conversation(conversation_id: str):
-    """获取对话历史。"""
-    ...
-
-@router.delete("/conversations/{conversation_id}")
-async def delete_conversation(conversation_id: str):
-    """删除对话。"""
-    ...
-```
-
-### 5.3 实体引用提取策略
+### 6.3 实体引用提取策略
 
 **选型：State Accumulation（状态累积）**
 
 在 LangGraph 状态图执行过程中，tools 节点直接将工具返回的实体信息累积到 `AgentState.entity_refs` 中，assemble 节点负责将累积的实体与最终文本进行匹配。
 
-```
-优势：
 - 实体信息来源明确（直接从 Tool 结果提取），准确度高
 - 无需额外 LLM 调用进行后处理
-- 流式友好——实体引用可在文本生成过程中穿插发出
-
-对比方案 — Post-processing（后处理）：
-- 在完整文本生成后，用正则/NER 从文本中提取实体名，再与 Ontology 匹配
-- 劣势：延迟高（需等完整文本）、准确度依赖文本匹配质量
-```
+- 流式友好——实体引用可在文本流中穿插发出
+- **兜底**：assemble 节点增加轻量文本匹配（正则匹配已知 apiName），覆盖 Agent 不调用 Tool 时的场景
 
 ---
 
-## 6. 前端架构设计
+## 七、前端架构设计
 
-### 6.1 组件层次
+> 整合原 README §6 组件层次 + 修订版 §四 前端文件清单
+
+### 7.1 组件层次
 
 ```
-AgentPage
-├── ChatPanel (60% 宽度)
+AgentPage（独立全屏布局）
+├── ChatPanel (30% 宽度)
 │   ├── MessageList
 │   │   ├── UserMessage
 │   │   └── AgentMessage
@@ -784,63 +837,41 @@ AgentPage
 │   │   └── SendButton
 │   └── ConversationSidebar                   ← 对话列表
 │
-└── OntologyContextPanel (40% 宽度)
-    ├── PanelTabs
-    │   ├── EntitiesTab
-    │   │   └── EntityCardList
-    │   │       └── EntityCard                ← 属性摘要 + 链接到详情页
-    │   ├── GraphTab
-    │   │   └── MiniRelationshipGraph         ← ReactFlow 微型关系图
-    │   └── SourcesTab
-    │       └── SourceList                    ← Tool 调用记录
-    └── PanelHeader
-        └── ToggleButton                      ← 展开/收起
+├── GraphPanel (45% 宽度)
+│   └── ReactFlow 力导向关系图
+│       ├── 自定义节点（Object Type 矩形卡片）
+│       ├── 自定义边（Link Type 标签 + 箭头）
+│       └── 推理轨迹动画层
+│
+└── EntityDrawer (25% 宽度)
+    ├── 三层渐进披露
+    │   ├── Tier 1: Popover 悬停预览
+    │   ├── Tier 2: Drawer 完整属性/关系/溯源
+    │   └── Tier 3: 跳转详情页
+    └── ReasoningSteps                        ← 推理步骤折叠展示
 ```
 
-### 6.2 页面布局
+### 7.2 前端文件清单
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│  Agent Chat                                            [≡] [⚙]  │
-├──────────────────────────────────┬───────────────────────────────┤
-│                                  │                               │
-│  ChatPanel (60%)                 │  OntologyContextPanel (40%)   │
-│                                  │                               │
-│  ┌────────────────────────────┐  │  ┌─────────────────────────┐  │
-│  │ 🤖 根据本体定义，          │  │  │ [实体] [关系图] [来源]  │  │
-│  │    [Customer] 和 [Order]   │  │  │                         │  │
-│  │    之间存在 places 链接    │  │  │  ┌──────────────────┐   │  │
-│  │    关系（一对多）。        │  │  │  │ 📦 Customer      │   │  │
-│  │                            │  │  │  │ 客户实体          │   │  │
-│  │    Customer 通过 places    │  │  │  │ 属性: name, email │   │  │
-│  │    链接到 Order，表示      │  │  │  │ [查看详情 →]      │   │  │
-│  │    "客户下单"的业务关系。  │  │  │  └──────────────────┘   │  │
-│  │                            │  │  │                         │  │
-│  │  📎 来源: list_link_types  │  │  │  ┌──────────────────┐   │  │
-│  └────────────────────────────┘  │  │  │ 📦 Order         │   │  │
-│                                  │  │  │ 订单实体          │   │  │
-│  ┌────────────────────────────┐  │  │  │ 属性: order_id,  │   │  │
-│  │ 👤 还有哪些对象类型与      │  │  │  │   status, amount │   │  │
-│  │    Customer 相关？         │  │  │  │ [查看详情 →]      │   │  │
-│  └────────────────────────────┘  │  │  └──────────────────┘   │  │
-│                                  │  │                         │  │
-│  ┌────────────────────────────┐  │  │  ┌───────────────────┐  │  │
-│  │ ⏳ 正在查询链接类型...     │  │  │  │  Customer         │  │  │
-│  └────────────────────────────┘  │  │  │     │ places      │  │  │
-│                                  │  │  │     ▼             │  │  │
-│  ┌────────────────────────────┐  │  │  │   Order           │  │  │
-│  │ [请输入你的问题...]    [↑] │  │  │  └───────────────────┘  │  │
-│  └────────────────────────────┘  │  │                         │  │
-│                                  │  └─────────────────────────┘  │
-└──────────────────────────────────┴───────────────────────────────┘
-```
+| 文件 | 职责 |
+|------|------|
+| `pages/agent/AgentPage.tsx` | 三面板主页面（独立布局） |
+| `components/agent/ChatPanel.tsx` | 对话面板（消息流 + 输入框） |
+| `components/agent/ChatMessage.tsx` | 单条消息（含实体锚点渲染） |
+| `components/agent/GraphPanel.tsx` | React Flow 图谱画布 |
+| `components/agent/EntityDrawer.tsx` | Tier 2 实体侧面板 |
+| `components/agent/EntityPopover.tsx` | Tier 1 悬停预览 |
+| `components/agent/ReasoningSteps.tsx` | 推理步骤折叠展示 |
+| `stores/agent-panel-store.ts` | 面板尺寸/折叠状态 |
+| `stores/entity-highlight-store.ts` | 双向高亮共享状态 |
+| `api/agent.ts` | TanStack Query hooks（会话 CRUD） |
+| `api/use-agent-chat.ts` | 自定义 SSE 流式 hook |
 
-### 6.3 Entity Mention 内联芯片
+### 7.3 Entity Mention 内联芯片
 
 对话文本中的实体引用渲染为可交互的内联芯片（Chip）：
 
 ```tsx
-// components/agent/EntityMentionChip.tsx
 interface EntityMentionChipProps {
   rid: string;
   entityType: 'object_type' | 'link_type' | 'property';
@@ -850,9 +881,9 @@ interface EntityMentionChipProps {
 }
 
 // 视觉样式：
-// - object_type: 蓝色背景芯片 🔵
-// - link_type:   绿色背景芯片 🟢
-// - property:    灰色背景芯片 ⚪
+// - object_type: 蓝色背景芯片
+// - link_type:   绿色背景芯片
+// - property:    灰色背景芯片
 //
 // 交互行为：
 // - hover: Tooltip 显示 description + apiName
@@ -860,49 +891,10 @@ interface EntityMentionChipProps {
 // - double-click: 导航到详情页 (/object-types/:rid)
 ```
 
-### 6.4 SSE 流式 Hook + Zustand Chat Store
-
-```typescript
-// stores/agent-chat-store.ts
-import { create } from 'zustand';
-
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  text: string;
-  entityRefs: EntityRef[];
-  relationships: Relationship[];
-  sources: Source[];
-  isStreaming: boolean;
-}
-
-interface AgentChatStore {
-  // 对话状态
-  conversations: Map<string, Conversation>;
-  activeConversationId: string | null;
-
-  // 当前流式消息
-  streamingMessage: Message | null;
-
-  // UI 状态（仅 UI 相关，服务端数据在 TanStack Query）
-  isContextPanelOpen: boolean;
-  activeContextTab: 'entities' | 'graph' | 'sources';
-  highlightedEntityRid: string | null;
-
-  // Actions
-  setStreamingMessage: (msg: Message | null) => void;
-  appendTextDelta: (delta: string) => void;
-  addEntityRef: (ref: EntityRef) => void;
-  addRelationship: (rel: Relationship) => void;
-  finalizeMessage: () => void;
-  setHighlightedEntity: (rid: string | null) => void;
-}
-```
+### 7.4 SSE 流式 Hook
 
 ```typescript
 // api/use-agent-chat.ts
-import { useMutation } from '@tanstack/react-query';
-
 export function useAgentChat() {
   const store = useAgentChatStore();
 
@@ -920,7 +912,6 @@ export function useAgentChat() {
       const reader = response.body!.getReader();
       const decoder = new TextDecoder();
 
-      // 初始化流式消息
       store.setStreamingMessage({
         id: crypto.randomUUID(),
         role: 'assistant',
@@ -944,7 +935,6 @@ export function useAgentChat() {
         for (const line of lines) {
           if (line.startsWith('event: ')) {
             const eventType = line.slice(7);
-            // 下一行是 data:
             continue;
           }
           if (line.startsWith('data: ')) {
@@ -963,10 +953,10 @@ export function useAgentChat() {
 
 function handleSSEEvent(store: AgentChatStore, type: string, data: any) {
   switch (type) {
-    case 'text_delta':
+    case 'text-delta':
       store.appendTextDelta(data.delta);
       break;
-    case 'entity_ref':
+    case 'entity-ref':
       store.addEntityRef(data);
       break;
     case 'relationship':
@@ -975,7 +965,7 @@ function handleSSEEvent(store: AgentChatStore, type: string, data: any) {
     case 'source':
       store.addSource(data);
       break;
-    case 'tool_start':
+    case 'tool-start':
       // 显示 "正在调用 xxx..." 指示器
       break;
     case 'done':
@@ -985,9 +975,31 @@ function handleSSEEvent(store: AgentChatStore, type: string, data: any) {
 }
 ```
 
-### 6.5 与现有页面集成
+### 7.5 Store 设计
 
-Agent 页面与现有 Ontology Manager 页面的集成点：
+按照项目 kebab-case 命名规范，拆分为单一职责 store：
+
+**`agent-panel-store.ts`** — 面板 UI 状态（纯 UI，不含服务端数据）：
+```typescript
+interface AgentPanelState {
+  chatPanelWidth: number;      // 默认 30%
+  graphPanelWidth: number;     // 默认 45%
+  detailPanelWidth: number;    // 默认 25%
+  isDetailOpen: boolean;
+  isReasoningExpanded: boolean;
+}
+```
+
+**`entity-highlight-store.ts`** — 双向高亮共享状态：
+```typescript
+interface EntityHighlightState {
+  hoveredEntityId: string | null;     // 当前悬停的实体 RID
+  selectedEntityId: string | null;    // 当前选中的实体 RID（打开 Drawer）
+  highlightSource: 'chat' | 'graph' | null;  // 高亮来源
+}
+```
+
+### 7.6 与现有页面集成
 
 | 集成点 | 交互方式 |
 |--------|---------|
@@ -998,7 +1010,7 @@ Agent 页面与现有 Ontology Manager 页面的集成点：
 | Object Type 详情页 → Agent | 添加 "Ask Agent about this type" 按钮 |
 | 全局导航 | 侧边栏添加 "Agent Chat" 菜单项 |
 
-### 6.6 与 3D 星空 Demo 的连接点
+### 7.7 与 3D 星空 Demo 的连接点
 
 现有 3D 星空 Demo（`/demo/canvas`）可与 Agent 深度联动：
 
@@ -1011,9 +1023,11 @@ Agent 页面与现有 Ontology Manager 页面的集成点：
 
 ---
 
-## 7. 本体可视化模式
+## 八、本体可视化模式
 
-### 7.1 Entity Cards
+> 来源：原 README §7
+
+### 8.1 Entity Cards
 
 每个被 Agent 引用的实体显示为一张摘要卡片：
 
@@ -1037,7 +1051,7 @@ Agent 页面与现有 Ontology Manager 页面的集成点：
 └──────────────────────────────┘
 ```
 
-### 7.2 Relationship Graph（ReactFlow）
+### 8.2 Relationship Graph（ReactFlow）
 
 使用 ReactFlow 渲染对话中涉及的实体关系子图：
 
@@ -1066,7 +1080,7 @@ Agent 页面与现有 Ontology Manager 页面的集成点：
 - 箭头方向 = 关系方向
 - 节点可拖拽、缩放
 
-### 7.3 Evidence Trail（证据追踪）
+### 8.3 Evidence Trail（证据追踪）
 
 展示 Agent 推理过程中调用的 Tools 和结果：
 
@@ -1086,7 +1100,7 @@ Agent 页面与现有 Ontology Manager 页面的集成点：
 └─────────────────────────────────────────┘
 ```
 
-### 7.4 Interactive Navigation
+### 8.4 Interactive Navigation
 
 用户可从可视化面板出发进一步探索：
 
@@ -1098,117 +1112,245 @@ Agent 页面与现有 Ontology Manager 页面的集成点：
 
 ---
 
-## 8. 技术选型总结
+## 九、与现有代码库集成
 
-### 8.1 核心技术栈
+> 来源：修订版 §四 完整内容
 
-| 层 | 技术 | 用途 |
-|---|------|------|
-| Agent 框架 | LangGraph 0.2+ | 状态图编排、工具调用循环、流式输出 |
-| LLM 接口 | langchain-anthropic / langchain-openai | 多 LLM 提供商适配 |
-| 工具定义 | langchain-core `@tool` | 包装现有 Service 为 Agent Tools |
-| 流式协议 | SSE (Server-Sent Events) | 实时流式输出到前端 |
-| 关系图 | ReactFlow | 交互式本体关系图 |
-| Markdown 渲染 | react-markdown + rehype | 支持内联 Entity Chip 的 Markdown 渲染 |
-| 前端框架 | Ant Design 5.x（现有） | 对话 UI 组件 |
-| 状态管理 | Zustand（UI 状态） + TanStack Query（服务端状态） | 遵循现有架构 |
+### 9.1 新增文件
 
-### 8.2 新增 Python 依赖
+**后端**：
 
-```toml
-# apps/server/pyproject.toml 新增
-[project.dependencies]
-langgraph = ">=0.2.0"
-langchain-core = ">=0.3.0"
-langchain-anthropic = ">=0.2.0"
-langchain-openai = ">=0.2.0"     # 可选，按需启用
+| 文件 | 职责 |
+|------|------|
+| `app/routers/agent.py` | Agent REST + SSE 端点 |
+| `app/services/agent_service.py` | LangGraph 编排 + 工具调用 |
+| `app/services/retrieval_service.py` | 本体检索（CTE + tsvector 融合） |
+| `app/services/schema_service.py` | 本体 schema 序列化（上下文构建） |
+| `app/domain/agent.py` | Agent Pydantic 模型（继承 DomainModel） |
+| `app/storage/agent_storage.py` | 会话/消息/审计日志的 CRUD |
+| `alembic/versions/0010_agent_tables.py` | 会话 + 消息 + 审计日志表迁移 |
+
+**前端**：
+
+| 文件 | 职责 |
+|------|------|
+| `pages/agent/AgentPage.tsx` | 三面板主页面（独立布局） |
+| `components/agent/ChatPanel.tsx` | 对话面板（消息流 + 输入框） |
+| `components/agent/ChatMessage.tsx` | 单条消息（含实体锚点渲染） |
+| `components/agent/GraphPanel.tsx` | React Flow 图谱画布 |
+| `components/agent/EntityDrawer.tsx` | Tier 2 实体侧面板 |
+| `components/agent/EntityPopover.tsx` | Tier 1 悬停预览 |
+| `components/agent/ReasoningSteps.tsx` | 推理步骤折叠展示 |
+| `stores/agent-panel-store.ts` | 面板尺寸/折叠状态 |
+| `stores/entity-highlight-store.ts` | 双向高亮共享状态 |
+| `api/agent.ts` | TanStack Query hooks（会话 CRUD） |
+| `api/use-agent-chat.ts` | 自定义 SSE 流式 hook |
+
+### 9.2 需修改的现有文件
+
+| 文件 | 修改内容 |
+|------|----------|
+| `apps/server/app/main.py` | 注册 `agent.router` |
+| `apps/web/src/router.tsx` | 添加 `/agent` 路由（AppShell 下独立布局） |
+| `apps/web/src/locales/en-US/common.json` | 新增 `agent.*` i18n key |
+| `apps/web/src/locales/zh-CN/common.json` | 新增 `agent.*` i18n key |
+| `apps/web/src/components/layout/TopBar.tsx` | 添加 Agent 导航入口 |
+| `apps/server/app/config.py` | 新增 LLM 配置项 |
+| `apps/server/openapi.json` | 自动重新生成 |
+
+### 9.3 数据库设计
+
+> 修订版决策：MVP 即建表（非原方案的 Phase 3 延后）
+
+**agent_sessions 表**：
+```sql
+CREATE TABLE agent_sessions (
+    rid          TEXT PRIMARY KEY,  -- ri.ontology.agent-session.<12hex>
+    ontology_rid TEXT NOT NULL REFERENCES ontologies(rid),
+    title        TEXT,              -- 会话标题（LLM 自动生成或用户编辑）
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 ```
 
-### 8.3 新增前端依赖
-
-```json
-// apps/web/package.json 新增
-{
-  "dependencies": {
-    "@xyflow/react": "^12.0.0",
-    "react-markdown": "^9.0.0",
-    "rehype-raw": "^7.0.0",
-    "remark-gfm": "^4.0.0"
-  }
-}
+**agent_messages 表**：
+```sql
+CREATE TABLE agent_messages (
+    rid          TEXT PRIMARY KEY,  -- ri.ontology.agent-message.<12hex>
+    session_rid  TEXT NOT NULL REFERENCES agent_sessions(rid) ON DELETE CASCADE,
+    role         TEXT NOT NULL,     -- 'user' | 'assistant' | 'system'
+    content      TEXT NOT NULL,
+    metadata     JSONB,            -- { referencedEntities, reasoningSteps, confidence, subgraph }
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_agent_messages_session ON agent_messages(session_rid, created_at);
 ```
+
+**agent_audit_logs 表**：
+```sql
+CREATE TABLE agent_audit_logs (
+    rid            TEXT PRIMARY KEY,  -- ri.ontology.agent-audit.<12hex>
+    session_rid    TEXT REFERENCES agent_sessions(rid) ON DELETE SET NULL,
+    action_type    TEXT NOT NULL,     -- 'query' | 'tool_call' | 'llm_request' | 'response'
+    tool_name      TEXT,              -- 工具名（entity_lookup, relationship_traverse 等）
+    input_summary  TEXT,              -- 输入摘要（脱敏后）
+    output_summary TEXT,              -- 输出摘要
+    latency_ms     INTEGER,
+    created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_agent_audit_session ON agent_audit_logs(session_rid, created_at);
+```
+
+> RID 格式遵循现有 `generate_rid()` 规范：`ri.ontology.<type>.<uuid4.hex[:12]>`
+
+### 9.4 错误码表
+
+| 错误码 | HTTP | 说明 |
+|--------|------|------|
+| `AGENT_SESSION_NOT_FOUND` | 404 | 会话不存在 |
+| `AGENT_LLM_UNAVAILABLE` | 503 | LLM 服务不可用 |
+| `AGENT_INPUT_TOO_LONG` | 400 | 输入超长（> 4096 字符） |
+| `AGENT_PROMPT_INJECTION` | 400 | 检测到 prompt 注入 |
+| `AGENT_TOOL_EXECUTION_FAILED` | 500 | 工具执行失败 |
+| `AGENT_RATE_LIMITED` | 429 | 速率限制 |
+| `AGENT_ONTOLOGY_NOT_FOUND` | 404 | 关联本体不存在 |
+
+与现有 `AppError` + `app_error_handler` 模式一致。
+
+### 9.5 严格遵守的约束
+
+- 后端分层：routers → services → domain/storage（禁止反向导入）
+- Domain 模型继承 `DomainModel`（自动 camelCase 序列化）
+- 数据库：rid 主键 `ri.ontology.<type>.<12hex>`，Alembic 迁移
+- 类型管道：openapi.json → openapi-typescript → generated/api.ts
+- 前端状态：服务端数据 → TanStack Query，UI 状态 → Zustand
+- i18n：所有用户可见字符串用 `t('agent.xxx')`
+- 异步 SQLAlchemy：async session + asyncpg
 
 ---
 
-## 9. MVP 分阶段规划
+## 十、各方案精华采纳总览
 
-### Phase 1: 基础聊天 + 本体上下文注入
+> 来源：修订版 §三
 
-**目标**: 用户可以与 Agent 进行基本对话，Agent 具备 Ontology 上下文感知能力。
+### Claude 方案（✅ 完整采纳 6 项）
 
-**范围**:
-- [x] LangGraph 状态图骨架（load_context → agent → tools → assemble）
-- [x] OAG L0/L1 自动生成 + system prompt 注入
-- [x] 基础 Ontology Tools（list_object_types, get_object_type, list_link_types）
-- [x] SSE 流式输出（仅 text_delta + done 事件）
-- [x] 前端 ChatPanel（消息列表 + 输入框 + 流式渲染）
-- [x] 单一 LLM 提供商（Claude）
-- [ ] 对话历史（内存存储）
+| 创新 | 采纳 |
+|------|------|
+| OAG（本体增强生成）理念 | ✅ 核心架构原则 |
+| 三层渐进式实体探索 | ✅ 适配 Ant Design |
+| 双向实体高亮 | ✅ Zustand 共享状态 |
+| Entity-Linked Citation | ✅ [E1]/[R1]/[I1] |
+| 嵌入式迷你图 | ✅ 360x220px |
+| Instructor + Pydantic 结构化输出 | ✅ 两阶段方案 |
 
-**不包含**: 实体引用、关系图、上下文面板。
+### Gemini 方案（✅ 完整采纳 3 项 + 简化/延后 4 项）
 
-### Phase 2: 结构化响应 + 实体引用
+| 创新 | 采纳 |
+|------|------|
+| 语义层隔离（NL→本体安全调用） | ✅ 消除 SQL 幻觉 |
+| 推理轨迹实时可视化 | ✅ 图谱节点动画 |
+| 本体原语完整性（6 大原语） | ✅ 与现有领域模型对齐 |
+| DeepAgent 任务规划 | 📋 简化为 LangGraph todos 字段 |
+| A2UI 协议 | 📋 简化为 SSE 事件类型 |
+| 事实验证管线 | 📅 V1 引入 |
+| ReBAC 权限 | 📅 V2 引入 |
 
-**目标**: Agent 响应中包含结构化的实体引用，前端以内联芯片形式渲染。
+### OpenAI 方案（✅ 完整采纳 3 项 + 分阶段 3 项）
 
-**范围**:
-- [ ] 实体引用提取（State Accumulation 策略）
-- [ ] SSE entity_ref / relationship / source 事件
-- [ ] Entity Mention Chip 组件
-- [ ] OntologyContextPanel（Entity Cards Tab）
-- [ ] 60/40 分栏布局
-- [ ] Entity Card 链接到详情页
-- [ ] 更多 Tools（search_ontology, describe_relationship, get_properties）
-
-### Phase 3: 交互式本体可视化
-
-**目标**: 对话中涉及的本体关系以交互式图形展示。
-
-**范围**:
-- [ ] ReactFlow Mini Relationship Graph
-- [ ] Graph ↔ Chat 双向联动（点击节点高亮对话文本）
-- [ ] Evidence Trail（Tool 调用记录面板）
-- [ ] 对话历史持久化（PostgreSQL）
-- [ ] 多对话管理（Conversation Sidebar）
-
-### Phase 4: 高级特性
-
-**目标**: Agent 具备更深层的 Ontology 理解和辅助设计能力。
-
-**范围**:
-- [ ] RAG — 基于 Ontology 描述文本的向量检索
-- [ ] Multi-Agent — 专项 Agent 协作（Schema 分析 Agent + 数据质量 Agent）
-- [ ] Agent 辅助设计 — 用自然语言描述业务场景，Agent 生成 Object Type / Link Type 草案
-- [ ] 3D 星空联动 — Agent 引用实体在星空中高亮
-- [ ] @ Mention 自动补全 — 输入 `@` 触发 Ontology 实体搜索
-- [ ] 多 LLM 提供商 UI 切换
-
-### 时间线估算
-
-```
-Phase 1 ──────── 基础聊天
-Phase 2 ────────── 结构化响应
-Phase 3 ──────────── 本体可视化
-Phase 4 ──────────────── 高级特性
-```
+| 创新 | 采纳 |
+|------|------|
+| 三路并行混合检索 + RRF 融合 | ✅ 最全面检索策略 |
+| OWASP LLM 风险防范清单 | ✅ 安全审查 checklist |
+| 置信度多因素计算 | ✅ LLM概率+检索得分+验证结果 |
+| 5 层安全防护 | 📅 MVP 实现 L1/L3/L5，V1 补齐 |
+| Graphiti 知识图记忆 | 📅 V1 引入 |
+| 细粒度 ACL | 📅 V2 引入 |
 
 ---
 
-## 10. 关键设计决策与权衡
+## 十一、新增依赖清单
 
-### D1: Agent 框架选择 — LangGraph vs 原生实现
+> 来源：修订版 §五
 
-**决策**: 选择 LangGraph。
+### 后端（`apps/server/pyproject.toml`）
+
+| 包 | 版本 | 用途 | 阶段 |
+|----|------|------|------|
+| `langgraph` | `>=0.2` | Agent 状态图编排 | MVP |
+| `pydantic-ai` | `>=0.1` | Agent 工具定义 | MVP |
+| `instructor` | `>=1.0` | 结构化 LLM 输出提取 | MVP |
+| `anthropic` | `>=0.40` | Claude API SDK | MVP |
+| `openai` | `>=1.50` | OpenAI API SDK | MVP |
+| `tiktoken` | `>=0.7` | Token 计数（上下文管理） | MVP |
+| `pgvector` | `>=0.3` | 向量搜索 SQLAlchemy 集成 | V1 |
+
+### 前端（`apps/web/package.json`）
+
+| 包 | 用途 | 阶段 |
+|----|------|------|
+| `react-resizable-panels` | 三面板拖拽调整 | MVP |
+
+> `@xyflow/react`（React Flow）已在依赖中，无需新增。
+
+---
+
+## 十二、分阶段路线
+
+> 来源：修订版 §六
+
+### MVP（8 周）— "会说话的本体"
+
+| 周 | 任务 | 产出 |
+|----|------|------|
+| W1 | 环境搭建 + Alembic 迁移 + Agent domain 模型 + config | 数据库表 + Pydantic 模型 |
+| W2 | LangGraph 状态图 + 基础工具（实体查找）+ SSE 端点骨架 | POST /agent/chat 可返回流式文本 |
+| W3 | Instructor 结构化输出 + 更多工具（关系遍历、schema 查询） + openapi 管道 | 实体标注 + 类型生成 |
+| W4 | 前端对话面板：Ant Design 对话 UI + SSE 流式渲染 | 可对话的基础 UI |
+| W5 | 实体锚点渲染 + Tier 1 悬停预览 + Tier 2 Drawer 侧面板 | 可点击的实体引用 |
+| W6 | React Flow 图谱画布 + 双向高亮联动 | 知识图谱可视化 |
+| W7 | 安全层 L1/L3/L5：输入检验 + 工具白名单 + 审计日志 | 基础安全防护 |
+| W8 | 集成测试 + 打磨 + 文档 | 可发布状态 |
+
+### V1（8-10 周）— "可信赖的智能助手"
+
+- 混合检索三路并行（新增 pgvector 语义搜索 + RRF 融合）
+- Entity-Linked Citation（`[E1]`/`[R1]`/`[I1]` 引用标记）
+- 事实验证管线
+- 嵌入式迷你图（360x220px React Flow 嵌入对话）
+- 推理轨迹动画（图谱节点依次点亮）
+- Graphiti 知识图记忆
+- 权限 L2/L4
+- LangSmith 可观测性
+
+### V2（10-12 周）— "自主操作的本体代理"
+
+- 动作执行（人工审批流）
+- 多代理协作
+- ReBAC 权限
+- A2UI 完整实现
+- 图谱交互操作（框选 + 右键菜单驱动对话）
+- 多模型路由
+
+---
+
+## 十三、关键设计决策与权衡
+
+> 整合原 README §10 详细对比表 + 修订版 §七 决策记录
+
+### 已确认决策
+
+| # | 决策 | 结论 | 说明 |
+|---|------|------|------|
+| D1 | LLM 模型 | **MVP 即支持多模型** | 通过 config 切换 Anthropic/OpenAI，需同时引入两个 SDK |
+| D2 | 图谱渲染库 | **React Flow** | 已有依赖，零新增。V1 如性能不足再迁移 G6 |
+| D3 | 页面布局 | **独立全屏** | AppShell 下独立路由，不嵌入 HomeLayout |
+| D4 | 会话标题 | **LLM 自动生成** | 第一轮对话后异步生成标题，额外一次 API 调用 |
+| D5 | SSE 实现 | **FastAPI 原生** | `StreamingResponse` + async generator，零新增依赖 |
+
+### 详细权衡分析
+
+#### D1: Agent 框架 — LangGraph vs 原生实现
 
 | 维度 | LangGraph | 原生实现 |
 |------|-----------|---------|
@@ -1220,9 +1362,7 @@ Phase 4 ──────────────── 高级特性
 
 **权衡**: 接受 langchain 生态的依赖换取更快的开发迭代。核心 Tools 只依赖 `@tool` 装饰器，迁移成本低。
 
-### D2: 流式协议 — SSE vs WebSocket
-
-**决策**: 选择 SSE。
+#### D2: 流式协议 — SSE vs WebSocket
 
 | 维度 | SSE | WebSocket |
 |------|-----|-----------|
@@ -1232,80 +1372,66 @@ Phase 4 ──────────────── 高级特性
 | 断线重连 | 浏览器自动重连 | 需手动实现 |
 | 并发连接 | 受 HTTP/1.1 限制（每域 6 连接） | 无限制 |
 
-**权衡**: Agent 对话是典型的"请求-流式响应"模式，SSE 足够且更简单。如果后续需要实时协作（多人编辑 Ontology），再引入 WebSocket。
+**权衡**: Agent 对话是典型的"请求-流式响应"模式，SSE 足够且更简单。如果后续需要实时协作再引入 WebSocket。
 
-### D3: 实体引用提取 — State Accumulation vs Post-processing
+#### D3: 实体引用提取 — State Accumulation vs Post-processing
 
-**决策**: 选择 State Accumulation。
+**选择**: State Accumulation。
 
-**理由**:
 - Tool 调用天然返回结构化实体数据，无需额外解析
-- 流式友好 — entity_ref 事件可在文本流中穿插发出
+- 流式友好 — entity-ref 事件可在文本流中穿插发出
 - 准确度高 — 不依赖文本匹配/NER 的不确定性
+- **劣势**: Agent 不调用 Tool 时无法提取实体引用 → assemble 节点增加轻量文本匹配兜底
 
-**劣势**: Agent 在不调用 Tool 时（纯基于 L1 上下文推理）无法提取实体引用。
-**应对**: assemble 节点增加轻量文本匹配作为兜底（正则匹配已知 apiName）。
+#### D4: 前端状态管理
 
-### D4: 前端状态管理 — 服务端数据 vs UI 状态
-
-**决策**: 遵循现有架构约定。
+遵循现有架构约定：
 
 - **服务端数据**（对话历史、Agent 响应）→ TanStack Query cache
 - **UI 状态**（面板开关、高亮实体、流式消息缓冲）→ Zustand store
 - **流式消息**是特殊情况 — 流式进行中存在 Zustand（避免 TanStack Query 频繁更新），流式完成后移入 TanStack Query cache
 
-### D5: 可视化技术 — ReactFlow vs D3.js vs 3D 星空复用
-
-**决策**: ReactFlow 作为主可视化方案，3D 星空作为可选联动。
+#### D5: 可视化技术 — ReactFlow vs D3.js vs 3D 星空复用
 
 | 维度 | ReactFlow | D3.js | 3D 星空复用 |
 |------|-----------|-------|------------|
 | 学习曲线 | 低（React 原生） | 高 | 中（已有代码） |
-| 交互性 | 高（拖拽、缩放、事件原生支持） | 需手动实现 | 高但不适合小面板 |
+| 交互性 | 高（拖拽、缩放原生支持） | 需手动实现 | 高但不适合小面板 |
 | 适合嵌入 | 好（轻量、可嵌入面板） | 好 | 差（3D 渲染开销大） |
 | 关系图表达 | 专为图设计 | 通用 | 偏展示，非精确操作 |
 
 **权衡**: ReactFlow 适合面板内嵌入的轻量关系图。3D 星空保留为可选的沉浸式全屏视图。
 
-### D6: 对话持久化 — 立即持久化 vs 延迟实现
+#### D6: 数据库建表时机
 
-**决策**: Phase 1 使用内存存储，Phase 3 迁移到 PostgreSQL。
+**修订版决策**: MVP 即建表（`agent_sessions` + `agent_messages` + `agent_audit_logs`）。
 
-**理由**: MVP 优先验证 Agent 能力和交互设计，对话持久化不影响核心价值验证。Phase 3 使用 Alembic 迁移添加 `conversations` 和 `messages` 表。
+原方案将数据库延后到 Phase 3，但代码库审查后发现：
+- 现有 Alembic 迁移管线成熟，新增 3 张表成本极低
+- MVP 即需要审计日志（安全层 L5）
+- 会话持久化是基础用户体验
 
 ---
 
-## 附录 A: 数据库扩展（Phase 3）
+## 十四、验证方式
 
-```sql
--- conversations 表
-CREATE TABLE conversations (
-    rid TEXT PRIMARY KEY,           -- ri.ontology.conversation.<uuid>
-    title TEXT,                      -- 自动从第一条消息生成
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+> 来源：修订版 §八
 
--- messages 表
-CREATE TABLE messages (
-    rid TEXT PRIMARY KEY,           -- ri.ontology.message.<uuid>
-    conversation_rid TEXT NOT NULL REFERENCES conversations(rid) ON DELETE CASCADE,
-    role TEXT NOT NULL,              -- 'user' | 'assistant'
-    content TEXT NOT NULL,           -- 主体文本
-    entity_refs JSONB DEFAULT '[]', -- EntityRef 数组
-    relationships JSONB DEFAULT '[]', -- Relationship 数组
-    sources JSONB DEFAULT '[]',     -- Source 数组
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+1. **后端单元测试**：`cd apps/server && PYTHONPATH=. uv run pytest tests/unit/ -v` 覆盖 Agent 服务 + 检索逻辑
+2. **后端集成测试**：`cd apps/server && PYTHONPATH=. uv run pytest tests/integration/ -v` 覆盖 Agent 路由端点
+3. **前端测试**：`cd apps/web && pnpm test --run` 覆盖对话面板 + 实体探索 + 图谱联动
+4. **端到端手动验证**：
+   - 启动后端+前端
+   - 访问 `/agent` 页面
+   - 输入自然语言查询（如"有哪些对象类型？"）
+   - 验证：流式文本渲染 → 实体锚点可点击 → 图谱节点显示 → Drawer 面板弹出
+5. **SSE 流式验证**：浏览器 DevTools Network → EventStream 面板查看事件序列完整性
 
-    -- 按对话和时间排序
-    CONSTRAINT messages_conversation_fk FOREIGN KEY (conversation_rid)
-        REFERENCES conversations(rid) ON DELETE CASCADE
-);
+---
 
-CREATE INDEX idx_messages_conversation ON messages(conversation_rid, created_at);
-```
+## 附录
 
-## 附录 B: 环境变量配置
+### A: 环境变量配置
 
 ```bash
 # Agent LLM 配置
@@ -1320,3 +1446,17 @@ AGENT_MAX_TOOL_CALLS=10                      # 单轮最大工具调用次数
 AGENT_CONTEXT_MAX_TOKENS=8000                # 对话上下文最大 token 数
 AGENT_OAG_LEVEL=l1                           # 默认注入的 OAG 层级
 ```
+
+### B: 技术栈总结
+
+| 层 | 技术 | 用途 |
+|---|------|------|
+| Agent 框架 | LangGraph 0.2+ | 状态图编排、工具调用循环、流式输出 |
+| 结构化输出 | Instructor + PydanticAI | 两阶段实体提取 |
+| LLM 接口 | langchain-anthropic / langchain-openai | 多 LLM 提供商适配 |
+| 工具定义 | langchain-core `@tool` | 包装现有 Service 为 Agent Tools |
+| 流式协议 | SSE (Server-Sent Events) | 实时流式输出到前端 |
+| 关系图 | ReactFlow | 交互式本体关系图 |
+| Markdown 渲染 | react-markdown + rehype | 支持内联 Entity Chip |
+| 前端框架 | Ant Design 5.x（现有） | 对话 UI 组件 |
+| 状态管理 | Zustand（UI 状态） + TanStack Query（服务端状态） | 遵循现有架构 |
