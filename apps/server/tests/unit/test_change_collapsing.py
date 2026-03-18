@@ -298,3 +298,170 @@ class TestMergedView:
         data, state = result[0]
         assert state == ChangeState.DELETED
         assert data["rid"] == "ri.ontology.object-type.abc"
+
+
+# ---------------------------------------------------------------------------
+# Deep Merge Helper
+# ---------------------------------------------------------------------------
+
+
+class TestDeepMergeDicts:
+    def test_flat_merge(self):
+        base = {"a": 1, "b": 2}
+        override = {"b": 3, "c": 4}
+        assert _deep_merge_dicts(base, override) == {"a": 1, "b": 3, "c": 4}
+
+    def test_nested_merge(self):
+        base = {"sideA": {"objectTypeRid": "ot1", "displayName": "Old", "apiName": "link"}}
+        override = {"sideA": {"displayName": "New"}}
+        result = _deep_merge_dicts(base, override)
+        assert result["sideA"] == {
+            "objectTypeRid": "ot1",
+            "displayName": "New",
+            "apiName": "link",
+        }
+
+    def test_multi_level_deep(self):
+        base = {"a": {"b": {"c": 1, "d": 2}, "e": 3}}
+        override = {"a": {"b": {"c": 99}}}
+        result = _deep_merge_dicts(base, override)
+        assert result == {"a": {"b": {"c": 99, "d": 2}, "e": 3}}
+
+    def test_override_non_dict_with_dict(self):
+        base = {"a": "string"}
+        override = {"a": {"nested": True}}
+        result = _deep_merge_dicts(base, override)
+        assert result == {"a": {"nested": True}}
+
+
+# ---------------------------------------------------------------------------
+# Nested Dict Collapsing (LinkType sideA/sideB)
+# ---------------------------------------------------------------------------
+
+
+def _make_link_type_change(
+    change_type: ChangeType,
+    resource_rid: str = "ri.ontology.link-type.lt1",
+    before: dict | None = None,
+    after: dict | None = None,
+) -> Change:
+    return Change(
+        id=f"c-{change_type.value.lower()}",
+        resource_type=ResourceType.LINK_TYPE,
+        resource_rid=resource_rid,
+        change_type=change_type,
+        before=before,
+        after=after,
+        timestamp=datetime(2026, 1, 1, tzinfo=timezone.utc),
+    )
+
+
+_FULL_SIDE_A = {
+    "objectTypeRid": "ri.ontology.object-type.ot1",
+    "displayName": "Original",
+    "apiName": "linkA",
+    "visibility": "normal",
+}
+
+
+class TestNestedDictCollapsing:
+    @pytest.fixture
+    def service(self):
+        from app.services.working_state_service import WorkingStateService
+
+        session = AsyncMock()
+        return WorkingStateService(session)
+
+    def test_create_then_update_deep_merges_nested_side(self, service):
+        """CREATE with full sideA + UPDATE changing only sideA.displayName preserves other fields."""
+        create = _make_link_type_change(
+            ChangeType.CREATE,
+            after={"rid": "ri.ontology.link-type.lt1", "sideA": {**_FULL_SIDE_A}},
+        )
+        update = _make_link_type_change(
+            ChangeType.UPDATE,
+            after={"sideA": {"displayName": "Renamed"}},
+        )
+        result = service._collapse_change([create], update)
+
+        assert len(result) == 1
+        assert result[0].change_type == ChangeType.CREATE
+        side_a = result[0].after["sideA"]
+        assert side_a["displayName"] == "Renamed"
+        assert side_a["objectTypeRid"] == "ri.ontology.object-type.ot1"
+        assert side_a["apiName"] == "linkA"
+
+    def test_update_then_update_deep_merges_nested_side(self, service):
+        """Two UPDATEs modifying different sideA fields are both preserved."""
+        update1 = _make_link_type_change(
+            ChangeType.UPDATE,
+            before={"sideA": {**_FULL_SIDE_A}},
+            after={"sideA": {"displayName": "V1"}},
+        )
+        update2 = _make_link_type_change(
+            ChangeType.UPDATE,
+            after={"sideA": {"visibility": "hidden"}},
+        )
+        result = service._collapse_change([update1], update2)
+
+        assert len(result) == 1
+        side_a = result[0].after["sideA"]
+        assert side_a["displayName"] == "V1"
+        assert side_a["visibility"] == "hidden"
+
+    @pytest.mark.asyncio
+    async def test_merged_view_update_deep_merges_nested_side(self, service):
+        """Published LinkType + UPDATE on sideA.displayName preserves full sideA in merged view."""
+        from app.domain.link_type import (
+            Cardinality,
+            JoinMethod,
+            LinkSide,
+            LinkType,
+        )
+
+        published_lt = LinkType(
+            rid="ri.ontology.link-type.lt1",
+            id="analyst-company",
+            side_a=LinkSide(
+                object_type_rid="ri.ontology.object-type.ot1",
+                display_name="Original",
+                api_name="linkA",
+            ),
+            side_b=LinkSide(
+                object_type_rid="ri.ontology.object-type.ot2",
+                display_name="Company",
+                api_name="linkB",
+            ),
+            cardinality=Cardinality.MANY_TO_ONE,
+            join_method=JoinMethod.FOREIGN_KEY,
+            project_rid="ri.ontology.space.default",
+            ontology_rid=DEFAULT_ONTOLOGY_RID,
+            created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            created_by="default",
+            last_modified_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            last_modified_by="default",
+        )
+
+        ws = _make_working_state(
+            [
+                _make_link_type_change(
+                    ChangeType.UPDATE,
+                    resource_rid="ri.ontology.link-type.lt1",
+                    before={"sideA": {"displayName": "Original"}},
+                    after={"sideA": {"displayName": "Renamed"}},
+                )
+            ]
+        )
+
+        with (
+            patch.object(service, "_get_published_link_types", return_value=[published_lt]),
+            patch.object(service, "_get_working_state", return_value=ws),
+        ):
+            result = await service.get_merged_view(DEFAULT_ONTOLOGY_RID, ResourceType.LINK_TYPE)
+
+        assert len(result) == 1
+        data, state = result[0]
+        assert state == ChangeState.MODIFIED
+        assert data["sideA"]["displayName"] == "Renamed"
+        assert data["sideA"]["objectTypeRid"] == "ri.ontology.object-type.ot1"
+        assert data["sideA"]["apiName"] == "linkA"
