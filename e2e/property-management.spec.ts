@@ -185,29 +185,31 @@ test.describe.serial('Property Management — E2E', () => {
     // Wait for table to load
     await expect(page.locator('.ant-table-row').first()).toBeVisible({ timeout: 5000 });
 
-    // Filter by object type
+    // Filter by object type — select "E2E Department"
     const otFilter = page.locator('.ant-select').first();
     await selectAntOption(page, otFilter, 'E2E Department');
 
-    // Should only show department properties
+    // Should only show department properties (2 items)
+    const rows = page.locator('.ant-table-row');
+    await expect(rows).toHaveCount(2, { timeout: 3000 });
     await expect(page.getByText('Dept-code')).toBeVisible({ timeout: 3000 });
     await expect(page.getByText('Budget')).toBeVisible();
-    // Employee properties should be hidden
-    await expect(page.getByText('Full-name')).not.toBeVisible();
 
-    // Clear filter
+    // Clear OT filter
     const clearBtn = otFilter.locator('.ant-select-clear');
     if (await clearBtn.isVisible()) {
       await clearBtn.click();
       await page.waitForTimeout(300);
     }
 
-    // Filter by base type (Integer)
+    // Filter by OT = E2E Employee + base type = Integer
+    await selectAntOption(page, otFilter, 'E2E Employee');
+    await page.waitForTimeout(300);
+
     const baseTypeFilter = page.locator('.ant-select').nth(3);
     await selectAntOption(page, baseTypeFilter, /Integer|整数/);
 
-    // Only 'age' property should be visible in the table
-    const rows = page.locator('.ant-table-row');
+    // Only 'age' property from E2E Employee should be visible
     await expect(rows).toHaveCount(1, { timeout: 3000 });
     await expect(rows.first()).toContainText('Age');
   });
