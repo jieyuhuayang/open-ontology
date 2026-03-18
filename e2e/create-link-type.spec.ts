@@ -26,7 +26,7 @@ async function navigateToLinkTypes(page: Page) {
 
 async function openCreateWizard(page: Page) {
   // Click the "New link type" button
-  const btn = page.locator('button').filter({ hasText: /New link type|新建链接类型/ });
+  const btn = page.locator('button').filter({ hasText: /New link type|新建链接类型/ }).first();
   await expect(btn).toBeVisible({ timeout: 5000 });
   await btn.click();
   // Wait for modal to appear
