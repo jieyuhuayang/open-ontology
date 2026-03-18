@@ -1,9 +1,11 @@
-import { Table, Tag } from 'antd';
+import { Table, Tag, Typography } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
 import StatusBadge from '@/components/StatusBadge';
 import ChangeStateBadge from '@/components/ChangeStateBadge';
 import type { LinkType, ResourceStatus } from '@/api/types';
+
+const { Text } = Typography;
 
 interface LinkTypeTableProps {
   items: LinkType[];
@@ -28,22 +30,29 @@ export default function LinkTypeTable({
 
   const columns: ColumnsType<LinkType> = [
     {
-      title: t('linkType.fields.id'),
-      dataIndex: 'id',
-      key: 'id',
+      title: t('linkType.fields.relationship'),
+      key: 'relationship',
+      render: (_val, record) => {
+        const nameA = record.sideA.objectTypeDisplayName ?? record.sideA.objectTypeRid;
+        const nameB = record.sideB.objectTypeDisplayName ?? record.sideB.objectTypeRid;
+        return (
+          <span>
+            <Tag>{nameA}</Tag>
+            <Text type="secondary" style={{ margin: '0 4px' }}>
+              →
+            </Text>
+            <Tag>{nameB}</Tag>
+          </span>
+        );
+      },
     },
     {
-      title: t('linkType.fields.sideA'),
-      key: 'sideA',
+      title: t('linkType.fields.linkNames'),
+      key: 'linkNames',
       render: (_val, record) => (
-        <Tag>{record.sideA.objectTypeDisplayName ?? record.sideA.objectTypeRid}</Tag>
-      ),
-    },
-    {
-      title: t('linkType.fields.sideB'),
-      key: 'sideB',
-      render: (_val, record) => (
-        <Tag>{record.sideB.objectTypeDisplayName ?? record.sideB.objectTypeRid}</Tag>
+        <Text type="secondary">
+          {record.sideA.displayName} / {record.sideB.displayName}
+        </Text>
       ),
     },
     {
