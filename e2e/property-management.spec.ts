@@ -453,7 +453,8 @@ test.describe.serial('Property Management — E2E', () => {
       .first();
 
     // Use the batch status select in the batch bar area
-    const batchBar = page.locator('[style*="e6f4ff"]');
+    // Locate batch bar by its "selected" text, then find sibling selects
+    const batchBar = page.getByText(/selected|已选/).locator('..');
     const statusSelect = batchBar.locator('.ant-select').first();
     await selectAntOption(page, statusSelect, /Active|活跃/);
 
