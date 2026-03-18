@@ -1,11 +1,13 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Modal, Steps, Flex, Select, Form, Input, Radio, Typography, message, Divider, Alert } from 'antd';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { Modal, Steps, Flex, Select, Form, Input, Radio, Typography, message, Divider, Alert, Card } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useCreateLinkTypeModalStore } from '@/stores/create-link-type-modal-store';
 import { useCreateLinkType, useEligibleSideLinks } from '@/api/link-types';
 import { useObjectTypes } from '@/api/object-types';
+import { useProperties } from '@/api/properties';
 import { useDatasets, useDataset } from '@/api/datasets';
+import { toCamelCase } from '@/utils/naming';
 import type { Cardinality } from '@/api/types';
 import type { AxiosError } from 'axios';
 import RelationshipCard from './RelationshipCard';
@@ -21,25 +23,12 @@ interface FormValues {
   id: string;
   sideADisplayName: string;
   sideAApiName: string;
-  sideAVisibility: string;
   sideBDisplayName: string;
   sideBApiName: string;
-  sideBVisibility: string;
   status: string;
 }
 
 const LINK_SIDE_API_NAME_PATTERN = /^[a-z][a-zA-Z0-9]{0,99}$/;
-
-function toCamelCase(str: string): string {
-  return str
-    .replace(/[^a-zA-Z0-9\s]/g, ' ')
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word, i) =>
-      i === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-    )
-    .join('');
-}
 
 const CARDINALITY_CHOICES: Cardinality[] = ['one-to-one', 'one-to-many', 'many-to-one', 'many-to-many'];
 
@@ -56,6 +45,13 @@ const CARDINALITY_DIAGRAM_TYPES: Record<Cardinality, 'one-to-one' | 'one-to-many
   'many-to-one': 'many-to-one',
   'many-to-many': 'many-to-many',
 };
+
+/** Determine which side holds the FK for FK-based cardinalities */
+function getFkSide(cardinality: Cardinality | null): 'A' | 'B' | null {
+  if (cardinality === 'one-to-one' || cardinality === 'many-to-one') return 'A';
+  if (cardinality === 'one-to-many') return 'B';
+  return null;
+}
 
 export default function CreateLinkTypeWizard() {
   const { t } = useTranslation();
@@ -74,7 +70,11 @@ export default function CreateLinkTypeWizard() {
   const [joinTableDatasetRid, setJoinTableDatasetRid] = useState<string | undefined>(undefined);
   const [sideAJtColumn, setSideAJtColumn] = useState<string | undefined>(undefined);
   const [sideBJtColumn, setSideBJtColumn] = useState<string | undefined>(undefined);
-  const [sideAFkPropId, setSideAFkPropId] = useState<string | undefined>(undefined);
+  const [fkPropId, setFkPropId] = useState<string | undefined>(undefined);
+
+  // Track whether user manually edited API names
+  const [sideAApiNameManual, setSideAApiNameManual] = useState(false);
+  const [sideBApiNameManual, setSideBApiNameManual] = useState(false);
 
   // BO-specific state
   const [backingOtRid, setBackingOtRid] = useState<string | undefined>(undefined);
@@ -82,6 +82,12 @@ export default function CreateLinkTypeWizard() {
   const [sideBLinkRid, setSideBLinkRid] = useState<string | undefined>(undefined);
 
   const isJoinTable = cardinality === 'many-to-many' && !isBackingObject;
+  const fkSide = getFkSide(cardinality);
+  const isFkBased = fkSide !== null;
+  const fkOtRid = fkSide === 'A' ? sideARid : fkSide === 'B' ? sideBRid : undefined;
+
+  // Load FK-side properties
+  const { data: fkPropertiesData } = useProperties(fkOtRid ?? '');
 
   // Load dataset columns when a JT dataset is selected
   const { data: selectedDataset } = useDataset(joinTableDatasetRid ?? '');
@@ -129,6 +135,25 @@ export default function CreateLinkTypeWizard() {
     }));
   }, [selectedDataset?.columns]);
 
+  const fkPropertyOptions = useMemo(() => {
+    if (!fkPropertiesData?.items) return [];
+    return fkPropertiesData.items.map((p) => ({
+      value: p.rid,
+      label: `${p.displayName} (${p.apiName})`,
+    }));
+  }, [fkPropertiesData?.items]);
+
+  // Resolve OT display names
+  const sideAOt = useMemo(
+    () => objectTypesData?.items.find((ot) => ot.rid === sideARid),
+    [objectTypesData?.items, sideARid],
+  );
+  const sideBOt = useMemo(
+    () => objectTypesData?.items.find((ot) => ot.rid === sideBRid),
+    [objectTypesData?.items, sideBRid],
+  );
+  const fkOtName = fkSide === 'A' ? sideAOt?.displayName : sideBOt?.displayName;
+
   useEffect(() => {
     if (isOpen && prefilledSideA) {
       setSideARid(prefilledSideA);
@@ -144,7 +169,9 @@ export default function CreateLinkTypeWizard() {
     setJoinTableDatasetRid(undefined);
     setSideAJtColumn(undefined);
     setSideBJtColumn(undefined);
-    setSideAFkPropId(undefined);
+    setFkPropId(undefined);
+    setSideAApiNameManual(false);
+    setSideBApiNameManual(false);
     setBackingOtRid(undefined);
     setSideALinkRid(undefined);
     setSideBLinkRid(undefined);
@@ -160,8 +187,6 @@ export default function CreateLinkTypeWizard() {
       if (isBackingObject && (!backingOtRid || !sideALinkRid || !sideBLinkRid)) return;
 
       // Auto-populate form defaults based on selected OTs
-      const sideAOt = objectTypesData?.items.find((ot) => ot.rid === sideARid);
-      const sideBOt = objectTypesData?.items.find((ot) => ot.rid === sideBRid);
       if (sideAOt && sideBOt) {
         const sideAName = sideBOt.displayName;
         const sideBName = sideAOt.displayName;
@@ -172,9 +197,9 @@ export default function CreateLinkTypeWizard() {
           sideBApiName: toCamelCase(sideBName),
           id: `${sideAOt.id}-${sideBOt.id}`,
           status: 'experimental',
-          sideAVisibility: 'normal',
-          sideBVisibility: 'normal',
         });
+        setSideAApiNameManual(false);
+        setSideBApiNameManual(false);
       }
     }
     setCurrentStep((s) => s + 1);
@@ -183,6 +208,27 @@ export default function CreateLinkTypeWizard() {
   const handlePrev = () => {
     setCurrentStep((s) => s - 1);
   };
+
+  // Auto-generate API name when display name changes (unless manually edited)
+  const handleSideADisplayNameChange = useCallback(
+    (value: string) => {
+      form.setFieldValue('sideADisplayName', value);
+      if (!sideAApiNameManual) {
+        form.setFieldValue('sideAApiName', toCamelCase(value));
+      }
+    },
+    [form, sideAApiNameManual],
+  );
+
+  const handleSideBDisplayNameChange = useCallback(
+    (value: string) => {
+      form.setFieldValue('sideBDisplayName', value);
+      if (!sideBApiNameManual) {
+        form.setFieldValue('sideBApiName', toCamelCase(value));
+      }
+    },
+    [form, sideBApiNameManual],
+  );
 
   const handleSubmit = async () => {
     try {
@@ -193,15 +239,16 @@ export default function CreateLinkTypeWizard() {
           objectTypeRid: sideARid!,
           displayName: values.sideADisplayName,
           apiName: values.sideAApiName,
-          visibility: values.sideAVisibility as 'prominent' | 'normal' | 'hidden',
-          ...(sideAFkPropId ? { foreignKeyPropertyId: sideAFkPropId } : {}),
+          visibility: 'normal',
+          ...(isFkBased && fkSide === 'A' && fkPropId ? { foreignKeyPropertyId: fkPropId } : {}),
           ...(sideAJtColumn ? { joinTableColumn: sideAJtColumn } : {}),
         },
         sideB: {
           objectTypeRid: sideBRid!,
           displayName: values.sideBDisplayName,
           apiName: values.sideBApiName,
-          visibility: values.sideBVisibility as 'prominent' | 'normal' | 'hidden',
+          visibility: 'normal',
+          ...(isFkBased && fkSide === 'B' && fkPropId ? { foreignKeyPropertyId: fkPropId } : {}),
           ...(sideBJtColumn ? { joinTableColumn: sideBJtColumn } : {}),
         },
         cardinality: cardinality!,
@@ -255,6 +302,7 @@ export default function CreateLinkTypeWizard() {
 
   const handleCardinalitySelect = (value: Cardinality) => {
     setCardinality(value);
+    setFkPropId(undefined);
     if (value !== 'many-to-many') {
       setIsBackingObject(false);
       setBackingOtRid(undefined);
@@ -362,6 +410,7 @@ export default function CreateLinkTypeWizard() {
                 onChange={(val) => {
                   setSideARid(val);
                   setSideALinkRid(undefined);
+                  if (fkSide === 'A') setFkPropId(undefined);
                 }}
                 options={objectTypeOptions}
                 style={{ width: '100%', marginTop: 8 }}
@@ -400,12 +449,40 @@ export default function CreateLinkTypeWizard() {
                 onChange={(val) => {
                   setSideBRid(val);
                   setSideBLinkRid(undefined);
+                  if (fkSide === 'B') setFkPropId(undefined);
                 }}
                 options={objectTypeOptions}
                 style={{ width: '100%', marginTop: 8 }}
               />
             </div>
           </Flex>
+
+          {/* FK Property Selector (for FK-based cardinalities) */}
+          {isFkBased && fkOtRid && sideARid && sideBRid && (
+            <>
+              <Divider style={{ margin: '8px 0' }} />
+              <div>
+                <Text type="secondary">
+                  {t('linkType.wizard.fkPropertyOn', { objectType: fkOtName })}
+                </Text>
+                <Select
+                  allowClear
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
+                  }
+                  placeholder={t('linkType.wizard.selectFkProperty')}
+                  value={fkPropId}
+                  onChange={setFkPropId}
+                  options={fkPropertyOptions}
+                  style={{ width: '100%', marginTop: 8 }}
+                />
+                <Text type="secondary" style={{ fontSize: 12, marginTop: 4, display: 'block' }}>
+                  {t('linkType.wizard.fkPropertyOptional')}
+                </Text>
+              </div>
+            </>
+          )}
 
           {isBackingObject && backingOtRid && sideARid && sideBRid && (
             <>
@@ -515,7 +592,7 @@ export default function CreateLinkTypeWizard() {
         </Flex>
       )}
 
-      {/* Step 2: Details (Names, API Names, Status) */}
+      {/* Step 2: Card-style Link Names */}
       {currentStep === 2 && (
         <Form form={form} layout="vertical">
           <Form.Item
@@ -532,75 +609,95 @@ export default function CreateLinkTypeWizard() {
             <Input placeholder="e.g. employee-company" />
           </Form.Item>
 
-          <Text strong style={{ display: 'block', marginBottom: 8 }}>
-            {t('linkType.wizard.sideA')}
-          </Text>
-          <Flex gap={12}>
-            <Form.Item
-              name="sideADisplayName"
-              label={t('linkType.fields.displayName')}
-              rules={[{ required: true, message: t('linkType.validation.required') }]}
-              style={{ flex: 1 }}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="sideAApiName"
-              label={t('linkType.fields.apiName')}
-              rules={[
-                { required: true, message: t('linkType.validation.required') },
-                {
-                  pattern: LINK_SIDE_API_NAME_PATTERN,
-                  message: t('linkType.validation.apiNameFormat'),
-                },
-              ]}
-              style={{ flex: 1 }}
-            >
-              <Input placeholder="e.g. employer" />
-            </Form.Item>
-          </Flex>
-          <Form.Item name="sideAVisibility" label={t('linkType.fields.visibility')}>
-            <Radio.Group>
-              <Radio value="prominent">{t('objectType.visibility.prominent')}</Radio>
-              <Radio value="normal">{t('objectType.visibility.normal')}</Radio>
-              <Radio value="hidden">{t('objectType.visibility.hidden')}</Radio>
-            </Radio.Group>
-          </Form.Item>
+          {/* Direction card: A → B */}
+          <Card
+            size="small"
+            title={t('linkType.wizard.directionTitle', {
+              source: sideAOt?.displayName ?? '',
+              target: sideBOt?.displayName ?? '',
+            })}
+            style={{ marginBottom: 16 }}
+          >
+            <Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
+              {t('linkType.wizard.linkNameGuide', {
+                source: sideAOt?.displayName ?? '',
+                target: sideBOt?.displayName ?? '',
+              })}
+            </Text>
+            <Flex gap={12}>
+              <Form.Item
+                name="sideADisplayName"
+                label={t('linkType.fields.displayName')}
+                rules={[{ required: true, message: t('linkType.validation.required') }]}
+                style={{ flex: 1 }}
+              >
+                <Input
+                  onChange={(e) => handleSideADisplayNameChange(e.target.value)}
+                />
+              </Form.Item>
+              <Form.Item
+                name="sideAApiName"
+                label={t('linkType.fields.apiName')}
+                rules={[
+                  { required: true, message: t('linkType.validation.required') },
+                  {
+                    pattern: LINK_SIDE_API_NAME_PATTERN,
+                    message: t('linkType.validation.apiNameFormat'),
+                  },
+                ]}
+                style={{ flex: 1 }}
+              >
+                <Input
+                  onChange={() => setSideAApiNameManual(true)}
+                />
+              </Form.Item>
+            </Flex>
+          </Card>
 
-          <Text strong style={{ display: 'block', marginBottom: 8 }}>
-            {t('linkType.wizard.sideB')}
-          </Text>
-          <Flex gap={12}>
-            <Form.Item
-              name="sideBDisplayName"
-              label={t('linkType.fields.displayName')}
-              rules={[{ required: true, message: t('linkType.validation.required') }]}
-              style={{ flex: 1 }}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="sideBApiName"
-              label={t('linkType.fields.apiName')}
-              rules={[
-                { required: true, message: t('linkType.validation.required') },
-                {
-                  pattern: LINK_SIDE_API_NAME_PATTERN,
-                  message: t('linkType.validation.apiNameFormat'),
-                },
-              ]}
-              style={{ flex: 1 }}
-            >
-              <Input placeholder="e.g. employee" />
-            </Form.Item>
-          </Flex>
-          <Form.Item name="sideBVisibility" label={t('linkType.fields.visibility')}>
-            <Radio.Group>
-              <Radio value="prominent">{t('objectType.visibility.prominent')}</Radio>
-              <Radio value="normal">{t('objectType.visibility.normal')}</Radio>
-              <Radio value="hidden">{t('objectType.visibility.hidden')}</Radio>
-            </Radio.Group>
-          </Form.Item>
+          {/* Direction card: B → A */}
+          <Card
+            size="small"
+            title={t('linkType.wizard.directionTitle', {
+              source: sideBOt?.displayName ?? '',
+              target: sideAOt?.displayName ?? '',
+            })}
+            style={{ marginBottom: 16 }}
+          >
+            <Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
+              {t('linkType.wizard.linkNameGuide', {
+                source: sideBOt?.displayName ?? '',
+                target: sideAOt?.displayName ?? '',
+              })}
+            </Text>
+            <Flex gap={12}>
+              <Form.Item
+                name="sideBDisplayName"
+                label={t('linkType.fields.displayName')}
+                rules={[{ required: true, message: t('linkType.validation.required') }]}
+                style={{ flex: 1 }}
+              >
+                <Input
+                  onChange={(e) => handleSideBDisplayNameChange(e.target.value)}
+                />
+              </Form.Item>
+              <Form.Item
+                name="sideBApiName"
+                label={t('linkType.fields.apiName')}
+                rules={[
+                  { required: true, message: t('linkType.validation.required') },
+                  {
+                    pattern: LINK_SIDE_API_NAME_PATTERN,
+                    message: t('linkType.validation.apiNameFormat'),
+                  },
+                ]}
+                style={{ flex: 1 }}
+              >
+                <Input
+                  onChange={() => setSideBApiNameManual(true)}
+                />
+              </Form.Item>
+            </Flex>
+          </Card>
 
           <Form.Item name="status" label={t('linkType.fields.status')}>
             <Radio.Group>
