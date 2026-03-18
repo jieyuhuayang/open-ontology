@@ -77,7 +77,7 @@
     "wizard": {
       "step1": "Relationship",
       "step2": "Object Types",
-      "step3": "Details",
+      "step3": "Link Names",
       "next": "Next",
       "back": "Back",
       "sideA": "Side A",
