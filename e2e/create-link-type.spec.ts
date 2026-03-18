@@ -48,26 +48,21 @@ async function selectCardinality(page: Page, label: RegExp) {
 
 /** Select an option from an Ant Design Select dropdown by typing to search */
 async function selectAntOption(page: Page, selectLocator: ReturnType<Page['locator']>, search: string) {
+  // Click the select to open dropdown and focus its internal search input
   await selectLocator.click();
-  // Type in search box
-  const searchInput = page.locator('.ant-select-dropdown:visible input.ant-select-selection-search-input, .ant-select-dropdown:visible .ant-select-search input').first();
-  // Sometimes the input is inside the select itself
-  const activeInput = page.locator('.ant-select-focused input').first();
-  if (await activeInput.isVisible()) {
-    await activeInput.fill(search);
-  } else {
-    await selectLocator.locator('input').fill(search);
-  }
-  await page.waitForTimeout(300);
-  // Click the matching option
-  const option = page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: search });
-  await expect(option.first()).toBeVisible({ timeout: 3000 });
-  await option.first().click();
-}
+  await page.waitForTimeout(200);
 
-/** Get the nth Ant Select within a visible container */
-function getNthSelect(page: Page, container: ReturnType<Page['locator']>, n: number) {
-  return container.locator('.ant-select').nth(n);
+  // Type into the select's own search input
+  const input = selectLocator.locator('input.ant-select-selection-search-input');
+  await input.fill(search);
+  await page.waitForTimeout(500);
+
+  // Click the matching option in the visible dropdown
+  const option = page.locator('.ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option')
+    .filter({ hasText: search });
+  await expect(option.first()).toBeVisible({ timeout: 5000 });
+  await option.first().click();
+  await page.waitForTimeout(200);
 }
 
 // ──────────── Tests ────────────

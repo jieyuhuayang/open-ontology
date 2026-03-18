@@ -1,82 +1,142 @@
 # Page snapshot
 
 ```yaml
-- generic [ref=e4]:
-  - banner [ref=e5]:
-    - generic [ref=e6]:
-      - img "deployment-unit" [ref=e7]:
-        - img [ref=e8]
-      - strong [ref=e11]: Ontology Management
-    - generic [ref=e13]:
-      - img "search" [ref=e15]:
-        - img [ref=e16]
-      - textbox "Search by name, RID, aliases..." [ref=e18]
-      - generic [ref=e20]: ⌘K
-    - generic [ref=e21]:
-      - button "plus New" [ref=e22] [cursor=pointer]:
-        - img "plus" [ref=e24]:
-          - img [ref=e25]
-        - generic [ref=e28]: New
-      - generic [ref=e29] [cursor=pointer]:
-        - img "global" [ref=e30]:
-          - img [ref=e31]
-        - text: English
-  - generic [ref=e33]:
-    - complementary [ref=e34]:
-      - navigation [ref=e36]:
-        - strong [ref=e39]: Default Ontology
-        - menu [ref=e40]:
-          - menuitem "compass Discover" [ref=e41] [cursor=pointer]:
-            - img "compass" [ref=e42]:
-              - img [ref=e43]
-            - generic [ref=e45]: Discover
-          - text: Resources
-          - group [ref=e46]:
-            - menuitem "appstore Object Types 7" [ref=e47] [cursor=pointer]:
-              - img "appstore" [ref=e48]:
-                - img [ref=e49]
-              - generic [ref=e52]:
-                - text: Object Types
-                - generic [ref=e53]: "7"
-            - menuitem "unordered-list Properties" [ref=e54] [cursor=pointer]:
-              - img "unordered-list" [ref=e55]:
-                - img [ref=e56]
-              - generic [ref=e58]: Properties
-            - menuitem "link Link Types 0" [ref=e59] [cursor=pointer]:
-              - img "link" [ref=e60]:
-                - img [ref=e61]
-              - generic [ref=e64]:
-                - text: Link Types
-                - generic [ref=e65]: "0"
-            - menuitem "thunderbolt Action Types" [ref=e66] [cursor=pointer]:
-              - img "thunderbolt" [ref=e67]:
-                - img [ref=e68]
-              - generic [ref=e70]: Action Types
-          - text: Data Connection
-          - group [ref=e71]:
-            - menuitem "database Data Connection" [ref=e72] [cursor=pointer]:
-              - img "database" [ref=e73]:
-                - img [ref=e74]
-              - generic [ref=e76]: Data Connection
-        - button "left" [ref=e77] [cursor=pointer]:
-          - img "left" [ref=e78]:
-            - img [ref=e79]
-    - main [ref=e81]:
-      - main [ref=e82]:
-        - generic [ref=e83]:
-          - generic [ref=e84]:
-            - heading "Link Types" [level=4] [ref=e85]
-            - button "plus New link type" [ref=e86] [cursor=pointer]:
-              - img "plus" [ref=e88]:
-                - img [ref=e89]
-              - generic [ref=e92]: New link type
-          - generic [ref=e93]:
-            - img "No data" [ref=e95]
-            - generic [ref=e108]:
-              - generic [ref=e109]: Create your first link type
-              - generic [ref=e110]: Link types define semantic relationships between object types.
-            - button "plus New link type" [ref=e112] [cursor=pointer]:
-              - img "plus" [ref=e114]:
-                - img [ref=e115]
-              - generic [ref=e118]: New link type
+- generic [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - img "deployment-unit" [ref=e7]:
+          - img [ref=e8]
+        - strong [ref=e11]: Ontology Management
+      - generic [ref=e13]:
+        - img "search" [ref=e15]:
+          - img [ref=e16]
+        - textbox "Search by name, RID, aliases..." [ref=e18]
+        - generic [ref=e20]: ⌘K
+      - generic [ref=e21]:
+        - button "plus New" [ref=e22] [cursor=pointer]:
+          - img "plus" [ref=e24]:
+            - img [ref=e25]
+          - generic [ref=e28]: New
+        - generic [ref=e29] [cursor=pointer]:
+          - img "global" [ref=e30]:
+            - img [ref=e31]
+          - text: English
+    - generic [ref=e33]:
+      - complementary [ref=e34]:
+        - navigation [ref=e36]:
+          - strong [ref=e39]: Default Ontology
+          - menu [ref=e40]:
+            - menuitem "compass Discover" [ref=e41] [cursor=pointer]:
+              - img "compass" [ref=e42]:
+                - img [ref=e43]
+              - generic [ref=e45]: Discover
+            - text: Resources
+            - group [ref=e46]:
+              - menuitem "appstore Object Types 7" [ref=e47] [cursor=pointer]:
+                - img "appstore" [ref=e48]:
+                  - img [ref=e49]
+                - generic [ref=e52]:
+                  - text: Object Types
+                  - generic [ref=e53]: "7"
+              - menuitem "unordered-list Properties" [ref=e54] [cursor=pointer]:
+                - img "unordered-list" [ref=e55]:
+                  - img [ref=e56]
+                - generic [ref=e58]: Properties
+              - menuitem "link Link Types 0" [ref=e59] [cursor=pointer]:
+                - img "link" [ref=e60]:
+                  - img [ref=e61]
+                - generic [ref=e64]:
+                  - text: Link Types
+                  - generic [ref=e65]: "0"
+              - menuitem "thunderbolt Action Types" [ref=e66] [cursor=pointer]:
+                - img "thunderbolt" [ref=e67]:
+                  - img [ref=e68]
+                - generic [ref=e70]: Action Types
+            - text: Data Connection
+            - group [ref=e71]:
+              - menuitem "database Data Connection" [ref=e72] [cursor=pointer]:
+                - img "database" [ref=e73]:
+                  - img [ref=e74]
+                - generic [ref=e76]: Data Connection
+          - button "left" [ref=e77] [cursor=pointer]:
+            - img "left" [ref=e78]:
+              - img [ref=e79]
+      - main [ref=e81]:
+        - main [ref=e82]:
+          - generic [ref=e83]:
+            - generic [ref=e84]:
+              - heading "Link Types" [level=4] [ref=e85]
+              - button "plus New link type" [ref=e86] [cursor=pointer]:
+                - img "plus" [ref=e88]:
+                  - img [ref=e89]
+                - generic [ref=e92]: New link type
+            - generic [ref=e93]:
+              - img "No data" [ref=e95]
+              - generic [ref=e108]:
+                - generic [ref=e109]: Create your first link type
+                - generic [ref=e110]: Link types define semantic relationships between object types.
+              - button "plus New link type" [ref=e112] [cursor=pointer]:
+                - img "plus" [ref=e114]:
+                  - img [ref=e115]
+                - generic [ref=e118]: New link type
+  - generic [ref=e119]:
+    - dialog "Create Link Type":
+      - generic [ref=e120]:
+        - button "Close" [ref=e121] [cursor=pointer]:
+          - generic "Close" [ref=e122]:
+            - img "close" [ref=e123]:
+              - img [ref=e124]
+        - generic [ref=e127]: Create Link Type
+        - generic [ref=e128]:
+          - generic [ref=e129]:
+            - generic [ref=e131]:
+              - img "check" [ref=e134]:
+                - img [ref=e135]
+              - generic [ref=e138]: Relationship
+            - generic [ref=e140]:
+              - generic [ref=e141]: "2"
+              - generic [ref=e143]: Object Types
+            - generic [ref=e145]:
+              - generic [ref=e146]: "3"
+              - generic [ref=e148]: Link Names
+          - generic [ref=e149]:
+            - generic [ref=e150]:
+              - generic [ref=e151]:
+                - strong [ref=e153]: Side A
+                - generic [ref=e154] [cursor=pointer]:
+                  - generic [ref=e156]:
+                    - combobox [ref=e158]
+                    - generic "研究员" [ref=e159]
+                  - generic:
+                    - img:
+                      - img
+              - generic [ref=e160]:
+                - strong [ref=e162]: Side B
+                - generic [ref=e163] [cursor=pointer]:
+                  - combobox [expanded] [active] [ref=e167]:
+                    - text: latest_report_id
+                    - listbox [ref=e168]:
+                      - generic [ref=e169]:
+                        - img "No data" [ref=e171]
+                        - generic [ref=e177]: No data
+                  - generic:
+                    - img:
+                      - img
+            - separator [ref=e178]
+            - generic [ref=e179]:
+              - text: Foreign key property (on 研究员)
+              - generic [ref=e180] [cursor=pointer]:
+                - generic [ref=e182]:
+                  - combobox [ref=e184]
+                  - generic: Select property
+                - generic:
+                  - img:
+                    - img
+              - generic [ref=e185]: "Optional: specify the property used for linking"
+        - generic [ref=e186]:
+          - button "Back" [ref=e187] [cursor=pointer]:
+            - generic [ref=e188]: Back
+          - button "Next" [ref=e189] [cursor=pointer]:
+            - generic [ref=e190]: Next
 ```
