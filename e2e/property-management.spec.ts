@@ -482,7 +482,7 @@ test.describe.serial('Property Management — E2E', () => {
     await expect(page.getByText(/2 selected|已选 2/)).toBeVisible({ timeout: 3000 });
 
     // Click visibility select in batch bar and pick "Hidden"
-    const batchBar = page.locator('[style*="e6f4ff"]');
+    const batchBar = page.getByText(/selected|已选/).locator('..');
     const visibilitySelect = batchBar.locator('.ant-select').nth(1);
     await selectAntOption(page, visibilitySelect, /Hidden|隐藏/);
 
