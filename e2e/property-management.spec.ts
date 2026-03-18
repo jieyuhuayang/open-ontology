@@ -519,7 +519,7 @@ test.describe.serial('Property Management — E2E', () => {
     await page.waitForTimeout(300);
 
     // Click batch delete button
-    const batchBar = page.locator('[style*="e6f4ff"]');
+    const batchBar = page.getByText(/selected|已选/).locator('..');
     const deleteBtn = batchBar.locator('button').filter({ hasText: /Delete|删除/ });
     await deleteBtn.click();
 
