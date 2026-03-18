@@ -55,7 +55,7 @@ async function selectAntOption(page: Page, selectLocator: ReturnType<Page['locat
   // Try to type-to-search if input is editable, otherwise just open and click
   const input = selectLocator.locator('input.ant-select-selection-search-input');
   const isReadonly = await input.getAttribute('readonly');
-  if (!isReadonly) {
+  if (isReadonly === null) {
     await input.fill(search);
     await page.waitForTimeout(500);
   } else {
