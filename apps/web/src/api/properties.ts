@@ -120,3 +120,47 @@ export function useReorderProperties(objectTypeRid: string) {
     },
   });
 }
+
+export function useAllProperties() {
+  return useQuery({
+    queryKey: propertyKeys.allProperties(),
+    queryFn: async () => {
+      const { data } = await apiClient.get<PropertyListAllResponse>('/properties');
+      return data;
+    },
+  });
+}
+
+export function useBatchUpdateProperties(objectTypeRid: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (req: PropertyBatchUpdateRequest) => {
+      const { data } = await apiClient.patch<BatchOperationResponse>(
+        `/object-types/${objectTypeRid}/properties/batch`,
+        req,
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: propertyKeys.list(objectTypeRid) });
+      queryClient.invalidateQueries({ queryKey: propertyKeys.allProperties() });
+    },
+  });
+}
+
+export function useBatchDeleteProperties(objectTypeRid: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (req: PropertyBatchDeleteRequest) => {
+      const { data } = await apiClient.post<BatchOperationResponse>(
+        `/object-types/${objectTypeRid}/properties/batch-delete`,
+        req,
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: propertyKeys.list(objectTypeRid) });
+      queryClient.invalidateQueries({ queryKey: propertyKeys.allProperties() });
+    },
+  });
+}
