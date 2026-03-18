@@ -33,6 +33,7 @@ interface PropertyTypeSelectorProps {
   onChange?: (value: string) => void;
   disabled?: boolean;
   placeholder?: string;
+  excludeArray?: boolean;
 }
 
 export default function PropertyTypeSelector({
