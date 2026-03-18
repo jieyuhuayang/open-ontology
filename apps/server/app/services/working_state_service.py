@@ -118,7 +118,7 @@ class WorkingStateService:
         if existing.change_type == ChangeType.CREATE:
             if new_change.change_type == ChangeType.UPDATE:
                 # CREATE + UPDATE → CREATE with merged after
-                merged_after = {**(existing.after or {}), **(new_change.after or {})}
+                merged_after = _deep_merge_dicts(existing.after or {}, new_change.after or {})
                 merged = existing.model_copy(
                     update={"after": merged_after, "timestamp": new_change.timestamp}
                 )
@@ -129,7 +129,7 @@ class WorkingStateService:
         elif existing.change_type == ChangeType.UPDATE:
             if new_change.change_type == ChangeType.UPDATE:
                 # UPDATE + UPDATE → keep earliest before + merged after
-                merged_after = {**(existing.after or {}), **(new_change.after or {})}
+                merged_after = _deep_merge_dicts(existing.after or {}, new_change.after or {})
                 merged = existing.model_copy(
                     update={"after": merged_after, "timestamp": new_change.timestamp}
                 )
