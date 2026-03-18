@@ -62,17 +62,30 @@ async function createProperty(
   return resp.json();
 }
 
-async function deleteAllObjectTypes(request: APIRequestContext) {
-  // Delete all properties first (via each OT), then OTs
+/** Only delete OTs created by this test suite (id starts with "e2e-") */
+async function cleanupTestData(request: APIRequestContext) {
   const resp = await request.get(`${API}/object-types`);
   if (!resp.ok()) return;
   const data = await resp.json();
   for (const ot of data.items) {
-    // Delete properties
+    if (!(ot.id as string).startsWith('e2e-')) continue;
+    // Delete properties first — skip PK/active ones by unsetting them
     const propResp = await request.get(`${API}/object-types/${ot.rid}/properties`);
     if (propResp.ok()) {
       const propData = await propResp.json();
       for (const prop of propData.items) {
+        // Unset PK if set
+        if (prop.isPrimaryKey) {
+          await request.put(`${API}/object-types/${ot.rid}/properties/${prop.rid}`, {
+            data: { isPrimaryKey: false },
+          });
+        }
+        // Set to deprecated if active
+        if (prop.status === 'active') {
+          await request.put(`${API}/object-types/${ot.rid}/properties/${prop.rid}`, {
+            data: { status: 'deprecated' },
+          });
+        }
         await request.delete(`${API}/object-types/${ot.rid}/properties/${prop.rid}`);
       }
     }
