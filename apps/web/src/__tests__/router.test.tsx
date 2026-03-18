@@ -91,10 +91,10 @@ describe('Router', () => {
     });
   });
 
-  it('/properties renders Coming Soon placeholder', async () => {
+  it('/properties renders PropertiesPage', async () => {
     renderRoute('/properties');
     await waitFor(() => {
-      expect(screen.getByText(/coming soon/i)).toBeInTheDocument();
+      expect(screen.getByText('Properties', { selector: 'h4' })).toBeInTheDocument();
     });
   });
 
