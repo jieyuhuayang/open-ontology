@@ -244,6 +244,27 @@
         }
       }
     },
+    "/api/v1/properties": {
+      "get": {
+        "tags": [
+          "properties"
+        ],
+        "summary": "List All Properties",
+        "operationId": "list_all_properties_api_v1_properties_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyListAllResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/object-types/{object_type_rid}/properties": {
       "get": {
         "tags": [
@@ -367,6 +388,110 @@
         "responses": {
           "204": {
             "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/object-types/{object_type_rid}/properties/batch": {
+      "patch": {
+        "tags": [
+          "properties"
+        ],
+        "summary": "Batch Update Properties",
+        "operationId": "batch_update_properties_api_v1_object_types__object_type_rid__properties_batch_patch",
+        "parameters": [
+          {
+            "name": "object_type_rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Object Type Rid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertyBatchUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchOperationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/object-types/{object_type_rid}/properties/batch-delete": {
+      "post": {
+        "tags": [
+          "properties"
+        ],
+        "summary": "Batch Delete Properties",
+        "operationId": "batch_delete_properties_api_v1_object_types__object_type_rid__properties_batch_delete_post",
+        "parameters": [
+          {
+            "name": "object_type_rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Object Type Rid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertyBatchDeleteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchOperationResponse"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -1748,6 +1873,39 @@
   },
   "components": {
     "schemas": {
+      "BatchOperationResponse": {
+        "properties": {
+          "processed": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Processed"
+          },
+          "skipped": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Skipped"
+          },
+          "skippedReasons": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Skippedreasons",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "required": [
+          "processed",
+          "skipped"
+        ],
+        "title": "BatchOperationResponse",
+        "description": "Response for batch operations showing what was done and what was skipped."
+      },
       "Body_upload_preview_api_v1_datasets_upload_preview_post": {
         "properties": {
           "file": {
@@ -3703,6 +3861,60 @@
         "title": "ObjectTypeWithChangeState",
         "description": "ObjectType with change state annotation for merged view."
       },
+      "PropertyBatchDeleteRequest": {
+        "properties": {
+          "rids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Rids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rids"
+        ],
+        "title": "PropertyBatchDeleteRequest",
+        "description": "Batch delete multiple properties."
+      },
+      "PropertyBatchUpdateRequest": {
+        "properties": {
+          "rids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Rids"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResourceStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Visibility"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "rids"
+        ],
+        "title": "PropertyBatchUpdateRequest",
+        "description": "Batch update status/visibility for multiple properties."
+      },
       "PropertyCreateRequest": {
         "properties": {
           "id": {
@@ -3785,6 +3997,28 @@
           "baseType"
         ],
         "title": "PropertyCreateRequest"
+      },
+      "PropertyListAllResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PropertyWithObjectType"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "PropertyListAllResponse",
+        "description": "Response for GET /api/v1/properties (ontology-level summary)."
       },
       "PropertyListResponse": {
         "properties": {
@@ -4067,6 +4301,94 @@
         ],
         "title": "PropertyWithChangeState",
         "description": "Property with change state annotation for merged view."
+      },
+      "PropertyWithObjectType": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "apiName": {
+            "type": "string",
+            "title": "Apiname"
+          },
+          "objectTypeRid": {
+            "type": "string",
+            "title": "Objecttyperid"
+          },
+          "objectTypeDisplayName": {
+            "type": "string",
+            "title": "Objecttypedisplayname"
+          },
+          "displayName": {
+            "type": "string",
+            "title": "Displayname"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "baseType": {
+            "type": "string",
+            "title": "Basetype"
+          },
+          "arrayInnerType": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arrayinnertype"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResourceStatus",
+            "default": "experimental"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/Visibility",
+            "default": "normal"
+          },
+          "isPrimaryKey": {
+            "type": "boolean",
+            "title": "Isprimarykey",
+            "default": false
+          },
+          "isTitleKey": {
+            "type": "boolean",
+            "title": "Istitlekey",
+            "default": false
+          },
+          "changeState": {
+            "$ref": "#/components/schemas/ChangeState",
+            "default": "published"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "id",
+          "apiName",
+          "objectTypeRid",
+          "objectTypeDisplayName",
+          "displayName",
+          "baseType"
+        ],
+        "title": "PropertyWithObjectType",
+        "description": "Property with its owning object type metadata for the summary view."
       },
       "ResourceStatus": {
         "type": "string",
