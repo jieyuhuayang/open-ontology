@@ -4,6 +4,7 @@ import AppShell from '@/components/layout/AppShell';
 import HomeLayout from '@/components/layout/HomeLayout';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import PlaceholderPage from '@/components/PlaceholderPage';
+import PropertiesPage from '@/pages/properties/PropertiesPage';
 import DiscoverPage from '@/pages/DiscoverPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import ObjectTypeListPage from '@/pages/object-types/ObjectTypeListPage';
