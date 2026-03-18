@@ -537,11 +537,12 @@ test.describe.serial('Property Management — E2E', () => {
 
   // ──────── Cleanup ────────
   test('cleanup: delete test object types', async ({ request }) => {
-    await deleteAllObjectTypes(request);
+    await cleanupTestData(request);
 
-    // Verify clean state
-    const resp = await request.get(`${API}/properties`);
+    // Verify test OTs are gone
+    const resp = await request.get(`${API}/object-types`);
     const data = await resp.json();
-    expect(data.total).toBe(0);
+    const testOts = data.items.filter((ot: { id: string }) => (ot.id as string).startsWith('e2e-'));
+    expect(testOts).toHaveLength(0);
   });
 });
