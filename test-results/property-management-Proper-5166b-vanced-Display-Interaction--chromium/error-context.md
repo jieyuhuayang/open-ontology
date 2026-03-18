@@ -1,0 +1,204 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - img "deployment-unit" [ref=e7]:
+          - img [ref=e8]
+        - strong [ref=e11]: Ontology Management
+      - generic [ref=e13]:
+        - img "search" [ref=e15]:
+          - img [ref=e16]
+        - textbox "Search by name, RID, aliases..." [ref=e18]
+        - generic [ref=e20]: ⌘K
+      - generic [ref=e21]:
+        - button "plus New" [ref=e22] [cursor=pointer]:
+          - img "plus" [ref=e24]:
+            - img [ref=e25]
+          - generic [ref=e28]: New
+        - generic [ref=e29] [cursor=pointer]:
+          - img "global" [ref=e30]:
+            - img [ref=e31]
+          - text: English
+    - generic [ref=e33]:
+      - complementary [ref=e34]:
+        - complementary [ref=e35]:
+          - navigation [ref=e37]:
+            - link "arrow-left Back home" [ref=e39] [cursor=pointer]:
+              - /url: /object-types
+              - img "arrow-left" [ref=e40]:
+                - img [ref=e41]
+              - text: Back home
+            - generic [ref=e44]:
+              - img "appstore" [ref=e45]:
+                - img [ref=e46]
+              - strong [ref=e48]: E2E Employee
+              - generic [ref=e49]: Experimental
+              - generic [ref=e50]: New
+              - button "more" [ref=e51] [cursor=pointer]:
+                - img "more" [ref=e53]:
+                  - img [ref=e54]
+            - menu [ref=e56]:
+              - menuitem "file-text Overview" [ref=e57] [cursor=pointer]:
+                - img "file-text" [ref=e58]:
+                  - img [ref=e59]
+                - generic [ref=e62]: Overview
+              - menuitem "unordered-list Properties" [ref=e63] [cursor=pointer]:
+                - img "unordered-list" [ref=e64]:
+                  - img [ref=e65]
+                - generic [ref=e68]: Properties
+              - menuitem "database Datasources" [ref=e69] [cursor=pointer]:
+                - img "database" [ref=e70]:
+                  - img [ref=e71]
+                - generic [ref=e74]: Datasources
+      - main [ref=e75]:
+        - main [ref=e76]:
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - heading "Properties" [level=5] [ref=e79]
+              - generic [ref=e80]:
+                - generic [ref=e82] [cursor=pointer]:
+                  - generic [ref=e84]:
+                    - combobox [ref=e86]
+                    - generic: All Statuses
+                  - generic:
+                    - img:
+                      - img
+                - generic [ref=e88] [cursor=pointer]:
+                  - generic [ref=e90]:
+                    - combobox [ref=e92]
+                    - generic: All Visibilities
+                  - generic:
+                    - img:
+                      - img
+                - generic [ref=e94] [cursor=pointer]:
+                  - generic [ref=e96]:
+                    - combobox [ref=e98]
+                    - generic: All Types
+                  - generic:
+                    - img:
+                      - img
+                - button "plus Add Property" [ref=e100] [cursor=pointer]:
+                  - img "plus" [ref=e102]:
+                    - img [ref=e103]
+                  - generic [ref=e106]: Add Property
+            - generic [ref=e107]:
+              - table [ref=e114]:
+                - rowgroup [ref=e127]:
+                  - row "Select all Display Name ID API Name Base Type Backing Column Status Visibility Primary Key Title Key" [ref=e128]:
+                    - columnheader "Select all" [ref=e129]:
+                      - checkbox "Select all" [ref=e133] [cursor=pointer]
+                    - columnheader [ref=e135]
+                    - columnheader "Display Name" [ref=e136]
+                    - columnheader "ID" [ref=e137]
+                    - columnheader "API Name" [ref=e138]
+                    - columnheader "Base Type" [ref=e139]
+                    - columnheader "Backing Column" [ref=e140]
+                    - columnheader "Status" [ref=e141]
+                    - columnheader "Visibility" [ref=e142]
+                    - columnheader "Primary Key" [ref=e143]
+                    - columnheader "Title Key" [ref=e144]
+                - rowgroup [ref=e145]:
+                  - button "holder Full-name New full-name fullName String — Experimental normal" [ref=e146] [cursor=pointer]:
+                    - cell [ref=e147]:
+                      - checkbox [ref=e150]
+                    - cell "holder" [ref=e152]:
+                      - img "holder" [ref=e154]:
+                        - img [ref=e155]
+                    - cell "Full-name New" [ref=e157]:
+                      - generic [ref=e158]:
+                        - text: Full-name
+                        - generic [ref=e159]: New
+                    - cell "full-name" [ref=e160]
+                    - cell "fullName" [ref=e161]
+                    - cell "String" [ref=e162]
+                    - cell "—" [ref=e163]
+                    - cell "Experimental" [ref=e164]:
+                      - generic [ref=e165]: Experimental
+                    - cell "normal" [ref=e166]
+                    - cell [ref=e167]
+                    - cell [ref=e168]
+                  - button "holder Email New email email String — Experimental normal" [ref=e169] [cursor=pointer]:
+                    - cell [ref=e170]:
+                      - checkbox [ref=e173]
+                    - cell "holder" [ref=e175]:
+                      - img "holder" [ref=e177]:
+                        - img [ref=e178]
+                    - cell "Email New" [ref=e180]:
+                      - generic [ref=e181]:
+                        - text: Email
+                        - generic [ref=e182]: New
+                    - cell "email" [ref=e183]
+                    - cell "email" [ref=e184]
+                    - cell "String" [ref=e185]
+                    - cell "—" [ref=e186]
+                    - cell "Experimental" [ref=e187]:
+                      - generic [ref=e188]: Experimental
+                    - cell "normal" [ref=e189]
+                    - cell [ref=e190]
+                    - cell [ref=e191]
+                  - button "holder Age New age age Integer — Experimental normal" [ref=e192] [cursor=pointer]:
+                    - cell [ref=e193]:
+                      - checkbox [ref=e196]
+                    - cell "holder" [ref=e198]:
+                      - img "holder" [ref=e200]:
+                        - img [ref=e201]
+                    - cell "Age New" [ref=e203]:
+                      - generic [ref=e204]:
+                        - text: Age
+                        - generic [ref=e205]: New
+                    - cell "age" [ref=e206]
+                    - cell "age" [ref=e207]
+                    - cell "Integer" [ref=e208]
+                    - cell "—" [ref=e209]
+                    - cell "Experimental" [ref=e210]:
+                      - generic [ref=e211]: Experimental
+                    - cell "normal" [ref=e212]
+                    - cell [ref=e213]
+                    - cell [ref=e214]
+                  - button "holder Tags New tags tags Array String — Experimental normal key" [ref=e215] [cursor=pointer]:
+                    - cell [ref=e216]:
+                      - checkbox [ref=e219]
+                    - cell "holder" [ref=e221]:
+                      - img "holder" [ref=e223]:
+                        - img [ref=e224]
+                    - cell "Tags New" [ref=e226]:
+                      - generic [ref=e227]:
+                        - text: Tags
+                        - generic [ref=e228]: New
+                    - cell "tags" [ref=e229]
+                    - cell "tags" [ref=e230]
+                    - cell "Array String" [ref=e231]:
+                      - generic [ref=e232]:
+                        - text: Array
+                        - generic [ref=e233]: String
+                    - cell "—" [ref=e234]
+                    - cell "Experimental" [ref=e235]:
+                      - generic [ref=e236]: Experimental
+                    - cell "normal" [ref=e237]
+                    - cell "key" [ref=e238]:
+                      - img "key" [ref=e239]:
+                        - img [ref=e240]
+                    - cell [ref=e242]
+              - status [ref=e243]
+  - dialog "Full-name" [ref=e245]:
+    - generic [ref=e246]:
+      - generic [ref=e247]:
+        - button "Close" [ref=e248] [cursor=pointer]:
+          - img "close" [ref=e249]:
+            - img [ref=e250]
+        - generic [ref=e252]: Full-name
+      - button "Delete" [ref=e254] [cursor=pointer]:
+        - generic [ref=e255]: Delete
+    - generic [ref=e257]:
+      - tablist [ref=e258]:
+        - generic [ref=e260]:
+          - tab "General" [ref=e262] [cursor=pointer]
+          - tab "Details" [ref=e264] [cursor=pointer]
+          - tab "Advanced" [ref=e266] [cursor=pointer]
+          - tab "Display" [ref=e268] [cursor=pointer]
+          - tab "Interaction" [active] [selected] [ref=e270] [cursor=pointer]
+      - tabpanel "Interaction" [ref=e273]: Conditional formatting — Coming Soon (P2)
+```

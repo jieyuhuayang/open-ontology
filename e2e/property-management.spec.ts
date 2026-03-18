@@ -285,13 +285,13 @@ test.describe.serial('Property Management — E2E', () => {
     const displayTab = drawer.locator('.ant-tabs-tab').filter({ hasText: /^Display$|^显示$/ });
     await displayTab.click();
     await page.waitForTimeout(300);
-    await expect(drawer.getByText(/Coming Soon|即将推出/)).toBeVisible();
+    await expect(drawer.getByText(/Value formatting|值格式化/)).toBeVisible();
 
     // Click Interaction tab — should show placeholder
     const interactionTab = drawer.locator('.ant-tabs-tab').filter({ hasText: /Interaction|交互/ });
     await interactionTab.click();
     await page.waitForTimeout(300);
-    await expect(drawer.getByText(/Coming Soon|即将推出/)).toBeVisible();
+    await expect(drawer.getByText(/Conditional formatting|条件格式化/)).toBeVisible();
   });
 
   test('AC-41: array property shows "Allow multiple" label in Details tab', async ({ page }) => {
