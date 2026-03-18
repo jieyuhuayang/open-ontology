@@ -6,7 +6,11 @@ from starlette.responses import Response
 
 from app.database import get_db_session
 from app.domain.property import (
+    BatchOperationResponse,
+    PropertyBatchDeleteRequest,
+    PropertyBatchUpdateRequest,
     PropertyCreateRequest,
+    PropertyListAllResponse,
     PropertyListResponse,
     PropertySortOrderRequest,
     PropertyUpdateRequest,
