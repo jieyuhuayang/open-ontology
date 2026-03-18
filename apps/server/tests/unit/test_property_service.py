@@ -12,6 +12,8 @@ from app.domain.property import (
     MAX_PROPERTIES_PER_OBJECT_TYPE,
     PRIMARY_KEY_TYPES,
     TITLE_KEY_TYPES,
+    PropertyBatchDeleteRequest,
+    PropertyBatchUpdateRequest,
     PropertyCreateRequest,
     PropertySortOrderItem,
     PropertySortOrderRequest,
