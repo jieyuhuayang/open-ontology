@@ -1,0 +1,245 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - img "deployment-unit" [ref=e7]:
+          - img [ref=e8]
+        - strong [ref=e11]: Ontology Management
+      - generic [ref=e13]:
+        - img "search" [ref=e15]:
+          - img [ref=e16]
+        - textbox "Search by name, RID, aliases..." [ref=e18]
+        - generic [ref=e20]: ⌘K
+      - generic [ref=e21]:
+        - button "plus New" [ref=e22] [cursor=pointer]:
+          - img "plus" [ref=e24]:
+            - img [ref=e25]
+          - generic [ref=e28]: New
+        - generic [ref=e29] [cursor=pointer]:
+          - img "global" [ref=e30]:
+            - img [ref=e31]
+          - text: English
+    - generic [ref=e33]:
+      - complementary [ref=e34]:
+        - navigation [ref=e36]:
+          - strong [ref=e39]: Default Ontology
+          - menu [ref=e40]:
+            - menuitem "compass Discover" [ref=e41] [cursor=pointer]:
+              - img "compass" [ref=e42]:
+                - img [ref=e43]
+              - generic [ref=e45]: Discover
+            - text: Resources
+            - group [ref=e46]:
+              - menuitem "appstore Object Types 7" [ref=e47] [cursor=pointer]:
+                - img "appstore" [ref=e48]:
+                  - img [ref=e49]
+                - generic [ref=e52]:
+                  - text: Object Types
+                  - generic [ref=e53]: "7"
+              - menuitem "unordered-list Properties" [ref=e54] [cursor=pointer]:
+                - img "unordered-list" [ref=e55]:
+                  - img [ref=e56]
+                - generic [ref=e58]: Properties
+              - menuitem "link Link Types 3" [ref=e59] [cursor=pointer]:
+                - img "link" [ref=e60]:
+                  - img [ref=e61]
+                - generic [ref=e64]:
+                  - text: Link Types
+                  - generic [ref=e65]: "3"
+              - menuitem "thunderbolt Action Types" [ref=e66] [cursor=pointer]:
+                - img "thunderbolt" [ref=e67]:
+                  - img [ref=e68]
+                - generic [ref=e70]: Action Types
+            - text: Data Connection
+            - group [ref=e71]:
+              - menuitem "database Data Connection" [ref=e72] [cursor=pointer]:
+                - img "database" [ref=e73]:
+                  - img [ref=e74]
+                - generic [ref=e76]: Data Connection
+          - button "left" [ref=e77] [cursor=pointer]:
+            - img "left" [ref=e78]:
+              - img [ref=e79]
+      - main [ref=e81]:
+        - main [ref=e82]:
+          - generic [ref=e83]:
+            - generic [ref=e84]:
+              - heading "Link Types" [level=4] [ref=e85]
+              - button "plus New link type" [ref=e86] [cursor=pointer]:
+                - img "plus" [ref=e88]:
+                  - img [ref=e89]
+                - generic [ref=e92]: New link type
+            - generic [ref=e93]:
+              - generic [ref=e94] [cursor=pointer]:
+                - generic [ref=e96]:
+                  - combobox [ref=e98]
+                  - generic: Object Type
+                - generic:
+                  - img:
+                    - img
+              - generic [ref=e99] [cursor=pointer]:
+                - generic [ref=e101]:
+                  - combobox [ref=e105]
+                  - generic: Status
+                - generic:
+                  - img:
+                    - img
+              - generic [ref=e106] [cursor=pointer]:
+                - generic [ref=e108]:
+                  - combobox [ref=e112]
+                  - generic: Visibility
+                - generic:
+                  - img:
+                    - img
+            - generic [ref=e115]:
+              - table [ref=e119]:
+                - rowgroup [ref=e128]:
+                  - row "ID Side A Side B Cardinality Join Method Status Change State" [ref=e129]:
+                    - columnheader "ID" [ref=e130]
+                    - columnheader "Side A" [ref=e131]
+                    - columnheader "Side B" [ref=e132]
+                    - columnheader "Cardinality" [ref=e133]
+                    - columnheader "Join Method" [ref=e134]
+                    - columnheader "Status" [ref=e135]
+                    - columnheader "Change State" [ref=e136]
+                - rowgroup [ref=e137]:
+                  - row "analyst-latest-report 研究员 评级报告 Many to One Foreign Key Experimental New" [ref=e138] [cursor=pointer]:
+                    - cell "analyst-latest-report" [ref=e139]
+                    - cell "研究员" [ref=e140]:
+                      - generic [ref=e141]: 研究员
+                    - cell "评级报告" [ref=e142]:
+                      - generic [ref=e143]: 评级报告
+                    - cell "Many to One" [ref=e144]
+                    - cell "Foreign Key" [ref=e145]
+                    - cell "Experimental" [ref=e146]:
+                      - generic [ref=e147]: Experimental
+                    - cell "New" [ref=e148]:
+                      - generic [ref=e149]: New
+                  - row "company-latest-report 公司 评级报告 Many to One Foreign Key Experimental New" [ref=e150] [cursor=pointer]:
+                    - cell "company-latest-report" [ref=e151]
+                    - cell "公司" [ref=e152]:
+                      - generic [ref=e153]: 公司
+                    - cell "评级报告" [ref=e154]:
+                      - generic [ref=e155]: 评级报告
+                    - cell "Many to One" [ref=e156]
+                    - cell "Foreign Key" [ref=e157]
+                    - cell "Experimental" [ref=e158]:
+                      - generic [ref=e159]: Experimental
+                    - cell "New" [ref=e160]:
+                      - generic [ref=e161]: New
+                  - row "analyst-coverage 研究员 公司 Many to One Foreign Key Experimental New" [ref=e162] [cursor=pointer]:
+                    - cell "analyst-coverage" [ref=e163]
+                    - cell "研究员" [ref=e164]:
+                      - generic [ref=e165]: 研究员
+                    - cell "公司" [ref=e166]:
+                      - generic [ref=e167]: 公司
+                    - cell "Many to One" [ref=e168]
+                    - cell "Foreign Key" [ref=e169]
+                    - cell "Experimental" [ref=e170]:
+                      - generic [ref=e171]: Experimental
+                    - cell "New" [ref=e172]:
+                      - generic [ref=e173]: New
+              - list [ref=e174]:
+                - listitem "Previous Page" [ref=e175]:
+                  - button "left" [disabled] [ref=e176]:
+                    - img "left" [ref=e177]:
+                      - img [ref=e178]
+                - listitem "1" [ref=e180] [cursor=pointer]:
+                  - generic [ref=e181]: "1"
+                - listitem "Next Page" [ref=e182]:
+                  - button "right" [disabled] [ref=e183]:
+                    - img "right" [ref=e184]:
+                      - img [ref=e185]
+                - listitem [ref=e187]:
+                  - generic "Page Size" [ref=e188] [cursor=pointer]:
+                    - generic [ref=e190]:
+                      - combobox "Page Size" [ref=e192]
+                      - generic "20 / page" [ref=e193]
+                    - generic:
+                      - img:
+                        - img
+  - generic [ref=e194]:
+    - dialog "Create Link Type":
+      - generic [ref=e195]:
+        - button "Close" [ref=e196] [cursor=pointer]:
+          - generic "Close" [ref=e197]:
+            - img "close" [ref=e198]:
+              - img [ref=e199]
+        - generic [ref=e202]: Create Link Type
+        - generic [ref=e203]:
+          - generic [ref=e204]:
+            - generic [ref=e206]:
+              - img "check" [ref=e209]:
+                - img [ref=e210]
+              - generic [ref=e213]: Relationship
+            - generic [ref=e215]:
+              - generic [ref=e216]: "2"
+              - generic [ref=e218]: Object Types
+            - generic [ref=e220]:
+              - generic [ref=e221]: "3"
+              - generic [ref=e223]: Link Names
+          - generic [ref=e224]:
+            - generic [ref=e225]:
+              - generic [ref=e226]:
+                - strong [ref=e228]: Side A
+                - generic [ref=e229] [cursor=pointer]:
+                  - generic [ref=e231]:
+                    - combobox [ref=e233]
+                    - generic "基金" [ref=e234]
+                  - generic:
+                    - img:
+                      - img
+              - generic [ref=e235]:
+                - strong [ref=e237]: Side B
+                - generic [ref=e238] [cursor=pointer]:
+                  - generic [ref=e240]:
+                    - combobox [ref=e242]
+                    - generic "公司" [ref=e243]
+                  - generic:
+                    - img:
+                      - img
+            - separator [ref=e244]
+            - generic [ref=e245]:
+              - strong [ref=e247]: Select join table dataset
+              - generic [ref=e248] [cursor=pointer]:
+                - generic [ref=e250]:
+                  - combobox [ref=e252]
+                  - generic "fund_company_holdings" [ref=e253]
+                - generic:
+                  - img:
+                    - img
+            - generic [ref=e254]:
+              - generic [ref=e255]:
+                - generic [ref=e256]: Side A → Join Table Column
+                - generic [ref=e257] [cursor=pointer]:
+                  - generic [ref=e259]:
+                    - combobox [expanded] [active] [ref=e261]:
+                      - listbox:
+                        - option "fund_id (string)": fund_id
+                        - option "company_id (string)": company_id
+                    - generic: Select column
+                  - generic:
+                    - img:
+                      - img
+              - generic [ref=e262]:
+                - generic [ref=e263]: Side B → Join Table Column
+                - generic [ref=e264] [cursor=pointer]:
+                  - generic [ref=e266]:
+                    - combobox [ref=e268]
+                    - generic: Select column
+                  - generic:
+                    - img:
+                      - img
+        - generic [ref=e269]:
+          - button "Back" [ref=e270] [cursor=pointer]:
+            - generic [ref=e271]: Back
+          - button "Next" [ref=e272] [cursor=pointer]:
+            - generic [ref=e273]: Next
+  - generic [ref=e279]:
+    - generic "fund_id (string)" [ref=e280] [cursor=pointer]:
+      - generic [ref=e281]: fund_id (string)
+    - generic "company_id (string)" [ref=e282] [cursor=pointer]:
+      - generic [ref=e283]: company_id (string)
+```

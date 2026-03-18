@@ -52,9 +52,15 @@ async function selectAntOption(page: Page, selectLocator: ReturnType<Page['locat
   await selectLocator.click();
   await page.waitForTimeout(200);
 
+  // Try to type-to-search if input is editable, otherwise just open and click
   const input = selectLocator.locator('input.ant-select-selection-search-input');
-  await input.fill(search);
-  await page.waitForTimeout(500);
+  const isReadonly = await input.getAttribute('readonly');
+  if (!isReadonly) {
+    await input.fill(search);
+    await page.waitForTimeout(500);
+  } else {
+    await page.waitForTimeout(300);
+  }
 
   const option = page.locator('.ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option')
     .filter({ hasText: search });
