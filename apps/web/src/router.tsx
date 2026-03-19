@@ -47,6 +47,7 @@ export const routeConfig: RouteObject[] = [
           { path: 'overview', element: <ObjectTypeOverviewPage /> },
           { path: 'properties', element: <ObjectTypePropertiesPage /> },
           { path: 'datasources', element: <ObjectTypeDatasourcesPage /> },
+          { path: 'history', element: <ObjectTypeHistoryPage /> },
         ],
       },
       { path: 'link-types/:rid', element: <LinkTypeDetailPage /> },
