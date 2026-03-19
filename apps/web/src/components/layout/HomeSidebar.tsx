@@ -10,6 +10,8 @@ import {
   LeftOutlined,
   RightOutlined,
   SearchOutlined,
+  HistoryOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
