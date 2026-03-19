@@ -11,14 +11,14 @@
 |------|------|------|
 | spec.md | ✅ 已评审 | 28 条 AC，用户确认 2026-03-19 |
 | tasks.md | 🔲 草稿 | 拆解完成后改为 ✅ 已拆解 |
-| 实现 | 🔲 未开始 | 0 / 14 完成 |
+| 实现 | 🔲 未开始 | 0 / 16 完成 |
 
 ---
 
 ## 开发模式
 
 **后端 Test-First**：测试 → 实现配对编排。
-**前端 Test-Alongside**：实现任务内含测试。
+**前端 Test-Alongside**：每个前端实现任务内含测试，测试文件显式列入文件清单。
 **自包含任务**：每个任务内联文件、逻辑、测试上下文。
 
 ---
@@ -110,11 +110,11 @@
 - 内容:
   - **History API 测试**（4 个）：
     - `test_list_history_empty` — 无记录返回 200 空列表 → AC-22
-    - `test_list_history_after_publish` — 先 publish 再查 history，返回 1 条记录 → AC-19
+    - `test_list_history_after_publish` — 先 publish 再查 history，返回 1 条 ChangeRecord → AC-19
     - `test_get_history_version_success` — 获取 publish 后的 version 返回 200 → AC-20
     - `test_get_history_version_not_found` — 不存在的 version 返回 404 CHANGE_RECORD_NOT_FOUND → AC-21
   - **Discard Single 测试**（3 个）：
-    - `test_discard_single_change_success` — 创建 OT（产生 change）→ DELETE change → 200 → AC-26
+    - `test_discard_single_change_success` — 创建 OT（产生 change）→ DELETE change → **204** → AC-26
     - `test_discard_single_change_last_deletes_ws` — discard 最后一条后 GET /working-state 返回 404 → AC-26
     - `test_discard_single_change_not_found` — 不存在的 changeId 返回 404 CHANGE_NOT_FOUND → AC-27
   - 使用 `seeded_client` fixture，每个测试前创建 ontology + object type（触发 WorkingState）
@@ -149,7 +149,7 @@
 
 ---
 
-## Phase 3: 前端 — 类型 + API Hooks + Store
+## Phase 3: 前端 — 类型 + API Hooks + Store + i18n
 
 ### T06: OpenAPI 类型重生成 + API Hooks
 
@@ -157,31 +157,29 @@
 - 文件:
   - `apps/web/src/generated/api.ts` — 自动生成
   - `apps/web/src/api/working-state.ts` — 新建
-  - `apps/web/src/api/history.ts` — 新建
 - 内容:
   - 执行类型生成管线：`cd apps/web && pnpm run generate:api`
   - **`working-state.ts`** hooks:
-    - `useWorkingState(ontologyRid)` — `GET /working-state`，`queryKey: ['working-state', ontologyRid]`，enabled 时轮询或 staleTime 短
+    - `useWorkingState(ontologyRid)` — `GET /working-state`，`queryKey: ['working-state', ontologyRid]`
     - `usePublish(ontologyRid)` — `POST /save` mutation，onSuccess invalidate `['working-state']` + `['object-types']` + `['link-types']` + `['properties']` + `['history']`
     - `useDiscardAll(ontologyRid)` — `DELETE /working-state` mutation，onSuccess invalidate 同上
     - `useDiscardChange(ontologyRid)` — `DELETE /working-state/changes/{changeId}` mutation，onSuccess invalidate `['working-state']`
-  - **`history.ts`** hooks:
-    - `useHistory(ontologyRid, page, pageSize)` — `GET /history`，`queryKey: ['history', ontologyRid, page, pageSize]`
-    - `useHistoryVersion(ontologyRid, version)` — `GET /history/{version}`，`queryKey: ['history', ontologyRid, version]`，`enabled: !!version`
   - 确认 TypeScript 编译通过：`cd apps/web && pnpm tsc --noEmit`
 - 依赖: T05（后端 API + openapi.json 就绪）
-- 覆盖 AC: 前端所有 AC 的类型/数据基础
+- 覆盖 AC: 无（基础设施）
 
 ---
 
-### T07: SaveDialog Zustand Store + i18n Keys
+### T07: History Hooks + SaveDialog Store + i18n Keys
 
 - [ ] **T07**
 - 文件:
+  - `apps/web/src/api/history.ts` — 新建
   - `apps/web/src/stores/save-dialog-store.ts` — 新建
-  - `apps/web/src/locales/en-US/common.json` — 修改
-  - `apps/web/src/locales/zh-CN/common.json` — 修改
 - 内容:
+  - **`history.ts`** hooks:
+    - `useHistory(ontologyRid, page, pageSize)` — `GET /history`，`queryKey: ['history', ontologyRid, page, pageSize]`
+    - `useHistoryVersion(ontologyRid, version)` — `GET /history/{version}`，`queryKey: ['history', ontologyRid, version]`，`enabled: !!version`
   - **save-dialog-store**:
     ```typescript
     interface SaveDialogState {
@@ -192,8 +190,19 @@
       setActiveTab: (tab: 'changes' | 'errors') => void;
     }
     ```
-    - `openDialog(tab)` — set `open: true`, `activeTab: tab ?? 'changes'`
-    - `closeDialog()` — set `open: false`
+- 依赖: T06
+- 覆盖 AC: 无（基础设施）
+
+---
+
+### T08: i18n Keys + Store 测试
+
+- [ ] **T08**
+- 文件:
+  - `apps/web/src/locales/en-US/common.json` — 修改
+  - `apps/web/src/locales/zh-CN/common.json` — 修改
+  - `apps/web/src/stores/__tests__/save-dialog-store.test.ts` — 新建
+- 内容:
   - **i18n keys**（`changeManagement` 命名空间）:
     - `save`, `discard`, `discardAll`, `reviewEdits`, `changes`, `errors`
     - `saveSuccess`, `saveError`, `discardConfirm`, `discardConfirmMessage`
@@ -202,18 +211,24 @@
     - `history`, `historyEmpty`, `version`, `changesCount`
     - `noHistory`, `created`, `modified`, `deleted`
     - `objectTypes`, `properties`, `linkTypes`（分组标题）
-- 依赖: 无
-- 覆盖 AC: 无（基础设施）
+  - **save-dialog-store 测试**：
+    - `test openDialog sets open=true and activeTab='changes'`
+    - `test openDialog('errors') sets activeTab='errors'`
+    - `test closeDialog sets open=false`
+    - `test setActiveTab updates tab`
+- 依赖: T07（store 已定义）
+- 覆盖 AC: AC-04（store 控制 tab 切换）
 
 ---
 
 ## Phase 4: 前端 — ChangeActions + SaveDialog
 
-### T08: ChangeActions 组件（TopBar Portal: Save + Discard 按钮）
+### T09: ChangeActions 组件 + 测试（TopBar Portal: Save + Discard 按钮）
 
-- [ ] **T08**
+- [ ] **T09**
 - 文件:
   - `apps/web/src/components/ChangeActions.tsx` — 新建
+  - `apps/web/src/components/__tests__/ChangeActions.test.tsx` — 新建
 - 内容:
   - 使用 `createPortal(content, document.getElementById('change-status-slot')!)` 渲染到 TopBar
   - 调用 `useWorkingState(ontologyRid)` 获取 WorkingState
@@ -222,24 +237,24 @@
     - **Save 按钮**: `type="primary"`，文字 `t('changeManagement.save') + " (" + changes.length + ")"`，onClick → `useSaveDialogStore.openDialog()`
     - **Discard 按钮**: `danger` text 按钮，onClick → `Modal.confirm({...})` 确认后调用 `useDiscardAll` mutation
   - Discard 确认对话框：title = `t('changeManagement.discardConfirm')`，content = `t('changeManagement.discardConfirmMessage')`
-  - Discard 成功后：刷新缓存（mutation onSuccess 已处理）
-  - **ontologyRid** 来源：当前 MVP 固定单个 ontology，从环境或 context 获取（与已有 OT/LT 创建方式一致）
-  - 测试: `components/__tests__/ChangeActions.test.tsx`
-    - 渲染测试：有变更时显示 Save + Discard；无变更时不渲染
-    - 点击 Save 打开 dialog（mock store）
-- 依赖: T06（hooks）、T07（store + i18n）
+  - **ontologyRid** 来源：与已有 OT/LT 创建方式一致（固定单个 ontology）
+  - **测试**：
+    - 有变更时渲染 Save + Discard 两个按钮 → AC-01
+    - 无变更时不渲染 → AC-02
+    - 点击 Save 调用 `openDialog()` → AC-03
+    - 点击 Discard 弹出确认框 → AC-28
+- 依赖: T06（hooks）、T07（store）、T08（i18n）
 - 覆盖 AC: AC-01, AC-02, AC-03, AC-28
 
 ---
 
-### T09: SaveDialog 组件（Modal + ChangesTab + ErrorsTab）
+### T10: SaveDialog 主体 + ChangesTab + 测试
 
-- [ ] **T09**
+- [ ] **T10**
 - 文件:
   - `apps/web/src/components/SaveDialog/SaveDialog.tsx` — 新建
   - `apps/web/src/components/SaveDialog/ChangesTab.tsx` — 新建
-  - `apps/web/src/components/SaveDialog/ErrorsTab.tsx` — 新建
-  - `apps/web/src/components/SaveDialog/ChangeItem.tsx` — 新建
+  - `apps/web/src/components/SaveDialog/__tests__/SaveDialog.test.tsx` — 新建
 - 内容:
   - **SaveDialog.tsx**:
     - Ant Design `Modal`，width 640，open/onCancel 从 `useSaveDialogStore`
@@ -252,92 +267,111 @@
   - **ChangesTab.tsx**:
     - 接收 `changes: Change[]`
     - 按 `resourceType` 分组：Object Types / Properties / Link Types
-    - 每组使用 `Collapse` 或标题 + 列表，标题含 `Badge count`
-    - 渲染每条 `ChangeItem`
-  - **ChangeItem.tsx**:
-    - 显示：资源 displayName（从 `change.after?.displayName ?? change.before?.displayName ?? change.resourceRid`）
-    - `Tag` 颜色：Created=green / Modified=blue / Deleted=red
-    - 垃圾桶 `DeleteOutlined` → `useDiscardChange` mutation → 成功后从列表移除
+    - 每组标题含 `Badge count`
+    - 渲染每条变更：displayName（从 `change.after?.displayName ?? change.before?.displayName ?? change.resourceRid`）+ ChangeType Tag
+    - 每条旁垃圾桶 `DeleteOutlined` → `useDiscardChange` mutation
+  - **测试**:
+    - 渲染测试：两个选项卡存在 → AC-04
+    - Changes 按 ResourceType 分组 → AC-05
+    - 有错误时 Save 按钮 disabled → AC-07
+    - Save 成功后关闭 Modal → AC-08
+    - Save 失败显示错误 → AC-09
+    - Discard all 弹确认框 → AC-11
+    - 确认后调用 discard API → AC-12
+    - 单条 discard 调用 API 并移除 → AC-10
+- 依赖: T06（hooks）、T07（store）、T08（i18n）
+- 覆盖 AC: AC-04, AC-05, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12
+
+---
+
+### T11: ErrorsTab + ChangeItem 子组件
+
+- [ ] **T11**
+- 文件:
+  - `apps/web/src/components/SaveDialog/ErrorsTab.tsx` — 新建
+  - `apps/web/src/components/SaveDialog/ChangeItem.tsx` — 新建
+- 内容:
   - **ErrorsTab.tsx**:
     - 前端基本校验：遍历 changes 中 CREATE/UPDATE 类型，检查必填字段（displayName 非空）
     - 每条错误：描述文字 + `Button type="link"` "Open" → navigate 到资源编辑页
     - 无错误：`Empty` 组件 + `t('changeManagement.noErrors')`
-  - 测试: `components/SaveDialog/__tests__/SaveDialog.test.tsx`
-    - 渲染测试：两个选项卡存在
-    - Changes 分组展示
-    - Errors 阻止 Save
-- 依赖: T06（hooks）、T07（store + i18n）、T08（ChangeActions 触发 openDialog）
-- 覆盖 AC: AC-04, AC-05, AC-06, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12
+    - 导出 `getValidationErrors(changes)` 供 SaveDialog 计算 errorCount
+  - **ChangeItem.tsx**:
+    - Props：`change: Change`, `onDiscard: (changeId: string) => void`
+    - 显示：资源 displayName + `Tag`（Created=green / Modified=blue / Deleted=red）+ 垃圾桶图标
+    - 垃圾桶 onClick → `onDiscard(change.id)`
+  - 这两个组件由 T10 中的 SaveDialog/ChangesTab 消费；拆出是为保持 T10 在 3 文件以内
+- 依赖: T08（i18n）
+- 覆盖 AC: AC-06
 
 ---
 
-## Phase 5: 前端 — Sidebar 入口 + History 页面
+## Phase 5: 前端 — Sidebar 入口 + 全局挂载
 
-### T10: HomeSidebar 修改 — History 导航 + Unsaved Changes 入口
+### T12: HomeSidebar 修改 + ChangeActions/SaveDialog 全局挂载
 
-- [ ] **T10**
+- [ ] **T12**
 - 文件:
   - `apps/web/src/components/layout/HomeSidebar.tsx` — 修改
+  - `apps/web/src/components/layout/HomeLayout.tsx` — 修改
 - 内容:
-  - **History 导航项**：在 `menuItems` 数组中新增 group 或项：
-    ```typescript
-    { key: '/history', icon: <HistoryOutlined />, label: t('changeManagement.history') }
-    ```
-    放在 DataConnection group 之后，或作为独立导航项
-  - **Unsaved Changes 入口**：在折叠按钮上方（`<nav>` 底部，collapse toggle 之前）新增条件渲染区域：
-    - 调用 `useWorkingState(ontologyRid)` 获取 changes count
-    - `count > 0` 时显示可点击区域：`EditOutlined` + `t('changeManagement.unsavedChangesCount', { count })`
-    - onClick → `useSaveDialogStore.openDialog('changes')`
-    - 侧边栏折叠时只显示 icon，tooltip 显示数字
-  - **getSelectedKey** 函数新增：`if (pathname.startsWith('/history')) return '/history';`
-  - import 新增：`HistoryOutlined`, `EditOutlined`, `useWorkingState`, `useSaveDialogStore`
-- 依赖: T06（hooks）、T07（store + i18n）
+  - **HomeSidebar.tsx**:
+    - `menuItems` 数组新增 History 导航项：`{ key: '/history', icon: <HistoryOutlined />, label: t('changeManagement.history') }`
+    - 折叠按钮上方新增 Unsaved Changes 入口区域：
+      - 调用 `useWorkingState(ontologyRid)` 获取 changes count
+      - `count > 0` 时显示可点击区域：`EditOutlined` + `t('changeManagement.unsavedChangesCount', { count })`
+      - onClick → `useSaveDialogStore.openDialog('changes')`
+      - 侧边栏折叠时只显示 icon + tooltip
+    - `getSelectedKey` 新增：`if (pathname.startsWith('/history')) return '/history';`
+    - **影响范围**：仅新增 menu item 和底部区域，不改变现有导航结构
+  - **HomeLayout.tsx**（或 AppShell.tsx）:
+    - 在 layout 中挂载 `<ChangeActions />` 和 `<SaveDialog />`，使其在所有页面生效
+    - ChangeActions 通过 Portal 注入 TopBar，SaveDialog 作为全局 Modal
+  - import 新增：`HistoryOutlined`, `EditOutlined`, `useWorkingState`, `useSaveDialogStore`, `ChangeActions`, `SaveDialog`
+- 依赖: T09（ChangeActions）、T10（SaveDialog）、T11（ErrorsTab/ChangeItem）
 - 覆盖 AC: AC-13, AC-14, AC-15
 
 ---
 
-### T11: HistoryPage — 变更历史列表页
+## Phase 6: 前端 — History 页面 + OT History Tab
 
-- [ ] **T11**
+### T13: HistoryPage — 变更历史列表页 + 测试
+
+- [ ] **T13**
 - 文件:
   - `apps/web/src/pages/history/HistoryPage.tsx` — 新建
-  - `apps/web/src/router.tsx` — 修改
+  - `apps/web/src/pages/history/__tests__/HistoryPage.test.tsx` — 新建
 - 内容:
   - **HistoryPage.tsx**:
     - 使用 `useHistory(ontologyRid, page, pageSize)` 获取分页数据
     - 页面标题：`t('changeManagement.history')`
     - Ant Design `Collapse` 组件渲染列表，每个 panel：
       - Header: 版本号 `v{version}`、相对时间（`dayjs(savedAt).fromNow()`，tooltip 完整时间）、savedBy、变更摘要（如 "3 changes: 1 created, 2 modified"）
-      - 摘要计算：按 changeType 分组 count
-      - Content（展开后）：变更列表，每条含 resourceType 标签 + displayName（从 after/before 提取）+ ChangeType Tag
-    - 分页：Ant Design `Pagination`，total/page/pageSize 从响应获取
+      - 摘要：按 changeType 分组 count
+      - Content（展开后）：变更列表，每条含 resourceType 标签 + displayName + ChangeType Tag
+    - 分页：Ant Design `Pagination`
     - 空状态：`Empty` + `t('changeManagement.historyEmpty')`
-    - Loading：`Spin`
-  - **router.tsx 修改**：HomeLayout children 新增
-    ```typescript
-    { path: 'history', element: <HistoryPage /> }
-    ```
-    import `HistoryPage`
-  - 测试: `pages/history/__tests__/HistoryPage.test.tsx`（可选，Test-Alongside）
-    - 渲染测试：空状态 / 有数据时显示列表
-- 依赖: T06（hooks）、T07（i18n）、T10（sidebar 导航）
+  - **router.tsx 修改**：HomeLayout children 新增 `{ path: 'history', element: <HistoryPage /> }`
+    - **影响范围**：仅新增一个路由条目，不影响现有路由
+  - **测试**：
+    - 空状态渲染 → AC-22（前端表现）
+    - 有数据时显示列表 + 版本号 + 时间 → AC-16, AC-17
+    - 展开显示变更详情 → AC-18
+- 依赖: T07（history hooks）、T08（i18n）
 - 覆盖 AC: AC-16, AC-17, AC-18
 
 ---
 
-## Phase 6: 前端 — OT 详情页 History Tab
+### T14: ObjectTypeHistoryPage + OT Nav 更新 + 测试
 
-### T12: ObjectTypeDetailLayout 新增 History Nav + ObjectTypeHistoryPage
-
-- [ ] **T12**
+- [ ] **T14**
 - 文件:
-  - `apps/web/src/pages/object-types/ObjectTypeDetailLayout.tsx` — 修改
   - `apps/web/src/pages/object-types/ObjectTypeHistoryPage.tsx` — 新建
-  - `apps/web/src/router.tsx` — 修改
+  - `apps/web/src/pages/object-types/ObjectTypeDetailLayout.tsx` — 修改
 - 内容:
   - **ObjectTypeDetailLayout.tsx**:
     - `OT_NAV_ITEMS` 新增：`{ key: 'history', labelKey: 'changeManagement.history', icon: <HistoryOutlined /> }`
-    - import `HistoryOutlined`
+    - **影响范围**：仅在 nav items 数组末尾追加一项，不影响 Overview/Properties/Datasources
   - **ObjectTypeHistoryPage.tsx**:
     - 获取当前 OT rid：`useParams<{ rid: string }>()`
     - **上部 — 未保存变更**：
@@ -345,60 +379,46 @@
       - 有匹配项时渲染 Card："Pending changes"，列出每条变更的 ChangeType Tag
       - 无匹配项时不显示此区域
     - **下部 — 已发布历史**：
-      - `useHistory(ontologyRid, 1, 100)` → 从所有 ChangeRecord 中筛选含 `change.resourceRid === rid` 的记录
+      - `useHistory(ontologyRid, 1, 100)` → 从 ChangeRecord 列表中筛选含 `change.resourceRid === rid` 的记录
       - 按 version 降序排列
       - 每条显示：版本号、时间、变更类型
       - 空状态：`Empty` + `t('changeManagement.noHistory')`
-  - **router.tsx 修改**：OT detail children 新增
-    ```typescript
-    { path: 'history', element: <ObjectTypeHistoryPage /> }
-    ```
-    import `ObjectTypeHistoryPage`
-- 依赖: T06（hooks）、T07（i18n）
+  - **router.tsx 修改**：OT detail children 新增 `{ path: 'history', element: <ObjectTypeHistoryPage /> }`
+    - **影响范围**：仅在 OT detail children 追加一个路由
+  - **测试**（内含于组件文件或 `__tests__/ObjectTypeHistoryPage.test.tsx`）：
+    - OT 有历史时显示列表 → AC-24
+    - OT 无历史时显示空状态 → AC-25
+    - OT nav 含 History 项 → AC-23
+- 依赖: T06（working-state hooks）、T07（history hooks）、T08（i18n）
 - 覆盖 AC: AC-23, AC-24, AC-25
 
 ---
 
-## Phase 7: 集成验证
+## Phase 7: 全量测试
 
-### T13: SaveDialog 全局挂载 + 端到端联调
+### T15: 后端全量测试通过
 
-- [ ] **T13**
-- 文件:
-  - `apps/web/src/components/layout/AppShell.tsx`（或 `HomeLayout.tsx`）— 修改
+- [ ] **T15**
+- 文件: 无新增
 - 内容:
-  - 确保 `<ChangeActions />` 和 `<SaveDialog />` 在应用根层级挂载（AppShell 或 HomeLayout 中），使 Portal 和 Modal 在所有页面生效
-  - **联调验证清单**：
-    1. 创建 OT → TopBar 显示 Save (1) + Discard → AC-01
-    2. 点击 Save → Modal 打开，Changes 列表显示 OT → AC-03, AC-04, AC-05
-    3. 点击 Modal Save → 发布成功，按钮消失 → AC-08
-    4. 刷新后 History 页面显示 1 条记录 → AC-16, AC-17
-    5. 再次创建 OT → 点击 TopBar Discard → 确认 → 按钮消失 → AC-28
-    6. 创建多条变更 → 单条 discard（垃圾桶）→ 列表更新 → AC-10
-    7. Sidebar "Unsaved changes" 入口可见并可点击 → AC-13, AC-14
-    8. OT 详情页 History tab → AC-23, AC-24, AC-25
-  - 修复联调过程中发现的 UI 问题
-- 依赖: T08~T12 全部完成
-- 覆盖 AC: AC-01, AC-02, AC-03, AC-04, AC-05, AC-08, AC-10, AC-13, AC-14, AC-16, AC-17, AC-23, AC-24, AC-25, AC-28
+  - 运行后端全量测试：`cd apps/server && uv run pytest tests/unit/test_history_service.py tests/integration/test_history_api.py -v`
+  - 确认所有测试通过
+  - 如有失败，在此任务内修复
+- 依赖: T05
+- 覆盖 AC: AC-19, AC-20, AC-21, AC-22, AC-26, AC-27
 
 ---
 
-### T14: 前端测试补全 + 全量测试通过
+### T16: 前端全量测试通过
 
-- [ ] **T14**
-- 文件:
-  - `apps/web/src/stores/__tests__/save-dialog-store.test.ts` — 新建
-  - 各组件测试文件（T08, T09 中已列出）
+- [ ] **T16**
+- 文件: 无新增
 - 内容:
-  - **save-dialog-store 测试**：
-    - `openDialog()` 设置 open=true, activeTab='changes'
-    - `openDialog('errors')` 设置 activeTab='errors'
-    - `closeDialog()` 设置 open=false
-  - 补全 T08、T09 中标注但未完成的组件测试
-  - 运行全量前端测试：`cd apps/web && pnpm test --run`
-  - 确认无失败
-- 依赖: T08, T09, T11, T12
-- 覆盖 AC: AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-28
+  - 运行前端全量测试：`cd apps/web && pnpm test --run`
+  - 确认所有测试通过（包括 T08, T09, T10, T13, T14 中的测试）
+  - 如有失败，在此任务内修复
+- 依赖: T09, T10, T11, T12, T13, T14
+- 覆盖 AC: AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-23, AC-24, AC-25, AC-28
 
 ---
 
@@ -406,34 +426,34 @@
 
 | AC | 测试任务 | 实现任务 |
 |----|----------|----------|
-| AC-01 | T14 | T08 |
-| AC-02 | T14 | T08 |
-| AC-03 | T14 | T08 |
-| AC-04 | T14 | T09 |
-| AC-05 | T14 | T09 |
-| AC-06 | T14 | T09 |
-| AC-07 | T14 | T09 |
-| AC-08 | T13 | T09 |
-| AC-09 | T09(内含) | T09 |
-| AC-10 | T13 | T09 |
-| AC-11 | T09(内含) | T09 |
-| AC-12 | T09(内含) | T09 |
-| AC-13 | T13 | T10 |
-| AC-14 | T13 | T10 |
-| AC-15 | T13 | T10 |
-| AC-16 | T13 | T11 |
-| AC-17 | T13 | T11 |
-| AC-18 | T13 | T11 |
+| AC-01 | T09 | T09 |
+| AC-02 | T09 | T09 |
+| AC-03 | T09 | T09 |
+| AC-04 | T08, T10 | T10 |
+| AC-05 | T10 | T10 |
+| AC-06 | T11(内含) | T11 |
+| AC-07 | T10 | T10 |
+| AC-08 | T10 | T10 |
+| AC-09 | T10 | T10 |
+| AC-10 | T10 | T10 |
+| AC-11 | T10 | T10 |
+| AC-12 | T10 | T10 |
+| AC-13 | T12(内含) | T12 |
+| AC-14 | T12(内含) | T12 |
+| AC-15 | T12(内含) | T12 |
+| AC-16 | T13 | T13 |
+| AC-17 | T13 | T13 |
+| AC-18 | T13 | T13 |
 | AC-19 | T02, T04 | T03, T05 |
 | AC-20 | T02, T04 | T03, T05 |
 | AC-21 | T02, T04 | T03, T05 |
 | AC-22 | T02, T04 | T03, T05 |
-| AC-23 | T13 | T12 |
-| AC-24 | T13 | T12 |
-| AC-25 | T13 | T12 |
+| AC-23 | T14 | T14 |
+| AC-24 | T14 | T14 |
+| AC-25 | T14 | T14 |
 | AC-26 | T02, T04 | T03, T05 |
 | AC-27 | T02, T04 | T03, T05 |
-| AC-28 | T14 | T08 |
+| AC-28 | T09 | T09 |
 
 ---
 
