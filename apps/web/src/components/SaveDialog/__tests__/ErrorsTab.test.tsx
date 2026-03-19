@@ -33,7 +33,7 @@ describe('getValidationErrors', () => {
   it('returns error for change missing displayName', () => {
     const errors = getValidationErrors([invalidChange]);
     expect(errors).toHaveLength(1);
-    expect(errors[0]?.message).toContain('missing a display name');
+    expect(errors[0]?.message).toContain('missing display name');
   });
 
   it('skips DELETE changes', () => {
