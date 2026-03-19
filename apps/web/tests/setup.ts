@@ -1,6 +1,21 @@
 import '@testing-library/jest-dom';
 import '@/locales/i18n';
 
+// Mock window.matchMedia for Ant Design components in jsdom
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: (query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false,
+  }),
+});
+
 // Mock localStorage for Zustand persist middleware in jsdom
 const storageMock = (() => {
   let store: Record<string, string> = {};
