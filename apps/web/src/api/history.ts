@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/api/client';
 import type { HistoryListResponse, ChangeRecord } from '@/api/types';
-import { DEFAULT_ONTOLOGY_RID } from '@/api/working-state';
+/** MVP uses a single default ontology. */
+const DEFAULT_ONTOLOGY_RID = 'ri.ontology.ontology.default';
 
 export const historyKeys = {
   all: ['history'] as const,
