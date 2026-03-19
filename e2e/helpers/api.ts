@@ -59,6 +59,7 @@ export const ONTOLOGY_RID = 'ri.ontology.ontology.default';
 
 /**
  * Create a complete OT with dataset + PK + TK, ready to publish.
+ * Uses the two-step file upload flow: preview → confirm → create OT.
  * Returns the OT RID.
  */
 export async function createPublishableObjectType(
@@ -66,25 +67,34 @@ export async function createPublishableObjectType(
   id: string,
   displayName: string,
 ): Promise<string> {
-  // Create dataset
-  const dsResp = await request.post(`${API}/datasets/upload`, {
+  // Step 1: Upload preview
+  const previewResp = await request.post(`${API}/datasets/upload/preview`, {
     multipart: {
       file: {
         name: `${id}.csv`,
         mimeType: 'text/csv',
-        buffer: Buffer.from('id,name\n1,Alice\n'),
+        buffer: Buffer.from('id,name\n1,Alice\n2,Bob\n'),
       },
+    },
+  });
+  expect(previewResp.ok(), `Upload preview failed: ${previewResp.status()}`).toBeTruthy();
+  const previewData = await previewResp.json();
+
+  // Step 2: Confirm import
+  const confirmResp = await request.post(`${API}/datasets/upload/confirm`, {
+    data: {
+      fileToken: previewData.fileToken,
+      datasetName: `${id}-ds`,
+      sheetName: previewData.sheetName ?? null,
+      hasHeader: true,
+      selectedColumns: previewData.columns.map((c: { name: string }) => c.name),
+      columnTypeOverrides: {},
       ontologyRid: ONTOLOGY_RID,
     },
   });
-  expect(dsResp.ok(), `Failed to upload dataset: ${dsResp.status()}`).toBeTruthy();
-  const dsData = await dsResp.json();
-  const dsRid = dsData.rid;
-
-  // Confirm dataset
-  await request.post(`${API}/datasets/${dsRid}/confirm`, {
-    data: { name: `${id}-ds`, columns: dsData.columns },
-  });
+  expect(confirmResp.ok(), `Upload confirm failed: ${confirmResp.status()}`).toBeTruthy();
+  const confirmData = await confirmResp.json();
+  const dsRid = confirmData.datasetRid;
 
   // Create OT with backing datasource
   const otResp = await request.post(`${API}/object-types`, {
@@ -99,12 +109,12 @@ export async function createPublishableObjectType(
   expect(otResp.ok(), `Failed to create OT '${id}': ${otResp.status()}`).toBeTruthy();
   const otRid = (await otResp.json()).rid;
 
-  // Create PK property
+  // Create PK property (mapped to 'id' column)
   await request.post(`${API}/object-types/${otRid}/properties`, {
     data: { id: `${id}-pk`, apiName: `${id.replace(/-/g, '')}Pk`, displayName: 'PK', baseType: 'integer', backingColumn: 'id' },
   });
 
-  // Create TK property
+  // Create TK property (mapped to 'name' column)
   await request.post(`${API}/object-types/${otRid}/properties`, {
     data: { id: `${id}-name`, apiName: `${id.replace(/-/g, '')}Name`, displayName: 'Name', baseType: 'string', backingColumn: 'name' },
   });
