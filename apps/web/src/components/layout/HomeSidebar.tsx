@@ -36,8 +36,11 @@ export default function HomeSidebar() {
   const { data: objectTypesData } = useObjectTypes(1, 1);
   const { data: linkTypesData } = useLinkTypes(1, 1, {});
   const { data: searchData } = useSearch(query);
+  const { data: ws } = useWorkingState();
+  const openDialog = useSaveDialogStore((s) => s.openDialog);
 
   const selectedKey = getSelectedKey(location.pathname);
+  const unsavedCount = ws?.changes?.length ?? 0;
 
   const objectTypeCount = objectTypesData?.total;
   const linkTypeCount = linkTypesData?.total;
