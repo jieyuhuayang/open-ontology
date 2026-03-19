@@ -25,7 +25,7 @@ function changeSummary(changes: Change[], t: (key: string, opts?: Record<string,
   if (counts['CREATE']) parts.push(`${counts['CREATE']} ${t('changeManagement.created').toLowerCase()}`);
   if (counts['UPDATE']) parts.push(`${counts['UPDATE']} ${t('changeManagement.modified').toLowerCase()}`);
   if (counts['DELETE']) parts.push(`${counts['DELETE']} ${t('changeManagement.deleted').toLowerCase()}`);
-  return `${changes.length} changes: ${parts.join(', ')}`;
+  return `${t('changeManagement.changesCount', { count: changes.length })}: ${parts.join(', ')}`;
 }
 
 function displayName(change: Change): string {
