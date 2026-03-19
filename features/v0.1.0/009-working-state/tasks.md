@@ -342,11 +342,12 @@
 
 ## Phase 6: 前端 — History 页面 + OT History Tab
 
-### T13: HistoryPage — 变更历史列表页 + 测试
+### T13: HistoryPage — 变更历史列表页 + 路由 + 测试
 
 - [ ] **T13**
 - 文件:
   - `apps/web/src/pages/history/HistoryPage.tsx` — 新建
+  - `apps/web/src/router.tsx` — 修改（HomeLayout children 新增 history 路由）
   - `apps/web/src/pages/history/__tests__/HistoryPage.test.tsx` — 新建
 - 内容:
   - **HistoryPage.tsx**:
