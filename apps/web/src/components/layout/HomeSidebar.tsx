@@ -186,6 +186,30 @@ export default function HomeSidebar() {
             style={{ border: 'none', flex: 1 }}
           />
         )}
+        {unsavedCount > 0 && (
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => openDialog('changes')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') openDialog('changes');
+            }}
+            style={{
+              borderTop: '1px solid #f0f0f0',
+              padding: '10px 16px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              color: '#1677ff',
+              fontSize: 13,
+            }}
+            title={t('changeManagement.unsavedChangesCount', { count: unsavedCount })}
+          >
+            <EditOutlined />
+            {!collapsed && t('changeManagement.unsavedChangesCount', { count: unsavedCount })}
+          </div>
+        )}
         <div
           role="button"
           tabIndex={0}
