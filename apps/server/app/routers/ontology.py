@@ -1,11 +1,11 @@
 """Ontology change management REST endpoints."""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import Response
 
 from app.database import get_db_session
-from app.domain.working_state import ChangeRecord, WorkingState
+from app.domain.working_state import ChangeRecord, HistoryListResponse, WorkingState
 from app.exceptions import AppError
 from app.services.working_state_service import WorkingStateService
 
