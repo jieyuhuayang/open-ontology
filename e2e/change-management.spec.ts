@@ -226,14 +226,17 @@ test.describe.serial('Change Management — E2E', () => {
     // Confirm dialog should appear
     await expect(page.locator('.ant-modal-confirm')).toBeVisible({ timeout: 3000 });
 
-    // Click OK/confirm
-    const okBtn = page.locator('.ant-modal-confirm .ant-btn-primary').first();
+    // Click OK/confirm button (Ant Design confirm dialog)
+    const okBtn = page.locator('.ant-modal-confirm .ant-btn-dangerous, .ant-modal-confirm .ant-btn-primary').first();
     await okBtn.click();
+
+    // Wait for discard API to complete and UI to refresh
+    await page.waitForTimeout(2000);
 
     // Buttons should disappear
     await expect(
       page.locator('#change-status-slot button').filter({ hasText: /Save|保存/ }),
-    ).toHaveCount(0, { timeout: 5000 });
+    ).toHaveCount(0, { timeout: 8000 });
 
     // Verify via API
     const wsResp = await request.get(`${API}/ontologies/${ONTOLOGY_RID}/working-state`);

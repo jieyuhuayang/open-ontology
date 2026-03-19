@@ -1,0 +1,84 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - img "deployment-unit" [ref=e7]:
+        - img [ref=e8]
+      - strong [ref=e11]: Ontology Management
+    - generic [ref=e13]:
+      - img "search" [ref=e15]:
+        - img [ref=e16]
+      - textbox "Search by name, RID, aliases..." [ref=e18]
+      - generic [ref=e20]: ⌘K
+    - generic [ref=e21]:
+      - generic [ref=e23]:
+        - button "Save (1)" [ref=e25] [cursor=pointer]:
+          - generic [ref=e26]: Save (1)
+        - button "Discard" [active] [ref=e28] [cursor=pointer]:
+          - generic [ref=e29]: Discard
+      - button "plus New" [ref=e30] [cursor=pointer]:
+        - img "plus" [ref=e32]:
+          - img [ref=e33]
+        - generic [ref=e36]: New
+      - generic [ref=e37] [cursor=pointer]:
+        - img "global" [ref=e38]:
+          - img [ref=e39]
+        - text: English
+  - generic [ref=e41]:
+    - complementary [ref=e42]:
+      - navigation [ref=e44]:
+        - strong [ref=e47]: Default Ontology
+        - menu [ref=e48]:
+          - menuitem "compass Discover" [ref=e49] [cursor=pointer]:
+            - img "compass" [ref=e50]:
+              - img [ref=e51]
+            - generic [ref=e53]: Discover
+          - text: Resources
+          - group [ref=e54]:
+            - menuitem "appstore Object Types 0" [ref=e55] [cursor=pointer]:
+              - img "appstore" [ref=e56]:
+                - img [ref=e57]
+              - generic [ref=e60]:
+                - text: Object Types
+                - generic [ref=e61]: "0"
+            - menuitem "unordered-list Properties" [ref=e62] [cursor=pointer]:
+              - img "unordered-list" [ref=e63]:
+                - img [ref=e64]
+              - generic [ref=e66]: Properties
+            - menuitem "link Link Types 0" [ref=e67] [cursor=pointer]:
+              - img "link" [ref=e68]:
+                - img [ref=e69]
+              - generic [ref=e72]:
+                - text: Link Types
+                - generic [ref=e73]: "0"
+            - menuitem "thunderbolt Action Types" [ref=e74] [cursor=pointer]:
+              - img "thunderbolt" [ref=e75]:
+                - img [ref=e76]
+              - generic [ref=e78]: Action Types
+          - text: Data Connection
+          - group [ref=e79]:
+            - menuitem "database Data Connection" [ref=e80] [cursor=pointer]:
+              - img "database" [ref=e81]:
+                - img [ref=e82]
+              - generic [ref=e84]: Data Connection
+          - menuitem "history History" [ref=e85] [cursor=pointer]:
+            - img "history" [ref=e86]:
+              - img [ref=e87]
+            - generic [ref=e89]: History
+        - button "edit Unsaved changes (1)" [ref=e90] [cursor=pointer]:
+          - img "edit" [ref=e91]:
+            - img [ref=e92]
+          - text: Unsaved changes (1)
+        - button "left" [ref=e94] [cursor=pointer]:
+          - img "left" [ref=e95]:
+            - img [ref=e96]
+    - main [ref=e98]:
+      - main [ref=e99]:
+        - generic [ref=e100]:
+          - heading "Recently viewed object types" [level=4] [ref=e102]
+          - generic [ref=e103]:
+            - img "No data" [ref=e105]
+            - generic [ref=e117]: No recently viewed object types
+```
