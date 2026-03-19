@@ -175,11 +175,11 @@ cd apps/web && pnpm dev
 - 前端测试与实现可在同一任务内完成（无需 test-first 分离）
 - 完成前执行 `cd apps/web && pnpm test --run` 并确认无失败
 
-**E2E（Feature 完成后）**
+**E2E（Feature 完成后，强制）**
 
-- Feature 全部任务完成后，调用 `/e2e-test <feature_dir>` 生成 E2E 测试
+- **每个 feature 全部任务完成后，必须调用 `/e2e-test <feature_dir>` 生成并运行 E2E 测试** — 即使是纯后端改动也可能影响端到端流程，不得跳过
 - E2E 测试覆盖 spec.md 中的 **UI 交互流程类 AC**（表单、wizard、批量操作、跨页面导航）
-- 纯 API 行为的 AC 由后端集成测试覆盖，不需要 E2E
+- 纯 API 行为的 AC 由后端集成测试覆盖，但仍需 E2E 验证相关页面未因后端变更产生回归
 - 共享 Ant Design 交互函数在 `e2e/helpers/antd.ts`，禁止在 spec 文件中重复定义
 - 测试数据 ID 统一 `e2e-<feature>-` 前缀，确保跨套件隔离
 - 完成前执行 `npx playwright test e2e/<test_file>.spec.ts --reporter=list` 并确认通过
