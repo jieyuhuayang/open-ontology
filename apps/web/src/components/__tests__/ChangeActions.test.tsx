@@ -66,7 +66,7 @@ describe('ChangeActions', () => {
       data: { changes: [] },
       isLoading: false,
       error: null,
-    } as ReturnType<typeof useWorkingState>);
+    } as unknown as ReturnType<typeof useWorkingState>);
 
     renderWithProviders();
     expect(screen.queryByText(/Save/)).not.toBeInTheDocument();
@@ -76,7 +76,7 @@ describe('ChangeActions', () => {
       data: { changes: mockChanges },
       isLoading: false,
       error: null,
-    } as ReturnType<typeof useWorkingState>);
+    } as unknown as ReturnType<typeof useWorkingState>);
   });
 
   it('clicking Save opens dialog', async () => {
