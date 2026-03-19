@@ -71,6 +71,9 @@ export function useDiscardChange(ontologyRid: string = DEFAULT_ONTOLOGY_RID) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: workingStateKeys.all });
+      queryClient.invalidateQueries({ queryKey: objectTypeKeys.all });
+      queryClient.invalidateQueries({ queryKey: linkTypeKeys.all });
+      queryClient.invalidateQueries({ queryKey: propertyKeys.all });
     },
   });
 }
