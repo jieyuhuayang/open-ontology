@@ -15,6 +15,8 @@ import ObjectTypeDatasourcesPage from '@/pages/object-types/ObjectTypeDatasource
 import LinkTypeListPage from '@/pages/link-types/LinkTypeListPage';
 import LinkTypeDetailPage from '@/pages/link-types/LinkTypeDetailPage';
 import DataConnectionPage from '@/pages/data-connection/DataConnectionPage';
+import HistoryPage from '@/pages/history/HistoryPage';
+import ObjectTypeHistoryPage from '@/pages/object-types/ObjectTypeHistoryPage';
 export const routeConfig: RouteObject[] = [
   {
     path: '/demo/canvas',
