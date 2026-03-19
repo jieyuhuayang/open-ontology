@@ -470,7 +470,7 @@ apps/web/src/
 ├── api/working-state.ts                           # 新建 — WorkingState 相关 hooks
 ├── api/history.ts                                 # 新建 — History 相关 hooks
 ├── stores/save-dialog-store.ts                    # 新建 — SaveDialog UI 状态
-├── components/SaveButton.tsx                      # 新建 — Portal 到 TopBar
+├── components/ChangeActions.tsx                    # 新建 — Portal 到 TopBar（Save + Discard）
 ├── components/SaveDialog/
 │   ├── SaveDialog.tsx                             # 新建 — Modal 主体
 │   ├── ChangesTab.tsx                             # 新建 — 变更列表选项卡
