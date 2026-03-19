@@ -97,7 +97,7 @@
     - 否则 → `WorkingStateStorage.update_changes(session, ws.rid, remaining, now())`
   - 导入 `ChangeRecordStorage`、`HistoryListResponse`
 - 测试: T02 全部通过
-- 依赖: T01
+- 依赖: T01, T02
 - 覆盖 AC: AC-19, AC-20, AC-21, AC-22, AC-26, AC-27
 
 ---
