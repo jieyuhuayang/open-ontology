@@ -58,7 +58,7 @@ describe('ErrorsTab', () => {
         <ErrorsTab changes={[invalidChange]} />
       </MemoryRouter>,
     );
-    expect(screen.getByText(/missing a display name/)).toBeInTheDocument();
+    expect(screen.getByText(/missing display name/)).toBeInTheDocument();
     expect(screen.getByText(/Open/)).toBeInTheDocument();
   });
 });
