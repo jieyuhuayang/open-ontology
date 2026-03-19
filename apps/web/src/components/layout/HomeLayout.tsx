@@ -1,6 +1,8 @@
 import { Layout } from 'antd';
 import { Outlet } from 'react-router-dom';
 import HomeSidebar from './HomeSidebar';
+import ChangeActions from '@/components/ChangeActions';
+import SaveDialog from '@/components/SaveDialog/SaveDialog';
 import { useSearchStore } from '@/stores/search-store';
 import SearchResultsPanel from '@/components/search/SearchResultsPanel';
 
@@ -15,6 +17,8 @@ export default function HomeLayout() {
           {isSearchMode ? <SearchResultsPanel /> : <Outlet />}
         </main>
       </Layout.Content>
+      <ChangeActions />
+      <SaveDialog />
     </Layout>
   );
 }
