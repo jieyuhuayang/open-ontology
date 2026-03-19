@@ -144,7 +144,7 @@
     - 委托 `service.discard_single_change(rid, change_id)`
   - 重新生成 openapi.json：`cd apps/server && PYTHONPATH=. uv run python -c "import json; from app.main import app; ..."`
 - 测试: T04 全部通过
-- 依赖: T03
+- 依赖: T03, T04
 - 覆盖 AC: AC-19, AC-20, AC-21, AC-22, AC-26, AC-27
 
 ---
