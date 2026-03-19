@@ -24,6 +24,7 @@ const OT_NAV_ITEMS: DetailSidebarNavItem[] = [
   { key: 'overview', labelKey: 'detail.overview', icon: <FileTextOutlined /> },
   { key: 'properties', labelKey: 'detail.properties', icon: <UnorderedListOutlined /> },
   { key: 'datasources', labelKey: 'detail.datasources', icon: <DatabaseOutlined /> },
+  { key: 'history', labelKey: 'changeManagement.history', icon: <HistoryOutlined /> },
 ];
 
 export default function ObjectTypeDetailLayout() {
