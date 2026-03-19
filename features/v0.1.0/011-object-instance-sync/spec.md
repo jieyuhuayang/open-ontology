@@ -70,7 +70,8 @@
 | AC-11 | 系统 | `POST /api/v1/object-types/{ot_rid}/sync`（OT 有 backing datasource） | 200，触发手动同步，返回 SyncJob |
 | AC-12 | 系统 | `POST /api/v1/object-types/{ot_rid}/sync`（OT 无 backing datasource） | 400，`{ "error": { "code": "SYNC_NO_DATASOURCE" } }` |
 | AC-13 | 系统 | `POST /api/v1/object-types/{ot_rid}/sync`（OT 不存在） | 404，`{ "error": { "code": "OBJECT_TYPE_NOT_FOUND" } }` |
-| AC-14 | 系统 | `GET /api/v1/object-types/{ot_rid}/sync/status` | 200，返回最新 SyncJob 或 null |
+| AC-14 | 系统 | `GET /api/v1/object-types/{ot_rid}/sync/status`（有同步记录） | 200，返回最新 SyncJob |
+| AC-21 | 系统 | `GET /api/v1/object-types/{ot_rid}/sync/status`（无同步记录） | 200，返回 null |
 
 ### 前端 UI
 
