@@ -21,6 +21,8 @@
 | WorkingState / Change   | 003-object-type-crud (基础) + 009-working-state (扩展: discard-single, history 读取) | 草稿/已发布状态机，变更管理 |
 | DataSource / Connection | 010-data-connection                               | 连接注册、测试、Schema 提取                 |
 | Dataset / DatasetColumn | 010-data-connection（写入）/ 003-object-type-crud（查询） | Dataset 由 DC 创建，OT 查询 + in-use 判定 |
+| ObjectInstance          | 011-object-instance-sync                            | 对象实例 CRUD（同步写入 + 查询）             |
+| SyncJob                 | 011-object-instance-sync                            | 同步任务记录（创建 + 状态更新 + 查询）           |
 
 
 **规则**：
