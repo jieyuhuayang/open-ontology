@@ -16,6 +16,12 @@ const CHANGE_TYPE_COLORS: Record<string, string> = {
   DELETE: 'red',
 };
 
+const CHANGE_TYPE_KEYS: Record<string, string> = {
+  CREATE: 'changeManagement.created',
+  UPDATE: 'changeManagement.modified',
+  DELETE: 'changeManagement.deleted',
+};
+
 function changeSummary(changes: Change[], t: (key: string, opts?: Record<string, unknown>) => string): string {
   const counts: Record<string, number> = {};
   for (const c of changes) {
