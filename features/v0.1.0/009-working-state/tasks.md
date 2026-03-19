@@ -359,10 +359,9 @@
       - Content（展开后）：变更列表，每条含 resourceType 标签 + displayName + ChangeType Tag
     - 分页：Ant Design `Pagination`
     - 空状态：`Empty` + `t('changeManagement.historyEmpty')`
-  - **router.tsx 修改**：HomeLayout children 新增 `{ path: 'history', element: <HistoryPage /> }`
-    - **影响范围**：仅新增一个路由条目，不影响现有路由
+  - **router.tsx 修改**：HomeLayout children 新增 `{ path: 'history', element: <HistoryPage /> }`。**影响范围**：仅新增一个路由条目，不影响现有路由
   - **测试**：
-    - 空状态渲染 → AC-22（前端表现）
+    - 空状态渲染 "No changes have been published yet" → AC-22（前端表现）
     - 有数据时显示列表 + 版本号 + 时间 → AC-16, AC-17
     - 展开显示变更详情 → AC-18
 - 依赖: T07（history hooks）、T08（i18n）
