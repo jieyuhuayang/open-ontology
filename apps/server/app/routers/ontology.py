@@ -46,3 +46,32 @@ async def get_working_state(
             status_code=404,
         )
     return ws
+
+
+@router.get("/ontologies/{rid}/history", response_model=HistoryListResponse)
+async def list_history(
+    rid: str,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100, alias="pageSize"),
+    service: WorkingStateService = Depends(_get_service),
+):
+    return await service.list_history(rid, page, page_size)
+
+
+@router.get("/ontologies/{rid}/history/{version}", response_model=ChangeRecord)
+async def get_history_version(
+    rid: str,
+    version: int,
+    service: WorkingStateService = Depends(_get_service),
+):
+    return await service.get_history_version(rid, version)
+
+
+@router.delete("/ontologies/{rid}/working-state/changes/{change_id}", status_code=204)
+async def discard_single_change(
+    rid: str,
+    change_id: str,
+    service: WorkingStateService = Depends(_get_service),
+):
+    await service.discard_single_change(rid, change_id)
+    return Response(status_code=204)
