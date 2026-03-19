@@ -157,8 +157,8 @@ test.describe.serial('Change Management — E2E', () => {
     const modal = page.locator('.ant-modal-content');
     await expect(modal).toBeVisible({ timeout: 3000 });
 
-    // Click Save button in modal footer
-    const modalSaveBtn = modal.locator('.ant-modal-footer button').filter({ hasText: /^Save$|^保存$/ });
+    // Click Save button in modal (custom footer layout)
+    const modalSaveBtn = modal.locator('button.ant-btn-primary').filter({ hasText: /^Save$|^保存$/ });
     await expect(modalSaveBtn).toBeEnabled({ timeout: 3000 });
     await modalSaveBtn.click();
 
