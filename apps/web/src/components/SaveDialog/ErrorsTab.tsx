@@ -37,6 +37,8 @@ function resourcePath(resourceType: string, rid: string): string {
       return `/object-types/${rid}/overview`;
     case 'LinkType':
       return `/link-types/${rid}`;
+    case 'Property':
+      return `/properties`;
     default:
       return '/';
   }
