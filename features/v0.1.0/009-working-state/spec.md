@@ -356,7 +356,9 @@ class ChangeRecord(DomainModel):
 
 ```
 TopBar (#change-status-slot) ← Portal
-  └── SaveButton                          [新建] — 变更计数 + 点击打开 SaveDialog
+  └── ChangeActions                       [新建] — Save + Discard 按钮组合
+      ├── SaveButton                      — "Save (N)" 按钮，点击打开 SaveDialog
+      ├── DiscardButton                   — "Discard" 按钮，点击弹确认后丢弃全部
       └── SaveDialog (Modal)              [新建] — Review Edits 弹窗
           ├── ChangesTab                  [新建] — 按 ResourceType 分组展示变更
           │   └── ChangeItem              [新建] — 单条变更（名称 + 类型标签 + 垃圾桶）
