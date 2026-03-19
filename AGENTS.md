@@ -194,11 +194,11 @@ These rules are **mandatory** when writing or modifying any backend/frontend sou
 - Frontend tests and implementation may be completed in the same task (no test-first separation required)
 - Before marking done: run `cd apps/web && pnpm test --run` and confirm no failures
 
-**E2E (after feature completion)**
+**E2E (after feature completion, mandatory)**
 
-- After all tasks are done, invoke `/e2e-test <feature_dir>` to generate E2E tests
+- **After all tasks are done, you MUST invoke `/e2e-test <feature_dir>` to generate and run E2E tests** — even pure backend changes can affect end-to-end flows, do not skip
 - E2E tests cover **UI interaction flow ACs** from spec.md (forms, wizards, bulk operations, cross-page navigation)
-- Pure API behavior ACs are covered by backend integration tests — no E2E needed
+- Pure API behavior ACs are covered by backend integration tests, but E2E must still verify related pages have no regression from backend changes
 - Shared Ant Design interaction helpers live in `e2e/helpers/antd.ts` — do not duplicate in spec files
 - Test data IDs use `e2e-<feature>-` prefix for cross-suite isolation
 - Before marking done: run `npx playwright test e2e/<test_file>.spec.ts --reporter=list` and confirm passing
