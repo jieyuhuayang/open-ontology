@@ -80,9 +80,10 @@
 
 | ID | 角色 | 操作 | 预期结果 |
 |----|------|------|---------|
-| AC-01 | 本体管理员 | 对本体进行任何修改（创建/编辑/删除 OT/Property/LinkType）后查看 TopBar | TopBar 右侧 `#change-status-slot` 显示 Save 按钮，包含变更计数 badge（如 "Save (3)"） |
-| AC-02 | 本体管理员 | 无未保存变更时查看 TopBar | Save 按钮不显示（`#change-status-slot` 为空） |
+| AC-01 | 本体管理员 | 对本体进行任何修改（创建/编辑/删除 OT/Property/LinkType）后查看 TopBar | TopBar 右侧 `#change-status-slot` 显示 Save 按钮（含变更计数 badge，如 "Save (3)"）和 Discard 按钮 |
+| AC-02 | 本体管理员 | 无未保存变更时查看 TopBar | Save 和 Discard 按钮均不显示（`#change-status-slot` 为空） |
 | AC-03 | 本体管理员 | 点击 Save 按钮 | 打开 Review Edits Modal |
+| AC-28 | 本体管理员 | 点击 TopBar Discard 按钮 | 弹出确认对话框："确定要丢弃所有未保存的变更吗？此操作不可撤销。"确认后调用 `DELETE /ontologies/{rid}/working-state`，成功后刷新缓存、两个按钮消失 |
 
 ### Save Dialog
 
