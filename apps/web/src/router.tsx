@@ -36,6 +36,7 @@ export const routeConfig: RouteObject[] = [
           { path: 'properties', element: <PropertiesPage /> },
           { path: 'action-types', element: <PlaceholderPage title="Action Types" comingSoon /> },
           { path: 'data-connection', element: <DataConnectionPage /> },
+          { path: 'history', element: <HistoryPage /> },
         ],
       },
       {
