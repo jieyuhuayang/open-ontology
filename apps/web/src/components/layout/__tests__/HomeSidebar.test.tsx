@@ -16,6 +16,11 @@ vi.mock('@/api/search', () => ({
   useSearch: () => ({ data: null, isLoading: false, error: null }),
 }));
 
+vi.mock('@/api/working-state', () => ({
+  useWorkingState: () => ({ data: null, isLoading: false, error: null }),
+  DEFAULT_ONTOLOGY_RID: 'ri.ontology.ontology.default',
+}));
+
 function renderSidebar(initialRoute = '/') {
   return render(
     <MemoryRouter initialEntries={[initialRoute]}>
