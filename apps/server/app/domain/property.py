@@ -164,3 +164,61 @@ class PropertySortOrderRequest(DomainModel):
 class PropertyListResponse(DomainModel):
     items: list[PropertyWithChangeState]
     total: int
+
+
+# ---------------------------------------------------------------------------
+# Ontology-level property list (all OTs) — GAP 1
+# ---------------------------------------------------------------------------
+
+
+class PropertyWithObjectType(DomainModel):
+    """Property with its owning object type metadata for the summary view."""
+
+    rid: str
+    id: str
+    api_name: str
+    object_type_rid: str
+    object_type_display_name: str
+    display_name: str
+    description: str | None = None
+    base_type: str
+    array_inner_type: str | None = None
+    status: ResourceStatus = ResourceStatus.EXPERIMENTAL
+    visibility: Visibility = Visibility.NORMAL
+    is_primary_key: bool = False
+    is_title_key: bool = False
+    change_state: ChangeState = ChangeState.PUBLISHED
+
+
+class PropertyListAllResponse(DomainModel):
+    """Response for GET /api/v1/properties (ontology-level summary)."""
+
+    items: list[PropertyWithObjectType]
+    total: int
+
+
+# ---------------------------------------------------------------------------
+# Batch operations — GAP 2
+# ---------------------------------------------------------------------------
+
+
+class PropertyBatchUpdateRequest(DomainModel):
+    """Batch update status/visibility for multiple properties."""
+
+    rids: list[str]
+    status: ResourceStatus | None = None
+    visibility: Visibility | None = None
+
+
+class PropertyBatchDeleteRequest(DomainModel):
+    """Batch delete multiple properties."""
+
+    rids: list[str]
+
+
+class BatchOperationResponse(DomainModel):
+    """Response for batch operations showing what was done and what was skipped."""
+
+    processed: list[str]
+    skipped: list[str]
+    skipped_reasons: dict[str, str] = {}

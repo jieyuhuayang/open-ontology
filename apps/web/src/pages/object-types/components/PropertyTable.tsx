@@ -1,6 +1,6 @@
-import { createContext, useCallback, useContext } from 'react';
-import { Table, Tag, Tooltip } from 'antd';
-import { HolderOutlined, KeyOutlined } from '@ant-design/icons';
+import { createContext, useCallback, useContext, useState } from 'react';
+import { Button, Flex, Popconfirm, Select, Space, Table, Tag, Tooltip, message } from 'antd';
+import { DeleteOutlined, HolderOutlined, KeyOutlined } from '@ant-design/icons';
 import {
   DndContext,
   closestCenter,
@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import StatusBadge from '@/components/StatusBadge';
 import ChangeStateBadge from '@/components/ChangeStateBadge';
+import { useBatchUpdateProperties, useBatchDeleteProperties } from '@/api/properties';
 import type { Property, ResourceStatus, ChangeState } from '@/api/types';
 
 const PRIMARY_KEY_TYPES = new Set([
@@ -70,8 +71,15 @@ function SortableRow({ children, ...props }: SortableRowProps) {
   );
 }
 
-function DragHandleCell() {
+function DragHandleCell({ disabled }: { disabled?: boolean }) {
   const { setActivatorNodeRef, listeners } = useContext(RowContext);
+  if (disabled) {
+    return (
+      <span style={{ padding: '0 8px', color: '#e8e8e8', fontSize: 16 }}>
+        <HolderOutlined />
+      </span>
+    );
+  }
   return (
     <span
       ref={setActivatorNodeRef}
@@ -86,6 +94,7 @@ function DragHandleCell() {
 
 interface PropertyTableProps {
   properties: Property[];
+  objectTypeRid: string;
   objectTypeStatus?: string;
   onRowClick?: (property: Property) => void;
   onReorder?: (newOrder: Property[]) => void;
@@ -93,10 +102,16 @@ interface PropertyTableProps {
 
 export default function PropertyTable({
   properties,
+  objectTypeRid,
   onRowClick,
   onReorder,
 }: PropertyTableProps) {
   const { t } = useTranslation();
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const batchUpdateMutation = useBatchUpdateProperties(objectTypeRid);
+  const batchDeleteMutation = useBatchDeleteProperties(objectTypeRid);
+
+  const hasSelection = selectedRowKeys.length > 0;
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -106,6 +121,7 @@ export default function PropertyTable({
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
+      if (hasSelection) return; // disable drag when selecting
       const { active, over } = event;
       if (!over || active.id === over.id) return;
       const oldIndex = properties.findIndex((p) => p.rid === String(active.id));
@@ -114,14 +130,65 @@ export default function PropertyTable({
       const newOrder = arrayMove(properties, oldIndex, newIndex);
       onReorder?.(newOrder);
     },
-    [properties, onReorder],
+    [properties, onReorder, hasSelection],
   );
+
+  const handleBatchUpdateStatus = async (status: string) => {
+    try {
+      const result = await batchUpdateMutation.mutateAsync({
+        rids: selectedRowKeys as string[],
+        status: status as 'experimental' | 'active' | 'deprecated',
+      });
+      void message.success(
+        t('property.batch.updateSuccess', { count: result.processed.length }),
+      );
+      setSelectedRowKeys([]);
+    } catch {
+      void message.error(t('error.somethingWentWrong'));
+    }
+  };
+
+  const handleBatchUpdateVisibility = async (visibility: string) => {
+    try {
+      const result = await batchUpdateMutation.mutateAsync({
+        rids: selectedRowKeys as string[],
+        visibility: visibility as 'prominent' | 'normal' | 'hidden',
+      });
+      void message.success(
+        t('property.batch.updateSuccess', { count: result.processed.length }),
+      );
+      setSelectedRowKeys([]);
+    } catch {
+      void message.error(t('error.somethingWentWrong'));
+    }
+  };
+
+  const handleBatchDelete = async () => {
+    try {
+      const result = await batchDeleteMutation.mutateAsync({
+        rids: selectedRowKeys as string[],
+      });
+      if (result.processed.length > 0) {
+        void message.success(
+          t('property.batch.deleteSuccess', { count: result.processed.length }),
+        );
+      }
+      if (result.skipped.length > 0) {
+        void message.warning(
+          t('property.batch.deleteSkipped', { count: result.skipped.length }),
+        );
+      }
+      setSelectedRowKeys([]);
+    } catch {
+      void message.error(t('error.somethingWentWrong'));
+    }
+  };
 
   const columns: ColumnsType<Property> = [
     {
       key: 'drag',
       width: 40,
-      render: () => <DragHandleCell />,
+      render: () => <DragHandleCell disabled={hasSelection} />,
       onCell: () => ({ onClick: (e: React.MouseEvent) => e.stopPropagation() }),
     },
     {
@@ -224,29 +291,90 @@ export default function PropertyTable({
   ];
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext
-        items={properties.map((p) => p.rid)}
-        strategy={verticalListSortingStrategy}
-      >
-        <Table<Property>
-          columns={columns}
-          dataSource={properties}
-          rowKey="rid"
-          size="small"
-          pagination={false}
-          onRow={(record) => ({
-            onClick: () => onRowClick?.(record),
-            style: { cursor: 'pointer' },
-          })}
-          components={{
-            body: {
-              row: SortableRow,
-            },
+    <div>
+      {hasSelection && (
+        <Flex
+          align="center"
+          gap={12}
+          style={{
+            padding: '8px 16px',
+            marginBottom: 8,
+            background: '#e6f4ff',
+            borderRadius: 6,
           }}
-          locale={{ emptyText: t('property.empty') }}
-        />
-      </SortableContext>
-    </DndContext>
+        >
+          <span style={{ fontWeight: 500 }}>
+            {t('property.batch.selected', { count: selectedRowKeys.length })}
+          </span>
+          <Space size={8}>
+            <Select
+              placeholder={t('property.batch.updateStatus')}
+              onChange={(v) => void handleBatchUpdateStatus(v)}
+              size="small"
+              style={{ width: 140 }}
+              options={[
+                { value: 'experimental', label: t('objectType.status.experimental') },
+                { value: 'active', label: t('objectType.status.active') },
+                { value: 'deprecated', label: t('objectType.status.deprecated') },
+              ]}
+            />
+            <Select
+              placeholder={t('property.batch.updateVisibility')}
+              onChange={(v) => void handleBatchUpdateVisibility(v)}
+              size="small"
+              style={{ width: 140 }}
+              options={[
+                { value: 'prominent', label: t('objectType.visibility.prominent') },
+                { value: 'normal', label: t('objectType.visibility.normal') },
+                { value: 'hidden', label: t('objectType.visibility.hidden') },
+              ]}
+            />
+            <Popconfirm
+              title={t('property.batch.deleteConfirm', { count: selectedRowKeys.length })}
+              onConfirm={() => void handleBatchDelete()}
+              okText={t('common.delete')}
+              cancelText={t('common.cancel')}
+              okButtonProps={{ danger: true }}
+            >
+              <Button size="small" danger icon={<DeleteOutlined />}>
+                {t('property.batch.delete')}
+              </Button>
+            </Popconfirm>
+          </Space>
+          <Button size="small" type="link" onClick={() => setSelectedRowKeys([])}>
+            {t('common.deselectAll')}
+          </Button>
+        </Flex>
+      )}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext
+          items={properties.map((p) => p.rid)}
+          strategy={verticalListSortingStrategy}
+        >
+          <Table<Property>
+            columns={columns}
+            dataSource={properties}
+            rowKey="rid"
+            size="small"
+            pagination={false}
+            rowSelection={{
+              selectedRowKeys,
+              onChange: (keys) => setSelectedRowKeys(keys),
+              onCell: () => ({ onClick: (e: React.MouseEvent) => e.stopPropagation() }),
+            }}
+            onRow={(record) => ({
+              onClick: () => onRowClick?.(record),
+              style: { cursor: 'pointer' },
+            })}
+            components={{
+              body: {
+                row: SortableRow,
+              },
+            }}
+            locale={{ emptyText: t('property.empty') }}
+          />
+        </SortableContext>
+      </DndContext>
+    </div>
   );
 }

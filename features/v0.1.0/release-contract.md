@@ -18,7 +18,7 @@
 | ObjectType              | 003-object-type-crud                              | CRUD + WorkingState               |
 | Property（对象类型属性）        | 007-property-management                           | 属性定义、类型、默认值、格式化规则                 |
 | LinkType                | 006-link-type-crud                                | 链接类型 CRUD，包括端点定义、基数约束             |
-| WorkingState / Change   | 003-object-type-crud (Phase 1)                    | 草稿/已发布状态机，变更管理                    |
+| WorkingState / Change   | 003-object-type-crud (基础) + 009-working-state (扩展: discard-single, history 读取) | 草稿/已发布状态机，变更管理 |
 | DataSource / Connection | 010-data-connection                               | 连接注册、测试、Schema 提取                 |
 | Dataset / DatasetColumn | 010-data-connection（写入）/ 003-object-type-crud（查询） | Dataset 由 DC 创建，OT 查询 + in-use 判定 |
 
@@ -70,6 +70,7 @@ Feature spec 只能引用不变量 ID，不能重新定义或覆盖。
 | 005-object-type-crud-frontend | 010-data-connection                 | 需要 Dataset 列表 API（向导 Step 1） |
 | 006-link-type-crud            | 001-scaffolding, 002-db-schema, 003-object-type-crud, 004-app-shell | 需要 OT CRUD + WorkingState + App Shell |
 | 006-link-type-crud            | 010-data-connection                 | 需要 Dataset 列表 API（JT 连接表选择） |
+| 009-working-state             | 003-object-type-crud, 004-app-shell, 005-object-type-crud-frontend | 需要 WorkingState 基础 + App Shell + OT 详情页 |
 
 
 **规则**：
@@ -86,5 +87,6 @@ Feature spec 只能引用不变量 ID，不能重新定义或覆盖。
 | ---------- | ------------------------------------------ | ---- |
 | 2026-03-03 | 初始版本：从 PRD 需求拆分中创建，确立 003/006/007/010 领域归属 | —    |
 | 2026-03-16 | 追加 INV-7/8/9（LinkType 约束）+ 006 依赖图          | 006  |
+| 2026-03-19 | WorkingState 归属扩展至 009 + 009 依赖图               | 009  |
 
 

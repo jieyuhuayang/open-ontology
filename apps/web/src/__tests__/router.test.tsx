@@ -30,6 +30,24 @@ vi.mock('@/api/link-types', () => ({
   useEligibleSideLinks: () => ({ data: [], isLoading: false }),
 }));
 
+vi.mock('@/api/properties', () => ({
+  useAllProperties: () => ({
+    data: { items: [], total: 0 },
+    isLoading: false,
+  }),
+  useProperties: () => ({
+    data: { items: [], total: 0 },
+    isLoading: false,
+  }),
+  useCreateProperty: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useUpdateProperty: () => ({ mutateAsync: vi.fn() }),
+  useDeleteProperty: () => ({ mutateAsync: vi.fn() }),
+  useReorderProperties: () => ({ mutateAsync: vi.fn() }),
+  useBatchUpdateProperties: () => ({ mutateAsync: vi.fn() }),
+  useBatchDeleteProperties: () => ({ mutateAsync: vi.fn() }),
+  propertyKeys: { list: () => ['properties', 'list'] },
+}));
+
 vi.mock('@/api/search', () => ({
   useSearch: () => ({ data: null, isLoading: false, error: null }),
 }));
@@ -73,10 +91,10 @@ describe('Router', () => {
     });
   });
 
-  it('/properties renders Coming Soon placeholder', async () => {
+  it('/properties renders PropertiesPage', async () => {
     renderRoute('/properties');
     await waitFor(() => {
-      expect(screen.getByText(/coming soon/i)).toBeInTheDocument();
+      expect(screen.getByText('Properties', { selector: 'h4' })).toBeInTheDocument();
     });
   });
 

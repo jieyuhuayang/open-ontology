@@ -25,6 +25,11 @@ export type PropertySortOrderRequest = components['schemas']['PropertySortOrderR
 export type PropertySortOrderItem = components['schemas']['PropertySortOrderItem'];
 export type PropertyBaseType = string;
 export type StructField = components['schemas']['StructField'];
+export type PropertyWithObjectType = components['schemas']['PropertyWithObjectType'];
+export type PropertyListAllResponse = components['schemas']['PropertyListAllResponse'];
+export type PropertyBatchUpdateRequest = components['schemas']['PropertyBatchUpdateRequest'];
+export type PropertyBatchDeleteRequest = components['schemas']['PropertyBatchDeleteRequest'];
+export type BatchOperationResponse = components['schemas']['BatchOperationResponse'];
 
 export type Dataset = components['schemas']['Dataset'];
 export type DatasetListItem = components['schemas']['DatasetListItem'];

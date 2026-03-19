@@ -33,6 +33,9 @@ docs/
 features/                             # SDD 特性目录
 ├── _templates/                       # spec / tasks 模板
 └── v0.1.0/                           # 001 ~ 009 特性包
+e2e/                                  # Playwright E2E 测试
+├── helpers/                          # 共享工具（antd.ts, api.ts, fixtures.ts）
+└── *.spec.ts                         # 测试文件
 ops/mysql-sample/                     # 本地 MySQL 样本副本脚本
 justfile                              # Monorepo 任务运行器
 ```
@@ -172,6 +175,15 @@ cd apps/web && pnpm dev
 - 前端测试与实现可在同一任务内完成（无需 test-first 分离）
 - 完成前执行 `cd apps/web && pnpm test --run` 并确认无失败
 
+**E2E（Feature 完成后）**
+
+- Feature 全部任务完成后，调用 `/e2e-test <feature_dir>` 生成 E2E 测试
+- E2E 测试覆盖 spec.md 中的 **UI 交互流程类 AC**（表单、wizard、批量操作、跨页面导航）
+- 纯 API 行为的 AC 由后端集成测试覆盖，不需要 E2E
+- 共享 Ant Design 交互函数在 `e2e/helpers/antd.ts`，禁止在 spec 文件中重复定义
+- 测试数据 ID 统一 `e2e-<feature>-` 前缀，确保跨套件隔离
+- 完成前执行 `npx playwright test e2e/<test_file>.spec.ts --reporter=list` 并确认通过
+
 **禁止行为**
 
 - 禁止未运行测试就标记任务完成 — 必须运行并展示输出
@@ -245,6 +257,10 @@ cd apps/web && pnpm dev
    - 步骤 1-5 的文档工作在 main 上完成；步骤 7 的代码实现在 feature 分支上
 7. **执行** — 在 feature 分支上逐任务实施：
    - 实现代码 → 运行测试 → `/task-review <feature_dir> <task_id>` → PASS 后打勾
+7.5. **E2E 测试**（可选）— 全部任务完成后，若 feature 涉及 UI 交互流程：
+   - 调用 `/e2e-test <feature_dir>` 自动生成 E2E 测试
+   - 覆盖 spec.md 中 UI 交互类 AC，最多 3 轮修复
+   - 纯后端 feature 跳过此步
 8. **代码审查** — 全部任务完成后，调用 `/code-review --base main`
    - 自动运行（Codex + Gemini 并行），无需用户确认
    - PASS / PASS_WITH_WARNINGS → 可合并

@@ -251,3 +251,113 @@ class TestPropertyCRUD:
         # Verify deleted property excluded from list
         list_resp = await seeded_client.get(f"/api/v1/object-types/{ot_rid}/properties")
         assert list_resp.json()["total"] == 0
+
+
+@pytest.mark.asyncio
+class TestPropertyListAll:
+    """Integration tests for GET /api/v1/properties (AC-32, AC-34)."""
+
+    async def test_list_all_returns_properties_across_ots(self, seeded_client: AsyncClient):
+        """AC-32: list all properties with object type info."""
+        ot1 = await _create_object_type(seeded_client, "emp")
+        ot2 = await _create_object_type(seeded_client, "dept")
+        await _create_property(seeded_client, ot1, prop_id="name", api_name="name")
+        await _create_property(seeded_client, ot2, prop_id="code", api_name="code")
+
+        resp = await seeded_client.get("/api/v1/properties")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["total"] == 2
+        rids = {item["rid"] for item in data["items"]}
+        assert len(rids) == 2
+        # Every item should have objectTypeDisplayName
+        for item in data["items"]:
+            assert "objectTypeDisplayName" in item
+            assert "objectTypeRid" in item
+
+    async def test_list_all_empty(self, seeded_client: AsyncClient):
+        """Empty ontology returns empty list."""
+        resp = await seeded_client.get("/api/v1/properties")
+        assert resp.status_code == 200
+        assert resp.json()["total"] == 0
+
+
+@pytest.mark.asyncio
+class TestPropertyBatchOperations:
+    """Integration tests for batch update and batch delete (AC-36, AC-37, AC-38)."""
+
+    async def test_batch_update_status(self, seeded_client: AsyncClient):
+        """AC-36: Batch update status."""
+        ot_rid = await _create_object_type(seeded_client, "batch-ot")
+        p1 = await _create_property(seeded_client, ot_rid, prop_id="p1", api_name="pOne")
+        p2 = await _create_property(seeded_client, ot_rid, prop_id="p2", api_name="pTwo")
+
+        resp = await seeded_client.patch(
+            f"/api/v1/object-types/{ot_rid}/properties/batch",
+            json={"rids": [p1["rid"], p2["rid"]], "status": "active"},
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert set(data["processed"]) == {p1["rid"], p2["rid"]}
+        assert data["skipped"] == []
+
+    async def test_batch_update_visibility(self, seeded_client: AsyncClient):
+        """AC-37: Batch update visibility."""
+        ot_rid = await _create_object_type(seeded_client, "batch-vis")
+        p1 = await _create_property(seeded_client, ot_rid, prop_id="v1", api_name="vOne")
+
+        resp = await seeded_client.patch(
+            f"/api/v1/object-types/{ot_rid}/properties/batch",
+            json={"rids": [p1["rid"]], "visibility": "hidden"},
+        )
+        assert resp.status_code == 200
+        assert resp.json()["processed"] == [p1["rid"]]
+
+    async def test_batch_delete_skips_active_and_pk(self, seeded_client: AsyncClient):
+        """AC-38: Batch delete skips active and PK properties."""
+        ot_rid = await _create_object_type(seeded_client, "batch-del")
+        p_normal = await _create_property(
+            seeded_client, ot_rid, prop_id="normal", api_name="normal"
+        )
+        p_active = await _create_property(seeded_client, ot_rid, prop_id="act", api_name="act")
+        # Set p_active to active
+        await seeded_client.put(
+            f"/api/v1/object-types/{ot_rid}/properties/{p_active['rid']}",
+            json={"status": "active"},
+        )
+        p_pk = await _create_property(
+            seeded_client, ot_rid, prop_id="pk", api_name="pk", base_type="integer"
+        )
+        # Set p_pk as primary key
+        await seeded_client.put(
+            f"/api/v1/object-types/{ot_rid}/properties/{p_pk['rid']}",
+            json={"isPrimaryKey": True},
+        )
+
+        resp = await seeded_client.post(
+            f"/api/v1/object-types/{ot_rid}/properties/batch-delete",
+            json={"rids": [p_normal["rid"], p_active["rid"], p_pk["rid"]]},
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["processed"] == [p_normal["rid"]]
+        assert set(data["skipped"]) == {p_active["rid"], p_pk["rid"]}
+        assert data["skippedReasons"][p_active["rid"]] == "active"
+        assert data["skippedReasons"][p_pk["rid"]] == "primary_key"
+
+    async def test_batch_delete_success(self, seeded_client: AsyncClient):
+        """Batch delete all experimental properties."""
+        ot_rid = await _create_object_type(seeded_client, "batch-del2")
+        p1 = await _create_property(seeded_client, ot_rid, prop_id="d1", api_name="dOne")
+        p2 = await _create_property(seeded_client, ot_rid, prop_id="d2", api_name="dTwo")
+
+        resp = await seeded_client.post(
+            f"/api/v1/object-types/{ot_rid}/properties/batch-delete",
+            json={"rids": [p1["rid"], p2["rid"]]},
+        )
+        assert resp.status_code == 200
+        assert set(resp.json()["processed"]) == {p1["rid"], p2["rid"]}
+
+        # Verify they are gone from list
+        list_resp = await seeded_client.get(f"/api/v1/object-types/{ot_rid}/properties")
+        assert list_resp.json()["total"] == 0

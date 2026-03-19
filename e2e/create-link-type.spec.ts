@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { selectAntOption } from './helpers/antd';
 
 /**
  * E2E tests for Create Link Type wizard.
@@ -47,28 +48,6 @@ async function selectCardinality(page: Page, label: RegExp) {
   await card.first().click();
 }
 
-/** Select an option from an Ant Design Select dropdown */
-async function selectAntOption(page: Page, selectLocator: ReturnType<Page['locator']>, search: string) {
-  await selectLocator.click();
-  await page.waitForTimeout(200);
-
-  // Try to type-to-search if input is editable, otherwise just open and click
-  const input = selectLocator.locator('input.ant-select-selection-search-input');
-  const isReadonly = await input.getAttribute('readonly');
-  if (isReadonly === null) {
-    await input.fill(search);
-    await page.waitForTimeout(500);
-  } else {
-    await page.waitForTimeout(300);
-  }
-
-  const option = page.locator('.ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option')
-    .filter({ hasText: search });
-  await expect(option.first()).toBeVisible({ timeout: 5000 });
-  await option.first().click();
-  await page.waitForTimeout(300);
-}
-
 /** Helper to complete a FK link type creation */
 async function createFkLink(
   page: Page,
@@ -113,7 +92,7 @@ async function createFkLink(
   await expect(page).toHaveURL(/\/link-types\/ri\.ontology\.link-type\./, { timeout: 15000 });
 }
 
-// ──────────── Cleanup ────────────
+// ──────────── Tests ────────────
 
 test.describe.serial('Create Link Types — ordered', () => {
   // Clean up existing link types before the suite
@@ -253,7 +232,6 @@ test.describe.serial('Create Link Types — ordered', () => {
     await idInput.fill('analyst-company-via-report');
 
     // Change API names to avoid conflicts (gongSi/yanJiuYuan may already exist from analyst-coverage)
-    const apiNameInputs = page.locator('.ant-card input').filter({ hasText: '' });
     // Side A card: apiName input (2nd input in 1st card)
     const sideAApiName = page.locator('.ant-card').nth(0).locator('input').nth(1);
     await sideAApiName.clear();

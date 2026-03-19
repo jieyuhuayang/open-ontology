@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Button, Drawer, Form, Input, Select, Space, message } from 'antd';
+import { Button, Drawer, Form, Input, Select, Space, Switch, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useCreateProperty } from '@/api/properties';
 import PropertyTypeSelector from './PropertyTypeSelector';
@@ -21,6 +21,7 @@ interface FormValues {
   id: string;
   apiName: string;
   baseType: string;
+  allowMultiple?: boolean;
   arrayInnerType?: string;
   structSchema?: StructField[];
   backingColumn?: string;
@@ -37,6 +38,7 @@ export default function CreatePropertyDrawer({
   const { t } = useTranslation();
   const [form] = Form.useForm<FormValues>();
   const baseType = Form.useWatch('baseType', form);
+  const allowMultiple = Form.useWatch('allowMultiple', form);
   const createMutation = useCreateProperty(objectTypeRid);
 
   useEffect(() => {
@@ -57,12 +59,13 @@ export default function CreatePropertyDrawer({
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
+      const isArray = values.allowMultiple && values.baseType !== 'struct';
       await createMutation.mutateAsync({
         id: values.id,
         apiName: values.apiName,
         displayName: values.displayName,
-        baseType: values.baseType,
-        arrayInnerType: values.arrayInnerType ?? null,
+        baseType: isArray ? 'array' : values.baseType,
+        arrayInnerType: isArray ? values.baseType : null,
         structSchema: values.structSchema ?? null,
         backingColumn: values.backingColumn || null,
         description: values.description || null,
@@ -81,6 +84,9 @@ export default function CreatePropertyDrawer({
       void message.error(display);
     }
   };
+
+  // Filter out 'array' from the base type selector — user uses "Allow multiple" instead
+  const isStructType = baseType === 'struct';
 
   return (
     <Drawer
@@ -107,7 +113,7 @@ export default function CreatePropertyDrawer({
       <Form
         form={form}
         layout="vertical"
-        initialValues={{ status: 'experimental', visibility: 'normal' }}
+        initialValues={{ status: 'experimental', visibility: 'normal', allowMultiple: false }}
       >
         <Form.Item
           name="displayName"
@@ -154,22 +160,31 @@ export default function CreatePropertyDrawer({
           label={t('property.fields.baseType')}
           rules={[{ required: true, message: t('property.validation.baseTypeRequired') }]}
         >
-          <PropertyTypeSelector />
+          <PropertyTypeSelector excludeArray />
         </Form.Item>
-
-        {baseType === 'array' && (
-          <Form.Item
-            name="arrayInnerType"
-            label={t('property.arrayInnerType')}
-            rules={[{ required: true, message: t('property.validation.arrayInnerTypeRequired') }]}
-          >
-            <PropertyTypeSelector />
-          </Form.Item>
-        )}
 
         {baseType === 'struct' && (
           <Form.Item name="structSchema" label={t('property.baseTypes.struct')}>
             <StructFieldEditor />
+          </Form.Item>
+        )}
+
+        {baseType && !isStructType && (
+          <Form.Item
+            name="allowMultiple"
+            label={t('property.allowMultiple')}
+            valuePropName="checked"
+            extra={t('property.allowMultipleHint')}
+          >
+            <Switch />
+          </Form.Item>
+        )}
+
+        {allowMultiple && !isStructType && baseType && (
+          <Form.Item>
+            <span style={{ color: '#1677ff', fontSize: 12 }}>
+              {t('property.allowMultipleEnabled')}
+            </span>
           </Form.Item>
         )}
 

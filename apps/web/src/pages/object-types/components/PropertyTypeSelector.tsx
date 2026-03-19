@@ -33,6 +33,7 @@ interface PropertyTypeSelectorProps {
   onChange?: (value: string) => void;
   disabled?: boolean;
   placeholder?: string;
+  excludeArray?: boolean;
 }
 
 export default function PropertyTypeSelector({
@@ -40,13 +41,18 @@ export default function PropertyTypeSelector({
   onChange,
   disabled,
   placeholder,
+  excludeArray,
 }: PropertyTypeSelectorProps) {
   const { t } = useTranslation();
+
+  const availableTypes = excludeArray
+    ? AVAILABLE_TYPES.filter((type) => type !== 'array')
+    : AVAILABLE_TYPES;
 
   const options = [
     {
       label: t('property.filters.allTypes'),
-      options: AVAILABLE_TYPES.map((type) => ({
+      options: availableTypes.map((type) => ({
         value: type,
         label: t(`property.baseTypes.${type}`, type),
         disabled: false,

@@ -84,6 +84,12 @@ vi.mock('@/api/properties', () => ({
   useDeleteProperty: vi.fn(() => ({
     mutateAsync: vi.fn(),
   })),
+  useBatchUpdateProperties: vi.fn(() => ({
+    mutateAsync: vi.fn(),
+  })),
+  useBatchDeleteProperties: vi.fn(() => ({
+    mutateAsync: vi.fn(),
+  })),
   propertyKeys: { list: (rid: string) => ['properties', 'list', rid] },
 }));
 

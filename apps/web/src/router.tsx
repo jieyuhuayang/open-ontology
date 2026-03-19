@@ -4,6 +4,7 @@ import AppShell from '@/components/layout/AppShell';
 import HomeLayout from '@/components/layout/HomeLayout';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import PlaceholderPage from '@/components/PlaceholderPage';
+import PropertiesPage from '@/pages/properties/PropertiesPage';
 import DiscoverPage from '@/pages/DiscoverPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import ObjectTypeListPage from '@/pages/object-types/ObjectTypeListPage';
@@ -30,7 +31,7 @@ export const routeConfig: RouteObject[] = [
           { index: true, element: <DiscoverPage /> },
           { path: 'object-types', element: <ObjectTypeListPage /> },
           { path: 'link-types', element: <LinkTypeListPage /> },
-          { path: 'properties', element: <PlaceholderPage title="Properties" comingSoon /> },
+          { path: 'properties', element: <PropertiesPage /> },
           { path: 'action-types', element: <PlaceholderPage title="Action Types" comingSoon /> },
           { path: 'data-connection', element: <DataConnectionPage /> },
         ],

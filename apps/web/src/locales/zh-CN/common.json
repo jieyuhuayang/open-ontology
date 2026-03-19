@@ -318,10 +318,40 @@
       "status": "状态",
       "visibility": "可见性",
       "baseType": "基础类型",
+      "objectType": "对象类型",
       "allStatuses": "全部状态",
       "allVisibilities": "全部可见性",
-      "allTypes": "全部类型"
-    }
+      "allTypes": "全部类型",
+      "allObjectTypes": "全部对象类型"
+    },
+    "summaryTitle": "属性",
+    "summaryEmpty": "暂无属性。请先创建对象类型并添加属性。",
+    "summaryFilterEmpty": "没有匹配的属性",
+    "columns": {
+      "objectType": "对象类型"
+    },
+    "batch": {
+      "selected": "已选 {{count}} 项",
+      "updateStatus": "修改状态",
+      "updateVisibility": "修改可见性",
+      "delete": "删除",
+      "deleteConfirm": "删除 {{count}} 个选中的属性？此操作不可撤销。",
+      "deleteSuccess": "已删除 {{count}} 个属性",
+      "deleteSkipped": "{{count}} 个属性被跳过（活跃或主键）",
+      "updateSuccess": "已更新 {{count}} 个属性"
+    },
+    "tabs": {
+      "general": "基本信息",
+      "details": "详细信息",
+      "advanced": "高级",
+      "display": "显示",
+      "interaction": "交互",
+      "displayPlaceholder": "值格式化 — 即将推出 (P1)",
+      "interactionPlaceholder": "条件格式化 — 即将推出 (P2)"
+    },
+    "allowMultiple": "允许多值",
+    "allowMultipleHint": "启用后可存储多个值（创建数组属性）",
+    "allowMultipleEnabled": "已启用多值（数组）"
   },
   "objectType": {
     "listTitle": "对象类型",

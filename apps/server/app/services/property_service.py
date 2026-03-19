@@ -14,12 +14,17 @@ from app.domain.property import (
     PRIMARY_KEY_TYPES,
     STRUCT_FIELD_TYPES,
     TITLE_KEY_TYPES,
+    BatchOperationResponse,
     Property,
+    PropertyBatchDeleteRequest,
+    PropertyBatchUpdateRequest,
     PropertyCreateRequest,
+    PropertyListAllResponse,
     PropertyListResponse,
     PropertySortOrderRequest,
     PropertyUpdateRequest,
     PropertyWithChangeState,
+    PropertyWithObjectType,
 )
 from app.domain.validators import validate_property_api_name, validate_property_id
 from app.domain.working_state import (
@@ -528,3 +533,159 @@ class PropertyService:
             for item in req.property_orders
         ]
         await self._ws_service.add_changes(DEFAULT_ONTOLOGY_RID, changes)
+
+    async def list_all(self) -> PropertyListAllResponse:
+        """List all properties across all object types in the ontology (GAP 1)."""
+        # Get all properties via merged view
+        all_props = await self._ws_service.get_merged_view(
+            DEFAULT_ONTOLOGY_RID, ResourceType.PROPERTY
+        )
+        # Get all object types for displayName mapping
+        all_ots = await self._ws_service.get_merged_view(
+            DEFAULT_ONTOLOGY_RID, ResourceType.OBJECT_TYPE
+        )
+        ot_name_map: dict[str, str] = {}
+        for ot_data, ot_state in all_ots:
+            if ot_state != ChangeState.DELETED:
+                ot_name_map[ot_data.get("rid", "")] = ot_data.get("displayName", "")
+
+        items: list[PropertyWithObjectType] = []
+        for data, state in all_props:
+            if state == ChangeState.DELETED:
+                continue
+            ot_rid = data.get("objectTypeRid", "")
+            if ot_rid not in ot_name_map:
+                continue  # skip properties whose OT was deleted
+            items.append(
+                PropertyWithObjectType(
+                    rid=data.get("rid", ""),
+                    id=data.get("id", ""),
+                    api_name=data.get("apiName", ""),
+                    object_type_rid=ot_rid,
+                    object_type_display_name=ot_name_map[ot_rid],
+                    display_name=data.get("displayName", ""),
+                    description=data.get("description"),
+                    base_type=data.get("baseType", ""),
+                    array_inner_type=data.get("arrayInnerType"),
+                    status=data.get("status", "experimental"),
+                    visibility=data.get("visibility", "normal"),
+                    is_primary_key=data.get("isPrimaryKey", False),
+                    is_title_key=data.get("isTitleKey", False),
+                    change_state=state,
+                )
+            )
+
+        items.sort(key=lambda x: (x.object_type_display_name, x.display_name))
+        return PropertyListAllResponse(items=items, total=len(items))
+
+    async def batch_update(
+        self, object_type_rid: str, req: PropertyBatchUpdateRequest
+    ) -> BatchOperationResponse:
+        """Batch update status/visibility for multiple properties (GAP 2)."""
+        await self._check_object_type_exists(object_type_rid)
+
+        merged = await self._get_merged_properties(object_type_rid)
+        merged_map = {
+            data["rid"]: (data, state) for data, state in merged if state != ChangeState.DELETED
+        }
+
+        now = datetime.now(timezone.utc)
+        changes: list[Change] = []
+        processed: list[str] = []
+        skipped: list[str] = []
+        skipped_reasons: dict[str, str] = {}
+
+        for rid in req.rids:
+            if rid not in merged_map:
+                skipped.append(rid)
+                skipped_reasons[rid] = "not_found"
+                continue
+
+            data, _state = merged_map[rid]
+            update_fields: dict = {}
+            if req.status is not None:
+                update_fields["status"] = req.status.value
+            if req.visibility is not None:
+                update_fields["visibility"] = req.visibility.value
+
+            if not update_fields:
+                continue
+
+            update_fields["lastModifiedAt"] = now.isoformat()
+            update_fields["lastModifiedBy"] = DEFAULT_USER_ID
+
+            before = {k: data.get(k) for k in update_fields}
+            changes.append(
+                Change(
+                    id=uuid.uuid4().hex[:12],
+                    resource_type=ResourceType.PROPERTY,
+                    resource_rid=rid,
+                    change_type=ChangeType.UPDATE,
+                    before=before,
+                    after=update_fields,
+                    timestamp=now,
+                )
+            )
+            processed.append(rid)
+
+        if changes:
+            await self._ws_service.add_changes(DEFAULT_ONTOLOGY_RID, changes)
+
+        return BatchOperationResponse(
+            processed=processed, skipped=skipped, skipped_reasons=skipped_reasons
+        )
+
+    async def batch_delete(
+        self, object_type_rid: str, req: PropertyBatchDeleteRequest
+    ) -> BatchOperationResponse:
+        """Batch delete properties, skipping active and PK properties (GAP 2)."""
+        await self._check_object_type_exists(object_type_rid)
+
+        merged = await self._get_merged_properties(object_type_rid)
+        merged_map = {
+            data["rid"]: (data, state) for data, state in merged if state != ChangeState.DELETED
+        }
+
+        now = datetime.now(timezone.utc)
+        changes: list[Change] = []
+        processed: list[str] = []
+        skipped: list[str] = []
+        skipped_reasons: dict[str, str] = {}
+
+        for rid in req.rids:
+            if rid not in merged_map:
+                skipped.append(rid)
+                skipped_reasons[rid] = "not_found"
+                continue
+
+            data, _state = merged_map[rid]
+
+            if data.get("status") == ResourceStatus.ACTIVE.value:
+                skipped.append(rid)
+                skipped_reasons[rid] = "active"
+                continue
+
+            if data.get("isPrimaryKey") is True:
+                skipped.append(rid)
+                skipped_reasons[rid] = "primary_key"
+                continue
+
+            changes.append(
+                Change(
+                    id=uuid.uuid4().hex[:12],
+                    resource_type=ResourceType.PROPERTY,
+                    resource_rid=rid,
+                    change_type=ChangeType.DELETE,
+                    before=data,
+                    after=None,
+                    timestamp=now,
+                )
+            )
+            processed.append(rid)
+
+        if changes:
+            await self._ws_service.add_changes(DEFAULT_ONTOLOGY_RID, changes)
+
+        return BatchOperationResponse(
+            processed=processed, skipped=skipped, skipped_reasons=skipped_reasons
+        )

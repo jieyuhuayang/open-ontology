@@ -2,15 +2,20 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/api/client';
 import { objectTypeKeys } from '@/api/object-types';
 import type {
+  BatchOperationResponse,
   Property,
+  PropertyBatchDeleteRequest,
+  PropertyBatchUpdateRequest,
   PropertyCreateRequest,
-  PropertyUpdateRequest,
+  PropertyListAllResponse,
   PropertyListResponse,
   PropertySortOrderRequest,
+  PropertyUpdateRequest,
 } from '@/api/types';
 
 export const propertyKeys = {
   all: ['properties'] as const,
+  allProperties: () => [...propertyKeys.all, 'all'] as const,
   lists: () => [...propertyKeys.all, 'list'] as const,
   list: (objectTypeRid: string) => [...propertyKeys.lists(), objectTypeRid] as const,
   details: () => [...propertyKeys.all, 'detail'] as const,
@@ -112,6 +117,50 @@ export function useReorderProperties(objectTypeRid: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: propertyKeys.list(objectTypeRid) });
+    },
+  });
+}
+
+export function useAllProperties() {
+  return useQuery({
+    queryKey: propertyKeys.allProperties(),
+    queryFn: async () => {
+      const { data } = await apiClient.get<PropertyListAllResponse>('/properties');
+      return data;
+    },
+  });
+}
+
+export function useBatchUpdateProperties(objectTypeRid: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (req: PropertyBatchUpdateRequest) => {
+      const { data } = await apiClient.patch<BatchOperationResponse>(
+        `/object-types/${objectTypeRid}/properties/batch`,
+        req,
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: propertyKeys.list(objectTypeRid) });
+      queryClient.invalidateQueries({ queryKey: propertyKeys.allProperties() });
+    },
+  });
+}
+
+export function useBatchDeleteProperties(objectTypeRid: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (req: PropertyBatchDeleteRequest) => {
+      const { data } = await apiClient.post<BatchOperationResponse>(
+        `/object-types/${objectTypeRid}/properties/batch-delete`,
+        req,
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: propertyKeys.list(objectTypeRid) });
+      queryClient.invalidateQueries({ queryKey: propertyKeys.allProperties() });
     },
   });
 }
