@@ -49,6 +49,11 @@ export type FileConfirmRequest = components['schemas']['FileConfirmRequest'];
 export type ConnectionTestResponse = components['schemas']['ConnectionTestResponse'];
 export type FileUploadPreviewResponse = components['schemas']['FileUploadPreviewResponse'];
 
+export type WorkingState = components['schemas']['WorkingState'];
+export type Change = components['schemas']['Change'];
+export type ChangeRecord = components['schemas']['ChangeRecord'];
+export type HistoryListResponse = components['schemas']['HistoryListResponse'];
+
 export type SearchResponse = components['schemas']['SearchResponse'];
 export type SearchResultItem = components['schemas']['SearchResultItem'];
 export type SearchTypeResult = components['schemas']['SearchTypeResult'];
