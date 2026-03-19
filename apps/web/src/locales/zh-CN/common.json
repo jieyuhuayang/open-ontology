@@ -693,5 +693,33 @@
     "columnBaseType": "基础类型",
     "columnSideA": "A 端",
     "columnSideB": "B 端"
+  },
+  "changeManagement": {
+    "save": "保存",
+    "discard": "丢弃",
+    "discardAll": "丢弃全部",
+    "reviewEdits": "审阅编辑",
+    "changes": "变更",
+    "errors": "错误",
+    "saveSuccess": "变更已成功发布",
+    "saveError": "发布变更失败",
+    "discardConfirm": "丢弃所有变更？",
+    "discardConfirmMessage": "确定要丢弃所有未保存的变更吗？此操作不可撤销。",
+    "unsavedChanges": "未保存变更",
+    "unsavedChangesCount": "未保存变更 ({{count}})",
+    "noErrors": "无错误",
+    "openResource": "打开",
+    "history": "历史",
+    "historyEmpty": "暂无已发布的变更记录",
+    "version": "v{{version}}",
+    "changesCount": "{{count}} 条变更",
+    "noHistory": "暂无历史记录",
+    "created": "新建",
+    "modified": "修改",
+    "deleted": "删除",
+    "objectTypes": "对象类型",
+    "properties": "属性",
+    "linkTypes": "链接类型",
+    "pendingChanges": "待处理变更"
   }
 }
