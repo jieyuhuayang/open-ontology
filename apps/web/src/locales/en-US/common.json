@@ -692,5 +692,33 @@
     "columnBaseType": "BASE TYPE",
     "columnSideA": "SIDE A",
     "columnSideB": "SIDE B"
+  },
+  "changeManagement": {
+    "save": "Save",
+    "discard": "Discard",
+    "discardAll": "Discard all",
+    "reviewEdits": "Review edits",
+    "changes": "Changes",
+    "errors": "Errors",
+    "saveSuccess": "Changes published successfully",
+    "saveError": "Failed to publish changes",
+    "discardConfirm": "Discard all changes?",
+    "discardConfirmMessage": "Are you sure you want to discard all unsaved changes? This action cannot be undone.",
+    "unsavedChanges": "Unsaved changes",
+    "unsavedChangesCount": "Unsaved changes ({{count}})",
+    "noErrors": "No errors",
+    "openResource": "Open",
+    "history": "History",
+    "historyEmpty": "No changes have been published yet",
+    "version": "v{{version}}",
+    "changesCount": "{{count}} changes",
+    "noHistory": "No history yet",
+    "created": "Created",
+    "modified": "Modified",
+    "deleted": "Deleted",
+    "objectTypes": "Object Types",
+    "properties": "Properties",
+    "linkTypes": "Link Types",
+    "pendingChanges": "Pending changes"
   }
 }
