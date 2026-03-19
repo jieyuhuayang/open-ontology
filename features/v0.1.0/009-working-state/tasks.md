@@ -369,12 +369,13 @@
 
 ---
 
-### T14: ObjectTypeHistoryPage + OT Nav 更新 + 测试
+### T14: ObjectTypeHistoryPage + OT Nav 更新 + 路由 + 测试
 
 - [ ] **T14**
 - 文件:
   - `apps/web/src/pages/object-types/ObjectTypeHistoryPage.tsx` — 新建
   - `apps/web/src/pages/object-types/ObjectTypeDetailLayout.tsx` — 修改
+  - `apps/web/src/router.tsx` — 修改（OT detail children 新增 history 路由）
 - 内容:
   - **ObjectTypeDetailLayout.tsx**:
     - `OT_NAV_ITEMS` 新增：`{ key: 'history', labelKey: 'changeManagement.history', icon: <HistoryOutlined /> }`
