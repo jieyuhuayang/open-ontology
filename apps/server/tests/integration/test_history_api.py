@@ -101,7 +101,7 @@ class TestHistoryAPI:
         record = data["items"][0]
         assert record["version"] == 1
         assert len(record["changes"]) > 0
-        assert record["savedBy"] == "system"
+        assert record["savedBy"] == "default"
 
     async def test_get_history_version_success(
         self, seeded_client: AsyncClient, db_session: AsyncSession
