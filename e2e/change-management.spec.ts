@@ -224,14 +224,17 @@ test.describe.serial('Change Management — E2E', () => {
     await discardBtn.click();
 
     // Confirm dialog should appear
-    await expect(page.locator('.ant-modal-confirm')).toBeVisible({ timeout: 3000 });
+    const confirmModal = page.locator('.ant-modal-confirm');
+    await expect(confirmModal).toBeVisible({ timeout: 3000 });
 
-    // Click OK/confirm button (Ant Design confirm dialog)
-    const okBtn = page.locator('.ant-modal-confirm .ant-btn-dangerous, .ant-modal-confirm .ant-btn-primary').first();
+    // Click the danger/OK button in confirm dialog
+    const okBtn = confirmModal.locator('button').filter({ hasText: /Discard|丢弃|OK/ }).first();
+    await expect(okBtn).toBeVisible();
     await okBtn.click();
 
-    // Wait for discard API to complete and UI to refresh
-    await page.waitForTimeout(2000);
+    // Wait for confirm to close and discard API to complete
+    await expect(confirmModal).not.toBeVisible({ timeout: 5000 });
+    await page.waitForTimeout(1000);
 
     // Buttons should disappear
     await expect(
