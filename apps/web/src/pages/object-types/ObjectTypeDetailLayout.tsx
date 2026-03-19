@@ -4,6 +4,7 @@ import {
   FileTextOutlined,
   UnorderedListOutlined,
   DatabaseOutlined,
+  HistoryOutlined,
   MoreOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
