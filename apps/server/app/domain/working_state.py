@@ -57,3 +57,12 @@ class ChangeRecord(DomainModel):
     saved_at: datetime
     saved_by: str
     description: str | None = None
+
+
+class HistoryListResponse(DomainModel):
+    """Paginated ChangeRecord list response."""
+
+    items: list[ChangeRecord]
+    total: int
+    page: int
+    page_size: int
