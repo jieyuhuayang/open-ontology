@@ -73,6 +73,7 @@ Feature spec 只能引用不变量 ID，不能重新定义或覆盖。
 | 006-link-type-crud            | 001-scaffolding, 002-db-schema, 003-object-type-crud, 004-app-shell | 需要 OT CRUD + WorkingState + App Shell |
 | 006-link-type-crud            | 010-data-connection                 | 需要 Dataset 列表 API（JT 连接表选择） |
 | 009-working-state             | 003-object-type-crud, 004-app-shell, 005-object-type-crud-frontend | 需要 WorkingState 基础 + App Shell + OT 详情页 |
+| 011-object-instance-sync      | 003-object-type-crud, 007-property-management, 009-working-state, 010-data-connection | 需要 OT + Property + Publish 流程 + Dataset |
 
 
 **规则**：
