@@ -106,6 +106,11 @@ export default function HomeSidebar() {
         },
       ],
     },
+    {
+      key: '/history',
+      icon: <HistoryOutlined />,
+      label: t('changeManagement.history'),
+    },
   ];
 
   const otSearchCount = searchData?.results?.objectTypes?.total ?? 0;
