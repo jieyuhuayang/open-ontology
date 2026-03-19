@@ -248,9 +248,35 @@
 
 ---
 
-### T10: SaveDialog 主体 + ChangesTab + 测试
+### T10: ErrorsTab + ChangeItem 叶组件 + 测试
 
 - [ ] **T10**
+- 文件:
+  - `apps/web/src/components/SaveDialog/ErrorsTab.tsx` — 新建
+  - `apps/web/src/components/SaveDialog/ChangeItem.tsx` — 新建
+  - `apps/web/src/components/SaveDialog/__tests__/ErrorsTab.test.tsx` — 新建
+- 内容:
+  - **ErrorsTab.tsx**:
+    - 前端基本校验：遍历 changes 中 CREATE/UPDATE 类型，检查必填字段（displayName 非空）
+    - 每条错误：描述文字 + `Button type="link"` "Open" → navigate 到资源编辑页
+    - 无错误：`Empty` 组件 + `t('changeManagement.noErrors')`
+    - 导出 `getValidationErrors(changes)` 纯函数，供 SaveDialog 计算 errorCount
+  - **ChangeItem.tsx**:
+    - Props：`change: Change`, `onDiscard: (changeId: string) => void`
+    - 显示：资源 displayName + `Tag`（Created=green / Modified=blue / Deleted=red）+ 垃圾桶图标
+    - 垃圾桶 onClick → `onDiscard(change.id)`
+  - **测试**:
+    - ErrorsTab 无错误时显示空状态 → AC-06
+    - ErrorsTab 有错误时显示错误列表 + "Open" 链接 → AC-06
+    - ChangeItem 渲染 displayName + Tag + 垃圾桶
+- 依赖: T08（i18n）
+- 覆盖 AC: AC-06
+
+---
+
+### T11: SaveDialog 主体 + ChangesTab + 测试
+
+- [ ] **T11**
 - 文件:
   - `apps/web/src/components/SaveDialog/SaveDialog.tsx` — 新建
   - `apps/web/src/components/SaveDialog/ChangesTab.tsx` — 新建
@@ -258,8 +284,8 @@
 - 内容:
   - **SaveDialog.tsx**:
     - Ant Design `Modal`，width 640，open/onCancel 从 `useSaveDialogStore`
-    - `Tabs` 组件：`items` = Changes（默认）| Errors
-    - Errors tab 标题含 badge count（errorCount > 0 时显示）
+    - `Tabs` 组件：`items` = Changes（默认）| Errors（使用 T10 的 ErrorsTab）
+    - Errors tab 标题含 badge count（`getValidationErrors(changes).length`）
     - Footer：左侧 "Discard all"（danger text button）→ `Modal.confirm` → `useDiscardAll`；右侧 "Save"（primary）→ `usePublish` mutation
     - Save 按钮：`disabled={errorCount > 0 || publishing}`，loading 状态
     - Save 成功 → `closeDialog()` + toast 成功
@@ -268,8 +294,7 @@
     - 接收 `changes: Change[]`
     - 按 `resourceType` 分组：Object Types / Properties / Link Types
     - 每组标题含 `Badge count`
-    - 渲染每条变更：displayName（从 `change.after?.displayName ?? change.before?.displayName ?? change.resourceRid`）+ ChangeType Tag
-    - 每条旁垃圾桶 `DeleteOutlined` → `useDiscardChange` mutation
+    - 渲染每条 `ChangeItem`（来自 T10），传入 `onDiscard` → `useDiscardChange` mutation
   - **测试**:
     - 渲染测试：两个选项卡存在 → AC-04
     - Changes 按 ResourceType 分组 → AC-05
@@ -279,30 +304,8 @@
     - Discard all 弹确认框 → AC-11
     - 确认后调用 discard API → AC-12
     - 单条 discard 调用 API 并移除 → AC-10
-- 依赖: T06（hooks）、T07（store）、T08（i18n）
+- 依赖: T06（hooks）、T07（store）、T08（i18n）、T10（ErrorsTab + ChangeItem）
 - 覆盖 AC: AC-04, AC-05, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12
-
----
-
-### T11: ErrorsTab + ChangeItem 子组件
-
-- [ ] **T11**
-- 文件:
-  - `apps/web/src/components/SaveDialog/ErrorsTab.tsx` — 新建
-  - `apps/web/src/components/SaveDialog/ChangeItem.tsx` — 新建
-- 内容:
-  - **ErrorsTab.tsx**:
-    - 前端基本校验：遍历 changes 中 CREATE/UPDATE 类型，检查必填字段（displayName 非空）
-    - 每条错误：描述文字 + `Button type="link"` "Open" → navigate 到资源编辑页
-    - 无错误：`Empty` 组件 + `t('changeManagement.noErrors')`
-    - 导出 `getValidationErrors(changes)` 供 SaveDialog 计算 errorCount
-  - **ChangeItem.tsx**:
-    - Props：`change: Change`, `onDiscard: (changeId: string) => void`
-    - 显示：资源 displayName + `Tag`（Created=green / Modified=blue / Deleted=red）+ 垃圾桶图标
-    - 垃圾桶 onClick → `onDiscard(change.id)`
-  - 这两个组件由 T10 中的 SaveDialog/ChangesTab 消费；拆出是为保持 T10 在 3 文件以内
-- 依赖: T08（i18n）
-- 覆盖 AC: AC-06
 
 ---
 
