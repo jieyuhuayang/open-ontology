@@ -504,3 +504,56 @@ class WorkingStateService:
 
     async def get_working_state(self, ontology_rid: str) -> WorkingState | None:
         return await self._get_working_state(ontology_rid)
+
+    # ------------------------------------------------------------------
+    # History
+    # ------------------------------------------------------------------
+
+    async def list_history(
+        self, ontology_rid: str, page: int = 1, page_size: int = 20
+    ) -> HistoryListResponse:
+        items, total = await ChangeRecordStorage.list_by_ontology(
+            self._session, ontology_rid, page, page_size
+        )
+        return HistoryListResponse(items=items, total=total, page=page, page_size=page_size)
+
+    async def get_history_version(self, ontology_rid: str, version: int) -> ChangeRecord:
+        record = await ChangeRecordStorage.get_by_version(self._session, ontology_rid, version)
+        if not record:
+            raise AppError(
+                code="CHANGE_RECORD_NOT_FOUND",
+                message=f"Change record with version {version} not found",
+                status_code=404,
+            )
+        return record
+
+    # ------------------------------------------------------------------
+    # Discard single change
+    # ------------------------------------------------------------------
+
+    async def discard_single_change(self, ontology_rid: str, change_id: str) -> None:
+        ws = await self._get_working_state(ontology_rid)
+        if not ws:
+            raise AppError(
+                code="WORKING_STATE_NOT_FOUND",
+                message="No active working state",
+                status_code=404,
+            )
+
+        remaining = [c for c in ws.changes if c.id != change_id]
+        if len(remaining) == len(ws.changes):
+            raise AppError(
+                code="CHANGE_NOT_FOUND",
+                message=f"Change with id {change_id} not found in working state",
+                status_code=404,
+            )
+
+        if not remaining:
+            await WorkingStateStorage.delete(self._session, ws.rid)
+        else:
+            await WorkingStateStorage.update_changes(
+                self._session,
+                ws.rid,
+                remaining,
+                datetime.now(timezone.utc),
+            )
