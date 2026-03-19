@@ -275,10 +275,10 @@ After completing each SDD task and before checking it off, run `/task-review <fe
    - Steps 1-5 (documentation) on main; step 7 (code) on feature branch
 7. **Execute** — Implement tasks on feature branch:
    - Write code → run tests → `/task-review <feature_dir> <task_id>` → check off after PASS
-7.5. **E2E tests** (optional) — After all tasks complete, if feature involves UI interaction flows:
-   - Invoke `/e2e-test <feature_dir>` to auto-generate E2E tests
+7.5. **E2E tests** (mandatory) — After all tasks complete:
+   - Invoke `/e2e-test <feature_dir>` to auto-generate and run E2E tests
    - Cover UI interaction ACs from spec.md, max 3 fix rounds
-   - Pure backend features skip this step
+   - Even pure backend features must run E2E to verify related pages have no regression
 8. **Code review** — After all tasks complete, invoke `/code-review --base main`
    - Runs automatically (Codex + Gemini in parallel), no user confirmation needed
    - PASS / PASS_WITH_WARNINGS → ready to merge
