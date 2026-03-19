@@ -25,12 +25,12 @@ const invalidChanges = [
     resourceRid: 'ri.ontology.object-type.def',
     changeType: 'CREATE',
     before: null,
-    after: {},
+    after: {} as Record<string, unknown>,
     timestamp: '2026-01-01T00:00:00Z',
   },
 ];
 
-let mockChanges = validChanges;
+let mockChanges: typeof validChanges | typeof invalidChanges = validChanges;
 
 vi.mock('@/api/working-state', () => ({
   useWorkingState: () => ({
