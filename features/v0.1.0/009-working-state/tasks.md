@@ -311,7 +311,7 @@
 
 ## Phase 5: 前端 — Sidebar 入口 + 全局挂载
 
-### T12: HomeSidebar 修改 + ChangeActions/SaveDialog 全局挂载
+### T12: HomeSidebar 修改 + 全局挂载 + 测试
 
 - [ ] **T12**
 - 文件:
@@ -331,7 +331,11 @@
     - 在 layout 中挂载 `<ChangeActions />` 和 `<SaveDialog />`，使其在所有页面生效
     - ChangeActions 通过 Portal 注入 TopBar，SaveDialog 作为全局 Modal
   - import 新增：`HistoryOutlined`, `EditOutlined`, `useWorkingState`, `useSaveDialogStore`, `ChangeActions`, `SaveDialog`
-- 依赖: T09（ChangeActions）、T10（SaveDialog）、T11（ErrorsTab/ChangeItem）
+  - **测试**（在既有 HomeSidebar 测试中补充，或新建 `components/layout/__tests__/HomeSidebar.test.tsx`）：
+    - History 导航项出现在菜单中 → AC-15
+    - 有 WorkingState 时显示 Unsaved Changes 入口 → AC-13
+    - 点击 Unsaved Changes 调用 openDialog('changes') → AC-14
+- 依赖: T09（ChangeActions）、T11（SaveDialog）、T10（ErrorsTab/ChangeItem）
 - 覆盖 AC: AC-13, AC-14, AC-15
 
 ---
