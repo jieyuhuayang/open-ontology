@@ -24,6 +24,12 @@ vi.mock('@/api/search', () => ({
   useSearch: () => ({ data: null, isLoading: false, error: null }),
 }));
 
+vi.mock('@/api/working-state', () => ({
+  useWorkingState: () => ({ data: null, isLoading: false, error: null }),
+  useDiscardAll: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  DEFAULT_ONTOLOGY_RID: 'ri.ontology.ontology.default',
+}));
+
 describe('HomeLayout', () => {
   function renderWithRouter() {
     const router = createMemoryRouter([
