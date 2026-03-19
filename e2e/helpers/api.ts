@@ -87,7 +87,7 @@ export async function createPublishableObjectType(
       datasetName: `${id}-ds`,
       sheetName: previewData.sheetName ?? null,
       hasHeader: true,
-      selectedColumns: previewData.columns.map((c: { name: string }) => c.name),
+      selectedColumns: previewData.preview.columns.map((c: { name: string }) => c.name),
       columnTypeOverrides: {},
       ontologyRid: ONTOLOGY_RID,
     },
