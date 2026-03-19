@@ -375,11 +375,12 @@ ObjectTypeDetailLayout (OT_NAV_ITEMS 新增 history)
 
 ### 关键组件说明
 
-**SaveButton**
+**ChangeActions**（SaveButton + DiscardButton 组合组件）
 - 使用 `createPortal` 渲染到 `document.getElementById('change-status-slot')`
 - 通过 `useWorkingState()` hook 获取当前 WorkingState
 - 无 WorkingState 或 changes 为空时不渲染
-- 显示：`Save (N)` 按钮（N = changes.length），type="primary"
+- 显示：`Save (N)` 按钮（primary，N = changes.length）+ `Discard` 按钮（default/danger text）
+- Save 点击 → 打开 SaveDialog；Discard 点击 → 确认对话框 → 调用 DELETE /working-state
 
 **SaveDialog**
 - Ant Design Modal，宽度 640px
