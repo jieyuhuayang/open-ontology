@@ -238,5 +238,6 @@ function getSelectedKey(pathname: string): string {
   if (pathname.startsWith('/properties')) return '/properties';
   if (pathname.startsWith('/action-types')) return '/action-types';
   if (pathname.startsWith('/data-connection')) return '/data-connection';
+  if (pathname.startsWith('/history')) return '/history';
   return '/';
 }
