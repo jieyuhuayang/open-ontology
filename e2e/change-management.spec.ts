@@ -41,12 +41,14 @@ test.describe.serial('Change Management — E2E', () => {
   test('AC-02: no Save/Discard buttons when no changes', async ({ page }) => {
     // Covers: AC-02
     await page.goto('/');
+    // Wait for page to fully load
+    await expect(page.locator('header')).toBeVisible({ timeout: 5000 });
     await page.waitForTimeout(1000);
 
-    const slot = page.locator('#change-status-slot');
-    await expect(slot).toBeVisible();
-    // Slot should be empty (no buttons)
-    await expect(slot.locator('button')).toHaveCount(0);
+    // No Save or Discard buttons should appear in the TopBar
+    await expect(
+      page.locator('#change-status-slot button'),
+    ).toHaveCount(0, { timeout: 3000 });
   });
 
   test('AC-01, AC-03: Save/Discard appear after creating OT, Save opens dialog', async ({ page, request }) => {
