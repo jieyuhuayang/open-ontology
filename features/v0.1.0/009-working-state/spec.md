@@ -154,6 +154,7 @@
 - 当 ChangeRecord 中引用的资源已被后续删除时，History 详情中以 resource_rid 作为显示名（前端 best-effort 解析，不阻塞渲染）
 - 当 History 页面无任何 ChangeRecord 时，显示空状态插图 + "No changes have been published yet"
 - 当分页请求 `page` 超出范围时，返回空列表（与其他列表 API 行为一致）
+- **F011 对接点**：Publish 成功后，F011-object-sync 将扩展 publish 流程，对配好 backing datasource 的 OT 触发实例同步。F009 不涉及实例同步逻辑
 - **不支持**：Warnings 选项卡（PRD 6.1.2 提到非阻塞建议类警告，MVP 无 warning 来源，延后到 v0.2.0）
 - **不支持**：冲突检测与合并（单用户 MVP 不需要，延后到 v0.2.0）
 - **不支持**：Rollback 功能（延后到 P1）
