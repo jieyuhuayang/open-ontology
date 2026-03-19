@@ -26,8 +26,15 @@ vi.mock('@/api/search', () => ({
 
 vi.mock('@/api/working-state', () => ({
   useWorkingState: () => ({ data: null, isLoading: false, error: null }),
+  usePublish: () => ({ mutateAsync: vi.fn(), isPending: false }),
   useDiscardAll: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useDiscardChange: () => ({ mutate: vi.fn(), isPending: false }),
   DEFAULT_ONTOLOGY_RID: 'ri.ontology.ontology.default',
+}));
+
+vi.mock('@/api/history', () => ({
+  useHistory: () => ({ data: null, isLoading: false }),
+  historyKeys: { all: ['history'], lists: () => ['history', 'list'] },
 }));
 
 describe('HomeLayout', () => {
