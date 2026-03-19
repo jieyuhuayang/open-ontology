@@ -391,9 +391,8 @@
       - 按 version 降序排列
       - 每条显示：版本号、时间、变更类型
       - 空状态：`Empty` + `t('changeManagement.noHistory')`
-  - **router.tsx 修改**：OT detail children 新增 `{ path: 'history', element: <ObjectTypeHistoryPage /> }`
-    - **影响范围**：仅在 OT detail children 追加一个路由
-  - **测试**（内含于组件文件或 `__tests__/ObjectTypeHistoryPage.test.tsx`）：
+  - **router.tsx 修改**：OT detail children 新增 `{ path: 'history', element: <ObjectTypeHistoryPage /> }`。**影响范围**：仅在 OT detail children 追加一个路由
+  - **测试**（`pages/object-types/__tests__/ObjectTypeHistoryPage.test.tsx`）：
     - OT 有历史时显示列表 → AC-24
     - OT 无历史时显示空状态 → AC-25
     - OT nav 含 History 项 → AC-23
