@@ -18,7 +18,7 @@
 | ObjectType              | 003-object-type-crud                              | CRUD + WorkingState               |
 | Property（对象类型属性）        | 007-property-management                           | 属性定义、类型、默认值、格式化规则                 |
 | LinkType                | 006-link-type-crud                                | 链接类型 CRUD，包括端点定义、基数约束             |
-| WorkingState / Change   | 003-object-type-crud (Phase 1)                    | 草稿/已发布状态机，变更管理                    |
+| WorkingState / Change   | 003-object-type-crud (基础) + 009-working-state (扩展: discard-single, history 读取) | 草稿/已发布状态机，变更管理 |
 | DataSource / Connection | 010-data-connection                               | 连接注册、测试、Schema 提取                 |
 | Dataset / DatasetColumn | 010-data-connection（写入）/ 003-object-type-crud（查询） | Dataset 由 DC 创建，OT 查询 + in-use 判定 |
 
