@@ -14,6 +14,7 @@ from app.domain.working_state import (
     ChangeRecord,
     ChangeState,
     ChangeType,
+    HistoryListResponse,
     ResourceType,
     WorkingState,
 )
