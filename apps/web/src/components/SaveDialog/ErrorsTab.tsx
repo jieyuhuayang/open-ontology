@@ -24,7 +24,7 @@ export function getValidationErrors(changes: Change[]): ValidationError[] {
         changeId: change.id,
         resourceRid: change.resourceRid,
         resourceType: change.resourceType,
-        message: `${change.resourceType} is missing a display name`,
+        message: `${change.resourceType}: missing display name`,
       });
     }
   }
