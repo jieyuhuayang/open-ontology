@@ -29,6 +29,22 @@ RESERVED_API_NAMES = frozenset(
 )
 
 
+def validate_rid(rid: str) -> None:
+    """Validate RID format: ri.<namespace>.<type>.<id>, max 200 chars."""
+    if len(rid) > RID_MAX_LENGTH:
+        raise AppError(
+            code="INVALID_RID",
+            message=f"RID exceeds maximum length of {RID_MAX_LENGTH} characters",
+            status_code=400,
+        )
+    if not RID_PATTERN.match(rid):
+        raise AppError(
+            code="INVALID_RID",
+            message=f"Invalid RID format: must match 'ri.<namespace>.<type>.<id>'",
+            status_code=400,
+        )
+
+
 def validate_api_name(api_name: str) -> None:
     """Validate apiName: PascalCase format + reserved word check (AD-7)."""
     if not PASCAL_CASE_PATTERN.match(api_name):
