@@ -522,37 +522,7 @@ class WorkingStateService:
         sync_service = ObjectSyncService(self._session)
         for ot_rid in ot_rids_to_sync:
             try:
-                ot = await ObjectTypeStorage.get_by_rid(self._session, ot_rid)
-                if not ot or not ot.backing_datasource:
-                    continue
-                backing = ot.backing_datasource
-                if not isinstance(backing, dict) or not backing.get("rid"):
-                    continue
-
-                dataset_rid = backing["rid"]
-                has_pk = bool(ot.primary_key_property_id)
-
-                props = await PropertyStorage.list_by_object_type(self._session, ot_rid)
-                property_column_map = {}
-                pk_api_name = None
-                title_api_name = None
-                for p in props:
-                    if p.backing_column:
-                        property_column_map[p.api_name] = p.backing_column
-                    if p.is_primary_key:
-                        pk_api_name = p.api_name
-                    if p.is_title_key:
-                        title_api_name = p.api_name
-
-                await sync_service.sync(
-                    ot_rid,
-                    dataset_rid,
-                    triggered_by="system",
-                    has_primary_key=has_pk,
-                    primary_key_property_api_name=pk_api_name,
-                    title_key_property_api_name=title_api_name,
-                    property_column_map=property_column_map if property_column_map else None,
-                )
+                await sync_service.sync_for_object_type(ot_rid, triggered_by="system")
             except Exception:
                 logger.exception("Post-publish sync failed for OT %s", ot_rid)
 
