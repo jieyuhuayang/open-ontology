@@ -71,7 +71,8 @@ describe('getValidationErrors', () => {
   it('returns error for LinkType missing sideB displayName', () => {
     const errors = getValidationErrors([invalidLinkType]);
     expect(errors).toHaveLength(1);
-    expect(errors[0]?.message).toContain('LinkType: missing display name');
+    expect(errors[0]?.messageKey).toBe('changeManagement.missingDisplayName');
+    expect(errors[0]?.messageParams).toEqual({ type: 'LinkType' });
   });
 });
 
