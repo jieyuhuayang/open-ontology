@@ -63,8 +63,8 @@ export function useCreateLinkType() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: linkTypeKeys.lists() });
       queryClient.setQueryData(linkTypeKeys.detail(data.rid), data);
-      queryClient.invalidateQueries({ queryKey: workingStateKeys.all });
-      queryClient.invalidateQueries({ queryKey: searchKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['working-state'] });
+      queryClient.invalidateQueries({ queryKey: ['search'] });
     },
   });
 }
@@ -79,8 +79,8 @@ export function useUpdateLinkType(rid: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: linkTypeKeys.lists() });
       queryClient.invalidateQueries({ queryKey: linkTypeKeys.detail(rid) });
-      queryClient.invalidateQueries({ queryKey: workingStateKeys.all });
-      queryClient.invalidateQueries({ queryKey: searchKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['working-state'] });
+      queryClient.invalidateQueries({ queryKey: ['search'] });
     },
   });
 }
