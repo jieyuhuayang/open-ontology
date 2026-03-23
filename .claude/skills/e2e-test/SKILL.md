@@ -106,9 +106,13 @@ cd /Users/lilu/Projects/OpenOntology && npx playwright test e2e/<test-file>.spec
 |-----------|---------|
 | `strict mode violation` | 加 `.first()` 或 `.filter()` |
 | `expected string, got object` | fill 参数改为 string |
-| `Timeout exceeded` | 检查选择器 + headed 模式调试 |
+| `Timeout exceeded` (Select option) | 用 API 查实际 dataset columns，不要假设列名 |
+| `Timeout exceeded` (其他) | 检查选择器 + headed 模式调试 |
 | `toHaveCount` 失败 | 检查前缀隔离 + 增加 timeout |
-| `400/409 on DELETE` | 用 `cleanupByPrefix` |
+| `400/409 on DELETE` OT | 先删 Link Types 再删 OTs |
+| `400/409 on DELETE` property | 用 `cleanupByPrefix` |
+| `API_NAME_CONFLICT` | 同 OT 对间多链接需自定义 API Name |
+| 行点击无反应（半透明） | Dataset inUse，先删关联 OT |
 
 **最多 3 轮修复**。如果 3 轮后仍有失败，输出剩余问题让用户决定。
 
