@@ -465,3 +465,6 @@ Open Ontology 支持**两种数据接入模式**：
 | OT 编辑页"替换数据源" | 从本模块的 Dataset 列表中选择新的 Dataset |
 | 连接不可用降级 | 当 Live Dataset 对应的外部连接不可用时，OT 数据预览展示降级提示："外部数据源当前不可用，请前往 Data Connection 检查连接状态" |
 | 提示引导 | OT 创建向导中展示"需要导入新数据？请前往 Data Connection 模块"引导文案 |
+| Publish 后实例同步 | Publish 成功后，Ontology Manager 自动触发数据同步：Snapshot Dataset 从平台内部 `dataset_rows` 读取数据；Live Dataset 通过本模块的连接配置实时查询外部 MySQL。同步结果写入对象实例（Object Instance）表 |
+| 手动 Sync Now | 用户在 OT 详情页「数据」版块点击 "Sync Now"，触发与自动同步相同的数据读取流程，行为一致 |
+| Live 同步降级 | Live 模式同步时若外部连接不可用，同步标记为失败；OT「数据」版块展示降级提示，复用"连接不可用降级"的提示逻辑和重试入口 |
