@@ -19,6 +19,7 @@ import { useSidebarStore } from '@/stores/sidebar-store';
 import { useSearchStore, type SearchActiveType } from '@/stores/search-store';
 import { useObjectTypes } from '@/api/object-types';
 import { useLinkTypes } from '@/api/link-types';
+import { useAllProperties } from '@/api/properties';
 import { useSearch } from '@/api/search';
 import { useWorkingState } from '@/api/working-state';
 import { useSaveDialogStore } from '@/stores/save-dialog-store';
