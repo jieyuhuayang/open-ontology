@@ -296,3 +296,20 @@ npx playwright test --reporter=list
 - **结论**: 误报（均已处理）
 - **分析**: 审查全部 7 个 `skipGlobalError: true` 的 mutation（OT create/delete、LT create/delete、Property create/update/delete），调用方均在 `mutateAsync()` 外包裹 try-catch 并通过 `message.error()` 展示服务端错误。
 - **日期**: 2026-03-24
+
+### 3.1 OT 删除级联遗漏 draft LinkTypes
+- **结论**: 已修复
+- **修复内容**: 在 `object_type_service.delete()` 中新增 WS 草稿 LinkType 扫描 — 除查询 DB 已发布 LT 外，额外检查 WS 中 CREATE/UPDATE 的 LT 变更，若 `sideA.objectTypeRid` 或 `sideB.objectTypeRid` 匹配被删除 OT，则生成对应 DELETE 变更
+- **影响文件**: `object_type_service.py`
+- **日期**: 2026-03-24
+
+### 3.2 Dataset 删除对 WS 草稿 OT 引用的覆盖确认
+- **结论**: 误报（已正确覆盖）
+- **分析**: `_get_ws_backing_map()` 正确扫描 WS 中 `ChangeType.CREATE` 和 `ChangeType.UPDATE` 的 OT 变更，提取 `backingDatasource.rid`。`get_in_use_map()` 合并 published + WS 引用并排除被 DELETE 的 OT。覆盖完整。
+- **日期**: 2026-03-24
+
+### 3.3 Property 删除时 OT 的 PK/TK 引用清理
+- **结论**: 已修复（TK 保护缺失）
+- **修复内容**: PK 属性删除已有保护（返回 400），但 TK（Title Key）属性无同等保护。在 `delete()` 和 `batch_delete()` 中添加 `isTitleKey` 检查，删除 TK 属性时返回 `PROPERTY_TITLE_KEY_CANNOT_DELETE` 错误，要求用户先重新指定 TK
+- **影响文件**: `property_service.py`
+- **日期**: 2026-03-24
