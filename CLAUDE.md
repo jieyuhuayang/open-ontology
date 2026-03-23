@@ -95,7 +95,7 @@ cd apps/web && pnpm dev
 ## MVP 优先级（v0.1.0）
 
 - **P0**：UI 框架、Object Type CRUD、Link Type CRUD、本体搜索、变更管理/版本控制
-- **P1**：属性值格式化、对象关联链接、对象类型复制、本体导入导出（JSON）
+- **P1**：属性值格式化、对象关联链接、~~对象类型复制~~（延后到 v0.2.0）、~~本体导入导出（JSON）~~（延后到 v0.2.0）
 - **P2（延后）**：Discover 页定制、对象类型分组、共享属性、Action Type CRUD
 
 ## 代码分层规则
