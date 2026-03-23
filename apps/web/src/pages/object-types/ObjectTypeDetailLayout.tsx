@@ -83,13 +83,11 @@ export default function ObjectTypeDetailLayout() {
 
   if (!data) {
     return (
-      <Layout style={{ justifyContent: 'center', alignItems: 'center', minHeight: 300 }}>
-        <div style={{ textAlign: 'center' }}>
-          <p>{t('objectType.notFound')}</p>
-          <Button type="link" onClick={() => navigate('/object-types')}>
-            {t('objectType.backToList')}
-          </Button>
-        </div>
+      <Layout style={{ justifyContent: 'center', alignItems: 'center', minHeight: 300, textAlign: 'center' }}>
+        <p>{t('objectType.notFound')}</p>
+        <Button type="link" onClick={() => navigate('/object-types')}>
+          {t('objectType.backToList')}
+        </Button>
       </Layout>
     );
   }
