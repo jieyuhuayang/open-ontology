@@ -438,6 +438,66 @@ class DatasetRowModel(Base):
     __table_args__ = (Index("ix_dataset_rows_dataset", "dataset_rid"),)
 
 
+class ObjectInstanceModel(Base):
+    __tablename__ = "object_instances"
+
+    rid = Column(String, primary_key=True)
+    object_type_rid = Column(
+        String,
+        ForeignKey("object_types.rid", ondelete="CASCADE"),
+        nullable=False,
+    )
+    primary_key_value = Column(Text, nullable=True)
+    title_value = Column(Text, nullable=True)
+    properties = Column(JSONB, nullable=False, server_default=text("'{}'::jsonb"))
+    source_dataset_rid = Column(
+        String,
+        ForeignKey("datasets.rid", ondelete="SET NULL"),
+        nullable=True,
+    )
+    source_row_index = Column(Integer, nullable=True)
+    data_hash = Column(Text, nullable=True)
+    synced_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    __table_args__ = (
+        Index("ix_oi_ot", "object_type_rid"),
+        Index(
+            "ix_oi_ot_pk",
+            "object_type_rid",
+            "primary_key_value",
+            unique=True,
+            postgresql_where=text("primary_key_value IS NOT NULL"),
+        ),
+        Index("ix_oi_properties", "properties", postgresql_using="gin"),
+    )
+
+
+class SyncJobModel(Base):
+    __tablename__ = "sync_jobs"
+
+    rid = Column(String, primary_key=True)
+    object_type_rid = Column(
+        String,
+        ForeignKey("object_types.rid", ondelete="CASCADE"),
+        nullable=False,
+    )
+    dataset_rid = Column(String, nullable=False)
+    status = Column(Text, nullable=False, server_default="running")
+    sync_type = Column(Text, nullable=False, server_default="full")
+    total_rows = Column(Integer, server_default="0")
+    inserted_count = Column(Integer, server_default="0")
+    updated_count = Column(Integer, server_default="0")
+    deleted_count = Column(Integer, server_default="0")
+    unchanged_count = Column(Integer, server_default="0")
+    error_message = Column(Text, nullable=True)
+    started_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    completed_at = Column(DateTime(timezone=True), nullable=True)
+    triggered_by = Column(Text, nullable=False, server_default="system")
+
+    __table_args__ = (Index("ix_sj_ot", "object_type_rid"),)
+
+
 class MySQLConnectionModel(Base):
     __tablename__ = "mysql_connections"
 
