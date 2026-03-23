@@ -75,7 +75,16 @@ export default function HomeSidebar() {
         {
           key: '/properties',
           icon: <UnorderedListOutlined />,
-          label: t('nav.properties'),
+          label: collapsed ? (
+            t('nav.properties')
+          ) : (
+            <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              {t('nav.properties')}
+              {propertyCount != null && (
+                <Text type="secondary" style={{ fontSize: 12 }}>{propertyCount}</Text>
+              )}
+            </span>
+          ),
         },
         {
           key: '/link-types',
