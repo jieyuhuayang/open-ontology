@@ -95,17 +95,25 @@ async function createFkLink(
 // ──────────── Tests ────────────
 
 test.describe.serial('Create Link Types — ordered', () => {
-  // Clean up existing link types before the suite
-  test('cleanup: delete all existing link types', async ({ request }) => {
+  // Only delete link types created by THIS test suite
+  const TEST_LT_IDS = new Set([
+    'analyst-latest-report',
+    'company-latest-report',
+    'analyst-coverage',
+    'fund-holding',
+    'analyst-company-via-report',
+  ]);
+
+  test('cleanup: delete test link types from previous runs', async ({ request }) => {
     const resp = await request.get('http://localhost:8000/api/v1/link-types');
+    if (!resp.ok()) return;
     const data = await resp.json();
     for (const lt of data.items) {
+      if (!TEST_LT_IDS.has(lt.id as string)) continue;
       await request.delete(`http://localhost:8000/api/v1/link-types/${lt.rid}`);
     }
-    // Verify clean state
-    const check = await request.get('http://localhost:8000/api/v1/link-types');
-    const checkData = await check.json();
-    expect(checkData.items).toHaveLength(0);
+    // Discard any pending changes from cleanup
+    await request.delete('http://localhost:8000/api/v1/ontologies/ri.ontology.ontology.default/working-state').catch(() => {});
   });
 
   // ────── FK #4: analyst-latest-report ──────
@@ -251,14 +259,10 @@ test.describe.serial('Create Link Types — ordered', () => {
     const resp = await request.get('http://localhost:8000/api/v1/link-types');
     const data = await resp.json();
 
-    const ids = data.items.map((lt: { id: string }) => lt.id).sort();
-    expect(ids).toEqual([
-      'analyst-company-via-report',
-      'analyst-coverage',
-      'analyst-latest-report',
-      'company-latest-report',
-      'fund-holding',
-    ]);
+    const ids = data.items.map((lt: { id: string }) => lt.id);
+    for (const ltId of TEST_LT_IDS) {
+      expect(ids).toContain(ltId);
+    }
 
     // Verify specific properties
     const byId = Object.fromEntries(data.items.map((lt: { id: string }) => [lt.id, lt]));

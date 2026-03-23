@@ -14,6 +14,12 @@ export async function cleanupByPrefix(
   request: APIRequestContext,
   prefix: string,
 ): Promise<void> {
+  if (prefix.length < 5) {
+    throw new Error(
+      `Cleanup prefix too short: "${prefix}" (min 5 chars). This prevents accidental deletion of non-test data.`,
+    );
+  }
+
   const resp = await request.get(`${API}/object-types`);
   if (!resp.ok()) return;
 

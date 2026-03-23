@@ -54,6 +54,10 @@ export type Change = components['schemas']['Change'];
 export type ChangeRecord = components['schemas']['ChangeRecord'];
 export type HistoryListResponse = components['schemas']['HistoryListResponse'];
 
+export type ObjectInstanceItem = components['schemas']['ObjectInstance'];
+export type ObjectInstanceListResponse = components['schemas']['ObjectInstanceListResponse'];
+export type SyncJob = components['schemas']['SyncJob'];
+
 export type SearchResponse = components['schemas']['SearchResponse'];
 export type SearchResultItem = components['schemas']['SearchResultItem'];
 export type SearchTypeResult = components['schemas']['SearchTypeResult'];

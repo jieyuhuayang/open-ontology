@@ -11,7 +11,7 @@
 |------|------|------|
 | spec.md | ✅ 已评审 | 2026-03-23 用户确认 |
 | tasks.md | ✅ 已拆解 | 2026-03-23 审查通过（1 medium 已修复，2 low 跳过） |
-| 实现 | 🔲 未开始 | 0 / 12 完成 |
+| 实现 | ✅ 完成 | 12 / 12 完成 |
 
 ---
 
@@ -30,7 +30,7 @@
 
 ### Phase 1：基础设施
 
-- [ ] **T001**: 数据库迁移 + ORM 模型
+- [x] **T001**: 数据库迁移 + ORM 模型
   **文件**: `apps/server/alembic/versions/0010_add_object_instances_and_sync_jobs.py`, `apps/server/app/storage/models.py`
   **逻辑**:
   - 创建 `object_instances` 表：rid(PK), object_type_rid(FK→object_types CASCADE), primary_key_value, title_value, properties(JSONB DEFAULT '{}'), source_dataset_rid(FK→datasets SET NULL), source_row_index, data_hash, synced_at, created_at
@@ -42,7 +42,7 @@
   - Downgrade 方案：`drop table sync_jobs; drop table object_instances;`（含索引），标准可逆迁移
   **依赖**: 无
 
-- [ ] **T002**: Domain 模型 + Storage 层
+- [x] **T002**: Domain 模型 + Storage 层
   **文件**: `apps/server/app/domain/object_instance.py`, `apps/server/app/storage/object_instance_storage.py`, `apps/server/app/storage/sync_job_storage.py`
   **逻辑**:
   - Domain: `ObjectInstance`(DomainModel), `ObjectInstanceListResponse`, `SyncJob`(DomainModel)
@@ -52,7 +52,7 @@
 
 ### Phase 2：后端核心逻辑（Test-First）
 
-- [ ] **T003**: ObjectSyncService 单元测试
+- [x] **T003**: ObjectSyncService 单元测试
   **文件**: `apps/server/tests/unit/test_object_sync_service.py`
   **逻辑**: 用 mock_db_session mock 数据库，测试同步核心逻辑：
   - `test_sync_incremental_first_time` — 首次同步全部 INSERT（AC-02）
@@ -66,7 +66,7 @@
   **覆盖 AC**: AC-02, AC-03, AC-04, AC-05, AC-06, AC-07
   **依赖**: T002
 
-- [ ] **T004**: ObjectSyncService 实现
+- [x] **T004**: ObjectSyncService 实现
   **文件**: `apps/server/app/services/object_sync_service.py`
   **逻辑**:
   - `sync(ot_rid, dataset_rid, triggered_by, has_primary_key, pk_api_name, title_api_name, property_column_map)` — 主入口
@@ -80,7 +80,7 @@
   **覆盖 AC**: AC-02, AC-03, AC-04, AC-05, AC-06, AC-07
   **依赖**: T002
 
-- [ ] **T005**: ObjectInstanceService 实现
+- [x] **T005**: ObjectInstanceService 实现
   **文件**: `apps/server/app/services/object_instance_service.py`
   **逻辑**:
   - `list_by_object_type(ot_rid, page, page_size)` → 委托 ObjectInstanceStorage.list_by_object_type，返回 ObjectInstanceListResponse
@@ -89,7 +89,7 @@
 
 ### Phase 3：Publish 触发同步
 
-- [ ] **T006**: WorkingStateService 扩展——publish 后触发同步
+- [x] **T006**: WorkingStateService 扩展——publish 后触发同步
   **文件**: `apps/server/app/services/working_state_service.py`
   **逻辑**:
   - 在 `publish()` 方法末尾（flush 之后、return record 之前）调用 `_trigger_post_publish_sync(changes)`
@@ -101,7 +101,7 @@
 
 ### Phase 4：后端 API 层（Test-First）
 
-- [ ] **T007**: API 集成测试
+- [x] **T007**: API 集成测试
   **文件**: `apps/server/tests/integration/test_object_instance_api.py`
   **逻辑**: 使用 seeded_client fixture，测试 4 个 API 端点：
   - `test_list_instances_empty` — 无实例时返回空列表 200（AC-08）
@@ -116,7 +116,7 @@
   **覆盖 AC**: AC-08, AC-09, AC-10, AC-11, AC-12, AC-13, AC-14, AC-21
   **依赖**: T005, T006
 
-- [ ] **T008**: API Router 实现 + main.py 注册
+- [x] **T008**: API Router 实现 + main.py 注册
   **文件**: `apps/server/app/routers/object_instances.py`, `apps/server/app/main.py`
   **逻辑**:
   - `router = APIRouter(prefix="/api/v1", tags=["object-instances"])`
@@ -131,7 +131,7 @@
 
 ### Phase 5：OpenAPI + TS 类型重生成
 
-- [ ] **T009**: 重生成 openapi.json + TypeScript 类型
+- [x] **T009**: 重生成 openapi.json + TypeScript 类型
   **文件**: `apps/server/openapi.json`, `apps/web/src/generated/api.ts`
   **逻辑**:
   - 后端：`PYTHONPATH=. uv run python -c "..."` 重生成 openapi.json
@@ -140,7 +140,7 @@
 
 ### Phase 6：前端
 
-- [ ] **T010**: API Hooks + i18n
+- [x] **T010**: API Hooks + i18n
   **文件**: `apps/web/src/api/object-instances.ts`, `apps/web/src/locales/en-US/common.json`, `apps/web/src/locales/zh-CN/common.json`
   **逻辑**:
   - API hooks：`useObjectInstances(otRid, page, pageSize)`, `useObjectInstance(otRid, rid)`, `useTriggerSync(otRid)`, `useSyncStatus(otRid)`
@@ -149,7 +149,7 @@
   - i18n 新增：`detail.instances`, `instances.title`, `instances.noSyncYet`, `instances.publishToSync`, `instances.configureDatasource`, `instances.syncNow`, `instances.lastSynced`, `instances.syncStats`, `instances.syncStatus.running/completed/failed`（中英文各约 11 个 key）
   **依赖**: T009
 
-- [ ] **T011**: ObjectTypeInstancesPage + 路由 + Tab 注册
+- [x] **T011**: ObjectTypeInstancesPage + 路由 + Tab 注册
   **文件**: `apps/web/src/pages/object-types/ObjectTypeInstancesPage.tsx`, `apps/web/src/pages/object-types/ObjectTypeDetailLayout.tsx`, `apps/web/src/router.tsx`
   **逻辑**:
   - ObjectTypeInstancesPage：
@@ -163,7 +163,7 @@
   **覆盖 AC**: AC-15, AC-16, AC-17, AC-18, AC-19, AC-20
   **依赖**: T010
 
-- [ ] **T012**: 前端测试
+- [x] **T012**: 前端测试
   **文件**: `apps/web/src/pages/object-types/__tests__/ObjectTypeInstancesPage.test.tsx`
   **逻辑**:
   - `test_renders_instances_tab` — 验证 Instances Tab 出现在导航中（AC-15）

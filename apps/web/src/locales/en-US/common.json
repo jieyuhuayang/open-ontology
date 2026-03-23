@@ -25,7 +25,8 @@
   "detail": {
     "overview": "Overview",
     "properties": "Properties",
-    "datasources": "Datasources"
+    "datasources": "Datasources",
+    "instances": "Instances"
   },
   "discover": {
     "recentlyViewed": "Recently viewed object types",
@@ -693,6 +694,20 @@
     "columnSideA": "SIDE A",
     "columnSideB": "SIDE B"
   },
+  "instances": {
+    "title": "Object Instances",
+    "noSyncYet": "No sync has been performed yet",
+    "publishToSync": "Publish your changes to trigger the first sync",
+    "configureDatasource": "Configure a backing datasource and publish to sync",
+    "syncNow": "Sync Now",
+    "lastSynced": "Last synced: {{time}}",
+    "syncStats": "+{{inserted}} / ~{{updated}} / -{{deleted}}",
+    "syncStatus": {
+      "running": "Syncing",
+      "completed": "Synced",
+      "failed": "Failed"
+    }
+  },
   "changeManagement": {
     "save": "Save",
     "discard": "Discard",
@@ -720,6 +735,7 @@
     "properties": "Properties",
     "linkTypes": "Link Types",
     "pendingChanges": "Pending changes",
-    "missingDisplayName": "{{type}}: missing display name"
+    "missingDisplayName": "{{type}}: missing display name",
+    "editsCount": "{{count}} edits"
   }
 }

@@ -187,6 +187,14 @@ cd apps/web && pnpm dev
 - 测试数据 ID 统一 `e2e-<feature>-` 前缀，确保跨套件隔离
 - 完成前执行 `npx playwright test e2e/<test_file>.spec.ts --reporter=list` 并确认通过
 
+**E2E 数据隔离（强制）**
+
+- **禁止无条件删除所有资源** — cleanup 必须按前缀或白名单过滤，只删除本套件创建的数据
+- **前缀最短 5 字符** — `cleanupByPrefix()` 内置安全检查，短前缀会抛错
+- **cleanup 必须双重执行** — setup 阶段清理上次残留 + 末尾任务清理本次数据
+- **E2E 测试运行前后，非测试数据必须保持不变** — 这是不可违反的红线
+- 使用共享 helper `cleanupByPrefix(request, 'e2e-<suite>-')` 进行清理（`e2e/helpers/fixtures.ts`）
+
 **禁止行为**
 
 - 禁止未运行测试就标记任务完成 — 必须运行并展示输出

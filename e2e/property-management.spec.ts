@@ -27,11 +27,11 @@ test.describe.serial('Property Management — E2E', () => {
   // ──────── Setup ────────
   test('setup: create object types and properties', async ({ request }) => {
     // Clean any leftover test data
-    await cleanupByPrefix(request, 'e2e-');
+    await cleanupByPrefix(request, 'e2e-pm-');
 
     // Create two object types
-    otRidA = await createObjectType(request, 'e2e-employee', 'E2E Employee');
-    otRidB = await createObjectType(request, 'e2e-department', 'E2E Department');
+    otRidA = await createObjectType(request, 'e2e-pm-employee', 'E2E Employee');
+    otRidB = await createObjectType(request, 'e2e-pm-department', 'E2E Department');
 
     // Create properties on OT-A
     const p1 = await createProperty(request, otRidA, 'full-name', { apiName: 'fullName' });
@@ -427,12 +427,12 @@ test.describe.serial('Property Management — E2E', () => {
 
   // ──────── Cleanup ────────
   test('cleanup: delete test object types', async ({ request }) => {
-    await cleanupByPrefix(request, 'e2e-');
+    await cleanupByPrefix(request, 'e2e-pm-');
 
     // Verify test OTs are gone
     const resp = await request.get(`${API}/object-types`);
     const data = await resp.json();
-    const testOts = data.items.filter((ot: { id: string }) => (ot.id as string).startsWith('e2e-'));
+    const testOts = data.items.filter((ot: { id: string }) => (ot.id as string).startsWith('e2e-pm-'));
     expect(testOts).toHaveLength(0);
   });
 });

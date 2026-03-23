@@ -25,7 +25,8 @@
   "detail": {
     "overview": "概览",
     "properties": "属性",
-    "datasources": "数据源"
+    "datasources": "数据源",
+    "instances": "实例"
   },
   "discover": {
     "recentlyViewed": "最近查看的对象类型",
@@ -694,6 +695,20 @@
     "columnSideA": "A 端",
     "columnSideB": "B 端"
   },
+  "instances": {
+    "title": "对象实例",
+    "noSyncYet": "尚未执行同步",
+    "publishToSync": "发布变更以触发首次同步",
+    "configureDatasource": "配置底层数据源并发布以触发同步",
+    "syncNow": "立即同步",
+    "lastSynced": "上次同步：{{time}}",
+    "syncStats": "+{{inserted}} / ~{{updated}} / -{{deleted}}",
+    "syncStatus": {
+      "running": "同步中",
+      "completed": "已同步",
+      "failed": "同步失败"
+    }
+  },
   "changeManagement": {
     "save": "保存",
     "discard": "丢弃",
@@ -721,6 +736,7 @@
     "properties": "属性",
     "linkTypes": "链接类型",
     "pendingChanges": "待处理变更",
-    "missingDisplayName": "{{type}}: 缺少展示名称"
+    "missingDisplayName": "{{type}}: 缺少展示名称",
+    "editsCount": "{{count}} 项编辑"
   }
 }

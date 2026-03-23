@@ -1,6 +1,9 @@
 """WorkingState service — change management core logic."""
 
+import logging
 from datetime import datetime, timezone
+
+logger = logging.getLogger(__name__)
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -390,6 +393,9 @@ class WorkingStateService:
         await WorkingStateStorage.delete(self._session, ws.rid)
         await self._session.flush()
 
+        # Trigger instance sync for OTs with backing datasource (F011)
+        await self._trigger_post_publish_sync(ws.changes)
+
         return record
 
     async def _apply_object_type_change(self, change: Change) -> None:
@@ -491,6 +497,34 @@ class WorkingStateService:
                 await PropertyStorage.update(self._session, change.resource_rid, update_data)
         elif change.change_type == ChangeType.DELETE:
             await PropertyStorage.delete(self._session, change.resource_rid)
+
+    async def _trigger_post_publish_sync(self, changes: list[Change]) -> None:
+        """After publish, sync instances for OTs that have backing datasource (F011)."""
+        from app.services.object_sync_service import ObjectSyncService
+
+        ot_rids_to_sync: set[str] = set()
+        for change in changes:
+            if (
+                change.resource_type == ResourceType.OBJECT_TYPE
+                and change.change_type != ChangeType.DELETE
+            ):
+                data = change.after or {}
+                backing = data.get("backingDatasource")
+                if backing and isinstance(backing, dict) and backing.get("rid"):
+                    ot_rids_to_sync.add(change.resource_rid)
+            elif change.resource_type == ResourceType.PROPERTY:
+                # For CREATE/UPDATE use after; for DELETE use before (after is None)
+                data = change.after or change.before or {}
+                ot_rid = data.get("objectTypeRid")
+                if ot_rid:
+                    ot_rids_to_sync.add(ot_rid)
+
+        sync_service = ObjectSyncService(self._session)
+        for ot_rid in ot_rids_to_sync:
+            try:
+                await sync_service.sync_for_object_type(ot_rid, triggered_by="system")
+            except Exception:
+                logger.exception("Post-publish sync failed for OT %s", ot_rid)
 
     async def discard(self, ontology_rid: str) -> None:
         ws = await self._get_working_state(ontology_rid)
