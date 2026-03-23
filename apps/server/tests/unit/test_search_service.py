@@ -130,8 +130,8 @@ async def test_search_properties_with_ot_display_name(service):
             "get_merged_view",
             new_callable=AsyncMock,
             side_effect=[
+                ot_merged,  # OT merged view (pre-loaded for property search)
                 [],  # Property merged view
-                ot_merged,  # OT merged view for display names
             ],
         ),
     ):
