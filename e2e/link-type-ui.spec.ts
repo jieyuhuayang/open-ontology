@@ -136,7 +136,7 @@ test.describe.serial('Link Type UI — List + Detail + Edit', () => {
     await page.waitForLoadState('networkidle');
     await expect(page.locator('.ant-table-thead')).toBeVisible({ timeout: 10000 });
 
-    const row = page.locator('.ant-table-tbody tr').filter({ hasText: LINK_ID });
+    const row = page.locator('.ant-table-tbody tr').filter({ hasText: 'Company' });
     await row.first().click();
 
     await expect(page).toHaveURL(/\/link-types\/ri\.ontology\.link-type\./, { timeout: 10000 });
