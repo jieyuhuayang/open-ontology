@@ -175,9 +175,10 @@ test.describe.serial('Link Type UI — List + Detail + Edit', () => {
     await expect(page.locator('.ant-radio-button-wrapper').filter({ hasText: /Active|活跃/ })).toBeVisible();
     await expect(page.locator('.ant-radio-button-wrapper').filter({ hasText: /Deprecated|已弃用/ })).toBeVisible();
 
-    // ID and RID
-    await expect(page.getByText(LINK_ID)).toBeVisible();
-    await expect(page.getByText(linkTypeRid)).toBeVisible();
+    // ID and RID (ID appears in sidebar too, so use main content area)
+    const main = page.locator('main');
+    await expect(main.getByText(LINK_ID)).toBeVisible();
+    await expect(main.getByText(linkTypeRid)).toBeVisible();
   });
 
   test('detail: Section 2 — Configuration card with join method + diagram', async ({ page }) => {
