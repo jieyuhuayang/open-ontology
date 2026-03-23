@@ -12,6 +12,7 @@ from app.domain.link_type import (
     LinkTypeUpdateRequest,
     LinkTypeWithChangeState,
 )
+from app.domain.validators import validate_rid
 from app.services.link_type_service import LinkTypeService
 
 router = APIRouter(prefix="/api/v1", tags=["link-types"])
