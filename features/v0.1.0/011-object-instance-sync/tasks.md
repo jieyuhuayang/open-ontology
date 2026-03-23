@@ -80,7 +80,7 @@
   **覆盖 AC**: AC-02, AC-03, AC-04, AC-05, AC-06, AC-07
   **依赖**: T002
 
-- [ ] **T005**: ObjectInstanceService 实现
+- [x] **T005**: ObjectInstanceService 实现
   **文件**: `apps/server/app/services/object_instance_service.py`
   **逻辑**:
   - `list_by_object_type(ot_rid, page, page_size)` → 委托 ObjectInstanceStorage.list_by_object_type，返回 ObjectInstanceListResponse
