@@ -156,19 +156,19 @@
 
 ## 8. 性能
 
-- [ ] 🔴 **8.1 get_merged_view 请求内重复调用**
+- [x] 🔴 **8.1 get_merged_view 请求内重复调用**
   单次 property create 可调用 3 次 `get_merged_view`，每次都查 DB + 遍历 WS，应加请求级缓存。
   `property_service.py:47-79`, `working_state_service.py:166-218`
 
-- [ ] 🟡 **8.2 search 对每种资源类型分别调 get_merged_view**
+- [x] 🟡 **8.2 search 对每种资源类型分别调 get_merged_view**
   搜全部 3 类时调 3 次，WS 查询部分可复用。
   `search_service.py:23-45`
 
-- [ ] 🟡 **8.3 OT/LT/Property list 内存分页**
+- [x] 🟡 **8.3 OT/LT/Property list 内存分页**
   `get_merged_view` 加载全部到内存再切片，数量大时性能差。
   `object_type_service.py:193-219`
 
-- [ ] 🟢 **8.4 MySQL import fetchall 大表 OOM**
+- [x] 🟢 **8.4 MySQL import fetchall 大表 OOM**
   整表加载到内存，应有行数上限保护或流式读取。
   `mysql_import_service.py:474-475`
 
