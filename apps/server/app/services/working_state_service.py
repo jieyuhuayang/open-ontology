@@ -323,13 +323,11 @@ class WorkingStateService:
 
             col_type_map = {col.name: col.inferred_type for col in dataset.columns}
 
-            # Check properties for this OT
-            for c in changes:
-                if c.resource_type != ResourceType.PROPERTY:
+            # Check properties for this OT using merged view for complete data
+            merged_props = await self.get_merged_view(DEFAULT_ONTOLOGY_RID, ResourceType.PROPERTY)
+            for prop_data, prop_state in merged_props:
+                if prop_state == ChangeState.DELETED:
                     continue
-                if c.change_type == ChangeType.DELETE:
-                    continue
-                prop_data = c.after or {}
                 if prop_data.get("objectTypeRid") != change.resource_rid:
                     continue
                 backing_col = prop_data.get("backingColumn")
