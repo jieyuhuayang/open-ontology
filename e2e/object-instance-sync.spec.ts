@@ -128,15 +128,16 @@ test.describe.serial('Object Instance Sync — E2E', () => {
     otRidNoDs = (await nodsResp.json()).rid;
   });
 
-  // ──────── AC-20: Disabled without datasource ────────
-  test('AC-20: Sync Now disabled when OT has no datasource', async ({ page }) => {
+  // ──────── AC-20: No datasource shows configure message ────────
+  test('AC-20: shows configure datasource message and no sync button when OT has no datasource', async ({ page }) => {
     // Covers: AC-20
     await page.goto(`/object-types/${otRidNoDs}/instances`);
     await expect(
       page.getByText(/Configure a backing datasource|配置底层数据源/),
     ).toBeVisible({ timeout: 5000 });
+    // Sync Now button should not be present (Alert shown instead of sync bar)
     const syncBtn = page.locator('button').filter({ hasText: /Sync Now|立即同步/ });
-    await expect(syncBtn).toBeDisabled();
+    await expect(syncBtn).toHaveCount(0);
   });
 
   // ──────── Cleanup ────────
