@@ -231,16 +231,32 @@ class WorkingStateService:
         return None
 
     async def _has_mapped_properties(self, ot_rid: str, changes: list[Change]) -> bool:
-        """Check if OT has at least one property with backingColumn set."""
-        # Check WS CREATE properties for this OT
+        """Check if OT has at least one property with backingColumn set.
+
+        Must account for DELETE changes that remove mapped properties and
+        UPDATE changes that add backingColumn mappings.
+        """
+        # Collect RIDs of properties being DELETEd
+        deleted_prop_rids: set[str] = set()
         for c in changes:
-            if c.resource_type == ResourceType.PROPERTY and c.change_type == ChangeType.CREATE:
+            if c.resource_type == ResourceType.PROPERTY and c.change_type == ChangeType.DELETE:
+                deleted_prop_rids.add(c.resource_rid)
+
+        # Check WS CREATE/UPDATE properties for this OT
+        for c in changes:
+            if c.resource_type != ResourceType.PROPERTY:
+                continue
+            if c.change_type in (ChangeType.CREATE, ChangeType.UPDATE):
                 after = c.after or {}
                 if after.get("objectTypeRid") == ot_rid and after.get("backingColumn"):
-                    return True
-        # Check published properties
+                    if c.resource_rid not in deleted_prop_rids:
+                        return True
+
+        # Check published properties, excluding those being DELETEd
         published_props = await self._get_published_properties(DEFAULT_ONTOLOGY_RID)
         for p in published_props:
+            if p.rid in deleted_prop_rids:
+                continue
             data = p.model_dump(mode="json", by_alias=True)
             if data.get("objectTypeRid") == ot_rid and data.get("backingColumn"):
                 return True
