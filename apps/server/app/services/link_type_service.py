@@ -484,6 +484,22 @@ class LinkTypeService:
                 status_code=400,
             )
 
+        # Check if this LT is referenced as a side link by another BO LinkType
+        all_lts = await self._ws_service.get_merged_view(
+            DEFAULT_ONTOLOGY_RID, ResourceType.LINK_TYPE
+        )
+        for lt_data, lt_state in all_lts:
+            if lt_state == ChangeState.DELETED:
+                continue
+            if lt_data.get("rid") == rid:
+                continue
+            if lt_data.get("sideALinkTypeRid") == rid or lt_data.get("sideBLinkTypeRid") == rid:
+                raise AppError(
+                    code="LINK_TYPE_REFERENCED_AS_SIDE_LINK",
+                    message=f"Cannot delete link type '{rid}': it is referenced as a side link by '{lt_data.get('displayName', lt_data.get('rid'))}'",
+                    status_code=400,
+                )
+
         now = datetime.now(timezone.utc)
         change = Change(
             id=uuid.uuid4().hex[:12],
