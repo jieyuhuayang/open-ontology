@@ -62,21 +62,25 @@ test.describe.serial('Link Type UI — List + Detail + Edit', () => {
   test('setup: create test OTs and FK link type', async ({ request }) => {
     // Clean up any leftover data from previous runs
     const ltResp = await request.get(`${API}/link-types`);
-    const ltData = await ltResp.json();
-    for (const lt of ltData.items) {
-      if (lt.id === LINK_ID) {
-        await request.delete(`${API}/link-types/${lt.rid}`);
+    if (ltResp.ok()) {
+      const ltData = await ltResp.json();
+      for (const lt of ltData.items) {
+        if (lt.id === LINK_ID) {
+          await request.delete(`${API}/link-types/${lt.rid}`);
+        }
       }
     }
     const otResp = await request.get(`${API}/object-types`);
-    const otData = await otResp.json();
-    for (const ot of otData.items) {
-      if (ot.id === OT_A_ID || ot.id === OT_B_ID) {
-        await request.delete(`${API}/object-types/${ot.rid}`);
+    if (otResp.ok()) {
+      const otData = await otResp.json();
+      for (const ot of otData.items) {
+        if (ot.id === OT_A_ID || ot.id === OT_B_ID) {
+          await request.delete(`${API}/object-types/${ot.rid}`);
+        }
       }
     }
-    // Discard working state to finalize cleanup
-    await request.delete(`${API}/ontologies/ri.ontology.ontology.default/working-state`);
+    // Discard working state to finalize cleanup (ignore errors if no active state)
+    await request.delete(`${API}/ontologies/ri.ontology.ontology.default/working-state`).catch(() => {});
 
     // Create two object types
     otARid = await createObjectType(request, OT_A_ID, 'Company');
