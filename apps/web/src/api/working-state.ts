@@ -28,6 +28,20 @@ export function useWorkingState(ontologyRid: string = DEFAULT_ONTOLOGY_RID) {
   });
 }
 
+/** Invalidate all ontology-related queries after a mutation. */
+function invalidateOntologyData(
+  queryClient: ReturnType<typeof useQueryClient>,
+  opts?: { includeHistory?: boolean },
+) {
+  queryClient.invalidateQueries({ queryKey: workingStateKeys.all });
+  queryClient.invalidateQueries({ queryKey: objectTypeKeys.all });
+  queryClient.invalidateQueries({ queryKey: linkTypeKeys.all });
+  queryClient.invalidateQueries({ queryKey: propertyKeys.all });
+  if (opts?.includeHistory) {
+    queryClient.invalidateQueries({ queryKey: historyKeys.all });
+  }
+}
+
 export function usePublish(ontologyRid: string = DEFAULT_ONTOLOGY_RID) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -37,13 +51,7 @@ export function usePublish(ontologyRid: string = DEFAULT_ONTOLOGY_RID) {
       );
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: workingStateKeys.all });
-      queryClient.invalidateQueries({ queryKey: objectTypeKeys.all });
-      queryClient.invalidateQueries({ queryKey: linkTypeKeys.all });
-      queryClient.invalidateQueries({ queryKey: propertyKeys.all });
-      queryClient.invalidateQueries({ queryKey: historyKeys.all });
-    },
+    onSuccess: () => invalidateOntologyData(queryClient, { includeHistory: true }),
   });
 }
 
@@ -53,12 +61,7 @@ export function useDiscardAll(ontologyRid: string = DEFAULT_ONTOLOGY_RID) {
     mutationFn: async () => {
       await apiClient.delete(`/ontologies/${ontologyRid}/working-state`);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: workingStateKeys.all });
-      queryClient.invalidateQueries({ queryKey: objectTypeKeys.all });
-      queryClient.invalidateQueries({ queryKey: linkTypeKeys.all });
-      queryClient.invalidateQueries({ queryKey: propertyKeys.all });
-    },
+    onSuccess: () => invalidateOntologyData(queryClient),
   });
 }
 
@@ -70,11 +73,6 @@ export function useDiscardChange(ontologyRid: string = DEFAULT_ONTOLOGY_RID) {
         `/ontologies/${ontologyRid}/working-state/changes/${changeId}`,
       );
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: workingStateKeys.all });
-      queryClient.invalidateQueries({ queryKey: objectTypeKeys.all });
-      queryClient.invalidateQueries({ queryKey: linkTypeKeys.all });
-      queryClient.invalidateQueries({ queryKey: propertyKeys.all });
-    },
+    onSuccess: () => invalidateOntologyData(queryClient),
   });
 }
