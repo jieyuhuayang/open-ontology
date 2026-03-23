@@ -6,8 +6,6 @@ import type {
   LinkTypeUpdateRequest,
   LinkTypeListResponse,
 } from '@/api/types';
-import { workingStateKeys } from '@/api/working-state';
-import { searchKeys } from '@/api/search';
 
 export const linkTypeKeys = {
   all: ['link-types'] as const,
