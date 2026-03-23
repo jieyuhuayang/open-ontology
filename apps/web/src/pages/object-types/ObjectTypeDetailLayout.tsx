@@ -4,6 +4,7 @@ import {
   FileTextOutlined,
   UnorderedListOutlined,
   DatabaseOutlined,
+  TableOutlined,
   HistoryOutlined,
   MoreOutlined,
   DeleteOutlined,
