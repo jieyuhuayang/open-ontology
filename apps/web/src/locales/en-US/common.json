@@ -719,6 +719,7 @@
     "objectTypes": "Object Types",
     "properties": "Properties",
     "linkTypes": "Link Types",
-    "pendingChanges": "Pending changes"
+    "pendingChanges": "Pending changes",
+    "missingDisplayName": "{{type}}: missing display name"
   }
 }
