@@ -390,6 +390,9 @@ class WorkingStateService:
         await WorkingStateStorage.delete(self._session, ws.rid)
         await self._session.flush()
 
+        # Trigger instance sync for OTs with backing datasource (F011)
+        await self._trigger_post_publish_sync(ws.changes)
+
         return record
 
     async def _apply_object_type_change(self, change: Change) -> None:
