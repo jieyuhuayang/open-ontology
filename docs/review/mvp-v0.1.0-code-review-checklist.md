@@ -176,23 +176,23 @@
 
 ## 9. 测试覆盖缺口
 
-- [ ] 🔴 **9.1 discard_single_change 无级联场景测试**
+- [x] 🔴 **9.1 discard_single_change 无级联场景测试**
   撤销 OT DELETE 后 Property/LT DELETE 的处理无测试覆盖。
   `tests/integration/test_working_state_api.py`
 
-- [ ] 🟡 **9.2 前端 components 测试覆盖 36%**
+- [x] 🟡 **9.2 前端 components 测试覆盖 36%**
   SearchBar、PropertyTable、ChangePanel 等核心交互组件缺 Testing Library 测试。
   `apps/web/src/components/__tests__/`
 
-- [ ] 🟡 **9.3 并发场景无测试**
+- [x] 🟡 **9.3 并发场景无测试**
   同时 `add_change`、publish 中并发 CRUD 均无覆盖。
   `tests/integration/`
 
-- [ ] 🟡 **9.4 object_sync 边界测试不足**
+- [x] 🟡 **9.4 object_sync 边界测试不足**
   空数据集、全 unchanged、全 deleted 等边界场景。
   `tests/unit/test_object_sync_service.py`
 
-- [ ] 🟢 **9.5 E2E 缺数据连接页面测试**
+- [x] 🟢 **9.5 E2E 缺数据连接页面测试**
   7 个 E2E 文件无 data-connection 相关。
   `e2e/` 目录
 
