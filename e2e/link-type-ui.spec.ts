@@ -123,12 +123,13 @@ test.describe.serial('Link Type UI — List + Detail + Edit', () => {
     await page.waitForLoadState('networkidle');
     await expect(page.locator('.ant-table-thead')).toBeVisible({ timeout: 10000 });
 
-    // Find the row containing our test link type (search by OT display names since ID column is removed)
-    const row = page.locator('.ant-table-tbody tr').filter({ hasText: 'Company' });
-    await expect(row.first()).toBeVisible();
+    // Find first data row
+    const row = page.locator('.ant-table-tbody tr').first();
+    await expect(row).toBeVisible();
 
-    // Should have two .ant-tag elements (OT-A and OT-B names)
-    const tags = row.first().locator('.ant-tag');
+    // First cell (Relationship column) should contain two .ant-tag elements
+    const firstCell = row.locator('td').first();
+    const tags = firstCell.locator('.ant-tag');
     await expect(tags).toHaveCount(2);
 
     // Should contain OT display names
@@ -136,8 +137,8 @@ test.describe.serial('Link Type UI — List + Detail + Edit', () => {
     await expect(tags.nth(1)).toContainText('Analyst');
 
     // Arrow between tags
-    const rowText = await row.first().textContent();
-    expect(rowText).toContain('→');
+    const cellText = await firstCell.textContent();
+    expect(cellText).toContain('→');
   });
 
   test('list: Link Names column shows sideA / sideB display names', async ({ page }) => {
