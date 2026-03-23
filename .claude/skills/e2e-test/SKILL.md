@@ -86,13 +86,13 @@ e2e/helpers/
 2. **双重 cleanup**：setup 阶段清理上次残留 + 末尾 cleanup 任务清理本次数据
 3. **共享 helpers**：导入 `e2e/helpers/antd.ts` 的函数，**禁止在文件内重新定义** `selectAntOption` 等
 4. **i18n 安全**：用户可见文本用 `/English|中文/` 双语 RegExp
-4. **精确匹配**：禁止用短词 `getByText('Age')` — 改用 `.filter({ hasText })` 或 `{ exact: true }`
-5. **元素等待**：用 `expect().toBeVisible({ timeout })` 等待，不用硬编码 `waitForTimeout`（除了 Ant Design 动画的短暂 200-500ms 等待）
-6. **fill 类型安全**：`selectAntOption` 的 search 参数用于 `input.fill()` 时**必须是 string**（不能是 RegExp）
-7. **strict mode 安全**：多元素场景统一 `.first()` 或 `.nth()` 规避 strict mode 违规
-8. **串行执行**：setup/cleanup 作为独立 test case，使用 `test.describe.serial`
-9. **AC 追溯**：每个 test 注释标注 `// Covers: AC-NN`
-10. **API 验证**：数据变更操作后，通过 API 断言最终状态（不仅依赖 UI 展示）
+5. **精确匹配**：禁止用短词 `getByText('Age')` — 改用 `.filter({ hasText })` 或 `{ exact: true }`
+6. **元素等待**：用 `expect().toBeVisible({ timeout })` 等待，不用硬编码 `waitForTimeout`（除了 Ant Design 动画的短暂 200-500ms 等待）
+7. **fill 类型安全**：`selectAntOption` 的 search 参数用于 `input.fill()` 时**必须是 string**（不能是 RegExp）
+8. **strict mode 安全**：多元素场景统一 `.first()` 或 `.nth()` 规避 strict mode 违规
+9. **串行执行**：setup/cleanup 作为独立 test case，使用 `test.describe.serial`
+10. **AC 追溯**：每个 test 注释标注 `// Covers: AC-NN`
+11. **API 验证**：数据变更操作后，通过 API 断言最终状态（不仅依赖 UI 展示）
 
 ### Step 5：运行与修复
 
