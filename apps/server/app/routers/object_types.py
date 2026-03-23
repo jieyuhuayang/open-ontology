@@ -12,6 +12,7 @@ from app.domain.object_type import (
     ObjectTypeUpdateRequest,
     ObjectTypeWithChangeState,
 )
+from app.domain.validators import validate_rid
 from app.services.object_type_service import ObjectTypeService
 
 router = APIRouter(prefix="/api/v1", tags=["object-types"])
