@@ -17,6 +17,6 @@ export function useSearch(query: string, types?: string, limit?: number) {
       return data;
     },
     enabled: query.trim().length > 0,
-    staleTime: 30_000,
+    staleTime: 5_000,
   });
 }
