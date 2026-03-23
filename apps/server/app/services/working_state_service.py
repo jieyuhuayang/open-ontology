@@ -495,6 +495,66 @@ class WorkingStateService:
         elif change.change_type == ChangeType.DELETE:
             await PropertyStorage.delete(self._session, change.resource_rid)
 
+    async def _trigger_post_publish_sync(self, changes: list[Change]) -> None:
+        """After publish, sync instances for OTs that have backing datasource (F011)."""
+        from app.services.object_sync_service import ObjectSyncService
+
+        ot_rids_to_sync: set[str] = set()
+        for change in changes:
+            if (
+                change.resource_type == ResourceType.OBJECT_TYPE
+                and change.change_type != ChangeType.DELETE
+            ):
+                data = change.after or {}
+                backing = data.get("backingDatasource")
+                if backing and isinstance(backing, dict) and backing.get("rid"):
+                    ot_rids_to_sync.add(change.resource_rid)
+            elif (
+                change.resource_type == ResourceType.PROPERTY
+                and change.change_type != ChangeType.DELETE
+            ):
+                data = change.after or {}
+                ot_rid = data.get("objectTypeRid")
+                if ot_rid:
+                    ot_rids_to_sync.add(ot_rid)
+
+        sync_service = ObjectSyncService(self._session)
+        for ot_rid in ot_rids_to_sync:
+            try:
+                ot = await ObjectTypeStorage.get_by_rid(self._session, ot_rid)
+                if not ot or not ot.backing_datasource:
+                    continue
+                backing = ot.backing_datasource
+                if not isinstance(backing, dict) or not backing.get("rid"):
+                    continue
+
+                dataset_rid = backing["rid"]
+                has_pk = bool(ot.primary_key_property_id)
+
+                props = await PropertyStorage.list_by_object_type(self._session, ot_rid)
+                property_column_map = {}
+                pk_api_name = None
+                title_api_name = None
+                for p in props:
+                    if p.backing_column:
+                        property_column_map[p.api_name] = p.backing_column
+                    if p.is_primary_key:
+                        pk_api_name = p.api_name
+                    if p.is_title_key:
+                        title_api_name = p.api_name
+
+                await sync_service.sync(
+                    ot_rid,
+                    dataset_rid,
+                    triggered_by="system",
+                    has_primary_key=has_pk,
+                    primary_key_property_api_name=pk_api_name,
+                    title_key_property_api_name=title_api_name,
+                    property_column_map=property_column_map if property_column_map else None,
+                )
+            except Exception:
+                logger.exception("Post-publish sync failed for OT %s", ot_rid)
+
     async def discard(self, ontology_rid: str) -> None:
         ws = await self._get_working_state(ontology_rid)
         if not ws:
