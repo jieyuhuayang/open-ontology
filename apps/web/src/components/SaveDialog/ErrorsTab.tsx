@@ -87,7 +87,7 @@ export default function ErrorsTab({ changes }: ErrorsTabProps) {
             </Button>,
           ]}
         >
-          {err.message}
+          {t(err.messageKey, err.messageParams)}
         </List.Item>
       )}
     />
