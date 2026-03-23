@@ -12,7 +12,7 @@ class ObjectInstance(DomainModel):
     object_type_rid: str
     primary_key_value: str | None = None
     title_value: str | None = None
-    properties: dict = {}
+    properties: dict = Field(default_factory=dict)
     source_dataset_rid: str | None = None
     source_row_index: int | None = None
     data_hash: str | None = None
