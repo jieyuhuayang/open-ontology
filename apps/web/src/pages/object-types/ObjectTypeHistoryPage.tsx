@@ -6,24 +6,11 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { useWorkingState } from '@/api/working-state';
 import { useHistory } from '@/api/history';
 import type { Change, ChangeRecord } from '@/api/types';
+import { CHANGE_TYPE_COLORS, CHANGE_TYPE_KEYS, changeDisplayName } from '@/utils/change-helpers';
 
 dayjs.extend(relativeTime);
 
 const { Title, Text } = Typography;
-
-const CHANGE_TYPE_COLORS: Record<string, string> = {
-  CREATE: 'green',
-  UPDATE: 'blue',
-  DELETE: 'red',
-};
-
-function displayName(change: Change): string {
-  return (
-    (change.after as Record<string, unknown> | null)?.displayName ??
-    (change.before as Record<string, unknown> | null)?.displayName ??
-    change.resourceRid
-  ) as string;
-}
 
 export default function ObjectTypeHistoryPage() {
   const { t } = useTranslation();
