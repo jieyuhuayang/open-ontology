@@ -478,6 +478,12 @@ class PropertyService:
                 message="Cannot delete the primary key property. Please reassign the primary key first.",
                 status_code=400,
             )
+        if data.get("isTitleKey") is True:
+            raise AppError(
+                code="PROPERTY_TITLE_KEY_CANNOT_DELETE",
+                message="Cannot delete the title key property. Please reassign the title key first.",
+                status_code=400,
+            )
 
         now = datetime.now(timezone.utc)
         change = Change(
