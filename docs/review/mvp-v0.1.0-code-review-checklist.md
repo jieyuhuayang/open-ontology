@@ -116,19 +116,19 @@
 
 ## 6. 前端 UX 健壮性
 
-- [ ] 🟡 **6.1 仅全局 ErrorBoundary，无页面级降级**
+- [x] 🟡 **6.1 仅全局 ErrorBoundary，无页面级降级**
   任何页面渲染崩溃导致全站白屏，高复杂度页面应有独立 ErrorBoundary。
   `router.tsx:29`, `components/ErrorBoundary.tsx`
 
-- [ ] 🟡 **6.2 代码分割不足**
+- [x] 🟡 **6.2 代码分割不足**
   仅 demo 页 `lazy()`，11 个业务页同步 import，首屏加载过大。
   `router.tsx:7-19`
 
-- [ ] 🟢 **6.3 无障碍属性缺失**
+- [x] 🟢 **6.3 无障碍属性缺失**
   整个 components 仅 3 处 `aria-` 属性，自定义组件缺 ARIA 标注。
   `components/` 全目录
 
-- [ ] 🟢 **6.4 Publish/Discard 操作防误触机制确认**
+- [x] 🟢 **6.4 Publish/Discard 操作防误触机制确认**
   是否有 `Modal.confirm` 或类似二次确认。
   Save/Discard 相关组件
 
