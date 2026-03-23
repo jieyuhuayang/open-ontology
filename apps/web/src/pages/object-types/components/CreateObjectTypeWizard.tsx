@@ -111,11 +111,20 @@ export default function CreateObjectTypeWizard() {
       setIsCreating(true);
       const result = await createMutation.mutateAsync(buildCreateRequest());
 
+      let propertyError = false;
       if (properties.length > 0) {
-        await createPropertiesForObjectType(result.rid);
+        try {
+          await createPropertiesForObjectType(result.rid);
+        } catch {
+          propertyError = true;
+        }
       }
 
-      message.success(t('objectType.createSuccess'));
+      if (propertyError) {
+        message.warning(t('objectType.createSuccessPartialProperties'));
+      } else {
+        message.success(t('objectType.createSuccess'));
+      }
       close();
       reset();
       navigate(`/object-types/${result.rid}`);
