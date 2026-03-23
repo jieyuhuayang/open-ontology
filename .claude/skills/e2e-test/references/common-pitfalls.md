@@ -276,6 +276,10 @@ if (hasValue === 0) {
 | `expected string, got object` | fill 传了 RegExp | 改为 string |
 | `Timeout exceeded` (locator) | 元素不存在或不可见 | 检查选择器、打开 headed 模式调试 |
 | `Timeout exceeded` (navigation) | 页面加载慢 | 增加 timeout 或改用元素等待 |
+| `Timeout exceeded` (Select option) | 假设的列名/选项不存在 | 用 API 查实际 dataset columns |
 | `expect(received).toHaveCount` | 数据干扰或异步未完成 | 检查前缀隔离 + 增加 timeout |
-| `400/409 on DELETE` | PK/active 约束 | 用 cleanupByPrefix |
+| `400/409 on DELETE` OT | LT 仍引用该 OT | 先删 LT 再删 OT |
+| `400/409 on DELETE` property | PK/active 约束 | 用 cleanupByPrefix |
+| `API_NAME_CONFLICT` | 同 OT 对间多链接 | 手动设置不同的 API Name |
+| 行点击无反应（半透明） | Dataset inUse | 先删关联 OT 释放 dataset |
 | `net::ERR_CONNECTION_REFUSED` | 后端未启动 | 确认 localhost:8000 可访问 |
