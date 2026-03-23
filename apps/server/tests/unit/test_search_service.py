@@ -295,8 +295,8 @@ async def test_search_draft_property_under_draft_ot(service):
             "get_merged_view",
             new_callable=AsyncMock,
             side_effect=[
+                [(draft_ot, ChangeState.CREATED)],  # OT merged (pre-loaded)
                 [(draft_prop, ChangeState.CREATED)],  # Property merged
-                [(draft_ot, ChangeState.CREATED)],  # OT merged (for display name)
             ],
         ),
     ):
