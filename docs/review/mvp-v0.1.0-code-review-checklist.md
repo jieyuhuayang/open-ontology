@@ -200,19 +200,19 @@
 
 ## 10. 代码可维护性
 
-- [ ] 🟡 **10.1 6 处 in-method import 规避循环依赖**
+- [x] 🟡 **10.1 6 处 in-method import 规避循环依赖**
   应通过依赖注入或中间层解耦。
   6 个 service 文件
 
-- [ ] 🟡 **10.2 camelCase→snake_case key_map 三处重复**
+- [x] 🟡 **10.2 camelCase→snake_case key_map 三处重复**
   `_apply_*_change` 各维护一份 key_map，新增字段需 3 处同步更新，极易遗漏。
   `working_state_service.py:436-523`
 
-- [ ] 🟡 **10.3 Alembic downgrade 实质性缺失确认**
+- [x] 🟡 **10.3 Alembic downgrade 实质性缺失确认**
   10 个迁移的 `downgrade()` 是否为空 `pass`。
   `alembic/versions/0002*.py`, `0008*.py`, `0010*.py`
 
-- [ ] 🟢 **10.4 property_service.py 691 行建议拆分**
+- [x] 🟢 **10.4 property_service.py 691 行建议拆分**
   PK/TK cascade、batch 操作、sort order 等职责过多。
   `property_service.py`
 
