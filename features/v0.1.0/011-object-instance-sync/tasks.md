@@ -101,7 +101,7 @@
 
 ### Phase 4：后端 API 层（Test-First）
 
-- [ ] **T007**: API 集成测试
+- [x] **T007**: API 集成测试
   **文件**: `apps/server/tests/integration/test_object_instance_api.py`
   **逻辑**: 使用 seeded_client fixture，测试 4 个 API 端点：
   - `test_list_instances_empty` — 无实例时返回空列表 200（AC-08）
