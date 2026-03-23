@@ -115,6 +115,17 @@ class ObjectSyncService:
                 )
 
             if has_primary_key and primary_key_property_api_name:
+                # Validate no NULL primary key values — NULLs cause key collisions
+                null_pk_rows = [
+                    r["row_index"] for r in mapped_rows if r["primary_key_value"] is None
+                ]
+                if null_pk_rows:
+                    raise AppError(
+                        code="SYNC_NULL_PRIMARY_KEY",
+                        message=f"Source data has NULL primary key values at row(s): {null_pk_rows[:10]}",
+                        status_code=400,
+                        details={"nullRows": null_pk_rows[:10], "totalNulls": len(null_pk_rows)},
+                    )
                 stats = await self._sync_incremental(ot_rid, dataset_rid, mapped_rows)
             else:
                 stats = await self._sync_full_replace(ot_rid, dataset_rid, mapped_rows)
