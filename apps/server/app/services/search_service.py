@@ -29,16 +29,30 @@ class SearchService:
     ) -> SearchResponse:
         results: dict[str, SearchTypeResult] = {}
 
+        # Pre-load merged views once to avoid redundant DB queries
+        need_ot = "objectType" in types or "property" in types
+        ot_merged = (
+            await self._ws_service.get_merged_view(ontology_rid, ResourceType.OBJECT_TYPE)
+            if need_ot
+            else []
+        )
+
         if "objectType" in types:
-            ot_result = await self._search_object_types(ontology_rid, query, limit)
+            ot_result = await self._search_object_types(ontology_rid, query, limit, ot_merged)
             results["objectTypes"] = ot_result
 
         if "property" in types:
-            prop_result = await self._search_properties(ontology_rid, query, limit)
+            prop_merged = await self._ws_service.get_merged_view(
+                ontology_rid, ResourceType.PROPERTY
+            )
+            prop_result = await self._search_properties(
+                ontology_rid, query, limit, prop_merged, ot_merged
+            )
             results["properties"] = prop_result
 
         if "linkType" in types:
-            lt_result = await self._search_link_types(ontology_rid, query, limit)
+            lt_merged = await self._ws_service.get_merged_view(ontology_rid, ResourceType.LINK_TYPE)
+            lt_result = await self._search_link_types(ontology_rid, query, limit, lt_merged)
             results["linkTypes"] = lt_result
 
         total_count = sum(r.total for r in results.values())
