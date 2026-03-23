@@ -66,7 +66,7 @@
   **覆盖 AC**: AC-02, AC-03, AC-04, AC-05, AC-06, AC-07
   **依赖**: T002
 
-- [ ] **T004**: ObjectSyncService 实现
+- [x] **T004**: ObjectSyncService 实现
   **文件**: `apps/server/app/services/object_sync_service.py`
   **逻辑**:
   - `sync(ot_rid, dataset_rid, triggered_by, has_primary_key, pk_api_name, title_api_name, property_column_map)` — 主入口
