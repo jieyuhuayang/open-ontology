@@ -233,8 +233,7 @@ class SearchService:
             )
             seen_rids[orm.rid] = item
 
-        # Merge draft link types
-        merged = await self._ws_service.get_merged_view(ontology_rid, ResourceType.LINK_TYPE)
+        # Merge draft link types (using pre-loaded merged view)
         for data, change_state in merged:
             if change_state == ChangeState.DELETED:
                 seen_rids.pop(data.get("rid", ""), None)
