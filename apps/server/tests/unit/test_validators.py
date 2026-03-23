@@ -122,3 +122,47 @@ class TestValidateObjectTypeId:
         with pytest.raises(AppError) as exc_info:
             validate_object_type_id("my type")
         assert exc_info.value.code == "OBJECT_TYPE_INVALID_ID"
+
+
+# ---------------------------------------------------------------------------
+# validate_rid (2.1)
+# ---------------------------------------------------------------------------
+
+
+class TestValidateRid:
+    """RID must match ri.<namespace>.<type>.<id> and not exceed 200 chars."""
+
+    def test_valid_standard_rid(self):
+        validate_rid("ri.ontology.object-type.abc123def456")
+
+    def test_valid_ontology_rid(self):
+        validate_rid("ri.ontology.ontology.default")
+
+    def test_valid_working_state_rid(self):
+        validate_rid("ri.ontology.working-state.ws123")
+
+    def test_reject_no_ri_prefix(self):
+        with pytest.raises(AppError) as exc_info:
+            validate_rid("ontology.object-type.abc")
+        assert exc_info.value.code == "INVALID_RID"
+
+    def test_reject_too_long(self):
+        long_rid = "ri.ontology.object-type." + "a" * 200
+        with pytest.raises(AppError) as exc_info:
+            validate_rid(long_rid)
+        assert exc_info.value.code == "INVALID_RID"
+
+    def test_reject_special_characters(self):
+        with pytest.raises(AppError) as exc_info:
+            validate_rid("ri.ontology.object-type.abc;DROP TABLE")
+        assert exc_info.value.code == "INVALID_RID"
+
+    def test_reject_empty(self):
+        with pytest.raises(AppError) as exc_info:
+            validate_rid("")
+        assert exc_info.value.code == "INVALID_RID"
+
+    def test_reject_sql_injection(self):
+        with pytest.raises(AppError) as exc_info:
+            validate_rid("ri.ontology.object-type.abc' OR '1'='1")
+        assert exc_info.value.code == "INVALID_RID"
