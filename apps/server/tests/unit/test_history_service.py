@@ -211,3 +211,76 @@ class TestDiscardSingleChange:
 
             assert exc_info.value.code == "WORKING_STATE_NOT_FOUND"
             assert exc_info.value.status_code == 404
+
+    @pytest.mark.asyncio
+    async def test_discard_ot_delete_cascades_property_and_lt_deletes(
+        self, service: WorkingStateService
+    ):
+        """1.1: Discarding an OT DELETE should also discard cascade Property/LT DELETE changes."""
+        ot_rid = "ri.ontology.object-type.emp"
+        prop_rid = "ri.ontology.property.name"
+        lt_rid = "ri.ontology.link-type.manages"
+        other_rid = "ri.ontology.property.unrelated"
+
+        ot_delete = Change(
+            id="chg-ot-del",
+            resource_type=ResourceType.OBJECT_TYPE,
+            resource_rid=ot_rid,
+            change_type=ChangeType.DELETE,
+            before={"rid": ot_rid, "displayName": "Employee"},
+            after=None,
+            timestamp=_now(),
+        )
+        prop_delete = Change(
+            id="chg-prop-del",
+            resource_type=ResourceType.PROPERTY,
+            resource_rid=prop_rid,
+            change_type=ChangeType.DELETE,
+            before={"rid": prop_rid, "objectTypeRid": ot_rid},
+            after=None,
+            timestamp=_now(),
+        )
+        lt_delete = Change(
+            id="chg-lt-del",
+            resource_type=ResourceType.LINK_TYPE,
+            resource_rid=lt_rid,
+            change_type=ChangeType.DELETE,
+            before={"rid": lt_rid},
+            after=None,
+            timestamp=_now(),
+        )
+        unrelated_change = Change(
+            id="chg-other",
+            resource_type=ResourceType.PROPERTY,
+            resource_rid=other_rid,
+            change_type=ChangeType.CREATE,
+            before=None,
+            after={"rid": other_rid, "displayName": "Other"},
+            timestamp=_now(),
+        )
+
+        ws = _make_working_state(changes=[ot_delete, prop_delete, lt_delete, unrelated_change])
+        with (
+            patch.object(service, "_get_working_state", new_callable=AsyncMock, return_value=ws),
+            patch(
+                "app.services.working_state_service.ObjectTypeStorage.get_related_link_type_rids",
+                new_callable=AsyncMock,
+                return_value=[lt_rid],
+            ),
+            patch(
+                "app.services.working_state_service.WorkingStateStorage.update_changes",
+                new_callable=AsyncMock,
+            ) as mock_update,
+        ):
+            await service.discard_single_change(ONTOLOGY_RID, "chg-ot-del")
+
+        mock_update.assert_called_once()
+        remaining = mock_update.call_args[0][2]
+        remaining_ids = [c.id for c in remaining]
+        # OT DELETE + cascade Property DELETE + cascade LT DELETE all discarded
+        assert "chg-ot-del" not in remaining_ids
+        assert "chg-prop-del" not in remaining_ids
+        assert "chg-lt-del" not in remaining_ids
+        # Unrelated change kept
+        assert "chg-other" in remaining_ids
+        assert len(remaining) == 1
