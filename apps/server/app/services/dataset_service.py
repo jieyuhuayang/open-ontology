@@ -215,16 +215,20 @@ class DatasetService:
             mysql_conn.close()
 
     async def _is_join_table_dataset(self, rid: str) -> str | None:
-        """Check if dataset is used as a join table by any LinkType.
+        """Check if dataset is used as a join table by any LinkType (including drafts).
 
         Returns the LinkType displayName if in use, None otherwise.
         """
-        from app.storage.link_type_storage import LinkTypeStorage
+        from app.domain.working_state import ChangeState
+        from app.services.working_state_service import WorkingStateService
 
-        all_lts = await LinkTypeStorage.list_by_ontology(self._session, DEFAULT_ONTOLOGY_RID)
-        for lt in all_lts:
-            if lt.join_table_dataset_rid == rid:
-                return lt.display_name
+        ws_service = WorkingStateService(self._session)
+        merged_lts = await ws_service.get_merged_view(DEFAULT_ONTOLOGY_RID, ResourceType.LINK_TYPE)
+        for lt_data, lt_state in merged_lts:
+            if lt_state == ChangeState.DELETED:
+                continue
+            if lt_data.get("joinTableDatasetRid") == rid:
+                return lt_data.get("displayName", lt_data.get("rid", "Unknown"))
         return None
 
     async def delete(self, rid: str) -> None:
