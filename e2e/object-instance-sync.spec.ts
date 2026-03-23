@@ -145,6 +145,20 @@ test.describe.serial('Object Instance Sync — E2E', () => {
     await discardAll(request);
     await cleanupByPrefix(request, PREFIX);
 
+    // Clean up datasets created by this test suite
+    const dsResp = await request.get(`${API}/datasets`);
+    if (dsResp.ok()) {
+      const dsData = await dsResp.json();
+      for (const ds of dsData.items ?? []) {
+        if ((ds.name as string).startsWith(PREFIX)) {
+          await request.delete(`${API}/datasets/${ds.rid}`).catch(() => {});
+        }
+      }
+    }
+
+    // Discard any working state changes from cleanup
+    await discardAll(request);
+
     const resp = await request.get(`${API}/object-types`);
     const data = await resp.json();
     const testOts = data.items.filter((ot: { id: string }) =>
