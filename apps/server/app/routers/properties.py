@@ -16,6 +16,7 @@ from app.domain.property import (
     PropertyUpdateRequest,
     PropertyWithChangeState,
 )
+from app.domain.validators import validate_rid
 from app.services.property_service import PropertyService
 
 router = APIRouter(prefix="/api/v1", tags=["properties"])
