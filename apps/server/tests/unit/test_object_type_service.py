@@ -226,6 +226,11 @@ class TestDelete:
                 new_callable=AsyncMock,
                 return_value=[],
             ),
+            patch(
+                "app.services.object_type_service.PropertyStorage.list_by_object_type",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
         ):
             await service.delete("ri.ontology.object-type.abc")
 
