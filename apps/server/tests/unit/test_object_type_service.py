@@ -223,6 +223,9 @@ class TestDelete:
             patch.object(
                 service._ws_service, "add_changes", new_callable=AsyncMock
             ) as mock_add_batch,
+            patch.object(
+                service._ws_service, "get_working_state", new_callable=AsyncMock, return_value=None
+            ),
             patch(
                 "app.services.object_type_service.ObjectTypeStorage.get_related_link_type_rids",
                 new_callable=AsyncMock,
