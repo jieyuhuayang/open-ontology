@@ -27,7 +27,7 @@
 
 ### T01: ChangeRecordStorage 新建 + HistoryListResponse 模型
 
-- [ ] **T01**
+- [x] **T01**
 - 文件:
   - `apps/server/app/storage/change_record_storage.py` — 新建
   - `apps/server/app/domain/working_state.py` — 修改
