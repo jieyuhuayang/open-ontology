@@ -318,6 +318,22 @@ class ObjectTypeService:
 
         now = datetime.now(timezone.utc)
 
+        # Cascade: generate DELETE changes for related Properties
+        from app.storage.property_storage import PropertyStorage
+
+        related_props = await PropertyStorage.list_by_object_type(self._session, rid)
+        for prop in related_props:
+            prop_change = Change(
+                id=uuid.uuid4().hex[:12],
+                resource_type=ResourceType.PROPERTY,
+                resource_rid=prop.rid,
+                change_type=ChangeType.DELETE,
+                before={"rid": prop.rid},
+                after=None,
+                timestamp=now,
+            )
+            await self._ws_service.add_change(DEFAULT_ONTOLOGY_RID, prop_change)
+
         # Cascade: generate DELETE changes for related LinkTypes (AD-4)
         related_lt_rids = await ObjectTypeStorage.get_related_link_type_rids(self._session, rid)
         for lt_rid in related_lt_rids:
