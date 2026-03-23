@@ -676,6 +676,11 @@ class PropertyService:
                 skipped_reasons[rid] = "primary_key"
                 continue
 
+            if data.get("isTitleKey") is True:
+                skipped.append(rid)
+                skipped_reasons[rid] = "title_key"
+                continue
+
             changes.append(
                 Change(
                     id=uuid.uuid4().hex[:12],
