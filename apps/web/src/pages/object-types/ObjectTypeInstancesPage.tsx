@@ -52,13 +52,24 @@ export default function ObjectTypeInstancesPage() {
   const renderSyncBar = () => {
     if (!syncStatus) {
       return (
-        <Alert
-          type="info"
-          message={t('instances.noSyncYet')}
-          description={hasDatasource ? t('instances.publishToSync') : t('instances.configureDatasource')}
-          showIcon
-          style={{ marginBottom: 16 }}
-        />
+        <Space direction="vertical" style={{ width: '100%', marginBottom: 16 }}>
+          <Alert
+            type="info"
+            message={t('instances.noSyncYet')}
+            description={hasDatasource ? t('instances.publishToSync') : t('instances.configureDatasource')}
+            showIcon
+          />
+          <Space style={{ justifyContent: 'flex-end', width: '100%' }}>
+            <Button
+              icon={<SyncOutlined />}
+              onClick={() => triggerSync.mutate()}
+              loading={triggerSync.isPending}
+              disabled={!hasDatasource}
+            >
+              {t('instances.syncNow')}
+            </Button>
+          </Space>
+        </Space>
       );
     }
 
