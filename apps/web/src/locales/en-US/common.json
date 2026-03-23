@@ -359,6 +359,7 @@
     "newObjectType": "New object type",
     "createTitle": "Create Object Type",
     "createSuccess": "Object type created successfully",
+    "createSuccessPartialProperties": "Object type created, but some properties could not be added. Please add them manually.",
     "deleteTitle": "Delete Object Type",
     "deleteConfirm": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
     "deleteSuccess": "Object type deleted successfully",
