@@ -227,7 +227,7 @@ class TestDelete:
                 return_value=[],
             ),
             patch(
-                "app.services.object_type_service.PropertyStorage.list_by_object_type",
+                "app.storage.property_storage.PropertyStorage.list_by_object_type",
                 new_callable=AsyncMock,
                 return_value=[],
             ),
