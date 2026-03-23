@@ -6,9 +6,7 @@ import type {
   ObjectTypeUpdateRequest,
   ObjectTypeListResponse,
 } from '@/api/types';
-import { linkTypeKeys } from '@/api/link-types';
-import { propertyKeys } from '@/api/properties';
-import { searchKeys } from '@/api/search';
+// Use string keys to avoid circular imports (link-types/properties/search import object-types)
 
 export const objectTypeKeys = {
   all: ['object-types'] as const,
