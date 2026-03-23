@@ -172,7 +172,7 @@ class WorkingStateService:
         """Batch add multiple changes with a single load→collapse→write cycle."""
         if not changes:
             return
-        ws = await self.get_or_create(ontology_rid)
+        ws = await self.get_or_create(ontology_rid, for_update=True)
         collapsed = list(ws.changes)
         for change in changes:
             collapsed = self._collapse_change(collapsed, change)
