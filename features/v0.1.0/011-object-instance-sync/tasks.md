@@ -163,7 +163,7 @@
   **覆盖 AC**: AC-15, AC-16, AC-17, AC-18, AC-19, AC-20
   **依赖**: T010
 
-- [ ] **T012**: 前端测试
+- [x] **T012**: 前端测试
   **文件**: `apps/web/src/pages/object-types/__tests__/ObjectTypeInstancesPage.test.tsx`
   **逻辑**:
   - `test_renders_instances_tab` — 验证 Instances Tab 出现在导航中（AC-15）
