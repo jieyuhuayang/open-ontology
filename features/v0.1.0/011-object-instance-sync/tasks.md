@@ -89,7 +89,7 @@
 
 ### Phase 3：Publish 触发同步
 
-- [ ] **T006**: WorkingStateService 扩展——publish 后触发同步
+- [x] **T006**: WorkingStateService 扩展——publish 后触发同步
   **文件**: `apps/server/app/services/working_state_service.py`
   **逻辑**:
   - 在 `publish()` 方法末尾（flush 之后、return record 之前）调用 `_trigger_post_publish_sync(changes)`
