@@ -66,6 +66,8 @@ export function useUpdateObjectType(rid: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: objectTypeKeys.lists() });
       queryClient.invalidateQueries({ queryKey: objectTypeKeys.detail(rid) });
+      queryClient.invalidateQueries({ queryKey: ['working-state'] });
+      queryClient.invalidateQueries({ queryKey: ['search'] });
     },
   });
 }
