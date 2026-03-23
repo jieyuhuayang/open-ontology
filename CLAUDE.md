@@ -32,7 +32,7 @@ docs/
 └── research/                         # 技术调研笔记
 features/                             # SDD 特性目录
 ├── _templates/                       # spec / tasks 模板
-└── v0.1.0/                           # 001 ~ 009 特性包
+└── v0.1.0/                           # 001 ~ 011 特性包
 e2e/                                  # Playwright E2E 测试
 ├── helpers/                          # 共享工具（antd.ts, api.ts, fixtures.ts）
 └── *.spec.ts                         # 测试文件
