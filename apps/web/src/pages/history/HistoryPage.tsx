@@ -66,7 +66,7 @@ export default function HistoryPage() {
                       </Tag>
                       <Text type="secondary">{change.resourceType}</Text>
                       {' — '}
-                      {displayName(change)}
+                      {changeDisplayName(change)}
                     </div>
                   ))}
                 </div>
