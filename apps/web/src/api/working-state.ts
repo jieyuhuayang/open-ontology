@@ -5,6 +5,7 @@ import { objectTypeKeys } from '@/api/object-types';
 import { linkTypeKeys } from '@/api/link-types';
 import { propertyKeys } from '@/api/properties';
 import { historyKeys } from '@/api/history';
+import { searchKeys } from '@/api/search';
 
 /** MVP uses a single default ontology. */
 export const DEFAULT_ONTOLOGY_RID = 'ri.ontology.ontology.default';
