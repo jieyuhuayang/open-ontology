@@ -94,7 +94,25 @@ export async function createPublishableObjectType(
   });
   expect(confirmResp.ok(), `Upload confirm failed: ${confirmResp.status()}`).toBeTruthy();
   const confirmData = await confirmResp.json();
-  const dsRid = confirmData.datasetRid;
+  const taskId = confirmData.taskId;
+
+  // Poll import task until completed
+  let dsRid: string | null = null;
+  for (let i = 0; i < 30; i++) {
+    const taskResp = await request.get(`${API}/import-tasks/${taskId}`);
+    if (taskResp.ok()) {
+      const taskData = await taskResp.json();
+      if (taskData.status === 'completed') {
+        dsRid = taskData.datasetRid;
+        break;
+      }
+      if (taskData.status === 'failed') {
+        throw new Error(`Import failed: ${taskData.errorMessage}`);
+      }
+    }
+    await new Promise((r) => setTimeout(r, 200));
+  }
+  expect(dsRid, 'Import task did not complete in time').toBeTruthy();
 
   // Create OT with backing datasource
   const otResp = await request.post(`${API}/object-types`, {
