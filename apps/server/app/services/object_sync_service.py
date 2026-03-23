@@ -23,6 +23,45 @@ class ObjectSyncService:
     def __init__(self, session: AsyncSession):
         self._session = session
 
+    async def sync_for_object_type(
+        self, ot_rid: str, *, triggered_by: str = "system"
+    ) -> SyncJob | None:
+        """High-level sync: resolve OT config and delegate to sync().
+
+        Returns None if OT has no valid backing datasource.
+        """
+        ot = await ObjectTypeStorage.get_by_rid(self._session, ot_rid)
+        if not ot or not ot.backing_datasource:
+            return None
+        backing = ot.backing_datasource
+        if not isinstance(backing, dict) or not backing.get("rid"):
+            return None
+
+        dataset_rid = backing["rid"]
+        has_pk = bool(ot.primary_key_property_id)
+
+        props = await PropertyStorage.list_by_object_type(self._session, ot_rid)
+        property_column_map = {}
+        pk_api_name = None
+        title_api_name = None
+        for p in props:
+            if p.backing_column:
+                property_column_map[p.api_name] = p.backing_column
+            if p.is_primary_key:
+                pk_api_name = p.api_name
+            if p.is_title_key:
+                title_api_name = p.api_name
+
+        return await self.sync(
+            ot_rid,
+            dataset_rid,
+            triggered_by=triggered_by,
+            has_primary_key=has_pk,
+            primary_key_property_api_name=pk_api_name,
+            title_key_property_api_name=title_api_name,
+            property_column_map=property_column_map if property_column_map else None,
+        )
+
     async def sync(
         self,
         ot_rid: str,
