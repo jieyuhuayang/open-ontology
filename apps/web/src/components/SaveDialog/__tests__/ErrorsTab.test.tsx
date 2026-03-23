@@ -25,6 +25,29 @@ const invalidChange: Change = {
   timestamp: '2026-01-01T00:00:00Z',
 };
 
+const validLinkType: Change = {
+  id: 'chg-lt-1',
+  resourceType: 'LinkType',
+  resourceRid: 'ri.ontology.link-type.abc',
+  changeType: 'CREATE',
+  before: null,
+  after: {
+    sideA: { displayName: 'Employees' },
+    sideB: { displayName: 'Departments' },
+  },
+  timestamp: '2026-01-01T00:00:00Z',
+};
+
+const invalidLinkType: Change = {
+  id: 'chg-lt-2',
+  resourceType: 'LinkType',
+  resourceRid: 'ri.ontology.link-type.def',
+  changeType: 'CREATE',
+  before: null,
+  after: { sideA: { displayName: 'Employees' }, sideB: {} },
+  timestamp: '2026-01-01T00:00:00Z',
+};
+
 describe('getValidationErrors', () => {
   it('returns empty for valid changes', () => {
     expect(getValidationErrors([validChange])).toHaveLength(0);
@@ -39,6 +62,16 @@ describe('getValidationErrors', () => {
   it('skips DELETE changes', () => {
     const deleteChange: Change = { ...invalidChange, changeType: 'DELETE' };
     expect(getValidationErrors([deleteChange])).toHaveLength(0);
+  });
+
+  it('returns empty for LinkType with sideA/sideB displayNames', () => {
+    expect(getValidationErrors([validLinkType])).toHaveLength(0);
+  });
+
+  it('returns error for LinkType missing sideB displayName', () => {
+    const errors = getValidationErrors([invalidLinkType]);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]?.message).toContain('LinkType: missing display name');
   });
 });
 
