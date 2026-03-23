@@ -388,3 +388,25 @@ npx playwright test --reporter=list
 - **结论**: 延后 v0.2.0
 - **分析**: `config.py` 配置 `UPLOAD_TEMP_DIR=/tmp/open-ontology-uploads`，`UPLOAD_TOKEN_TTL_MINUTES=30`。文件导入完成后数据已入库，临时文件理论上可立即清理，但无后台任务执行。MVP 为短期运行的开发环境，`/tmp` 自身有 OS 级清理。生产环境应添加 startup 清理 + 定期后台任务。
 - **日期**: 2026-03-24
+
+### 8.1 get_merged_view 请求内重复调用
+- **结论**: 已修复
+- **修复内容**: 重构 `property_service.create()` — 将 `_check_property_uniqueness()` 调用替换为内联唯一性检查，复用已加载的 `merged` 数据。原先 3 次 `get_merged_view` 调用减至 2 次（OT 存在性检查 1 次 + 属性合并视图 1 次）
+- **影响文件**: `property_service.py`
+- **日期**: 2026-03-24
+
+### 8.2 search 对每种资源类型分别调 get_merged_view
+- **结论**: 已修复
+- **修复内容**: 重构 `search_service.search()` — 在顶层预加载所有需要的 merged view，然后传入各 `_search_*` 方法。原先搜索 3 种类型需 4 次 `get_merged_view`（OT 被重复加载），现减至最多 3 次（各类型各 1 次，无重复）
+- **影响文件**: `search_service.py`
+- **日期**: 2026-03-24
+
+### 8.3 OT/LT/Property list 内存分页
+- **结论**: MVP 可接受，延后 v0.2.0
+- **分析**: MVP 数据量上限约 200 OT + 1000 Property + 200 LT。内存切片 1000 条记录耗时 <1ms，不构成性能瓶颈。数据量超 10K 时需迁移至数据库级分页（DB offset/limit + WS overlay）。
+- **日期**: 2026-03-24
+
+### 8.4 MySQL import fetchall 大表 OOM
+- **结论**: 误报（已有保护）
+- **分析**: `mysql_import_service.py` 在 `start_import()` 中有 `_MAX_IMPORT_ROWS = 100_000` 硬限制。`fetchall()` 执行前先 `SELECT COUNT(*)` 校验行数，超限返回 `ROW_LIMIT_EXCEEDED` 错误。100K 行 × 20 列 ≈ 30-40MB 内存，在 Python 进程限制范围内。
+- **日期**: 2026-03-24
