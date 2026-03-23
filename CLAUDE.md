@@ -54,19 +54,22 @@ justfile                              # Monorepo 任务运行器
 
 **类型共享管道**：FastAPI → `openapi.json` → `openapi-typescript` → TS 类型。禁止手写 API 类型。
 
-## 本地开发启动（原生模式，不依赖 Docker）
+## 本地开发启动（Docker 模式）
 
-> PostgreSQL 16 通过 Homebrew 安装并以 LaunchAgent 自启动，无需手动启动。
-> `psql` 路径：`/usr/local/Cellar/postgresql@16/16.13/bin/psql`（不在 PATH 中）
+> PostgreSQL 16 通过 Docker Compose 运行（`docker-compose.yml` 中的 `db` 服务），无需本地安装。
+> 连接数据库：`docker exec -it openontology-db-1 psql -U ontology -d open_ontology`
 
 ```bash
-# 1. 数据库迁移（幂等，每次启动前跑一下确保表结构最新）
+# 1. 启动基础设施（PostgreSQL + MySQL sample，后台运行）
+docker compose up -d db mysql-sample
+
+# 2. 数据库迁移（幂等，每次启动前跑一下确保表结构最新）
 cd apps/server && PYTHONPATH=. uv run alembic upgrade head
 
-# 2. 启动后端（必须在 apps/server 目录下，必须设 PYTHONPATH=.）
+# 3. 启动后端（必须在 apps/server 目录下，必须设 PYTHONPATH=.）
 cd apps/server && PYTHONPATH=. uv run uvicorn app.main:app --reload --port 8000
 
-# 3. 启动前端（另开终端）
+# 4. 启动前端（另开终端）
 cd apps/web && pnpm dev
 ```
 
