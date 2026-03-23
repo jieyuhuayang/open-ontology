@@ -12,10 +12,7 @@ interface ChangeItemProps {
 export default function ChangeItem({ change, onDiscard }: ChangeItemProps) {
   const { t } = useTranslation();
 
-  const displayName =
-    (change.after as Record<string, unknown> | null)?.displayName ??
-    (change.before as Record<string, unknown> | null)?.displayName ??
-    change.resourceRid;
+  const displayName = changeDisplayName(change);
 
   return (
     <div
