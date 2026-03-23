@@ -249,10 +249,28 @@ npx playwright test --reporter=list
 
 > 每项完成后在此记录结论（已修复 / 误报 / 延后 v0.2.0）
 
-<!-- 示例：
 ### 1.1 discard_single_change 孤儿变更
 - **结论**: 已修复
-- **修复内容**: 在 discard_single_change 中添加级联撤销逻辑
-- **影响文件**: working_state_service.py
-- **日期**: 2026-03-25
--->
+- **修复内容**: 在 `discard_single_change` 中添加级联撤销逻辑 — 撤销 OT DELETE 时自动检测并移除关联的 Property DELETE（通过 `before.objectTypeRid`）和 LinkType DELETE（通过 `get_related_link_type_rids`）变更
+- **影响文件**: `working_state_service.py`
+- **测试**: `test_history_service.py::test_discard_ot_delete_cascades_property_and_lt_deletes`
+- **日期**: 2026-03-24
+
+### 1.2 _validate_completeness UPDATE 场景
+- **结论**: 已修复
+- **修复内容**: UPDATE 变更的 `after` 仅含变更字段，新增逻辑从 DB 查询已发布 OT 数据并 merge 后再校验完整性
+- **影响文件**: `working_state_service.py`
+- **测试**: `test_completeness_validation.py::test_update_merges_with_published_data`
+- **日期**: 2026-03-24
+
+### 1.3 Collapse DELETE→CREATE 重建路径
+- **结论**: 已修复
+- **修复内容**: 在 `_collapse_change` 中添加 `existing.change_type == DELETE` 分支：DELETE+CREATE → UPDATE（资源仍存在于已发布状态），DELETE+DELETE → 幂等保留原 DELETE
+- **影响文件**: `working_state_service.py`
+- **测试**: `test_change_collapsing.py::test_delete_then_create_becomes_update`, `test_delete_then_delete_is_idempotent`
+- **日期**: 2026-03-24
+
+### 1.4 publish sync 失败的事务隔离
+- **结论**: 确认设计正确（非问题）
+- **分析**: `_trigger_post_publish_sync` 在 `flush()` 后、`commit()` 前调用。异常被 per-OT 捕获并仅 log，不影响 publish 事务。`database.py` 的 `get_db_session()` 在 handler 返回后才 commit，sync 失败不阻止 publish 提交。sync 是 best-effort 后处理，设计符合预期。
+- **日期**: 2026-03-24
