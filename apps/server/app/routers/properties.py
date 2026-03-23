@@ -54,6 +54,7 @@ async def list_properties(
     object_type_rid: str,
     service: PropertyService = Depends(_get_service),
 ):
+    validate_rid(object_type_rid)
     return await service.list(object_type_rid)
 
 
