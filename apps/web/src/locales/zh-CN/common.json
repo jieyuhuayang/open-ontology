@@ -736,6 +736,7 @@
     "properties": "属性",
     "linkTypes": "链接类型",
     "pendingChanges": "待处理变更",
-    "missingDisplayName": "{{type}}: 缺少展示名称"
+    "missingDisplayName": "{{type}}: 缺少展示名称",
+    "editsCount": "{{count}} 项编辑"
   }
 }
