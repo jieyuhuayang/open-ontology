@@ -59,7 +59,11 @@ class SearchService:
         return SearchResponse(query=query, results=results, total_count=total_count)
 
     async def _search_object_types(
-        self, ontology_rid: str, query: str, limit: int
+        self,
+        ontology_rid: str,
+        query: str,
+        limit: int,
+        merged: list[tuple[dict, ChangeState]],
     ) -> SearchTypeResult:
         # 1. FTS + ILIKE from published data
         db_results = await SearchStorage.search_object_types(
