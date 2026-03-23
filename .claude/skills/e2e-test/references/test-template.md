@@ -80,9 +80,26 @@ test.describe.serial('<Feature Name> — E2E', () => {
 
   // ──────── Cleanup ────────
   test('cleanup: delete test data', async ({ request }) => {
+    // Discard any pending working state changes
+    await request.delete(`${API}/ontologies/ri.ontology.ontology.default/working-state`).catch(() => {});
+
+    // Delete test OTs (handles PK/active constraints automatically)
     await cleanupByPrefix(request, PREFIX);
 
-    // Verify cleanup
+    // If test created datasets, clean them up too
+    // const dsResp = await request.get(`${API}/datasets`);
+    // if (dsResp.ok()) {
+    //   for (const ds of (await dsResp.json()).items ?? []) {
+    //     if ((ds.name as string).startsWith(PREFIX)) {
+    //       await request.delete(`${API}/datasets/${ds.rid}`).catch(() => {});
+    //     }
+    //   }
+    // }
+
+    // Discard any working state changes from cleanup itself
+    await request.delete(`${API}/ontologies/ri.ontology.ontology.default/working-state`).catch(() => {});
+
+    // Verify: only test data was removed
     const resp = await request.get(`${API}/object-types`);
     const data = await resp.json();
     const testOts = data.items.filter((ot: { id: string }) => ot.id.startsWith(PREFIX));
