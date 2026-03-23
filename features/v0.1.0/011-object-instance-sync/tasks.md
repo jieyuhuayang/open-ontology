@@ -116,7 +116,7 @@
   **覆盖 AC**: AC-08, AC-09, AC-10, AC-11, AC-12, AC-13, AC-14, AC-21
   **依赖**: T005, T006
 
-- [ ] **T008**: API Router 实现 + main.py 注册
+- [x] **T008**: API Router 实现 + main.py 注册
   **文件**: `apps/server/app/routers/object_instances.py`, `apps/server/app/main.py`
   **逻辑**:
   - `router = APIRouter(prefix="/api/v1", tags=["object-instances"])`
