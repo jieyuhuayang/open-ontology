@@ -2087,7 +2087,6 @@
           "object-instances"
         ],
         "summary": "Trigger Sync",
-        "description": "Manually trigger sync for an object type.",
         "operationId": "trigger_sync_api_v1_object_types__ot_rid__sync_post",
         "parameters": [
           {
