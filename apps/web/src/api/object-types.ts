@@ -50,6 +50,8 @@ export function useCreateObjectType() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: objectTypeKeys.lists() });
       queryClient.setQueryData(objectTypeKeys.detail(data.rid), data);
+      queryClient.invalidateQueries({ queryKey: ['working-state'] });
+      queryClient.invalidateQueries({ queryKey: ['search'] });
     },
   });
 }
