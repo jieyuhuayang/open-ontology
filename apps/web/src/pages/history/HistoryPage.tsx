@@ -5,22 +5,11 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useHistory } from '@/api/history';
 import type { Change, ChangeRecord } from '@/api/types';
+import { CHANGE_TYPE_COLORS, CHANGE_TYPE_KEYS, changeDisplayName } from '@/utils/change-helpers';
 
 dayjs.extend(relativeTime);
 
 const { Title, Text } = Typography;
-
-const CHANGE_TYPE_COLORS: Record<string, string> = {
-  CREATE: 'green',
-  UPDATE: 'blue',
-  DELETE: 'red',
-};
-
-const CHANGE_TYPE_KEYS: Record<string, string> = {
-  CREATE: 'changeManagement.created',
-  UPDATE: 'changeManagement.modified',
-  DELETE: 'changeManagement.deleted',
-};
 
 function changeSummary(changes: Change[], t: (key: string, opts?: Record<string, unknown>) => string): string {
   const counts: Record<string, number> = {};
