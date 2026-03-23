@@ -5,10 +5,6 @@ import { cleanupByPrefix } from './helpers/fixtures';
 /**
  * E2E tests for Object Instance Sync (F011)
  *
- * Prerequisites:
- * - Backend running on localhost:8000
- * - Frontend running on localhost:5173
- *
  * Covers:
  * - AC-15: Instances Tab in OT detail nav
  * - AC-16: Sync status bar with sync record
@@ -24,32 +20,16 @@ test.describe.serial('Object Instance Sync — E2E', () => {
   let otRidWithDs: string;
   let otRidNoDs: string;
 
-  // ──────── Setup ────────
-  test('setup: create test data via API', async ({ request }) => {
-    // Clean leftover test data
+  // ──────── Setup: publishable OT ────────
+  test('setup: create publishable OT with datasource', async ({ request }) => {
     await discardAll(request);
     await cleanupByPrefix(request, PREFIX);
 
-    // OT WITH datasource + PK + TK (publishable)
     otRidWithDs = await createPublishableObjectType(
       request,
       `${PREFIX}employee`,
       'E2E Sync Employee',
     );
-  });
-
-  test('setup: create OT without datasource (after publish)', async ({ request }) => {
-    // Create AFTER publish so it doesn't block the incomplete validation
-    const nodsResp = await request.post(`${API}/object-types`, {
-      data: {
-        id: `${PREFIX}no-ds`,
-        apiName: `${PREFIX}no-ds`.replace(/-/g, '').replace(/^(.)/, (_, c: string) => c.toUpperCase()),
-        displayName: 'E2E No Datasource',
-        icon: { name: 'box', color: '#1677ff' },
-      },
-    });
-    expect(nodsResp.ok()).toBeTruthy();
-    otRidNoDs = (await nodsResp.json()).rid;
   });
 
   // ──────── AC-15: Instances Tab in navigation ────────
@@ -132,6 +112,22 @@ test.describe.serial('Object Instance Sync — E2E', () => {
     expect(syncJob.status).toBe('completed');
   });
 
+  // ──────── Setup: OT without datasource (created after publish) ────────
+  test('setup: create OT without datasource', async ({ request }) => {
+    const nodsResp = await request.post(`${API}/object-types`, {
+      data: {
+        id: `${PREFIX}no-ds`,
+        apiName: `${PREFIX}no-ds`
+          .replace(/-/g, '')
+          .replace(/^(.)/, (_, c: string) => c.toUpperCase()),
+        displayName: 'E2E No Datasource',
+        icon: { name: 'box', color: '#1677ff' },
+      },
+    });
+    expect(nodsResp.ok()).toBeTruthy();
+    otRidNoDs = (await nodsResp.json()).rid;
+  });
+
   // ──────── AC-20: Disabled without datasource ────────
   test('AC-20: Sync Now disabled when OT has no datasource', async ({ page }) => {
     // Covers: AC-20
@@ -148,10 +144,11 @@ test.describe.serial('Object Instance Sync — E2E', () => {
     await discardAll(request);
     await cleanupByPrefix(request, PREFIX);
 
-    // Verify cleanup
     const resp = await request.get(`${API}/object-types`);
     const data = await resp.json();
-    const testOts = data.items.filter((ot: { id: string }) => (ot.id as string).startsWith(PREFIX));
+    const testOts = data.items.filter((ot: { id: string }) =>
+      (ot.id as string).startsWith(PREFIX),
+    );
     expect(testOts).toHaveLength(0);
   });
 });
