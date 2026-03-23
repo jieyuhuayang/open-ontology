@@ -127,8 +127,8 @@ describe('ObjectTypeInstancesPage', () => {
   beforeEach(() => {
     mockMutate.mockClear();
     otBackingDatasource = { rid: 'ds1', name: 'test' };
-    syncStatusReturn = () => ({ data: mockSyncStatus, isLoading: false });
-    instancesReturn = () => ({ data: mockInstances, isLoading: false });
+    syncStatusReturn.mockReturnValue({ data: mockSyncStatus, isLoading: false });
+    instancesReturn.mockReturnValue({ data: mockInstances, isLoading: false });
   });
 
   it('renders page title', async () => {
