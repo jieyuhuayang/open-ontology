@@ -366,3 +366,25 @@ npx playwright test --reporter=list
 - **结论**: 误报（已实现）
 - **分析**: Discard All 操作在 `SaveDialog.tsx` 和 `ChangeActions.tsx` 中均使用 `Modal.confirm()` 二次确认（带红色 danger 按钮）。Publish/Save 通过 Changes 列表审阅 + Errors 标签禁用机制提供足够安全保障。
 - **日期**: 2026-03-24
+
+### 7.1 MySQL import SQL 注入风险
+- **结论**: 已修复
+- **修复内容**: 新增 `quote_mysql_identifier()` 函数（`domain/common.py`），使用正则 `^[a-zA-Z0-9_$]+$` 校验标识符，拒绝含反引号、空格、分号等危险字符的表名/列名。替换 `mysql_import_service.py` 中 4 处和 `dataset_service.py` 中 1 处的 f-string 标识符拼接
+- **影响文件**: `domain/common.py`, `mysql_import_service.py`, `dataset_service.py`
+- **日期**: 2026-03-24
+
+### 7.2 Live Dataset 预览 SQL 注入风险
+- **结论**: 已修复（同 7.1）
+- **修复内容**: `_get_live_preview()` 中的列名和表名均通过 `quote_mysql_identifier()` 安全引用
+- **影响文件**: `dataset_service.py`
+- **日期**: 2026-03-24
+
+### 7.3 ENCRYPTION_KEY 空值重启丢失
+- **结论**: 设计可接受，延后 v0.2.0
+- **分析**: `crypto_service.py` 已有完善的处理：(1) 空 key 时自动生成并缓存为模块级 `_dev_key`（同一进程内稳定）；(2) 日志 WARNING 提示用户设置；(3) 解密失败时返回 `ENCRYPTION_KEY_MISMATCH` 错误码，指导用户重建连接。MVP 为开发/演示环境，重启后重建连接可接受。生产部署需通过 `.env` 配置 `ENCRYPTION_KEY`。
+- **日期**: 2026-03-24
+
+### 7.4 文件上传临时目录无清理机制
+- **结论**: 延后 v0.2.0
+- **分析**: `config.py` 配置 `UPLOAD_TEMP_DIR=/tmp/open-ontology-uploads`，`UPLOAD_TOKEN_TTL_MINUTES=30`。文件导入完成后数据已入库，临时文件理论上可立即清理，但无后台任务执行。MVP 为短期运行的开发环境，`/tmp` 自身有 OS 级清理。生产环境应添加 startup 清理 + 定期后台任务。
+- **日期**: 2026-03-24
