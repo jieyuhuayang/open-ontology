@@ -1,11 +1,16 @@
 import { createPortal } from 'react-dom';
-import { Button, Space, Modal } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { Badge, Button, Modal, Space, Typography } from 'antd';
+import { HistoryOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useWorkingState, useDiscardAll } from '@/api/working-state';
 import { useSaveDialogStore } from '@/stores/save-dialog-store';
 
+const { Text } = Typography;
+
 export default function ChangeActions() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { data: ws } = useWorkingState();
   const discardAll = useDiscardAll();
   const openDialog = useSaveDialogStore((s) => s.openDialog);
@@ -14,7 +19,7 @@ export default function ChangeActions() {
   if (!slot) return null;
 
   const changes = ws?.changes ?? [];
-  if (changes.length === 0) return createPortal(null, slot);
+  const changeCount = changes.length;
 
   const handleDiscard = () => {
     Modal.confirm({
@@ -27,13 +32,33 @@ export default function ChangeActions() {
   };
 
   return createPortal(
-    <Space>
-      <Button type="primary" onClick={() => openDialog()}>
-        {t('changeManagement.save')} ({changes.length})
-      </Button>
-      <Button danger type="text" onClick={handleDiscard}>
-        {t('changeManagement.discard')}
-      </Button>
+    <Space size="middle" align="center">
+      <Badge count={changeCount > 0 ? `+${changeCount}` : 0} size="small">
+        <Button
+          type="text"
+          icon={<HistoryOutlined />}
+          onClick={() => navigate('/history')}
+        >
+          {t('changeManagement.history')}
+        </Button>
+      </Badge>
+      {changeCount > 0 && (
+        <>
+          <Text
+            type="secondary"
+            style={{ cursor: 'pointer' }}
+            onClick={() => openDialog('changes')}
+          >
+            {t('changeManagement.editsCount', { count: changeCount })}
+          </Text>
+          <Button onClick={handleDiscard}>
+            {t('changeManagement.discard')}
+          </Button>
+          <Button type="primary" onClick={() => openDialog()}>
+            {t('changeManagement.save')}
+          </Button>
+        </>
+      )}
     </Space>,
     slot,
   );
