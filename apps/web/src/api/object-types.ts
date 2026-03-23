@@ -83,7 +83,7 @@ export function useDeleteObjectType() {
       queryClient.removeQueries({ queryKey: objectTypeKeys.detail(rid) });
       queryClient.invalidateQueries({ queryKey: linkTypeKeys.all });
       queryClient.invalidateQueries({ queryKey: propertyKeys.all });
-      queryClient.invalidateQueries({ queryKey: workingStateKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['working-state'] });
       queryClient.invalidateQueries({ queryKey: searchKeys.all });
     },
   });
