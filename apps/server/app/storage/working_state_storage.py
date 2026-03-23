@@ -28,11 +28,14 @@ class WorkingStateStorage:
         session: AsyncSession,
         ontology_rid: str,
         user_id: str,
+        for_update: bool = False,
     ) -> WorkingState | None:
         stmt = select(WorkingStateModel).where(
             WorkingStateModel.ontology_rid == ontology_rid,
             WorkingStateModel.user_id == user_id,
         )
+        if for_update:
+            stmt = stmt.with_for_update()
         result = await session.execute(stmt)
         orm = result.scalar_one_or_none()
         return WorkingStateStorage._to_domain(orm) if orm else None
