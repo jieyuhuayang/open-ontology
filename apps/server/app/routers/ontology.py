@@ -31,6 +31,7 @@ async def discard_working_state(
     rid: str,
     service: WorkingStateService = Depends(_get_service),
 ):
+    validate_rid(rid)
     await service.discard(rid)
     return Response(status_code=204)
 
@@ -40,6 +41,7 @@ async def get_working_state(
     rid: str,
     service: WorkingStateService = Depends(_get_service),
 ):
+    validate_rid(rid)
     ws = await service.get_working_state(rid)
     if not ws:
         raise AppError(
@@ -57,6 +59,7 @@ async def list_history(
     page_size: int = Query(20, ge=1, le=100, alias="pageSize"),
     service: WorkingStateService = Depends(_get_service),
 ):
+    validate_rid(rid)
     return await service.list_history(rid, page, page_size)
 
 
@@ -66,6 +69,7 @@ async def get_history_version(
     version: int,
     service: WorkingStateService = Depends(_get_service),
 ):
+    validate_rid(rid)
     return await service.get_history_version(rid, version)
 
 
@@ -75,5 +79,6 @@ async def discard_single_change(
     change_id: str,
     service: WorkingStateService = Depends(_get_service),
 ):
+    validate_rid(rid)
     await service.discard_single_change(rid, change_id)
     return Response(status_code=204)
