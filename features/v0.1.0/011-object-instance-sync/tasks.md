@@ -30,7 +30,7 @@
 
 ### Phase 1：基础设施
 
-- [ ] **T001**: 数据库迁移 + ORM 模型
+- [x] **T001**: 数据库迁移 + ORM 模型
   **文件**: `apps/server/alembic/versions/0010_add_object_instances_and_sync_jobs.py`, `apps/server/app/storage/models.py`
   **逻辑**:
   - 创建 `object_instances` 表：rid(PK), object_type_rid(FK→object_types CASCADE), primary_key_value, title_value, properties(JSONB DEFAULT '{}'), source_dataset_rid(FK→datasets SET NULL), source_row_index, data_hash, synced_at, created_at
