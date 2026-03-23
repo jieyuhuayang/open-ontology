@@ -306,6 +306,9 @@ class WorkingStateService:
         """Validate Property baseType vs Dataset column inferredType (AC-V6)."""
         from app.storage.dataset_storage import DatasetStorage
 
+        # Load merged properties once, reuse across all OT validations
+        merged_props = await self.get_merged_view(DEFAULT_ONTOLOGY_RID, ResourceType.PROPERTY)
+
         for change in changes:
             if change.resource_type != ResourceType.OBJECT_TYPE:
                 continue
@@ -323,8 +326,6 @@ class WorkingStateService:
 
             col_type_map = {col.name: col.inferred_type for col in dataset.columns}
 
-            # Check properties for this OT using merged view for complete data
-            merged_props = await self.get_merged_view(DEFAULT_ONTOLOGY_RID, ResourceType.PROPERTY)
             for prop_data, prop_state in merged_props:
                 if prop_state == ChangeState.DELETED:
                     continue
