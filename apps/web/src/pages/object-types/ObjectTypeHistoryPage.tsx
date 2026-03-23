@@ -44,7 +44,7 @@ export default function ObjectTypeHistoryPage() {
               <Tag color={CHANGE_TYPE_COLORS[change.changeType]}>
                 {t(CHANGE_TYPE_KEYS[change.changeType] ?? change.changeType)}
               </Tag>
-              {displayName(change)}
+              {changeDisplayName(change)}
             </div>
           ))}
         </Card>
@@ -69,7 +69,7 @@ export default function ObjectTypeHistoryPage() {
                   <Tag color={CHANGE_TYPE_COLORS[change.changeType]}>
                     {t(CHANGE_TYPE_KEYS[change.changeType] ?? change.changeType)}
                   </Tag>
-                  {displayName(change)}
+                  {changeDisplayName(change)}
                 </div>
               ))}
             </Card>
