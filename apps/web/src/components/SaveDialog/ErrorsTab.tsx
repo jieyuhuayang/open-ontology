@@ -14,12 +14,22 @@ export interface ValidationError {
  * Extract front-end validation errors from changes.
  * Exported for use by SaveDialog to compute errorCount.
  */
+function hasDisplayName(resourceType: string, after: Record<string, unknown> | null): boolean {
+  if (!after) return false;
+  if (resourceType === 'LinkType') {
+    const sideA = after.sideA as Record<string, unknown> | undefined;
+    const sideB = after.sideB as Record<string, unknown> | undefined;
+    return !!(sideA?.displayName && sideB?.displayName);
+  }
+  return !!after.displayName;
+}
+
 export function getValidationErrors(changes: Change[]): ValidationError[] {
   const errors: ValidationError[] = [];
   for (const change of changes) {
     if (change.changeType === 'DELETE') continue;
     const after = change.after as Record<string, unknown> | null;
-    if (!after?.displayName) {
+    if (!hasDisplayName(change.resourceType, after)) {
       errors.push({
         changeId: change.id,
         resourceRid: change.resourceRid,
