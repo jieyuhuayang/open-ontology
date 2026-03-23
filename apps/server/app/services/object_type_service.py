@@ -338,7 +338,7 @@ class ObjectTypeService:
                 )
             )
 
-        # Cascade: LinkTypes (AD-4)
+        # Cascade: LinkTypes (AD-4) — published LTs from DB
         related_lt_rids = await ObjectTypeStorage.get_related_link_type_rids(self._session, rid)
         for lt_rid in related_lt_rids:
             cascade_changes.append(
@@ -352,6 +352,32 @@ class ObjectTypeService:
                     timestamp=now,
                 )
             )
+
+        # Cascade: Draft LinkTypes in WS that reference this OT
+        ws = await self._ws_service.get_working_state(DEFAULT_ONTOLOGY_RID)
+        published_lt_rid_set = set(related_lt_rids)
+        if ws:
+            for c in ws.changes:
+                if c.resource_type != ResourceType.LINK_TYPE:
+                    continue
+                if c.resource_rid in published_lt_rid_set:
+                    continue  # Already handled above
+                if c.change_type in (ChangeType.CREATE, ChangeType.UPDATE):
+                    after = c.after or {}
+                    side_a_ot = (after.get("sideA") or {}).get("objectTypeRid")
+                    side_b_ot = (after.get("sideB") or {}).get("objectTypeRid")
+                    if side_a_ot == rid or side_b_ot == rid:
+                        cascade_changes.append(
+                            Change(
+                                id=uuid.uuid4().hex[:12],
+                                resource_type=ResourceType.LINK_TYPE,
+                                resource_rid=c.resource_rid,
+                                change_type=ChangeType.DELETE,
+                                before=c.after,
+                                after=None,
+                                timestamp=now,
+                            )
+                        )
 
         # The ObjectType itself
         cascade_changes.append(
