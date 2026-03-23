@@ -24,6 +24,7 @@ export function useWorkingState(ontologyRid: string = DEFAULT_ONTOLOGY_RID) {
       return data;
     },
     retry: false,
+    staleTime: 5000,
   });
 }
 
