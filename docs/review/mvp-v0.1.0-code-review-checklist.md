@@ -274,3 +274,25 @@ npx playwright test --reporter=list
 - **结论**: 确认设计正确（非问题）
 - **分析**: `_trigger_post_publish_sync` 在 `flush()` 后、`commit()` 前调用。异常被 per-OT 捕获并仅 log，不影响 publish 事务。`database.py` 的 `get_db_session()` 在 handler 返回后才 commit，sync 失败不阻止 publish 提交。sync 是 best-effort 后处理，设计符合预期。
 - **日期**: 2026-03-24
+
+### 2.1 路由层 rid 参数无格式校验
+- **结论**: 已修复
+- **修复内容**: 在 `validators.py` 中添加 `validate_rid()` 函数（正则 `^ri\.[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*\.[a-zA-Z0-9]+$`，最大 200 字符），并在 `object_types.py`、`link_types.py`、`ontology.py`、`properties.py` 路由中所有 `rid` 路径参数处调用
+- **影响文件**: `validators.py`, `routers/object_types.py`, `routers/link_types.py`, `routers/ontology.py`, `routers/properties.py`
+- **测试**: `test_validators.py::TestValidateRid`（8 个用例）
+- **日期**: 2026-03-24
+
+### 2.2 分页参数上限不一致
+- **结论**: 误报（已统一）
+- **分析**: 所有分页路由均使用 `MAX_PAGE_SIZE=100`（`constants.py`），history 的 `le=100` 与 OT/LT 的 `le=MAX_PAGE_SIZE` 等价。Properties 按 OT 维度返回全量（无分页需求）。
+- **日期**: 2026-03-24
+
+### 2.3 search types 参数无枚举校验
+- **结论**: 误报（已有校验）
+- **分析**: `routers/search.py` 已有 `VALID_TYPES = {"objectType", "property", "linkType"}` 枚举校验，非法 type 返回 400 + `SEARCH_INVALID_TYPE` 错误码。集成测试 `test_search_invalid_type_returns_400` 已覆盖。
+- **日期**: 2026-03-24
+
+### 2.4 skipGlobalError mutation 缺本地 onError
+- **结论**: 误报（均已处理）
+- **分析**: 审查全部 7 个 `skipGlobalError: true` 的 mutation（OT create/delete、LT create/delete、Property create/update/delete），调用方均在 `mutateAsync()` 外包裹 try-catch 并通过 `message.error()` 展示服务端错误。
+- **日期**: 2026-03-24
