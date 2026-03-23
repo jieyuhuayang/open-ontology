@@ -2,18 +2,7 @@ import { Tag, Button } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { Change } from '@/api/types';
-
-const CHANGE_TYPE_COLORS: Record<string, string> = {
-  CREATE: 'green',
-  UPDATE: 'blue',
-  DELETE: 'red',
-};
-
-const CHANGE_TYPE_KEYS: Record<string, string> = {
-  CREATE: 'changeManagement.created',
-  UPDATE: 'changeManagement.modified',
-  DELETE: 'changeManagement.deleted',
-};
+import { CHANGE_TYPE_COLORS, CHANGE_TYPE_KEYS, changeDisplayName } from '@/utils/change-helpers';
 
 interface ChangeItemProps {
   change: Change;
