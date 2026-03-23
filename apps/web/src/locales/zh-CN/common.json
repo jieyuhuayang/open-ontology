@@ -359,6 +359,7 @@
     "newObjectType": "新建对象类型",
     "createTitle": "创建对象类型",
     "createSuccess": "对象类型创建成功",
+    "createSuccessPartialProperties": "对象类型已创建，但部分属性添加失败，请手动添加。",
     "deleteTitle": "删除对象类型",
     "deleteConfirm": "确定要删除 \"{{name}}\" 吗？此操作不可撤销。",
     "deleteSuccess": "对象类型删除成功",
