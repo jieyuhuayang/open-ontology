@@ -9,8 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.common import generate_rid
 from app.domain.object_instance import ObjectInstance, SyncJob
+from app.exceptions import AppError
 from app.storage.dataset_storage import DatasetStorage
 from app.storage.object_instance_storage import ObjectInstanceStorage
+from app.storage.object_type_storage import ObjectTypeStorage
+from app.storage.property_storage import PropertyStorage
 from app.storage.sync_job_storage import SyncJobStorage
 
 logger = logging.getLogger(__name__)
