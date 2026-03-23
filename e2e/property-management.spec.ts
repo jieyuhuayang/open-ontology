@@ -30,8 +30,8 @@ test.describe.serial('Property Management — E2E', () => {
     await cleanupByPrefix(request, 'e2e-pm-');
 
     // Create two object types
-    otRidA = await createObjectType(request, 'e2e-employee', 'E2E Employee');
-    otRidB = await createObjectType(request, 'e2e-department', 'E2E Department');
+    otRidA = await createObjectType(request, 'e2e-pm-employee', 'E2E Employee');
+    otRidB = await createObjectType(request, 'e2e-pm-department', 'E2E Department');
 
     // Create properties on OT-A
     const p1 = await createProperty(request, otRidA, 'full-name', { apiName: 'fullName' });
