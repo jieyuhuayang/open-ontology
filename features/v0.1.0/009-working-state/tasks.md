@@ -55,7 +55,7 @@
 
 ### T02: History + Discard Single 单元测试
 
-- [ ] **T02**
+- [x] **T02**
 - 文件:
   - `apps/server/tests/unit/test_history_service.py` — 新建
 - 内容:
@@ -79,7 +79,7 @@
 
 ### T03: Service 层实现 — list_history, get_history_version, discard_single_change
 
-- [ ] **T03**
+- [x] **T03**
 - 文件:
   - `apps/server/app/services/working_state_service.py` — 修改，新增 3 个方法
 - 内容:
@@ -104,7 +104,7 @@
 
 ### T04: History + Discard Single API 集成测试
 
-- [ ] **T04**
+- [x] **T04**
 - 文件:
   - `apps/server/tests/integration/test_history_api.py` — 新建
 - 内容:
@@ -125,7 +125,7 @@
 
 ### T05: Router 层实现 — 3 个新端点 + openapi.json 重生成
 
-- [ ] **T05**
+- [x] **T05**
 - 文件:
   - `apps/server/app/routers/ontology.py` — 修改，新增 3 个端点
   - `apps/server/openapi.json` — 重新生成
@@ -153,7 +153,7 @@
 
 ### T06: OpenAPI 类型重生成 + API Hooks
 
-- [ ] **T06**
+- [x] **T06**
 - 文件:
   - `apps/web/src/generated/api.ts` — 自动生成
   - `apps/web/src/api/working-state.ts` — 新建
@@ -172,7 +172,7 @@
 
 ### T07: History Hooks + SaveDialog Store + i18n Keys
 
-- [ ] **T07**
+- [x] **T07**
 - 文件:
   - `apps/web/src/api/history.ts` — 新建
   - `apps/web/src/stores/save-dialog-store.ts` — 新建
@@ -197,7 +197,7 @@
 
 ### T08: i18n Keys + Store 测试
 
-- [ ] **T08**
+- [x] **T08**
 - 文件:
   - `apps/web/src/locales/en-US/common.json` — 修改
   - `apps/web/src/locales/zh-CN/common.json` — 修改
@@ -225,7 +225,7 @@
 
 ### T09: ChangeActions 组件 + 测试（TopBar Portal: Save + Discard 按钮）
 
-- [ ] **T09**
+- [x] **T09**
 - 文件:
   - `apps/web/src/components/ChangeActions.tsx` — 新建
   - `apps/web/src/components/__tests__/ChangeActions.test.tsx` — 新建
@@ -250,7 +250,7 @@
 
 ### T10: ErrorsTab + ChangeItem 叶组件 + 测试
 
-- [ ] **T10**
+- [x] **T10**
 - 文件:
   - `apps/web/src/components/SaveDialog/ErrorsTab.tsx` — 新建
   - `apps/web/src/components/SaveDialog/ChangeItem.tsx` — 新建
@@ -276,7 +276,7 @@
 
 ### T11: SaveDialog 主体 + ChangesTab + 测试
 
-- [ ] **T11**
+- [x] **T11**
 - 文件:
   - `apps/web/src/components/SaveDialog/SaveDialog.tsx` — 新建
   - `apps/web/src/components/SaveDialog/ChangesTab.tsx` — 新建
@@ -313,7 +313,7 @@
 
 ### T12: HomeSidebar 修改 + 全局挂载 + 测试
 
-- [ ] **T12**
+- [x] **T12**
 - 文件:
   - `apps/web/src/components/layout/HomeSidebar.tsx` — 修改
   - `apps/web/src/components/layout/HomeLayout.tsx` — 修改
@@ -344,7 +344,7 @@
 
 ### T13: HistoryPage — 变更历史列表页 + 路由 + 测试
 
-- [ ] **T13**
+- [x] **T13**
 - 文件:
   - `apps/web/src/pages/history/HistoryPage.tsx` — 新建
   - `apps/web/src/router.tsx` — 修改（HomeLayout children 新增 history 路由）
@@ -371,7 +371,7 @@
 
 ### T14: ObjectTypeHistoryPage + OT Nav 更新 + 路由 + 测试
 
-- [ ] **T14**
+- [x] **T14**
 - 文件:
   - `apps/web/src/pages/object-types/ObjectTypeHistoryPage.tsx` — 新建
   - `apps/web/src/pages/object-types/ObjectTypeDetailLayout.tsx` — 修改
@@ -405,7 +405,7 @@
 
 ### T15: 后端全量测试通过
 
-- [ ] **T15**
+- [x] **T15**
 - 文件: 无新增
 - 内容:
   - 运行后端全量测试：`cd apps/server && uv run pytest tests/unit/test_history_service.py tests/integration/test_history_api.py -v`
@@ -418,7 +418,7 @@
 
 ### T16: 前端全量测试通过
 
-- [ ] **T16**
+- [x] **T16**
 - 文件: 无新增
 - 内容:
   - 运行前端全量测试：`cd apps/web && pnpm test --run`
