@@ -66,11 +66,11 @@ export default function SearchBar() {
       ref={inputRef}
       prefix={<SearchOutlined />}
       placeholder={t('topBar.searchPlaceholder')}
-      value={query}
+      value={inputValue}
       onChange={handleChange}
       onFocus={handleFocus}
       suffix={
-        query ? (
+        inputValue ? (
           <CloseCircleFilled
             style={{ color: '#999', cursor: 'pointer' }}
             onClick={handleClear}
