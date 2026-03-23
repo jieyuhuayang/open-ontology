@@ -66,6 +66,7 @@ async def get_link_type(
     rid: str,
     service: LinkTypeService = Depends(_get_service),
 ):
+    validate_rid(rid)
     return await service.get_by_rid(rid)
 
 
@@ -75,6 +76,7 @@ async def update_link_type(
     req: LinkTypeUpdateRequest,
     service: LinkTypeService = Depends(_get_service),
 ):
+    validate_rid(rid)
     return await service.update(rid, req)
 
 
@@ -83,5 +85,6 @@ async def delete_link_type(
     rid: str,
     service: LinkTypeService = Depends(_get_service),
 ):
+    validate_rid(rid)
     await service.delete(rid)
     return Response(status_code=204)
