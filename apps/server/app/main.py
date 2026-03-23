@@ -15,6 +15,7 @@ from app.routers import (
     imports,
     link_types,
     mysql_connections,
+    object_instances,
     object_types,
     ontology,
     properties,
