@@ -48,6 +48,8 @@ export function useCreateProperty(objectTypeRid: string) {
     meta: { skipGlobalError: true },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: propertyKeys.list(objectTypeRid) });
+      queryClient.invalidateQueries({ queryKey: ['working-state'] });
+      queryClient.invalidateQueries({ queryKey: ['search'] });
     },
   });
 }
