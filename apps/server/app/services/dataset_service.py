@@ -198,7 +198,7 @@ class DatasetService:
                 await cur.execute(
                     "SELECT TABLE_ROWS FROM information_schema.TABLES "
                     "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s",
-                    (db_name, table),
+                    (db_name, ds.source_table),
                 )
                 stat_row = await cur.fetchone()
                 total = stat_row["TABLE_ROWS"] if stat_row else len(rows)
