@@ -23,13 +23,7 @@ function changeSummary(changes: Change[], t: (key: string, opts?: Record<string,
   return `${t('changeManagement.changesCount', { count: changes.length })}: ${parts.join(', ')}`;
 }
 
-function displayName(change: Change): string {
-  return (
-    (change.after as Record<string, unknown> | null)?.displayName ??
-    (change.before as Record<string, unknown> | null)?.displayName ??
-    change.resourceRid
-  ) as string;
-}
+// displayName extracted to shared changeDisplayName()
 
 export default function HistoryPage() {
   const { t } = useTranslation();
