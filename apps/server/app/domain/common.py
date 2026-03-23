@@ -1,7 +1,11 @@
+import re
 import uuid
 
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
+
+# MySQL identifier safety: only allow alphanumeric, underscore, dollar sign
+_MYSQL_IDENT_PATTERN = re.compile(r"^[a-zA-Z0-9_$]+$")
 
 
 class DomainModel(BaseModel):
