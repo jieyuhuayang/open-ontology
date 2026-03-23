@@ -84,15 +84,15 @@
 
 ## 4. 并发与事务安全
 
-- [ ] 🔴 **4.1 WorkingState read-modify-write 无乐观锁**
+- [x] 🔴 **4.1 WorkingState read-modify-write 无乐观锁**
   并发 `add_change` 可能互相覆盖。应在 `working_states` 表增加版本号 + `WHERE version = N`。
   `working_state_service.py:149-153`, `working_state_storage.py`
 
-- [ ] 🟡 **4.2 process-local singleton 多 worker 失效**
+- [x] 🟡 **4.2 process-local singleton 多 worker 失效**
   `ImportTaskService` 和 `_preview_cache` 是内存 dict，多 worker 下前端轮询可能打到不同 worker。
   `import_task_service.py:41`, `file_import_service.py:27`
 
-- [ ] 🟡 **4.3 publish 与并发 CRUD 的竞态**
+- [x] 🟡 **4.3 publish 与并发 CRUD 的竞态**
   publish apply changes 过程中新 change 写入即将被清空的 WS。
   `working_state_service.py:354-419`, `database.py`
 
