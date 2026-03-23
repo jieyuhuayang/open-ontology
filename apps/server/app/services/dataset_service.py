@@ -214,12 +214,33 @@ class DatasetService:
         finally:
             mysql_conn.close()
 
+    async def _is_join_table_dataset(self, rid: str) -> str | None:
+        """Check if dataset is used as a join table by any LinkType.
+
+        Returns the LinkType displayName if in use, None otherwise.
+        """
+        from app.storage.link_type_storage import LinkTypeStorage
+
+        all_lts = await LinkTypeStorage.list_all(self._session, DEFAULT_ONTOLOGY_RID)
+        for lt in all_lts:
+            if lt.join_table_dataset_rid == rid:
+                return lt.display_name
+        return None
+
     async def delete(self, rid: str) -> None:
         in_use_map = await self.get_in_use_map()
         if rid in in_use_map:
             raise AppError(
                 code="DATASET_IN_USE",
                 message=f"Dataset is in use by '{in_use_map[rid]}'",
+                status_code=403,
+            )
+        # Check if dataset is used as a join table by any LinkType
+        jt_user = await self._is_join_table_dataset(rid)
+        if jt_user:
+            raise AppError(
+                code="DATASET_IN_USE_AS_JOIN_TABLE",
+                message=f"Dataset is used as a join table by link type '{jt_user}'",
                 status_code=403,
             )
         await DatasetStorage.delete(self._session, rid)
