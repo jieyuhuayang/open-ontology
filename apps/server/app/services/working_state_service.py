@@ -270,7 +270,18 @@ class WorkingStateService:
             if change.change_type == ChangeType.DELETE:
                 continue
 
-            data = change.after or {}
+            if change.change_type == ChangeType.UPDATE:
+                # UPDATE after only contains changed fields — merge with published data
+                published_ot = await ObjectTypeStorage.get_by_rid(
+                    self._session, change.resource_rid
+                )
+                if published_ot:
+                    published_data = published_ot.model_dump(mode="json", by_alias=True)
+                    data = _deep_merge_dicts(published_data, change.after or {})
+                else:
+                    data = change.after or {}
+            else:
+                data = change.after or {}
             missing = []
 
             if not data.get("displayName"):
