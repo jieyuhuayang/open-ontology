@@ -25,7 +25,8 @@
   "detail": {
     "overview": "Overview",
     "properties": "Properties",
-    "datasources": "Datasources"
+    "datasources": "Datasources",
+    "instances": "Instances"
   },
   "discover": {
     "recentlyViewed": "Recently viewed object types",
