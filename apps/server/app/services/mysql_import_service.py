@@ -386,8 +386,9 @@ class MySQLImportService:
             password,
         )
         try:
+            tbl = quote_mysql_identifier(table)
             async with check_conn.cursor() as cur:
-                await cur.execute(f"SELECT COUNT(*) FROM `{table}`")
+                await cur.execute(f"SELECT COUNT(*) FROM {tbl}")
                 row = await cur.fetchone()
                 count = row[0] if row else 0
             if count > _MAX_IMPORT_ROWS:
