@@ -1,6 +1,9 @@
 """WorkingState service — change management core logic."""
 
+import logging
 from datetime import datetime, timezone
+
+logger = logging.getLogger(__name__)
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
