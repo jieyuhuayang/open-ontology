@@ -80,21 +80,34 @@ export default function CreateObjectTypeWizard() {
     }
   };
 
+  /** Shared creation logic: create OT, optionally create properties, navigate. */
+  const executeCreate = async (opts: { showSuccessMessage: boolean }) => {
+    const result = await createMutation.mutateAsync(buildCreateRequest());
+
+    let propertyError = false;
+    if (properties.length > 0) {
+      try {
+        await createPropertiesForObjectType(result.rid);
+      } catch {
+        propertyError = true;
+      }
+    }
+
+    if (propertyError) {
+      message.warning(t('objectType.createSuccessPartialProperties'));
+    } else if (opts.showSuccessMessage) {
+      message.success(t('objectType.createSuccess'));
+    }
+    close();
+    reset();
+    navigate(`/object-types/${result.rid}`);
+  };
+
   const handleClose = async () => {
     if (displayName) {
       try {
         setIsCreating(true);
-        const result = await createMutation.mutateAsync(buildCreateRequest());
-        if (properties.length > 0) {
-          try {
-            await createPropertiesForObjectType(result.rid);
-          } catch {
-            message.warning(t('objectType.createSuccessPartialProperties'));
-          }
-        }
-        close();
-        reset();
-        navigate(`/object-types/${result.rid}`);
+        await executeCreate({ showSuccessMessage: false });
         return;
       } catch {
         // If OT creation fails, just close
@@ -113,25 +126,7 @@ export default function CreateObjectTypeWizard() {
     }
     try {
       setIsCreating(true);
-      const result = await createMutation.mutateAsync(buildCreateRequest());
-
-      let propertyError = false;
-      if (properties.length > 0) {
-        try {
-          await createPropertiesForObjectType(result.rid);
-        } catch {
-          propertyError = true;
-        }
-      }
-
-      if (propertyError) {
-        message.warning(t('objectType.createSuccessPartialProperties'));
-      } else {
-        message.success(t('objectType.createSuccess'));
-      }
-      close();
-      reset();
-      navigate(`/object-types/${result.rid}`);
+      await executeCreate({ showSuccessMessage: true });
     } catch (err) {
       const axiosErr = err as AxiosError<ApiErrorResponse>;
       const errorCode = axiosErr.response?.data?.error?.code;
