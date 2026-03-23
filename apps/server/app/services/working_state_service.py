@@ -70,9 +70,11 @@ class WorkingStateService:
     def __init__(self, session: AsyncSession):
         self._session = session
 
-    async def _get_working_state(self, ontology_rid: str) -> WorkingState | None:
+    async def _get_working_state(
+        self, ontology_rid: str, for_update: bool = False
+    ) -> WorkingState | None:
         return await WorkingStateStorage.get_by_ontology(
-            self._session, ontology_rid, DEFAULT_USER_ID
+            self._session, ontology_rid, DEFAULT_USER_ID, for_update=for_update
         )
 
     async def _get_published_object_types(self, ontology_rid: str) -> list[ObjectType]:
