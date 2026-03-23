@@ -151,6 +151,41 @@ class TestChangeCollapsing:
         assert result[0].before["displayName"] == "Original"
         assert result[0].after is None
 
+    def test_delete_then_create_becomes_update(self, service):
+        """1.3: DELETE + CREATE → UPDATE (resource still exists in published state)."""
+        existing = _make_change(
+            ChangeType.DELETE,
+            before={"displayName": "Original", "status": "experimental"},
+        )
+        new = _make_change(
+            ChangeType.CREATE,
+            after={"displayName": "Recreated", "status": "experimental"},
+        )
+        changes = [existing]
+        result = service._collapse_change(changes, new)
+
+        assert len(result) == 1
+        assert result[0].change_type == ChangeType.UPDATE
+        assert result[0].before["displayName"] == "Original"
+        assert result[0].after["displayName"] == "Recreated"
+
+    def test_delete_then_delete_is_idempotent(self, service):
+        """1.3: DELETE + DELETE → idempotent, keep existing DELETE."""
+        existing = _make_change(
+            ChangeType.DELETE,
+            before={"displayName": "Original"},
+        )
+        new = _make_change(
+            ChangeType.DELETE,
+            before={"displayName": "Original"},
+        )
+        changes = [existing]
+        result = service._collapse_change(changes, new)
+
+        assert len(result) == 1
+        assert result[0].change_type == ChangeType.DELETE
+        assert result[0] is existing  # keep existing, not new
+
 
 # ---------------------------------------------------------------------------
 # Merged View
