@@ -23,7 +23,6 @@ function changeSummary(changes: Change[], t: (key: string, opts?: Record<string,
   return `${t('changeManagement.changesCount', { count: changes.length })}: ${parts.join(', ')}`;
 }
 
-// displayName extracted to shared changeDisplayName()
 
 export default function HistoryPage() {
   const { t } = useTranslation();
