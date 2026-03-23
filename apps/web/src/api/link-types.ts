@@ -121,6 +121,8 @@ export function useDeleteLinkType() {
     onSuccess: (_data, rid) => {
       queryClient.invalidateQueries({ queryKey: linkTypeKeys.lists() });
       queryClient.removeQueries({ queryKey: linkTypeKeys.detail(rid) });
+      queryClient.invalidateQueries({ queryKey: workingStateKeys.all });
+      queryClient.invalidateQueries({ queryKey: searchKeys.all });
     },
   });
 }
