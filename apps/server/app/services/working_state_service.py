@@ -600,13 +600,48 @@ class WorkingStateService:
                 status_code=404,
             )
 
-        remaining = [c for c in ws.changes if c.id != change_id]
-        if len(remaining) == len(ws.changes):
+        # Find the change being discarded
+        discarded_change = None
+        for c in ws.changes:
+            if c.id == change_id:
+                discarded_change = c
+                break
+
+        if not discarded_change:
             raise AppError(
                 code="CHANGE_NOT_FOUND",
                 message=f"Change with id {change_id} not found in working state",
                 status_code=404,
             )
+
+        # Build set of change IDs to discard
+        discard_ids = {change_id}
+
+        # If discarding an OT DELETE, cascade-discard related Property/LT DELETE changes
+        # to prevent orphan DELETE changes that would delete still-in-use sub-resources
+        if (
+            discarded_change.resource_type == ResourceType.OBJECT_TYPE
+            and discarded_change.change_type == ChangeType.DELETE
+        ):
+            ot_rid = discarded_change.resource_rid
+            related_lt_rids = set(
+                await ObjectTypeStorage.get_related_link_type_rids(self._session, ot_rid)
+            )
+
+            for c in ws.changes:
+                if c.id == change_id or c.change_type != ChangeType.DELETE:
+                    continue
+                # Cascade-discard Property DELETE changes belonging to this OT
+                if c.resource_type == ResourceType.PROPERTY:
+                    before = c.before or {}
+                    if before.get("objectTypeRid") == ot_rid:
+                        discard_ids.add(c.id)
+                # Cascade-discard LinkType DELETE changes related to this OT
+                elif c.resource_type == ResourceType.LINK_TYPE:
+                    if c.resource_rid in related_lt_rids:
+                        discard_ids.add(c.id)
+
+        remaining = [c for c in ws.changes if c.id not in discard_ids]
 
         if not remaining:
             await WorkingStateStorage.delete(self._session, ws.rid)
