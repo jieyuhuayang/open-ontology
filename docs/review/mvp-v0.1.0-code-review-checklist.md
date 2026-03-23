@@ -68,15 +68,15 @@
 
 ## 3. 级联操作与引用完整性
 
-- [ ] 🔴 **3.1 OT 删除级联遗漏 draft LinkTypes**
+- [x] 🔴 **3.1 OT 删除级联遗漏 draft LinkTypes**
   `get_related_link_type_rids` 只查 DB 已发布 LinkType，WS 中 CREATE 的草稿 LinkType（引用该 OT）不会被级联删除。
   `object_type_service.py:342-354`, `object_type_storage.py`
 
-- [ ] 🟡 **3.2 Dataset 删除对 WS 草稿 OT 引用的覆盖确认**
+- [x] 🟡 **3.2 Dataset 删除对 WS 草稿 OT 引用的覆盖确认**
   `get_in_use_map()` 是否完整覆盖 CREATE 草稿 OT 的 `backingDatasource`。
   `dataset_service.py:234-249`
 
-- [ ] 🟡 **3.3 Property 删除时 OT 的 PK/TK 引用清理**
+- [x] 🟡 **3.3 Property 删除时 OT 的 PK/TK 引用清理**
   删除 `isPrimaryKey` 的 Property 时，OT 的 `primaryKeyPropertyId` 是否同步清空？
   `property_service.py` delete/batch_delete 方法
 
