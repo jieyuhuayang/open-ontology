@@ -363,6 +363,8 @@
     "deleteTitle": "Delete Object Type",
     "deleteConfirm": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
     "deleteSuccess": "Object type deleted successfully",
+    "notFound": "Object type not found or has been deleted.",
+    "backToList": "Back to Object Types",
     "cannotDeleteActive": "Cannot delete an active object type",
     "deleteCascadeWarning": "This will also delete {{count}} associated link type(s).",
     "cannotModifyApiNameActive": "API Name cannot be modified when status is Active",
