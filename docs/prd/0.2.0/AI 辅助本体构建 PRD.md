@@ -1,0 +1,1394 @@
+# Open Ontology v0.2.0 — AI 辅助本体构建 PRD
+
+> **版本**: v0.2.0
+> **状态**: Draft
+> **日期**: 2026-03-24
+> **前置版本**: v0.1.0（MVP）— 本体管理平台基础 CRUD
+
+---
+
+# 一、背景与愿景
+
+## 1.1 v0.1.0 回顾与局限
+
+v0.1.0（MVP）成功复现了 Palantir Ontology Manager 的核心操作能力：
+
+- ✅ 对象类型（Object Type）的创建、编辑、删除
+- ✅ 链接类型（Link Type）的创建、编辑、删除
+- ✅ 属性（Property）管理与类型映射
+- ✅ 数据连接（MySQL 快照导入 / Excel·CSV 上传）
+- ✅ 变更管理（Working State 草稿模式）
+- ✅ 本体搜索（全文检索）
+
+然而，这些功能本质上是**大模型时代之前的产物**——用户仍然需要手动完成以下繁琐流程：
+
+1. **理解本体概念**：对象类型、属性、链接类型等概念对业务人员陌生
+2. **逐个创建实体**：通过 5 步向导逐一创建对象类型，每个对象类型需手动配置属性
+3. **手动建立关系**：识别并创建对象类型之间的链接关系需要数据建模经验
+4. **反复调整迭代**：初次建模难以一步到位，需要多轮调整
+
+**核心痛点**：对于业务用户而言，想要创建一个适合企业真实场景的本体，仍然**难如登天**。
+
+## 1.2 v0.2.0 核心愿景
+
+> **从"手动逐步创建"到"Agent 辅助批量构建 + 3D 可视化微调"**
+
+大模型与 Agent 技术的发展使得一种全新的本体构建范式成为可能：
+
+```
+传统方式（v0.1.0）：
+  理解概念 → 准备数据 → 逐个创建对象类型 → 逐个配置属性 → 逐个建立链接 → 反复调整
+  ⏱ 数小时到数天
+
+Agent 辅助方式（v0.2.0）：
+  上传资料 → Agent 自动分析 → 生成本体蓝图 → 3D 可视化审查 → 微调确认 → 一键发布
+  ⏱ 数分钟
+```
+
+v0.2.0 的三大核心目标：
+
+| # | 目标 | 衡量标准 |
+|---|------|----------|
+| 1 | **降低业务用户创建企业本体的门槛** | 无需理解本体建模概念，上传资料即可获得本体初稿 |
+| 2 | **最大限度提高 Agent 的本体创建效果** | 使用 deepagents 框架，将原子操作封装为 Skills，Agent 灵活调用 |
+| 3 | **极致的用户交互体验** | 3D 星空可视化 + 流式 HITL 交互，让人惊呼"本体构建就应该这么做！" |
+
+## 1.3 目标用户画像
+
+| 用户角色 | 典型背景 | 使用场景 | 技术水平 |
+|----------|----------|----------|----------|
+| **业务分析师** | 了解业务流程，不懂数据建模 | 上传业务文档、Excel 表格，让 Agent 生成初始本体 | 低 |
+| **领域专家** | 深谙行业知识，对本体有直觉但不会操作 | 审查 Agent 生成的蓝图，调整实体关系和属性 | 中 |
+| **数据架构师** | 精通数据建模，需要快速原型 | 上传 DDL/ERD，快速生成本体骨架后精调 | 高 |
+| **开发者** | 使用 CLI/Skills 自动化本体构建流程 | 在 CI/CD 或 Claude Code 中执行批量本体操作 | 高 |
+
+## 1.4 与 ontology-agent-framework 的关系
+
+项目中存在两套定位不同的 Agent 系统：
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                    Open Ontology Agent 生态                       │
+├────────────────────────────┬─────────────────────────────────────┤
+│  v0.2.0 本体构建 Agent      │  ontology-agent-framework           │
+│  (本 PRD)                   │  (未来版本)                          │
+│                             │                                     │
+│  目的：帮用户从零构建本体    │  目的：基于已有本体构建 Agent 应用   │
+│  框架：deepagents            │  框架：LangGraph                    │
+│  输入：文档/表格/DDL         │  输入：自然语言查询                  │
+│  输出：本体蓝图 → 正式本体   │  输出：结构化回答 + 可视化          │
+│                             │                                     │
+│  用户：业务分析师/领域专家   │  用户：数据工程师/Agent 开发者      │
+│  阶段：本体 = 空 → 本体完成  │  阶段：本体已完成 → 使用本体       │
+└────────────────────────────┴─────────────────────────────────────┘
+                                        │
+                              ┌─────────┴─────────┐
+                              │  Ontology Core     │
+                              │  (共享的领域模型    │
+                              │   和 Service 层)   │
+                              └────────────────────┘
+```
+
+**v0.2.0 PRD 不包含 ontology-agent-framework 的内容。** 两者共享底层的 Ontology Core（Domain 模型、Service 层、Storage 层），但 Agent 编排层完全独立。
+
+---
+
+# 二、目标及优先级
+
+<table>
+<thead>
+<tr>
+<th>优先级</th>
+<th>目标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P0</td>
+<td>
+<ol>
+<li><b>本体构建 Agent 引擎</b> — 基于 deepagents 的通用 Agent，具备自主规划、Skill 调用、子 Agent 派生能力</li>
+<li><b>资料分析与本体蓝图生成</b> — 支持上传结构化/非结构化资料，Agent 自动分析并生成本体蓝图</li>
+<li><b>3D 本体工坊</b> — 将 3D 星空 Demo 升级为正式的本体可视化工作台，与 Agent 深度联动</li>
+<li><b>HITL 蓝图审查与微调</b> — 三级操作（接受/编辑/拒绝），流式可视化审查流程</li>
+<li><b>CLI 工具与 Skills 体系</b> — 将原子操作包装为 CLI 命令和 Claude Code Skills，Agent 和开发者共用</li>
+</ol>
+</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>
+<ol>
+<li><b>Agent Sidekick 面板</b> — Ontology Manager 各页面的常驻 AI 助手侧栏</li>
+<li><b>本体导入导出（JSON）</b>（v0.1.0 延后）</li>
+<li><b>Agent 反馈学习</b> — 记录用户对建议的接受/拒绝行为，用于优化后续推荐</li>
+</ol>
+</td>
+</tr>
+<tr>
+<td>P2（本期不做）</td>
+<td>
+<ol>
+<li>多人实时协作本体工坊（WebSocket + CRDT）</li>
+<li>非结构化数据一等公民存储（Media Set）</li>
+<li>Agent 知识库（向量索引 + 设计模式库）</li>
+<li>对象类型复制（v0.1.0 延后）</li>
+</ol>
+</td>
+</tr>
+</tbody>
+</table>
+
+---
+
+# 三、核心概念定义
+
+## 3.1 本体工坊（Ontology Workshop）
+
+3D 星空 Demo 升级后的正式产品名称。本体工坊是 v0.2.0 的**主交互界面**，取代传统的表格/表单 CRUD 模式，成为用户构建和审查本体的核心工作空间。
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                      本体工坊布局                              │
+├──────────┬───────────────────────────────────┬───────────────┤
+│          │                                   │               │
+│  对话    │                                   │   Agent       │
+│  面板    │      3D 星空画布                   │   Sidekick    │
+│  (Chat)  │   （对象类型 = 星体）              │   (建议面板)  │
+│          │   （链接类型 = 星链）              │               │
+│          │   （属性 = 星体光圈细节）          │   · 推荐建议  │
+│  · 上传  │                                   │   · 置信度    │
+│  · 对话  │      工具栏                        │   · 推理链    │
+│  · 历史  │   缩放|适配|重置|2D/3D|模式切换    │   · 操作按钮  │
+│          │                                   │               │
+├──────────┴───────────────────────────────────┴───────────────┤
+│   蓝图审查栏（可折叠）— 表格式展示所有建议项，支持批量操作     │
+└──────────────────────────────────────────────────────────────┘
+```
+
+**关键设计原则**：
+- 3D 星空是主视图，ReactFlow 2D 作为备选（节点 > 200 时自动降级，或用户手动切换）
+- 左侧对话面板支持用户上传资料和与 Agent 自然语言交互
+- 右侧 Sidekick 面板展示 Agent 的实时建议和推理过程
+- 底部蓝图审查栏提供表格式的精确编辑能力
+
+## 3.2 本体构建 Agent
+
+基于 deepagents 框架驱动的通用 AI Agent，具备以下核心能力：
+
+| 能力 | deepagents 对应机制 | 说明 |
+|------|---------------------|------|
+| **自主规划** | Planning Tool（`write_todos`） | Agent 接收用户上传的资料后，自动拆解为分析步骤 |
+| **Skill 调用** | Skill System（SKILL.md 目录） | 按需加载本体操作 Skills（创建对象类型、添加属性等） |
+| **子 Agent 派生** | Subagent Spawning | 复杂任务拆分给子 Agent 并行处理（如同时分析多个文件） |
+| **上下文管理** | Context Management | 管理大文件分析的上下文窗口，防止溢出 |
+| **长期记忆** | Memory Persistence | 记录用户偏好和历史决策，优化后续推荐 |
+
+## 3.3 本体蓝图（Ontology Blueprint）
+
+Agent 分析资料后生成的本体初稿，是用户审查和微调的中间产物。蓝图不是正式本体——它是一组"建议"，需要经过用户 HITL 审查后才转化为 WorkingState 中的草稿。
+
+```json
+{
+  "blueprintRid": "ri.ontology.blueprint.abc123",
+  "name": "电商平台本体蓝图",
+  "status": "pending_review",
+  "sourceFiles": ["orders.csv", "products.xlsx", "业务流程说明.pdf"],
+  "items": [
+    {
+      "itemRid": "ri.ontology.blueprint-item.001",
+      "type": "object_type",
+      "suggestion": {
+        "displayName": "订单",
+        "apiName": "Order",
+        "description": "表示一次客户购买行为",
+        "properties": [
+          { "displayName": "订单编号", "apiName": "orderId", "baseType": "string", "isPrimaryKey": true },
+          { "displayName": "金额", "apiName": "amount", "baseType": "double" },
+          { "displayName": "下单时间", "apiName": "createdAt", "baseType": "timestamp" }
+        ]
+      },
+      "confidence": 0.92,
+      "confidenceLevel": "high",
+      "reasoning": "从 orders.csv 的列结构直接推断：order_id(主键), amount(金额), created_at(时间戳)",
+      "source": "field_analysis",
+      "userDecision": null
+    },
+    {
+      "itemRid": "ri.ontology.blueprint-item.002",
+      "type": "link_type",
+      "suggestion": {
+        "displayName": "包含",
+        "apiName": "contains",
+        "sideA": { "objectType": "Order", "cardinality": "one" },
+        "sideB": { "objectType": "Product", "cardinality": "many" }
+      },
+      "confidence": 0.78,
+      "confidenceLevel": "medium",
+      "reasoning": "orders.csv 中的 product_id 列与 products.xlsx 的 id 列存在外键模式匹配",
+      "source": "pattern_matching",
+      "userDecision": null
+    }
+  ]
+}
+```
+
+## 3.4 HITL 三级操作模式
+
+v0.2.0 的 Human-in-the-Loop 设计遵循"接受/编辑/拒绝"三级模式，而非传统的二元"接受/拒绝"：
+
+| 操作 | 触发 | 用户交互 | 3D 效果 |
+|------|------|----------|---------|
+| **接受（Accept）** | 点击 ✓ 或自动（高置信度项） | 一键操作 | 星体从半透明"结晶"为实体，伴随发光脉冲 |
+| **编辑（Edit）** | 点击 ⚙️ 展开详情 | 内联编辑属性/类型/关系 | 星体闪烁等待状态，编辑确认后结晶 |
+| **拒绝（Reject）** | 点击 ✗，可选填理由 | 一键操作，可附理由 | 星体碎裂消散动画 |
+
+**风险分级**：
+
+| 风险级 | 操作类型 | Agent 行为 | 用户交互 |
+|--------|----------|------------|----------|
+| 🟢 低 | 读取/分析 | 自动执行 | 仅在 Sidekick 展示进度 |
+| 🟡 中 | 创建新实体（进入草稿） | 展示建议，等待确认 | 三级操作模式 |
+| 🔴 高 | 修改/删除已有实体 | 展示影响范围，等待确认 | 二次确认弹窗 + 影响范围分析 |
+
+## 3.5 置信度与推理溯源
+
+每条 Agent 建议都附带透明的质量评估：
+
+| 置信度 | 标签 | 视觉 | 含义 |
+|--------|------|------|------|
+| ≥ 0.8 | 🟢 高置信度 | 星体明亮，连线实线 | 基于明确的字段/结构分析 |
+| 0.5–0.8 | 🟡 中置信度 | 星体半透明，连线虚线 | 基于模式匹配或名称推断 |
+| < 0.5 | 🔴 低置信度 | 星体微弱闪烁 | 基于启发式猜测，需专家确认 |
+
+**推理来源标签**：
+
+| 来源 | 说明 | 示例 |
+|------|------|------|
+| `field_analysis` | 直接从字段名/类型推断 | "CSV 列 `order_id` (string) → 属性 orderId" |
+| `pattern_matching` | 外键模式/命名模式匹配 | "列 `customer_id` 匹配 Customer 表主键模式" |
+| `semantic_inference` | LLM 语义理解（非结构化文档） | "PDF 中提到'每个客户可下多个订单' → 1:N 关系" |
+| `best_practices` | 参考行业通用本体模式 | "电商领域 Order-Product 通常为 N:N 关系" |
+
+## 3.6 Skills 体系
+
+将本体操作封装为标准化的 Skills，供 Agent 内部调用和开发者外部使用：
+
+```
+本体操作 Skills 分层：
+
+┌─────────────────────────────────────────────────┐
+│  Level 3: 编排级 Skill（Agent 自主调用）          │
+│  · analyze-materials   — 分析资料生成蓝图        │
+│  · generate-blueprint  — 综合多文件生成完整蓝图   │
+│  · optimize-ontology   — 分析现有本体提优化建议   │
+└──────────────────────┬──────────────────────────┘
+                       │ 调用
+┌──────────────────────┴──────────────────────────┐
+│  Level 2: 组合级 Skill                           │
+│  · create-object-type-with-properties            │
+│  · create-link-type-with-validation              │
+│  · batch-create-from-blueprint                   │
+└──────────────────────┬──────────────────────────┘
+                       │ 调用
+┌──────────────────────┴──────────────────────────┐
+│  Level 1: 原子级 Skill（CLI 命令直接对应）        │
+│  · create-object-type  · update-object-type      │
+│  · delete-object-type  · create-property         │
+│  · create-link-type    · update-link-type        │
+│  · import-dataset      · list-object-types       │
+│  · search-ontology     · validate-ontology       │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+# 四、功能需求说明
+
+## 4.1 模块 A：本体构建 Agent 引擎（P0）
+
+### 概述
+
+基于 deepagents 框架构建的通用 Agent，是 v0.2.0 的核心引擎。Agent 接收用户上传的资料或自然语言指令，自主规划分析步骤，调用 Skills 完成本体蓝图的生成。
+
+### 核心能力
+
+#### A1. 自主规划（Planning）
+
+Agent 接收任务后，自动将复杂目标拆解为可执行步骤：
+
+```
+用户上传 3 个文件：orders.csv, products.xlsx, 业务流程说明.pdf
+
+Agent 规划：
+  Step 1: 解析 orders.csv 结构 → 提取列名、类型、样本数据
+  Step 2: 解析 products.xlsx 结构 → 提取列名、类型、样本数据
+  Step 3: 分析"业务流程说明.pdf" → 用 LLM 提取实体、关系、业务规则
+  Step 4: 交叉对比三个文件，识别共同实体和外键关系
+  Step 5: 生成本体蓝图初稿
+  Step 6: 对蓝图进行自我审查（命名冲突、循环链接、缺失属性）
+  Step 7: 输出最终蓝图，等待用户 HITL 审查
+```
+
+规划过程实时展示在 Agent Sidekick 面板中，用户可以看到 Agent 的思考过程。
+
+#### A2. Skill 系统
+
+deepagents 的 Skill 系统采用**两层加载**机制：
+
+1. **快速初始化**：仅加载 Skill 描述（几十字节），全部 Skills 的描述同时存在于 Agent 上下文中
+2. **按需详细化**：Agent 判断需要某 Skill 时，加载完整 SKILL.md（含参数定义、使用示例、约束规则）
+
+这种机制避免了将所有 Skill 定义一次性塞入上下文导致的 token 浪费。
+
+#### A3. 子 Agent 派生
+
+当用户上传多个文件时，Agent 可以派生子 Agent 并行处理：
+
+```
+主 Agent
+  ├── 子 Agent 1: 分析 orders.csv → 提取 Order 对象类型
+  ├── 子 Agent 2: 分析 products.xlsx → 提取 Product 对象类型
+  └── 子 Agent 3: 分析 业务流程说明.pdf → 提取业务实体和关系
+      │
+      └── 主 Agent 汇总三个子 Agent 的结果 → 合并去重 → 生成完整蓝图
+```
+
+子 Agent 拥有独立的上下文窗口，避免大文件分析相互干扰。
+
+#### A4. 对话交互
+
+用户可以在对话面板中与 Agent 自然语言交互：
+
+- "帮我分析这些文件，生成一个电商平台的本体"
+- "Order 和 Customer 之间应该是什么关系？"
+- "把 Shipping 对象类型的名称改成 Delivery"
+- "这个蓝图里缺少了退货相关的对象类型，请补充"
+
+Agent 的回复以 **SSE 流式** 方式逐步输出，同时通过事件触发 3D 星空和 Sidekick 面板的联动更新。
+
+#### A5. 上下文管理
+
+Agent 需要理解当前本体的已有状态（如果有的话）。通过 `03-agent-context-architecture.md` 定义的三接口策略获取本体上下文：
+
+- **小型本体**（< 50 个对象类型）：完整 Schema 内联到 system prompt
+- **大型本体**：L0 摘要 + 按需加载 L2 详情
+
+### SSE 流式事件协议
+
+Agent 与前端通过 SSE 流式通信，事件类型如下：
+
+```
+event: plan-step         # Agent 规划步骤（data: { step, index, total }）
+event: text-delta        # 文本增量（data: { text }）
+event: skill-call        # Skill 调用通知（data: { skillName, params, status }）
+event: blueprint-item    # 蓝图项建议（data: { item: BlueprintItem }）
+event: subgraph-update   # 3D 星空子图更新（data: { nodes, edges, action }）
+event: confidence-update # 置信度更新（data: { itemRid, confidence, reasoning }）
+event: done              # 流结束（data: { blueprintRid, summary }）
+event: error             # 错误（data: { code, message }）
+```
+
+### 对话会话管理
+
+- 每次进入本体工坊创建一个会话（Session）
+- 会话包含完整的消息历史和关联的蓝图
+- 用户可以查看历史会话、继续未完成的蓝图审查
+- 会话数据持久化到数据库
+
+---
+
+## 4.2 模块 B：资料分析与本体蓝图生成（P0）
+
+### 概述
+
+支持用户上传结构化和非结构化资料，由 Agent 自动分析并生成本体蓝图。
+
+### 支持的资料类型
+
+| 类型 | 格式 | 分析方式 | 产出 |
+|------|------|----------|------|
+| **结构化** | CSV, Excel (.xlsx) | 直接解析列名、数据类型、样本数据 | 对象类型 + 属性 |
+| **结构化** | SQL DDL | 解析表定义、主外键关系、索引 | 对象类型 + 属性 + 链接类型 |
+| **结构化** | JSON Schema | 解析对象结构和嵌套关系 | 对象类型 + 属性 + 链接类型 |
+| **非结构化** | PDF, Markdown, Word | LLM 提取实体、关系、业务规则 | 对象类型 + 链接类型 + 描述 |
+| **非结构化** | 纯文本（自然语言描述） | LLM 语义分析 | 对象类型 + 链接类型 |
+
+### 上传与分析流程
+
+```
+Phase 1: 资料上传
+━━━━━━━━━━━━━━━━━
+用户在对话面板中拖入文件（或点击上传按钮）
+  → 文件上传到服务端临时存储
+  → 前端显示文件缩略图和基本信息（名称、大小、类型）
+  → 用户可继续上传更多文件，或输入补充说明
+  → 用户点击"开始分析"或发送"帮我分析这些文件"
+
+约束：
+  · 单文件上限：10 MB
+  · 批量上传上限：20 个文件
+  · 支持的 MIME 类型白名单校验
+
+Phase 2: Agent 流式分析
+━━━━━━━━━━━━━━━━━━━━━━
+Agent 接收文件列表 + 用户补充说明
+  → 生成分析计划（plan-step 事件）
+  → 逐文件/逐步骤分析（skill-call + text-delta 事件）
+  → 每识别一个实体/关系，立即发送 blueprint-item 事件
+  → 识别结果实时在 3D 星空中"结晶"（subgraph-update 事件）
+
+分析策略：
+  · 结构化文件：直接解析 schema → 高置信度建议
+  · 非结构化文件：LLM 多轮提取 → 中/低置信度建议
+  · 多文件交叉：检测跨文件的实体引用和外键关系
+  · 大文件分块：超过 token 限制的文件自动分块处理
+
+Phase 3: 蓝图生成
+━━━━━━━━━━━━━━━━
+Agent 汇总所有分析结果
+  → 合并重复实体（如多个文件都提到 Customer）
+  → 补充缺失关系（基于语义推断）
+  → 自我审查（命名冲突、循环链接、属性类型一致性）
+  → 输出完整蓝图（done 事件）
+  → 蓝图持久化到数据库，进入 HITL 审查阶段
+```
+
+### 结构化文件分析规则
+
+#### CSV / Excel
+
+- 扫描前 1000 行推断数据类型
+- 类型匹配率 > 95% 确认类型，否则默认 String
+- 类型映射规则（复用 v0.1.0）：
+
+| 推断类型 | 本体属性类型 |
+|----------|-------------|
+| 整数 | Integer |
+| 小数 | Double |
+| 日期格式 | Date |
+| 日期时间格式 | Timestamp |
+| true/false/0/1 | Boolean |
+| 其他 | String |
+
+- 首列或名含 `id`/`_id`/`Id` 的列自动标记为主键候选
+- 列名含 `name`/`title`/`label` 的列自动标记为标题键候选
+
+#### SQL DDL
+
+- 解析 `CREATE TABLE` 语句提取表名、列名、类型
+- `PRIMARY KEY` → 主键属性
+- `FOREIGN KEY` → 链接类型（自动推断基数关系）
+- `UNIQUE INDEX` → 唯一约束属性
+- `NOT NULL` → 必填属性
+
+#### 非结构化文件（PDF/Markdown/Word）
+
+Agent 使用 LLM 提取以下信息：
+
+1. **实体识别**：文档中提到的业务实体（人、组织、事件、物品等）
+2. **关系识别**：实体之间的关系描述（"客户下单"→ Customer places Order）
+3. **属性识别**：实体的特征描述（"订单包含金额和日期"→ amount, date 属性）
+4. **业务规则**：影响本体设计的约束（"一个客户可以有多个订单"→ 1:N 基数）
+
+---
+
+## 4.3 模块 C：3D 本体工坊（P0）
+
+### 概述
+
+将 3D 星空 Demo 从独立的演示页面升级为正式的本体可视化工作台，与 Agent 引擎深度联动。
+
+### 从 Demo 到产品的升级点
+
+| 方面 | Demo（v0.1.0） | 本体工坊（v0.2.0） |
+|------|----------------|---------------------|
+| 路由 | `/demo/canvas`（独立演示） | `/workshop`（主入口之一） |
+| 数据 | Mock 数据 | 真实本体数据（API 驱动） |
+| Agent 联动 | Mock 建议（硬编码） | 真实 Agent 推理（SSE 流式） |
+| 交互模式 | 手动拖拽创建 | Agent 辅助 + 手动微调 |
+| 蓝图审查 | 无 | 底部审查栏 + 内联编辑 |
+| 会话持久化 | 无 | 数据库持久化 |
+| 视图切换 | 仅 3D | 3D/2D 自由切换 |
+
+### 3D 星空与 Agent 联动
+
+#### 实时结晶动画
+
+Agent 识别新实体时，3D 星空中实时"结晶"出新星体：
+
+```
+Agent 发送 blueprint-item 事件（type: object_type）
+  → 星空中心产生能量漩涡（VortexEffect 复用）
+  → 漩涡中凝聚出新星体（birth animation）
+  → 星体半透明状态（pending review）
+  → 属性以光圈形式环绕星体
+  → Sidekick 面板同步显示建议卡片
+
+Agent 发送 blueprint-item 事件（type: link_type）
+  → 两个相关星体之间出现虚线（pending review）
+  → 虚线带有方向箭头和基数标注
+  → 点击虚线可查看关系详情
+```
+
+#### 用户操作驱动 Agent
+
+```
+用户在 3D 中点击星体
+  → 右侧显示实体详情（Tier 2 面板）
+  → 可直接编辑属性/描述
+  → Sidekick 显示针对该实体的优化建议
+
+用户在 3D 中拖拽连线
+  → 触发链接创建（复用已有 DragLinkLine 组件）
+  → Agent 自动推荐基数关系和关系名称
+
+用户在 3D 中删除星体
+  → 红色碎裂消散动画
+  → Agent 检查并提示可能受影响的链接类型
+```
+
+#### 双向高亮联动
+
+- **对话 → 星空**：Agent 回复中提及的实体名称高亮，悬停时对应星体发光
+- **星空 → 对话**：点击星体时，对话面板高亮该实体的历史提及
+- 通过 Zustand store（`highlightedEntityRids`）实现共享状态
+
+### 3D / 2D 视图切换
+
+- 默认展示 3D 星空视图
+- 工具栏提供 3D ⇄ 2D 切换按钮
+- 2D 视图使用 ReactFlow 力导向图（`@xyflow/react` 已在依赖中）
+- 两个视图共享同一数据源（Zustand store）和交互状态
+- 自动降级规则：当实体数 > 200 时，提示用户切换到 2D 以保持流畅
+
+### 渐进式实体探索（三层）
+
+| 层级 | 触发 | 组件 | 内容 |
+|------|------|------|------|
+| **Tier 1** 悬停预览 | 鼠标悬停 200ms | Popover | 名称 + 类型徽标 + 一行描述 + 置信度 |
+| **Tier 2** 侧面板 | 单击实体 | Drawer | 完整属性列表 + 关系分组 + 推理来源 + 操作按钮 |
+| **Tier 3** 全屏详情 | 双击或"展开" | 跳转到 Ontology Manager 详情页 | 完整编辑、历史、审计 |
+
+### 中期升级项（从 Demo TODO 中继承，v0.2.0 实施）
+
+以下是 `apps/web/src/pages/demo/TODO-design-upgrades.md` 中的待办项，在 v0.2.0 中落地：
+
+1. ✅ Fresnel 边缘光 + 顶点噪声（星体视觉效果提升）
+2. ✅ 拖拽线流光效果 + 能量粒子（链接创建动画）
+3. ✅ 链接建立时的冲击波（震撼的视觉反馈）
+4. ✅ 电影感相机过渡（场景切换动画）
+5. 📋 语义重力场（V1 考虑）
+6. 📋 重力书写（V1 考虑）
+7. ✅ 手动模式入场氛围
+
+---
+
+## 4.4 模块 D：HITL 蓝图审查与微调（P0）
+
+### 概述
+
+蓝图生成后，用户通过 HITL 交互审查并微调每一项建议，最终将确认的部分批量创建为 WorkingState 中的草稿。
+
+### 蓝图审查表格
+
+底部蓝图审查栏以表格形式展示所有建议项：
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│ 蓝图审查 — 电商平台本体                        [全部接受] [应用蓝图] │
+├──────┬──────────┬──────┬────────┬────────┬───────────────────────────┤
+│ 类型 │ 名称      │ 属性数│ 置信度 │ 来源    │ 操作                     │
+├──────┼──────────┼──────┼────────┼────────┼───────────────────────────┤
+│ 🔵OT │ Order     │ 8    │ 🟢 92% │ 字段分析│ [✓ 接受] [⚙️ 编辑] [✗ 拒绝]│
+│ 🔵OT │ Product   │ 5    │ 🟢 88% │ 字段分析│ [✓ 接受] [⚙️ 编辑] [✗ 拒绝]│
+│ 🔵OT │ Customer  │ 7    │ 🟡 72% │ 模式匹配│ [✓ 接受] [⚙️ 编辑] [✗ 拒绝]│
+│ 🔗LT │ 包含      │ —    │ 🟡 78% │ 模式匹配│ [✓ 接受] [⚙️ 编辑] [✗ 拒绝]│
+│ 🔵OT │ Shipping  │ 4    │ 🟡 65% │ 语义推断│ [✓ 接受] [⚙️ 编辑] [✗ 拒绝]│
+│ 🔗LT │ 配送到    │ —    │ 🔴 45% │ 语义推断│ [✓ 接受] [⚙️ 编辑] [✗ 拒绝]│
+└──────┴──────────┴──────┴────────┴────────┴───────────────────────────┘
+```
+
+### 内联编辑
+
+点击"编辑"展开行内编辑面板：
+
+- **对象类型编辑**：修改名称、描述、图标、API Name
+- **属性编辑**：修改属性名称、类型、是否必填、是否主键
+- **链接类型编辑**：修改关系名称、两端对象类型、基数关系
+- **添加缺失项**：手动添加 Agent 遗漏的对象类型/属性/链接
+
+### 批量操作
+
+- **全部接受**：一键接受所有建议项
+- **按置信度筛选**：只显示高/中/低置信度的项
+- **按类型筛选**：只显示对象类型或链接类型
+- **批量拒绝**：勾选多项后批量拒绝
+
+### 应用蓝图
+
+用户确认蓝图后，点击"应用蓝图"：
+
+```
+应用蓝图流程：
+  1. 收集所有 userDecision = "accepted" 或 "edited" 的蓝图项
+  2. 调用现有 v0.1.0 Service 层的 CRUD API 批量创建：
+     · ObjectTypeService.create() — 创建对象类型
+     · PropertyService.create() — 创建属性
+     · LinkTypeService.create() — 创建链接类型
+  3. 所有创建操作进入 WorkingState（草稿状态）
+  4. 提供逐项创建的进度条和错误汇报
+  5. 创建完成后，星空中对应星体从"半透明建议"变为"实体确认"状态
+
+事务边界：每个对象类型为一个事务单元
+  · Order + 其属性 = 一个事务
+  · Product + 其属性 = 一个事务
+  · 单个事务失败不影响其他事务
+  · 失败项标记为"创建失败"，用户可重试
+```
+
+### 冲突检测
+
+应用蓝图前自动检查：
+
+| 冲突类型 | 检测方式 | 处理策略 |
+|----------|----------|----------|
+| apiName 重复 | 与现有本体比对 | 阻止创建，提示用户修改 |
+| 属性类型冲突 | 同名属性类型不一致 | 警告，用户选择保留哪个 |
+| 循环链接 | 图遍历检测环 | 警告，用户决定是否保留 |
+| 缺失依赖 | 链接类型引用未创建的对象类型 | 确保按依赖顺序创建 |
+
+---
+
+## 4.5 模块 E：CLI 工具与 Skills 体系（P0）
+
+### 概述
+
+将本体原子操作包装为三种形态，服务于不同用户和场景：
+
+1. **Agent Skills**（SKILL.md）— deepagents Agent 内部调用
+2. **CLI 命令**（`oo` 命令行工具）— 开发者/运维在终端中使用
+3. **Claude Code Skills**（`.claude/skills/`）— 开发者在 Claude Code 中使用
+
+三者共享底层逻辑——均调用同一套 Python Service 层 API。
+
+### 架构
+
+```
+┌─────────────────────────────────────────────────────┐
+│  入口层                                              │
+│                                                      │
+│  deepagents            CLI 命令          Claude Code  │
+│  SKILL.md              oo <cmd>          .claude/     │
+│  (Agent 调用)          (终端直接使用)     skills/      │
+│                                          (IDE 中使用) │
+└──────────┬──────────────┬──────────────┬─────────────┘
+           │              │              │
+           ▼              ▼              ▼
+┌──────────────────────────────────────────────────────┐
+│  统一适配层                                           │
+│  Python CLI Adapter（click 或 typer 框架）            │
+│  解析参数 → 调用 Service → 格式化输出                  │
+└──────────────────────┬───────────────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────────────┐
+│  现有 Service 层（复用 v0.1.0）                       │
+│  ObjectTypeService | PropertyService | LinkTypeService│
+│  DatasetService | WorkingStateService | SearchService │
+└──────────────────────────────────────────────────────┘
+```
+
+### CLI 命令设计（`oo` 工具）
+
+```bash
+# 对象类型操作
+oo object-type list [--ontology <rid>] [--format json|table]
+oo object-type create --name "Order" --api-name "Order" --description "订单" [--ontology <rid>]
+oo object-type get <rid-or-id>
+oo object-type update <rid-or-id> --description "更新描述"
+oo object-type delete <rid-or-id> [--force]
+
+# 属性操作
+oo property list --object-type <rid-or-id>
+oo property create --object-type <rid-or-id> --name "金额" --api-name "amount" --type double
+oo property update <rid-or-id> --name "新名称"
+oo property delete <rid-or-id>
+
+# 链接类型操作
+oo link-type list [--ontology <rid>]
+oo link-type create --name "包含" --api-name "contains" \
+   --side-a-object "Order" --side-b-object "Product" \
+   --cardinality "one-to-many"
+
+# 数据集操作
+oo dataset list
+oo dataset import-csv <file-path> --name "订单数据"
+oo dataset import-excel <file-path> --name "产品数据"
+
+# 搜索
+oo search "客户" [--type object_type|property|link_type]
+
+# 校验
+oo validate [--ontology <rid>]
+
+# 蓝图操作
+oo blueprint analyze <file1> [file2] [file3] --ontology <rid>
+oo blueprint list
+oo blueprint show <rid>
+oo blueprint apply <rid> [--auto-accept-high-confidence]
+
+# 变更管理
+oo working-state show
+oo working-state save [--message "初始本体创建"]
+oo working-state discard [--all | --item <rid>]
+```
+
+### deepagents Skill 定义示例
+
+```
+skills/
+├── analyze-materials/
+│   └── SKILL.md          # 分析上传资料，提取实体和关系
+├── create-object-type/
+│   └── SKILL.md          # 创建对象类型（含属性）
+├── create-link-type/
+│   └── SKILL.md          # 创建链接类型
+├── generate-blueprint/
+│   └── SKILL.md          # 汇总分析结果生成完整蓝图
+├── validate-ontology/
+│   └── SKILL.md          # 校验本体一致性
+├── search-ontology/
+│   └── SKILL.md          # 搜索本体资源
+└── optimize-ontology/
+    └── SKILL.md          # 分析并优化现有本体
+```
+
+示例 SKILL.md（`create-object-type`）：
+
+```markdown
+---
+name: create-object-type
+description: 在本体中创建一个新的对象类型，包括其属性定义。调用后对象类型进入 WorkingState 草稿状态。
+---
+
+## 参数
+
+- `displayName` (必填): 对象类型的显示名称
+- `apiName` (可选): API 名称，不填则从 displayName 自动生成 PascalCase
+- `description` (可选): 描述
+- `properties` (可选): 属性列表，每个属性包含 displayName, apiName, baseType
+
+## 约束
+
+- apiName 必须全局唯一（在同一 Ontology 内）
+- apiName 格式：PascalCase，以字母开头
+- 属性的 apiName 格式：camelCase
+- 支持的 baseType: string, integer, double, boolean, date, timestamp, long, float, short, byte, decimal, geohash, geoshape, marking, attachment, mediaReference
+
+## 使用场景
+
+当 Agent 分析资料后识别到一个新的业务实体需要在本体中表示时调用此 Skill。
+```
+
+### Claude Code Skills
+
+```
+.claude/skills/
+├── ontology-create/
+│   └── SKILL.md          # /ontology-create: 快速创建对象类型
+├── ontology-analyze/
+│   └── SKILL.md          # /ontology-analyze: 分析文件生成蓝图
+├── ontology-validate/
+│   └── SKILL.md          # /ontology-validate: 校验本体一致性
+└── ontology-blueprint/
+    └── SKILL.md          # /ontology-blueprint: 蓝图管理
+```
+
+---
+
+## 4.6 模块 F：Agent Sidekick 面板（P1）
+
+### 概述
+
+在 Ontology Manager 的各页面（非工坊模式下）提供常驻的 AI 助手侧栏。Sidekick 是轻量级入口，复杂任务引导用户跳转到本体工坊。
+
+### 触发场景
+
+| 页面 | Sidekick 建议 |
+|------|---------------|
+| Object Type 详情页 | "该对象类型缺少描述"、"建议添加链接到 Customer" |
+| Property 列表页 | "存在 3 个同名属性可合并为共享属性" |
+| Link Type 详情页 | "该链接类型的基数关系可能不正确" |
+| 搜索结果页 | "搜索 '客户' 找到 2 个相关对象类型和 3 个属性" |
+
+### 交互模式
+
+```
+┌─────────────────────────────────────────────┐
+│                                     [⚡ AI] │
+│   Ontology Manager 当前页面                  │
+│                                             │
+│                            ┌────────────────┤
+│                            │ Agent Sidekick │
+│                            │                │
+│                            │ 💡 建议 1       │
+│                            │ "Customer 缺少  │
+│                            │  描述信息"       │
+│                            │ [接受] [忽略]   │
+│                            │                │
+│                            │ 💡 建议 2       │
+│                            │ "建议添加链接   │
+│                            │  Customer→Order"│
+│                            │ [接受] [编辑]   │
+│                            │ [忽略]          │
+│                            │                │
+│                            │ ─────────────  │
+│                            │ 需要更多帮助？  │
+│                            │ [打开本体工坊]  │
+│                            └────────────────┤
+└─────────────────────────────────────────────┘
+```
+
+- Sidekick 默认折叠，点击右上角 ⚡ AI 按钮展开
+- 建议上下文感知：根据当前页面和正在编辑的实体生成
+- "打开本体工坊"按钮引导用户进入完整的 Agent + 3D 交互界面
+
+---
+
+# 五、用户故事与交互流程
+
+## 5.1 核心用户故事
+
+### US-1：业务分析师批量创建企业本体
+
+> 作为一名业务分析师，我上传一份 MySQL DDL 导出文件和一份业务流程 PDF 文档。Agent 在 30 秒内分析完毕，推荐了 8 个对象类型、35 个属性和 6 个链接类型。我在 3D 星空中看到蓝图的全貌——星体和星链构成了公司的业务模型图。我接受了其中 7 个高置信度的对象类型，拒绝了 1 个多余的"临时表"对象，编辑了 2 个属性的数据类型。点击"应用蓝图"，所有确认的实体进入草稿状态。我最终在 Ontology Manager 中 Save 发布。**整个过程花了 5 分钟，而以前需要 2 天。**
+
+### US-2：领域专家通过对话微调蓝图
+
+> 作为一名零售行业的领域专家，我看到 Agent 生成的蓝图中缺少了"退货"相关的对象类型。我在对话框输入"我们的业务还需要处理退货流程，请补充 Return 和 RefundRequest 对象类型"。Agent 理解后，在星空中新增了两个星体（半透明，待确认），并自动推断了 Return → Order（1:1）和 RefundRequest → Return（1:1）两个链接关系。我确认后点击接受。
+
+### US-3：数据架构师用 DDL 快速生成本体骨架
+
+> 作为一名数据架构师，我将线上 MySQL 的 `SHOW CREATE TABLE` 输出粘贴到对话框。Agent 瞬间解析了 15 张表的结构，识别出所有主外键关系，生成了包含 15 个对象类型和 12 个链接类型的蓝图。由于 DDL 提供了精确的类型信息，所有建议都是高置信度。我全部接受后，在星空中拖拽调整了几个星体的位置，使得图谱更清晰易读。
+
+### US-4：开发者使用 CLI 自动化本体构建
+
+> 作为一名开发者，我在 CI/CD 脚本中使用 `oo blueprint analyze schema.sql products.csv --ontology ri.ontology.main.xxx` 生成蓝图，然后 `oo blueprint apply <rid> --auto-accept-high-confidence` 自动接受所有高置信度建议。对于中低置信度的项，脚本输出待审查列表，我在 Claude Code 中用 `/ontology-blueprint review` 逐条处理。
+
+### US-5：用户在编辑页获取 Sidekick 建议（P1）
+
+> 作为一名管理员，我正在 Object Type 详情页编辑 Customer 对象。右侧 Sidekick 提示"Customer 有 12 个属性但没有描述，建议添加描述以提高 Agent 理解准确度"。我点击"接受"，Sidekick 自动生成了一段描述。随后它又提示"建议将 email 属性标记为标题键"。我接受了这条建议。
+
+## 5.2 端到端流程走查
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│  阶段 1：进入本体工坊                                                  │
+│  ━━━━━━━━━━━━━━━━━━━                                                 │
+│  用户从侧边栏或首页点击"本体工坊"                                      │
+│  → 进入全屏 3D 星空工作台                                              │
+│  → 如有已有本体，星空中展示现有对象类型和链接                           │
+│  → 左侧对话面板展示欢迎消息和使用引导                                   │
+│  → 右侧 Sidekick 显示"拖入文件或输入指令开始构建"                      │
+├──────────────────────────────────────────────────────────────────────┤
+│  阶段 2：资料上传                                                      │
+│  ━━━━━━━━━━━━━━━━                                                    │
+│  用户拖入文件到对话面板（或点击上传按钮）                                │
+│  → 文件缩略图出现在对话中                                              │
+│  → 用户可以继续上传更多文件                                            │
+│  → 用户可以输入补充说明（如"这是电商平台的数据"）                       │
+│  → 用户点击发送或输入"开始分析"                                        │
+├──────────────────────────────────────────────────────────────────────┤
+│  阶段 3：Agent 流式分析                                                │
+│  ━━━━━━━━━━━━━━━━━━━━                                                │
+│  Agent 开始分析（Sidekick 展示规划步骤）：                               │
+│  │                                                                    │
+│  │  Step 1/5: 解析 orders.csv... ✅                                    │
+│  │  → 星空中结晶出 Order 星体（半透明）                                 │
+│  │                                                                    │
+│  │  Step 2/5: 解析 products.xlsx... ✅                                 │
+│  │  → 星空中结晶出 Product 星体                                        │
+│  │                                                                    │
+│  │  Step 3/5: 分析 业务流程.pdf... 进行中 ⏳                            │
+│  │  → "识别到实体 Customer, Supplier..."                               │
+│  │  → 星空中逐个结晶出 Customer, Supplier 星体                        │
+│  │                                                                    │
+│  │  Step 4/5: 推断关系... ✅                                           │
+│  │  → 星空中出现星链虚线                                               │
+│  │                                                                    │
+│  │  Step 5/5: 生成蓝图... ✅                                           │
+│  │  → 完整蓝图生成                                                     │
+│  │                                                                    │
+│  整个过程用户可以实时观看，随时可以在对话中打断补充信息                   │
+├──────────────────────────────────────────────────────────────────────┤
+│  阶段 4：HITL 审查与微调                                               │
+│  ━━━━━━━━━━━━━━━━━━━━━━                                              │
+│  底部蓝图审查栏展开，列出所有建议项                                     │
+│  用户逐项审查：                                                        │
+│  │ · 高置信度项：快速浏览后点击"接受"（星体结晶确认）                    │
+│  │ · 中置信度项：点击"编辑"调整细节后确认                               │
+│  │ · 低置信度项：查看推理来源，决定接受或拒绝                            │
+│  │ · 缺失项：在对话中告诉 Agent 补充                                   │
+│  │                                                                    │
+│  同时可以在 3D 星空中直接操作：                                         │
+│  │ · 拖拽星体调整位置                                                  │
+│  │ · 拖拽创建新链接                                                    │
+│  │ · 点击星体查看/编辑详情                                              │
+├──────────────────────────────────────────────────────────────────────┤
+│  阶段 5：应用蓝图                                                      │
+│  ━━━━━━━━━━━━━━━━                                                    │
+│  用户确认蓝图后，点击"应用蓝图"                                        │
+│  → 进度条显示逐项创建过程                                              │
+│  → 创建成功的星体从半透明变为实体                                       │
+│  → 创建失败的星体标记为红色，提示错误原因                                │
+│  → 所有创建进入 WorkingState 草稿                                      │
+├──────────────────────────────────────────────────────────────────────┤
+│  阶段 6：发布                                                          │
+│  ━━━━━━━━━━━━                                                        │
+│  用户在顶栏点击 "Save (N)" 按钮                                        │
+│  → Save Dialog 展示所有变更摘要                                        │
+│  → 确认后发布到正式本体                                                │
+│  → 星空中所有星体转为最终确认状态（明亮、稳定）                          │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+## 5.3 HITL 交互规范
+
+### 建议卡片设计（Sidekick 面板）
+
+```
+┌──────────────────────────────────────┐
+│ 🔵 对象类型建议                 🟢 92%│
+│                                      │
+│ Order（订单）                        │
+│ 属性: orderId, amount, createdAt...  │
+│                                      │
+│ ▶ 推理来源（点击展开）               │
+│ ┌──────────────────────────────────┐ │
+│ │ 📊 字段分析                       │ │
+│ │ · orders.csv 包含 order_id 列     │ │
+│ │ · amount 为 DECIMAL 类型          │ │
+│ │ · created_at 为 TIMESTAMP 类型    │ │
+│ └──────────────────────────────────┘ │
+│                                      │
+│  [✓ 接受]  [⚙️ 编辑]  [✗ 拒绝]      │
+└──────────────────────────────────────┘
+```
+
+### 对话中的实体引用
+
+Agent 回复中的实体以可交互的"锚点"形式呈现：
+
+```
+Agent: 我从 orders.csv 中识别到 [Order] 对象类型，
+       包含 8 个属性。[Order] 与 [Customer] 之间存在
+       [places] 链接关系（1:N）。
+
+       其中 [Order].amount 属性推荐为 Double 类型
+       （基于数据分析，92% 的值为小数）。
+```
+
+- `[Order]` — 实体锚点，悬停高亮对应星体，点击打开 Tier 2 详情面板
+- `[places]` — 关系锚点，悬停高亮对应星链
+
+### 拒绝理由收集（可选）
+
+```
+┌──────────────────────────────┐
+│ 为什么拒绝这条建议？（可选）  │
+│                              │
+│ ○ 与业务不相关               │
+│ ○ 已有类似对象类型           │
+│ ○ 名称/属性不准确            │
+│ ○ 其他: [_______________]    │
+│                              │
+│        [确认拒绝]            │
+└──────────────────────────────┘
+```
+
+拒绝理由用于 P1 的 Agent 反馈学习功能。
+
+---
+
+# 六、技术约束与架构决策
+
+## 6.1 deepagents 集成方案
+
+### 架构定位
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Agent Application Layer（v0.2.0 新增）                       │
+│                                                               │
+│  ┌──────────────────────────────────────────────────┐        │
+│  │          deepagents Agent                         │        │
+│  │                                                   │        │
+│  │  Planning  → Skill System → Subagent Spawning    │        │
+│  │     │            │                │               │        │
+│  │     │     ┌──────┴──────┐   ┌────┴────┐         │        │
+│  │     │     │ SKILL.md    │   │ 子 Agent │         │        │
+│  │     │     │ 目录        │   │ (并行)   │         │        │
+│  │     │     └──────┬──────┘   └────┬────┘         │        │
+│  │     │            │               │               │        │
+│  │     ▼            ▼               ▼               │        │
+│  │  ┌───────────────────────────────────────┐      │        │
+│  │  │  统一 Tool Adapter（Python 函数封装）   │      │        │
+│  │  │  调用现有 Service 层                    │      │        │
+│  │  └───────────────────┬───────────────────┘      │        │
+│  └──────────────────────┼────────────────────────────┘        │
+│                          │                                    │
+└──────────────────────────┼────────────────────────────────────┘
+                           │
+┌──────────────────────────┼────────────────────────────────────┐
+│                          ▼                                    │
+│  Ontology Manager Layer（现有 v0.1.0 系统）                    │
+│  ObjectTypeService | PropertyService | LinkTypeService        │
+│  DatasetService | WorkingStateService | SearchService         │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### 核心设计原则
+
+1. **Agent 是 Service 的消费者，不是替代者** — deepagents Agent 通过 Tool Adapter 调用现有 Service 层，不绕过 Domain 层校验
+2. **Skill 按需加载** — 仅描述常驻上下文，完整定义按需加载，节省 token
+3. **子 Agent 上下文隔离** — 大文件分析不污染主 Agent 上下文
+
+### 新增后端代码结构
+
+```
+apps/server/
+├── app/
+│   ├── agent/                          # Agent 模块（v0.2.0 新增）
+│   │   ├── __init__.py
+│   │   ├── engine.py                   # deepagents Agent 主体配置
+│   │   ├── skills/                     # SKILL.md 目录
+│   │   │   ├── analyze-materials/
+│   │   │   ├── create-object-type/
+│   │   │   ├── create-link-type/
+│   │   │   ├── create-property/
+│   │   │   ├── search-ontology/
+│   │   │   ├── validate-ontology/
+│   │   │   ├── generate-blueprint/
+│   │   │   └── optimize-ontology/
+│   │   ├── tools/                      # Tool Adapter（Python 函数封装）
+│   │   │   ├── ontology_tools.py       # 本体 CRUD 工具
+│   │   │   ├── analysis_tools.py       # 文件分析工具
+│   │   │   └── blueprint_tools.py      # 蓝图管理工具
+│   │   ├── parsers/                    # 文件解析器
+│   │   │   ├── csv_parser.py
+│   │   │   ├── excel_parser.py
+│   │   │   ├── ddl_parser.py
+│   │   │   └── document_parser.py      # PDF/Markdown/Word
+│   │   └── prompts/                    # System prompt 模板
+│   │       ├── ontology_builder.md     # 主 Agent 系统提示
+│   │       └── file_analyzer.md        # 文件分析子 Agent 提示
+│   ├── routers/
+│   │   └── agent.py                    # Agent REST + SSE 端点
+│   ├── services/
+│   │   ├── agent_service.py            # Agent 会话管理
+│   │   ├── blueprint_service.py        # 蓝图 CRUD + 应用逻辑
+│   │   └── material_service.py         # 资料上传和管理
+│   ├── domain/
+│   │   ├── agent.py                    # Agent 领域模型
+│   │   └── blueprint.py               # 蓝图领域模型
+│   └── storage/
+│       ├── agent_storage.py            # 会话/消息持久化
+│       ├── blueprint_storage.py        # 蓝图持久化
+│       └── material_storage.py         # 资料元数据持久化
+├── cli/                                # CLI 工具（v0.2.0 新增）
+│   ├── __init__.py
+│   ├── main.py                         # oo 命令入口
+│   ├── commands/
+│   │   ├── object_type.py
+│   │   ├── property.py
+│   │   ├── link_type.py
+│   │   ├── dataset.py
+│   │   ├── blueprint.py
+│   │   ├── search.py
+│   │   └── validate.py
+│   └── formatters/                     # 输出格式化（table/json）
+│       └── output.py
+```
+
+### 新增前端代码结构
+
+```
+apps/web/src/
+├── pages/
+│   └── workshop/                       # 本体工坊页面（v0.2.0 新增）
+│       ├── WorkshopPage.tsx            # 主页面（全屏三面板布局）
+│       ├── components/
+│       │   ├── ChatPanel.tsx           # 左侧对话面板
+│       │   ├── StarfieldWorkbench.tsx  # 中央 3D 星空工作台（复用升级 Demo）
+│       │   ├── AgentSidekick.tsx       # 右侧建议面板（升级 Demo 版本）
+│       │   ├── BlueprintReviewBar.tsx  # 底部蓝图审查栏
+│       │   ├── BlueprintItemRow.tsx    # 蓝图项行组件
+│       │   ├── InlineEditor.tsx        # 蓝图项内联编辑器
+│       │   ├── ConfidenceIndicator.tsx # 置信度指示器
+│       │   ├── ReasoningPanel.tsx      # 推理来源展开面板
+│       │   ├── FileUploadArea.tsx      # 文件上传区域
+│       │   └── EntityAnchor.tsx        # 对话中的实体锚点
+│       ├── hooks/
+│       │   ├── use-agent-chat.ts       # SSE 流式对话 hook
+│       │   ├── use-blueprint.ts        # 蓝图状态管理
+│       │   └── use-starfield-sync.ts   # 3D 星空与 Agent 联动
+│       └── stores/
+│           ├── workshop-store.ts       # 工坊 UI 状态
+│           └── blueprint-store.ts      # 蓝图审查状态
+├── components/
+│   └── sidekick/                       # Sidekick 组件（P1，可复用）
+│       ├── SidekickPanel.tsx
+│       └── SuggestionCard.tsx
+```
+
+## 6.2 新增 API 端点
+
+| 端点 | 方法 | 说明 | 优先级 |
+|------|------|------|--------|
+| `/api/v1/agent/chat` | POST | SSE 流式对话（核心） | P0 |
+| `/api/v1/agent/sessions` | GET | 会话列表 | P0 |
+| `/api/v1/agent/sessions/{rid}` | GET | 会话详情（含消息历史） | P0 |
+| `/api/v1/agent/sessions/{rid}` | DELETE | 删除会话 | P0 |
+| `/api/v1/agent/materials/upload` | POST | 上传资料文件 | P0 |
+| `/api/v1/agent/materials/{rid}` | GET | 获取资料详情 | P0 |
+| `/api/v1/agent/materials/{rid}` | DELETE | 删除资料 | P0 |
+| `/api/v1/blueprints` | GET | 蓝图列表 | P0 |
+| `/api/v1/blueprints/{rid}` | GET | 蓝图详情 | P0 |
+| `/api/v1/blueprints/{rid}/items` | GET | 蓝图项列表 | P0 |
+| `/api/v1/blueprints/{rid}/items/{itemRid}` | PATCH | 更新蓝图项（接受/拒绝/编辑） | P0 |
+| `/api/v1/blueprints/{rid}/apply` | POST | 应用蓝图（批量创建） | P0 |
+
+## 6.3 新增数据库表
+
+```sql
+-- Agent 会话
+CREATE TABLE agent_sessions (
+    rid TEXT PRIMARY KEY,                    -- ri.ontology.agent-session.<uuid>
+    ontology_rid TEXT NOT NULL REFERENCES ontologies(rid),
+    title TEXT,                              -- 会话标题（自动生成或用户命名）
+    status TEXT NOT NULL DEFAULT 'active',   -- active | archived
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Agent 消息
+CREATE TABLE agent_messages (
+    rid TEXT PRIMARY KEY,                    -- ri.ontology.agent-message.<uuid>
+    session_rid TEXT NOT NULL REFERENCES agent_sessions(rid) ON DELETE CASCADE,
+    role TEXT NOT NULL,                      -- user | assistant | system
+    content TEXT NOT NULL,
+    metadata JSONB DEFAULT '{}',            -- 附加信息（文件引用、实体引用等）
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 上传资料
+CREATE TABLE agent_materials (
+    rid TEXT PRIMARY KEY,                    -- ri.ontology.agent-material.<uuid>
+    session_rid TEXT NOT NULL REFERENCES agent_sessions(rid) ON DELETE CASCADE,
+    file_name TEXT NOT NULL,
+    file_type TEXT NOT NULL,                 -- csv | xlsx | sql | pdf | md | docx | txt
+    file_size INTEGER NOT NULL,             -- bytes
+    storage_path TEXT NOT NULL,             -- 文件存储路径
+    analysis_status TEXT DEFAULT 'pending', -- pending | analyzing | completed | failed
+    analysis_result JSONB,                  -- 解析结果（列信息/提取的实体等）
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 本体蓝图
+CREATE TABLE blueprints (
+    rid TEXT PRIMARY KEY,                    -- ri.ontology.blueprint.<uuid>
+    session_rid TEXT NOT NULL REFERENCES agent_sessions(rid) ON DELETE CASCADE,
+    ontology_rid TEXT NOT NULL REFERENCES ontologies(rid),
+    name TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'draft',   -- draft | pending_review | applied | discarded
+    source_summary TEXT,                    -- 来源摘要
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 蓝图项（每个建议）
+CREATE TABLE blueprint_items (
+    rid TEXT PRIMARY KEY,                    -- ri.ontology.blueprint-item.<uuid>
+    blueprint_rid TEXT NOT NULL REFERENCES blueprints(rid) ON DELETE CASCADE,
+    item_type TEXT NOT NULL,                -- object_type | property | link_type
+    suggestion JSONB NOT NULL,              -- 建议内容（对象类型/属性/链接的完整定义）
+    confidence REAL NOT NULL,               -- 0.0 - 1.0
+    confidence_level TEXT NOT NULL,         -- high | medium | low
+    reasoning TEXT,                          -- 推理说明
+    source TEXT NOT NULL,                   -- field_analysis | pattern_matching | semantic_inference | best_practices
+    user_decision TEXT,                     -- null | accepted | edited | rejected
+    user_edits JSONB,                       -- 用户编辑后的内容（仅 edited 时有值）
+    rejection_reason TEXT,                  -- 拒绝理由（仅 rejected 时有值）
+    created_entity_rid TEXT,                -- 实际创建后的实体 RID（仅 applied 后有值）
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Agent 审计日志
+CREATE TABLE agent_audit_logs (
+    rid TEXT PRIMARY KEY,                    -- ri.ontology.agent-audit.<uuid>
+    session_rid TEXT REFERENCES agent_sessions(rid),
+    action TEXT NOT NULL,                   -- chat | skill_call | blueprint_apply | material_upload
+    details JSONB NOT NULL,                 -- 操作详情
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+## 6.4 LLM 模型配置
+
+```python
+# 新增配置项（在 app/config.py 的 Settings 类中）
+class Settings(BaseSettings):
+    # ... 现有配置 ...
+
+    # Agent LLM 配置
+    llm_provider: str = "anthropic"              # anthropic | openai
+    anthropic_api_key: str = ""                  # Anthropic API 密钥
+    openai_api_key: str = ""                     # OpenAI API 密钥（可选）
+    llm_model: str = "claude-sonnet-4-20250514"  # 默认模型
+    llm_max_tokens: int = 4096                   # 最大输出 token
+    llm_temperature: float = 0.3                 # 低温提高准确性
+
+    # 资料分析配置
+    max_file_size_mb: int = 10                   # 单文件上限
+    max_files_per_session: int = 20              # 单次上传上限
+    analysis_chunk_size: int = 8000              # 大文件分块大小（token）
+```
+
+## 6.5 安全约束
+
+| 层 | 防护 | 阶段 |
+|----|------|------|
+| L1 输入校验 | 文件类型白名单、大小限制、文件名清洗 | v0.2.0 |
+| L2 Prompt 安全 | 用户输入长度限制（4096 字符）、prompt 注入基础检测 | v0.2.0 |
+| L3 Agent 约束 | Skill 白名单（Agent 只能调用已定义的 Skills），禁止直接 SQL | v0.2.0 |
+| L4 输出过滤 | 确保 Agent 回复不包含原始文件中的敏感信息 | v0.3.0 |
+| L5 审计日志 | 完整对话链路日志、Skill 调用记录、蓝图操作记录 | v0.2.0 |
+| L6 成本控制 | 单会话 token 预算上限（可配置，默认 100K tokens） | v0.2.0 |
+
+## 6.6 LLM 成本控制策略
+
+| 策略 | 说明 |
+|------|------|
+| **Skill 懒加载** | 仅描述常驻，完整定义按需加载，减少 system prompt 的 token 占用 |
+| **Schema 缓存** | 本体 Schema 在会话级别缓存，ontology 变更时才失效 |
+| **结构化文件优先** | CSV/DDL 直接解析，不消耗 LLM token；仅非结构化文件调用 LLM |
+| **分块处理** | 大文件分块，每块独立推理后合并，避免单次请求 token 爆炸 |
+| **低成本模型路由** | 简单分析任务（如 CSV 解析）使用低成本模型（如 Haiku），复杂推理使用高能力模型 |
+| **预算上限** | 单会话 token 总消耗上限，接近时提示用户 |
+
+---
+
+# 七、非功能性需求
+
+## 7.1 性能指标
+
+| 指标 | 目标 |
+|------|------|
+| Agent 首次响应延迟（TTFT） | < 2 秒 |
+| SSE 事件间隔 | < 500 ms |
+| 单文件分析耗时（结构化，< 1MB） | < 5 秒 |
+| 单文件分析耗时（非结构化，< 1MB） | < 30 秒 |
+| 蓝图应用（10 个对象类型） | < 10 秒 |
+| 3D 星空 60fps 维持节点数 | ≤ 200 |
+| 对话面板消息渲染 | < 100 ms/条 |
+
+## 7.2 可观测性
+
+- SSE 连接状态和重连监控
+- LLM API 调用延迟和成功率
+- Skill 调用统计（调用频次、耗时、成功率）
+- 蓝图生成和应用成功率
+- 用户建议接受/拒绝比例（P1 反馈学习数据源）
+
+## 7.3 浏览器兼容性
+
+- 3D 星空依赖 WebGL 2.0，不支持的浏览器自动降级到 2D ReactFlow 视图
+- SSE 使用 `fetch` + `ReadableStream`（所有现代浏览器支持）
+
+---
+
+# 八、里程碑与交付计划
+
+```
+Phase 1: Agent 基础设施                               ≈ 3 周
+━━━━━━━━━━━━━━━━━━━━━━
+  · F012: deepagents Agent 引擎 + SSE 流式通信
+  · F013: CLI 工具基础框架（oo 命令）
+  · 数据库迁移（新增 6 张表）
+  · Skill 系统 Level 1（原子操作）
+
+Phase 2: 资料分析与蓝图生成                            ≈ 3 周
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  · F014: 资料上传 + 结构化文件分析（CSV/Excel/DDL）
+  · F015: 非结构化文件分析（PDF/Markdown）
+  · F016: 蓝图生成与管理 API
+  · Skill 系统 Level 2（组合级）+ Level 3（编排级）
+
+Phase 3: 3D 本体工坊                                   ≈ 3 周
+━━━━━━━━━━━━━━━━━━━━
+  · F017: 星空 Demo → 正式工坊升级（API 驱动、会话持久化）
+  · F018: Agent ↔ 星空联动（实时结晶、双向高亮）
+  · F019: 3D/2D 视图切换
+  · 星空视觉效果升级（从 Demo TODO 继承）
+
+Phase 4: HITL 与完善                                    ≈ 2 周
+━━━━━━━━━━━━━━━━━━━━━━
+  · F020: 蓝图审查栏 + 内联编辑器
+  · F021: 应用蓝图（批量创建 + WorkingState 集成）
+  · F022: Claude Code Skills 集成
+  · E2E 测试 + 代码审查
+
+Phase 5: P1 功能（可选）                                ≈ 2 周
+━━━━━━━━━━━━━━━━━━━━━━━━
+  · F023: Agent Sidekick 面板
+  · F024: 本体导入导出（JSON）
+  · F025: Agent 反馈学习基础
+```
+
+---
+
+# 附录
+
+## A. 术语对照表
+
+| 中文 | English | v0.2.0 新增 | 说明 |
+|------|---------|-------------|------|
+| 本体工坊 | Ontology Workshop | ✅ | 3D 星空升级后的正式产品名称 |
+| 本体构建 Agent | Ontology Builder Agent | ✅ | deepagents 驱动的通用 Agent |
+| 本体蓝图 | Ontology Blueprint | ✅ | Agent 生成的本体初稿 |
+| 蓝图项 | Blueprint Item | ✅ | 蓝图中的单个建议（对象类型/属性/链接） |
+| 置信度 | Confidence | ✅ | Agent 对建议准确性的评估 |
+| 推理来源 | Reasoning Source | ✅ | 建议的依据（字段分析/模式匹配/语义推断/最佳实践） |
+| 资料 | Material | ✅ | 用户上传的分析素材（文件/文本） |
+| 本体 | Ontology | | 组织的完整语义模型 |
+| 对象类型 | Object Type | | 对现实实体或事件的抽象 |
+| 属性 | Property | | 对象类型的特征、状态或度量 |
+| 链接类型 | Link Type | | 对象类型之间的语义关系 |
+
+## B. 与 v0.1.0 PRD 的变更对照
+
+| v0.1.0 功能 | v0.2.0 状态 | 说明 |
+|-------------|-------------|------|
+| 对象类型 CRUD | **复用** | 作为 Agent Skill 和 CLI 的底层实现 |
+| 链接类型 CRUD | **复用** | 同上 |
+| 属性管理 | **复用** | 同上 |
+| 数据连接 | **复用** | Agent 可调用数据集导入 Skill |
+| 变更管理 | **复用** | 蓝图应用后进入 WorkingState 草稿 |
+| 本体搜索 | **复用** | Agent 可调用搜索 Skill |
+| 5 步创建向导 | **补充** | Agent 辅助模式作为向导的替代入口 |
+| 3D 星空 Demo | **升级** | 从 Demo 升级为正式的本体工坊 |
+| 本体导入导出 | **新增 P1** | 从 v0.1.0 延后到 v0.2.0 实现 |
+| 对象类型复制 | **延后** | 推迟到 v0.3.0 |
+
+## C. 外部参考
+
+| 资源 | 说明 |
+|------|------|
+| [deepagents](https://github.com/langchain-ai/deepagents) | Agent 框架，提供 Planning + Skill + Subagent 能力 |
+| [LangGraph](https://github.com/langchain-ai/langgraph) | 图编排框架（用于未来的 ontology-agent-framework，非本版本） |
+| [Claude Code Skills](https://code.claude.com/docs/en/skills.md) | Claude Code 的能力扩展机制 |
+| [AG-UI Protocol](https://github.com/ag-ui-protocol/ag-ui) | Agent-User 交互协议参考 |
+| [Palantir AIP](https://www.palantir.com/docs/foundry/aip/) | Ontology + AI 的行业标杆参考 |
