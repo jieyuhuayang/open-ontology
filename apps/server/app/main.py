@@ -8,6 +8,7 @@ from sqlalchemy import text
 from app.config import settings
 from app.database import engine
 from app.exceptions import AppError, app_error_handler
+from app.seed import ensure_seed_data
 from app.routers import (
     datasets,
     health,
