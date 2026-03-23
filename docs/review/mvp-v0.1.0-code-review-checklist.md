@@ -28,19 +28,19 @@
 
 ## 1. 状态机与数据完整性
 
-- [ ] 🔴 **1.1 discard_single_change 孤儿变更问题**
+- [x] 🔴 **1.1 discard_single_change 孤儿变更问题**
   撤销 OT DELETE change 后，级联的 Property/LinkType DELETE changes 仍留在 WS 中，publish 时会删除仍在使用的子资源。
   `working_state_service.py:594-619`, `object_type_service.py:301-369`
 
-- [ ] 🔴 **1.2 _validate_completeness 对 UPDATE 场景不完整**
+- [x] 🔴 **1.2 _validate_completeness 对 UPDATE 场景不完整**
   UPDATE 的 `after` 只含变更字段（非完整快照），校验可能误判 OT 为 incomplete。
   `working_state_service.py:265-303`
 
-- [ ] 🟡 **1.3 Collapse 逻辑 DELETE→CREATE 重建路径缺失**
+- [x] 🟡 **1.3 Collapse 逻辑 DELETE→CREATE 重建路径缺失**
   对同一 RID 先 DELETE 再 CREATE，`_collapse_change` 未处理 `existing.change_type == DELETE` 分支。
   `working_state_service.py:108-147`
 
-- [ ] 🟡 **1.4 publish 中 sync 失败的事务隔离确认**
+- [x] 🟡 **1.4 publish 中 sync 失败的事务隔离确认**
   `_trigger_post_publish_sync` 中 sync 失败只 log 不 raise，需确认不影响 publish 事务完整性。
   `working_state_service.py:354-425`, `database.py:11-18`
 
