@@ -22,6 +22,7 @@ async def publish_changes(
     rid: str,
     service: WorkingStateService = Depends(_get_service),
 ):
+    validate_rid(rid)
     return await service.publish(rid)
 
 
