@@ -42,7 +42,7 @@
   - Downgrade 方案：`drop table sync_jobs; drop table object_instances;`（含索引），标准可逆迁移
   **依赖**: 无
 
-- [ ] **T002**: Domain 模型 + Storage 层
+- [x] **T002**: Domain 模型 + Storage 层
   **文件**: `apps/server/app/domain/object_instance.py`, `apps/server/app/storage/object_instance_storage.py`, `apps/server/app/storage/sync_job_storage.py`
   **逻辑**:
   - Domain: `ObjectInstance`(DomainModel), `ObjectInstanceListResponse`, `SyncJob`(DomainModel)
