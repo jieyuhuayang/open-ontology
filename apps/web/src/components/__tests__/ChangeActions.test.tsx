@@ -94,7 +94,8 @@ describe('ChangeActions', () => {
 
   it('shows +N badge on History button when changes exist', () => {
     renderWithProviders();
-    expect(screen.getByText('+1')).toBeInTheDocument();
+    // Ant Design Badge splits "+1" into separate scroll-number spans; check via title attribute
+    expect(document.querySelector('[title="+1"]')).toBeInTheDocument();
   });
 
   it('clicking History navigates to /history', async () => {
