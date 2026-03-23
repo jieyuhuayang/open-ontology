@@ -52,7 +52,7 @@
 
 ### Phase 2：后端核心逻辑（Test-First）
 
-- [ ] **T003**: ObjectSyncService 单元测试
+- [x] **T003**: ObjectSyncService 单元测试
   **文件**: `apps/server/tests/unit/test_object_sync_service.py`
   **逻辑**: 用 mock_db_session mock 数据库，测试同步核心逻辑：
   - `test_sync_incremental_first_time` — 首次同步全部 INSERT（AC-02）
