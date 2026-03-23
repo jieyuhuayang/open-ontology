@@ -16,9 +16,16 @@ export const CHANGE_TYPE_KEYS: Record<string, string> = {
 
 /** Extract displayName from a Change's after/before snapshot. */
 export function changeDisplayName(change: Change): string {
-  return (
-    (change.after as Record<string, unknown> | null)?.displayName ??
-    (change.before as Record<string, unknown> | null)?.displayName ??
-    change.resourceRid
-  ) as string;
+  const snapshot = (change.after ?? change.before) as Record<string, unknown> | null;
+  if (!snapshot) return change.resourceRid;
+
+  if (change.resourceType === 'LinkType') {
+    const sideA = snapshot.sideA as Record<string, unknown> | undefined;
+    const sideB = snapshot.sideB as Record<string, unknown> | undefined;
+    const a = (sideA?.displayName as string) ?? '';
+    const b = (sideB?.displayName as string) ?? '';
+    if (a || b) return [a, b].filter(Boolean).join(' ↔ ');
+  }
+
+  return (snapshot.displayName as string) ?? change.resourceRid;
 }
