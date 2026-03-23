@@ -36,6 +36,7 @@ export default function HomeSidebar() {
   const { isSearchMode, query, activeType, setActiveType, exitSearchMode } = useSearchStore();
   const { data: objectTypesData } = useObjectTypes(1, 1);
   const { data: linkTypesData } = useLinkTypes(1, 1, {});
+  const { data: allPropertiesData } = useAllProperties();
   const { data: searchData } = useSearch(query);
   const { data: ws } = useWorkingState();
   const openDialog = useSaveDialogStore((s) => s.openDialog);
