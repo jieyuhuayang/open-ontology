@@ -232,11 +232,27 @@ class PropertyService:
         validate_property_id(req.id)
         validate_property_api_name(req.api_name)
 
-        # Check uniqueness
-        await self._check_property_uniqueness(object_type_rid, req.id, req.api_name)
+        # Load merged properties once and reuse for uniqueness + count + sort_order
+        merged = await self._get_merged_properties(object_type_rid)
+
+        # Check uniqueness (inline to avoid re-loading)
+        for data, state in merged:
+            if state == ChangeState.DELETED:
+                continue
+            if data.get("id") == req.id:
+                raise AppError(
+                    code="PROPERTY_ID_CONFLICT",
+                    message=f"Property with id '{req.id}' already exists in this object type",
+                    status_code=409,
+                )
+            if data.get("apiName") == req.api_name:
+                raise AppError(
+                    code="PROPERTY_API_NAME_CONFLICT",
+                    message=f"Property with apiName '{req.api_name}' already exists in this object type",
+                    status_code=409,
+                )
 
         # Check count limit (published + non-deleted working state)
-        merged = await self._get_merged_properties(object_type_rid)
         non_deleted_count = sum(1 for _, state in merged if state != ChangeState.DELETED)
         if non_deleted_count >= MAX_PROPERTIES_PER_OBJECT_TYPE:
             raise AppError(
