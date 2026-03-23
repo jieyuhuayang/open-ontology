@@ -1965,6 +1965,215 @@
         }
       }
     },
+    "/api/v1/object-types/{ot_rid}/instances": {
+      "get": {
+        "tags": [
+          "object-instances"
+        ],
+        "summary": "List Instances",
+        "operationId": "list_instances_api_v1_object_types__ot_rid__instances_get",
+        "parameters": [
+          {
+            "name": "ot_rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ot Rid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Pagesize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectInstanceListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/object-types/{ot_rid}/instances/{rid}": {
+      "get": {
+        "tags": [
+          "object-instances"
+        ],
+        "summary": "Get Instance",
+        "operationId": "get_instance_api_v1_object_types__ot_rid__instances__rid__get",
+        "parameters": [
+          {
+            "name": "ot_rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ot Rid"
+            }
+          },
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectInstance"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/object-types/{ot_rid}/sync": {
+      "post": {
+        "tags": [
+          "object-instances"
+        ],
+        "summary": "Trigger Sync",
+        "description": "Manually trigger sync for an object type.",
+        "operationId": "trigger_sync_api_v1_object_types__ot_rid__sync_post",
+        "parameters": [
+          {
+            "name": "ot_rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ot Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncJob"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/object-types/{ot_rid}/sync/status": {
+      "get": {
+        "tags": [
+          "object-instances"
+        ],
+        "summary": "Get Sync Status",
+        "operationId": "get_sync_status_api_v1_object_types__ot_rid__sync_status_get",
+        "parameters": [
+          {
+            "name": "ot_rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ot Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/SyncJob"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Get Sync Status Api V1 Object Types  Ot Rid  Sync Status Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/search": {
       "get": {
         "tags": [
@@ -3641,6 +3850,128 @@
         ],
         "title": "MySQLTablePreview"
       },
+      "ObjectInstance": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "objectTypeRid": {
+            "type": "string",
+            "title": "Objecttyperid"
+          },
+          "primaryKeyValue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primarykeyvalue"
+          },
+          "titleValue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Titlevalue"
+          },
+          "properties": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Properties",
+            "default": {}
+          },
+          "sourceDatasetRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sourcedatasetrid"
+          },
+          "sourceRowIndex": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sourcerowindex"
+          },
+          "dataHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Datahash"
+          },
+          "syncedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Syncedat"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "objectTypeRid",
+          "syncedAt",
+          "createdAt"
+        ],
+        "title": "ObjectInstance"
+      },
+      "ObjectInstanceListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectInstance"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "pageSize": {
+            "type": "integer",
+            "title": "Pagesize"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
+        "title": "ObjectInstanceListResponse"
+      },
       "ObjectTypeCreateRequest": {
         "properties": {
           "displayName": {
@@ -4791,6 +5122,98 @@
           "type"
         ],
         "title": "StructField"
+      },
+      "SyncJob": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "objectTypeRid": {
+            "type": "string",
+            "title": "Objecttyperid"
+          },
+          "datasetRid": {
+            "type": "string",
+            "title": "Datasetrid"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "running"
+          },
+          "syncType": {
+            "type": "string",
+            "title": "Synctype",
+            "default": "full"
+          },
+          "totalRows": {
+            "type": "integer",
+            "title": "Totalrows",
+            "default": 0
+          },
+          "insertedCount": {
+            "type": "integer",
+            "title": "Insertedcount",
+            "default": 0
+          },
+          "updatedCount": {
+            "type": "integer",
+            "title": "Updatedcount",
+            "default": 0
+          },
+          "deletedCount": {
+            "type": "integer",
+            "title": "Deletedcount",
+            "default": 0
+          },
+          "unchangedCount": {
+            "type": "integer",
+            "title": "Unchangedcount",
+            "default": 0
+          },
+          "errorMessage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Errormessage"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Startedat"
+          },
+          "completedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completedat"
+          },
+          "triggeredBy": {
+            "type": "string",
+            "title": "Triggeredby",
+            "default": "system"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "objectTypeRid",
+          "datasetRid",
+          "startedAt"
+        ],
+        "title": "SyncJob"
       },
       "ValidationError": {
         "properties": {
