@@ -149,7 +149,7 @@
   - i18n 新增：`detail.instances`, `instances.title`, `instances.noSyncYet`, `instances.publishToSync`, `instances.configureDatasource`, `instances.syncNow`, `instances.lastSynced`, `instances.syncStats`, `instances.syncStatus.running/completed/failed`（中英文各约 11 个 key）
   **依赖**: T009
 
-- [ ] **T011**: ObjectTypeInstancesPage + 路由 + Tab 注册
+- [x] **T011**: ObjectTypeInstancesPage + 路由 + Tab 注册
   **文件**: `apps/web/src/pages/object-types/ObjectTypeInstancesPage.tsx`, `apps/web/src/pages/object-types/ObjectTypeDetailLayout.tsx`, `apps/web/src/router.tsx`
   **逻辑**:
   - ObjectTypeInstancesPage：
