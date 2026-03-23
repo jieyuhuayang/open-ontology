@@ -27,6 +27,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
     # Verify DB connectivity on startup
     async with engine.connect() as conn:
         await conn.execute(text("SELECT 1"))
+    await ensure_seed_data(engine)
     yield
     await engine.dispose()
 
