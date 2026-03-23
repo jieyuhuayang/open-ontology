@@ -132,6 +132,53 @@ class TestCompletenessValidation:
             await svc._validate_completeness([change])
         assert "mappedProperties" in exc_info.value.details["missingFields"]
 
+    async def test_update_merges_with_published_data(self):
+        """1.2: UPDATE after only contains changed fields — should merge with published data."""
+        from app.domain.object_type import Icon, ObjectType
+
+        from app.services.working_state_service import WorkingStateService
+
+        svc = WorkingStateService(AsyncMock())
+
+        # UPDATE only changes description — all other fields exist in published data
+        change = Change(
+            id="c1",
+            resource_type=ResourceType.OBJECT_TYPE,
+            resource_rid="ri.ontology.object-type.ot1",
+            change_type=ChangeType.UPDATE,
+            before={"description": None},
+            after={"description": "Updated description"},
+            timestamp=datetime.now(timezone.utc),
+        )
+
+        published_ot = ObjectType(
+            rid="ri.ontology.object-type.ot1",
+            id="employee",
+            api_name="Employee",
+            display_name="Employee",
+            icon=Icon(name="cube", color="#000"),
+            backing_datasource={"rid": "ri.ontology.dataset.ds1"},
+            primary_key_property_id="pk-prop",
+            title_key_property_id="tk-prop",
+            project_rid="ri.ontology.space.default",
+            ontology_rid="ri.ontology.ontology.default",
+            created_at=datetime.now(timezone.utc),
+            created_by="default",
+            last_modified_at=datetime.now(timezone.utc),
+            last_modified_by="default",
+        )
+
+        with (
+            patch(
+                "app.services.working_state_service.ObjectTypeStorage.get_by_rid",
+                new_callable=AsyncMock,
+                return_value=published_ot,
+            ),
+            patch.object(svc, "_has_mapped_properties", return_value=True),
+        ):
+            # Should NOT raise — published data has all required fields
+            await svc._validate_completeness([change])
+
 
 class TestTypeCompatibility:
     async def test_compatible_types(self):
