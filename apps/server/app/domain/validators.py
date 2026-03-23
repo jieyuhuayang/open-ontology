@@ -5,6 +5,9 @@ import unicodedata
 
 from app.exceptions import AppError
 
+RID_PATTERN = re.compile(r"^ri\.[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*\.[a-zA-Z0-9]+$")
+RID_MAX_LENGTH = 200
+
 PASCAL_CASE_PATTERN = re.compile(r"^[A-Z][a-zA-Z0-9_]*$")
 ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]*$")
 LINK_SIDE_API_NAME_PATTERN = re.compile(r"^[a-z][a-zA-Z0-9]{0,99}$")
