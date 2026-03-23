@@ -735,6 +735,7 @@
     "properties": "Properties",
     "linkTypes": "Link Types",
     "pendingChanges": "Pending changes",
-    "missingDisplayName": "{{type}}: missing display name"
+    "missingDisplayName": "{{type}}: missing display name",
+    "editsCount": "{{count}} edits"
   }
 }
