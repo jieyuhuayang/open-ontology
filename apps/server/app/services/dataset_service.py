@@ -185,11 +185,11 @@ class DatasetService:
 
         try:
             col_names = [c.name for c in ds.columns]
-            cols_sql = ", ".join(f"`{c}`" for c in col_names)
-            table = ds.source_table
+            cols_sql = ", ".join(quote_mysql_identifier(c) for c in col_names)
+            table_quoted = quote_mysql_identifier(ds.source_table)
 
             async with mysql_conn.cursor(aiomysql.DictCursor) as cur:
-                await cur.execute(f"SELECT {cols_sql} FROM `{table}` LIMIT %s", (limit,))
+                await cur.execute(f"SELECT {cols_sql} FROM {table_quoted} LIMIT %s", (limit,))
                 rows = await cur.fetchall()
 
                 # Use TABLE_STATUS for fast row estimate instead of COUNT(*)
