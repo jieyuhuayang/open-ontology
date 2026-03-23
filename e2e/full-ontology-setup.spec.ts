@@ -199,21 +199,35 @@ async function createFkLink(
 test.describe.serial('Full Ontology Setup — OT + LT creation', () => {
   // ═══════ Cleanup ═══════
 
-  test('cleanup: delete existing link types and object types', async ({ request }) => {
-    // Delete all link types first (they reference OTs)
+  test('cleanup: delete test link types and object types', async ({ request }) => {
+    // Only delete resources created by THIS test suite.
+    // Link type IDs created by this test:
+    const TEST_LT_IDS = new Set([
+      'analyst-latest-report',
+      'company-latest-report',
+      'analyst-coverage',
+      'fund-holding',
+      'analyst-company-via-report',
+    ]);
+    // Object type display names created by this test:
+    const TEST_OT_NAMES = new Set(['公司', '研究员', '评级报告', '基金']);
+
+    // Delete matching link types first (they reference OTs)
     const ltResp = await request.get(`${API}/link-types`);
     if (ltResp.ok()) {
       const ltData = await ltResp.json();
       for (const lt of ltData.items) {
+        if (!TEST_LT_IDS.has(lt.id as string)) continue;
         await request.delete(`${API}/link-types/${lt.rid}`);
       }
     }
 
-    // Delete all object types
+    // Delete matching object types
     const otResp = await request.get(`${API}/object-types`);
     if (otResp.ok()) {
       const otData = await otResp.json();
       for (const ot of otData.items) {
+        if (!TEST_OT_NAMES.has(ot.displayName as string)) continue;
         // Clean up properties first
         const propResp = await request.get(`${API}/object-types/${ot.rid}/properties`);
         if (propResp.ok()) {
@@ -236,17 +250,8 @@ test.describe.serial('Full Ontology Setup — OT + LT creation', () => {
       }
     }
 
-    // Discard any pending changes
-    await request.delete(`${API}/ontologies/ri.ontology.ontology.default/working-state`);
-
-    // Verify clean state
-    const checkOt = await request.get(`${API}/object-types`);
-    const checkOtData = await checkOt.json();
-    expect(checkOtData.items).toHaveLength(0);
-
-    const checkLt = await request.get(`${API}/link-types`);
-    const checkLtData = await checkLt.json();
-    expect(checkLtData.items).toHaveLength(0);
+    // Discard any pending changes from this cleanup
+    await request.delete(`${API}/ontologies/ri.ontology.ontology.default/working-state`).catch(() => {});
   });
 
   // ═══════ Phase 1: Create 4 Object Types ═══════
