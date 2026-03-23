@@ -143,6 +143,20 @@ class WorkingStateService:
                 # UPDATE + DELETE → DELETE with original before
                 merged = new_change.model_copy(update={"before": existing.before, "after": None})
                 return [*rest, merged]
+        elif existing.change_type == ChangeType.DELETE:
+            if new_change.change_type == ChangeType.CREATE:
+                # DELETE + CREATE → UPDATE (resource still exists in published state)
+                merged = new_change.model_copy(
+                    update={
+                        "change_type": ChangeType.UPDATE,
+                        "before": existing.before,
+                        "after": new_change.after,
+                    }
+                )
+                return [*rest, merged]
+            elif new_change.change_type == ChangeType.DELETE:
+                # DELETE + DELETE → idempotent, keep existing
+                return [*rest, existing]
 
         return [*rest, new_change]
 
