@@ -8,24 +8,25 @@ export default function SearchBar() {
   const { t } = useTranslation();
   const inputRef = useRef<InputRef>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
-  const { query, setQuery, enterSearchMode, exitSearchMode } = useSearchStore();
+  const { inputValue, setInputValue, setQuery, enterSearchMode, exitSearchMode } = useSearchStore();
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value.slice(0, 200);
-      setQuery(value);
+      setInputValue(value);
 
       if (debounceRef.current) clearTimeout(debounceRef.current);
 
       if (value.trim()) {
         debounceRef.current = setTimeout(() => {
+          setQuery(value);
           enterSearchMode();
         }, 300);
       } else {
         exitSearchMode();
       }
     },
-    [setQuery, enterSearchMode, exitSearchMode],
+    [setInputValue, setQuery, enterSearchMode, exitSearchMode],
   );
 
   const handleClear = useCallback(() => {
@@ -34,10 +35,10 @@ export default function SearchBar() {
   }, [exitSearchMode]);
 
   const handleFocus = useCallback(() => {
-    if (query.trim()) {
+    if (inputValue.trim()) {
       enterSearchMode();
     }
-  }, [query, enterSearchMode]);
+  }, [inputValue, enterSearchMode]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
