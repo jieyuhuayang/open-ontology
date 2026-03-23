@@ -7,7 +7,8 @@ export interface ValidationError {
   changeId: string;
   resourceRid: string;
   resourceType: string;
-  message: string;
+  messageKey: string;
+  messageParams?: Record<string, string>;
 }
 
 /**
