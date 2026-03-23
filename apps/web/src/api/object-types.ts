@@ -6,6 +6,10 @@ import type {
   ObjectTypeUpdateRequest,
   ObjectTypeListResponse,
 } from '@/api/types';
+import { linkTypeKeys } from '@/api/link-types';
+import { propertyKeys } from '@/api/properties';
+import { workingStateKeys } from '@/api/working-state';
+import { searchKeys } from '@/api/search';
 
 export const objectTypeKeys = {
   all: ['object-types'] as const,
