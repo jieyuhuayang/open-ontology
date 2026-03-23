@@ -512,11 +512,9 @@ class WorkingStateService:
                 backing = data.get("backingDatasource")
                 if backing and isinstance(backing, dict) and backing.get("rid"):
                     ot_rids_to_sync.add(change.resource_rid)
-            elif (
-                change.resource_type == ResourceType.PROPERTY
-                and change.change_type != ChangeType.DELETE
-            ):
-                data = change.after or {}
+            elif change.resource_type == ResourceType.PROPERTY:
+                # For CREATE/UPDATE use after; for DELETE use before (after is None)
+                data = change.after or change.before or {}
                 ot_rid = data.get("objectTypeRid")
                 if ot_rid:
                     ot_rids_to_sync.add(ot_rid)
