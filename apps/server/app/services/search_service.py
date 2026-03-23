@@ -183,8 +183,7 @@ class SearchService:
             )
             seen_rids[rid] = item
 
-        # Fill object type display names
-        ot_merged = await self._ws_service.get_merged_view(ontology_rid, ResourceType.OBJECT_TYPE)
+        # Fill object type display names (using pre-loaded OT merged view)
         ot_map: dict[str, str] = {}
         for data, cs in ot_merged:
             if cs != ChangeState.DELETED:
