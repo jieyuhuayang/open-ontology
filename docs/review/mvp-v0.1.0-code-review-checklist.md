@@ -329,3 +329,19 @@ npx playwright test --reporter=list
 - **结论**: 事务隔离足够，延后 v0.2.0
 - **分析**: PostgreSQL READ COMMITTED 隔离 + SQLAlchemy async session 提供语句级原子性。`publish()` 全程在同一 session 中执行（load → validate → apply → delete WS → flush），4.1 的 `FOR UPDATE` 行锁额外保证了 publish 期间 WS 不会被并发修改。并发 `add_change` 会阻塞等待 publish 完成后创建新 WS。
 - **日期**: 2026-03-24
+
+### 5.1 staleTime 策略不一致
+- **结论**: 已修复
+- **修复内容**: (1) 将 `search.ts` 的 staleTime 从 30s 降至 5s，与 working-state 保持一致。(2) 为所有 CRUD mutation（OT create/update、LT create/update/delete、Property create/update/delete）添加 WS + search 缓存失效（`invalidateQueries(['working-state'])` + `invalidateQueries(['search'])`），确保任何数据变更后搜索和变更面板立即更新
+- **影响文件**: `api/search.ts`, `api/object-types.ts`, `api/link-types.ts`, `api/properties.ts`
+- **日期**: 2026-03-24
+
+### 5.2 LT 删除缺少 properties 缓存失效
+- **结论**: 误报
+- **分析**: 后端 `link_type_service.delete()` 仅生成 LT 的 DELETE 变更，不级联删除 Properties。LT 删除后 Property 数据未变化，property 缓存不会过期。无需额外失效。
+- **日期**: 2026-03-24
+
+### 5.3 useWorkingState 404→null 语义模糊
+- **结论**: 误报（设计正确）
+- **分析**: 404 返回 `null`（无草稿），非 404 错误 re-throw。TanStack Query 的 `isError` 标志可区分网络错误。6 处 consumer 均使用 `data: ws` 解构 + `ws?.changes` 可选链，正确处理 null 场景。
+- **日期**: 2026-03-24
