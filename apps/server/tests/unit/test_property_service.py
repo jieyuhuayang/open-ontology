@@ -235,17 +235,15 @@ class TestCreate:
     @pytest.mark.asyncio
     async def test_create_id_conflict(self, service):
         """AC6: Duplicate id → 409."""
+        existing = [
+            (_make_prop_dict(id="name", apiName="existingName"), ChangeState.PUBLISHED),
+        ]
         req = PropertyCreateRequest(
             id="name", api_name="newName", display_name="Name", base_type="string"
         )
         with (
             _patch_ot_merged(service),
-            _patch_uniqueness(
-                service,
-                side_effect=AppError(
-                    code="PROPERTY_ID_CONFLICT", message="conflict", status_code=409
-                ),
-            ),
+            _patch_props_merged(service, existing),
         ):
             with pytest.raises(AppError) as exc_info:
                 await service.create(OT_RID, req)
@@ -254,17 +252,15 @@ class TestCreate:
     @pytest.mark.asyncio
     async def test_create_api_name_conflict(self, service):
         """AC6: Duplicate apiName → 409."""
+        existing = [
+            (_make_prop_dict(id="existingId", apiName="name"), ChangeState.PUBLISHED),
+        ]
         req = PropertyCreateRequest(
             id="other", api_name="name", display_name="Other", base_type="string"
         )
         with (
             _patch_ot_merged(service),
-            _patch_uniqueness(
-                service,
-                side_effect=AppError(
-                    code="PROPERTY_API_NAME_CONFLICT", message="conflict", status_code=409
-                ),
-            ),
+            _patch_props_merged(service, existing),
         ):
             with pytest.raises(AppError) as exc_info:
                 await service.create(OT_RID, req)
