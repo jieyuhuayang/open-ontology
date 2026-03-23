@@ -345,3 +345,24 @@ npx playwright test --reporter=list
 - **结论**: 误报（设计正确）
 - **分析**: 404 返回 `null`（无草稿），非 404 错误 re-throw。TanStack Query 的 `isError` 标志可区分网络错误。6 处 consumer 均使用 `data: ws` 解构 + `ws?.changes` 可选链，正确处理 null 场景。
 - **日期**: 2026-03-24
+
+### 6.1 仅全局 ErrorBoundary，无页面级降级
+- **结论**: 延后 v0.2.0
+- **分析**: 全局 `errorElement` 在 `router.tsx` 根路由已覆盖。MVP 用户为内部技术人员，全局 ErrorBoundary 足够。页面级 ErrorBoundary 可在 v0.2.0 按需添加到复杂页面（如 ObjectTypeDetailLayout、DataConnectionPage）。
+- **日期**: 2026-03-24
+
+### 6.2 代码分割不足
+- **结论**: 已修复
+- **修复内容**: 将 13 个业务页面从同步 import 改为 `React.lazy()` + `Suspense` 懒加载。新增 `PageSuspense` 包装组件（带 `Spin` loading 状态）。保留 `NotFoundPage` 和 `PlaceholderPage` 为同步导入（体积小、作为降级页面需即时可用）
+- **影响文件**: `router.tsx`
+- **日期**: 2026-03-24
+
+### 6.3 无障碍属性缺失
+- **结论**: 延后 v0.2.0
+- **分析**: Ant Design 组件自带基础 ARIA 属性（Form 的 label 关联、Button 的 role 等）。自定义组件缺少额外 ARIA 标注，但 MVP 用户为内部技术团队，无障碍合规非 MVP 阻塞项。v0.2.0 可优先添加 icon-only 按钮的 `aria-label` 和通知区域的 `aria-live`。
+- **日期**: 2026-03-24
+
+### 6.4 Publish/Discard 操作防误触机制
+- **结论**: 误报（已实现）
+- **分析**: Discard All 操作在 `SaveDialog.tsx` 和 `ChangeActions.tsx` 中均使用 `Modal.confirm()` 二次确认（带红色 danger 按钮）。Publish/Save 通过 Changes 列表审阅 + Errors 标签禁用机制提供足够安全保障。
+- **日期**: 2026-03-24
