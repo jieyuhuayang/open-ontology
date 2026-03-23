@@ -163,7 +163,7 @@ class WorkingStateService:
         return [*rest, new_change]
 
     async def add_change(self, ontology_rid: str, change: Change) -> None:
-        ws = await self.get_or_create(ontology_rid)
+        ws = await self.get_or_create(ontology_rid, for_update=True)
         collapsed = self._collapse_change(list(ws.changes), change)
         now = datetime.now(timezone.utc)
         await WorkingStateStorage.update_changes(self._session, ws.rid, collapsed, now)
