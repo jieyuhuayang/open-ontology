@@ -120,6 +120,8 @@ async def update_property(
     req: PropertyUpdateRequest,
     service: PropertyService = Depends(_get_service),
 ):
+    validate_rid(object_type_rid)
+    validate_rid(rid)
     return await service.update(object_type_rid, rid, req)
 
 
@@ -132,5 +134,7 @@ async def delete_property(
     rid: str,
     service: PropertyService = Depends(_get_service),
 ):
+    validate_rid(object_type_rid)
+    validate_rid(rid)
     await service.delete(object_type_rid, rid)
     return Response(status_code=204)
