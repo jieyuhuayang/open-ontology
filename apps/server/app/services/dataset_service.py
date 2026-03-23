@@ -221,7 +221,7 @@ class DatasetService:
         """
         from app.storage.link_type_storage import LinkTypeStorage
 
-        all_lts = await LinkTypeStorage.list_all(self._session, DEFAULT_ONTOLOGY_RID)
+        all_lts = await LinkTypeStorage.list_by_ontology(self._session, DEFAULT_ONTOLOGY_RID)
         for lt in all_lts:
             if lt.join_table_dataset_rid == rid:
                 return lt.display_name
