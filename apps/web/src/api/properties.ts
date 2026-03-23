@@ -67,6 +67,8 @@ export function useUpdateProperty(objectTypeRid: string, rid: string) {
     meta: { skipGlobalError: true },
     onSuccess: (_data, req) => {
       queryClient.invalidateQueries({ queryKey: propertyKeys.list(objectTypeRid) });
+      queryClient.invalidateQueries({ queryKey: ['working-state'] });
+      queryClient.invalidateQueries({ queryKey: ['search'] });
       // If PK/TK changed, also invalidate object type to refresh primaryKeyPropertyId/titleKeyPropertyId
       if (req.isPrimaryKey !== undefined || req.isTitleKey !== undefined) {
         queryClient.invalidateQueries({ queryKey: objectTypeKeys.detail(objectTypeRid) });
