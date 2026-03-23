@@ -82,8 +82,9 @@ e2e/helpers/
 **⚠️ 强制生成规则**：
 
 0. **先查后写**：涉及 Dataset 列名时，必须先通过 API 查询实际 schema（`GET /api/v1/datasets/<rid>`），**禁止假设列名**
-1. **数据隔离**：测试数据 ID 统一 `e2e-<feature>-` 前缀
-2. **共享 helpers**：导入 `e2e/helpers/antd.ts` 的函数，**禁止在文件内重新定义** `selectAntOption` 等
+1. **数据隔离（红线）**：测试数据 ID 统一 `e2e-<feature>-` 前缀（≥5 字符）。**禁止无条件删除所有资源**——cleanup 必须按前缀或白名单过滤，只删本套件创建的数据。E2E 运行前后，非测试数据必须保持不变
+2. **双重 cleanup**：setup 阶段清理上次残留 + 末尾 cleanup 任务清理本次数据
+3. **共享 helpers**：导入 `e2e/helpers/antd.ts` 的函数，**禁止在文件内重新定义** `selectAntOption` 等
 3. **i18n 安全**：用户可见文本用 `/English|中文/` 双语 RegExp
 4. **精确匹配**：禁止用短词 `getByText('Age')` — 改用 `.filter({ hasText })` 或 `{ exact: true }`
 5. **元素等待**：用 `expect().toBeVisible({ timeout })` 等待，不用硬编码 `waitForTimeout`（除了 Ant Design 动画的短暂 200-500ms 等待）
