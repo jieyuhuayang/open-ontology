@@ -313,3 +313,19 @@ npx playwright test --reporter=list
 - **修复内容**: PK 属性删除已有保护（返回 400），但 TK（Title Key）属性无同等保护。在 `delete()` 和 `batch_delete()` 中添加 `isTitleKey` 检查，删除 TK 属性时返回 `PROPERTY_TITLE_KEY_CANNOT_DELETE` 错误，要求用户先重新指定 TK
 - **影响文件**: `property_service.py`
 - **日期**: 2026-03-24
+
+### 4.1 WorkingState read-modify-write 无乐观锁
+- **结论**: 已修复
+- **修复内容**: 在 `WorkingStateStorage.get_by_ontology()` 中添加 `for_update` 参数支持 `SELECT ... FOR UPDATE` 行锁。`add_change()` 和 `add_changes()` 通过 `get_or_create(for_update=True)` 获取 WS 时加行锁，阻塞并发写入直至当前事务提交
+- **影响文件**: `working_state_storage.py`, `working_state_service.py`
+- **日期**: 2026-03-24
+
+### 4.2 process-local singleton 多 worker 失效
+- **结论**: MVP 可接受，延后 v0.2.0
+- **分析**: MVP 部署为单 worker (`uvicorn --reload`)，内存 dict 正常工作。代码中已有 TODO 注释标注多 worker 部署时需迁移到 Redis/DB 存储。`ImportTaskService` 和 `_preview_cache` 仅用于文件导入预览（临时数据，30min/1h 自动清理），不影响核心数据完整性。
+- **日期**: 2026-03-24
+
+### 4.3 publish 与并发 CRUD 的竞态
+- **结论**: 事务隔离足够，延后 v0.2.0
+- **分析**: PostgreSQL READ COMMITTED 隔离 + SQLAlchemy async session 提供语句级原子性。`publish()` 全程在同一 session 中执行（load → validate → apply → delete WS → flush），4.1 的 `FOR UPDATE` 行锁额外保证了 publish 期间 WS 不会被并发修改。并发 `add_change` 会阻塞等待 publish 完成后创建新 WS。
+- **日期**: 2026-03-24
