@@ -220,7 +220,9 @@ class TestDelete:
             patch.object(
                 service, "_find_in_merged_view", new_callable=AsyncMock, return_value=existing
             ),
-            patch.object(service._ws_service, "add_change", new_callable=AsyncMock) as mock_add,
+            patch.object(
+                service._ws_service, "add_changes", new_callable=AsyncMock
+            ) as mock_add_batch,
             patch(
                 "app.services.object_type_service.ObjectTypeStorage.get_related_link_type_rids",
                 new_callable=AsyncMock,
@@ -234,14 +236,13 @@ class TestDelete:
         ):
             await service.delete("ri.ontology.object-type.abc")
 
-        mock_add.assert_called()
-        # Should have at least the ObjectType DELETE change
-        calls = mock_add.call_args_list
+        mock_add_batch.assert_called_once()
+        # Should have at least the ObjectType DELETE change in the batch
+        changes = mock_add_batch.call_args[0][1]
         ot_delete = [
             c
-            for c in calls
-            if c[0][1].resource_type == ResourceType.OBJECT_TYPE
-            and c[0][1].change_type == ChangeType.DELETE
+            for c in changes
+            if c.resource_type == ResourceType.OBJECT_TYPE and c.change_type == ChangeType.DELETE
         ]
         assert len(ot_delete) == 1
 
