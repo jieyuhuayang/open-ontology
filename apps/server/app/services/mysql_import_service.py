@@ -469,9 +469,10 @@ class MySQLImportService:
                     )
 
                 # Fetch data
-                cols_sql = ", ".join(f"`{c}`" for c in col_names)
+                cols_sql = ", ".join(quote_mysql_identifier(c) for c in col_names)
+                table_quoted = quote_mysql_identifier(table)
                 async with conn.cursor(aiomysql.DictCursor) as cur:
-                    await cur.execute(f"SELECT {cols_sql} FROM `{table}`")
+                    await cur.execute(f"SELECT {cols_sql} FROM {table_quoted}")
                     all_rows = await cur.fetchall()
 
                 # Convert to serializable dicts
