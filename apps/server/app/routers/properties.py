@@ -68,6 +68,7 @@ async def create_property(
     req: PropertyCreateRequest,
     service: PropertyService = Depends(_get_service),
 ):
+    validate_rid(object_type_rid)
     return await service.create(object_type_rid, req)
 
 
