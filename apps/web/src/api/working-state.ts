@@ -26,7 +26,7 @@ export function useWorkingState(ontologyRid: string = DEFAULT_ONTOLOGY_RID) {
       } catch (err: unknown) {
         const status = (err as { response?: { status?: number } })?.response?.status;
         if (status === 404) {
-          return { changes: [] } as WorkingState;
+          return null;
         }
         throw err;
       }
