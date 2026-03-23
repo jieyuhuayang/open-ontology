@@ -128,17 +128,7 @@ class ObjectSyncService:
 
         # Snapshot: read from dataset_rows
         raw_rows = await DatasetStorage.get_preview(self._session, dataset_rid, limit=100000)
-        if not property_column_map:
-            return raw_rows
-
-        mapped = []
-        for raw in raw_rows:
-            row = {}
-            for api_name, col_name in property_column_map.items():
-                if col_name in raw:
-                    row[api_name] = raw[col_name]
-            mapped.append(row)
-        return mapped
+        return self._apply_column_map(raw_rows, property_column_map)
 
     async def _read_live_data(
         self,
@@ -155,18 +145,22 @@ class ObjectSyncService:
 
         mysql_svc = MySQLImportService(self._session)
         rows = await mysql_svc.fetch_table_data(connection_rid, source_table)
+        return self._apply_column_map(rows, property_column_map)
 
+    @staticmethod
+    def _apply_column_map(
+        raw_rows: list[dict], property_column_map: dict[str, str] | None
+    ) -> list[dict]:
         if not property_column_map:
-            return rows
-
-        mapped = []
-        for raw in rows:
-            row = {}
-            for api_name, col_name in property_column_map.items():
-                if col_name in raw:
-                    row[api_name] = raw[col_name]
-            mapped.append(row)
-        return mapped
+            return raw_rows
+        return [
+            {
+                api_name: raw[col_name]
+                for api_name, col_name in property_column_map.items()
+                if col_name in raw
+            }
+            for raw in raw_rows
+        ]
 
     @staticmethod
     def _compute_hash(properties: dict) -> str:
