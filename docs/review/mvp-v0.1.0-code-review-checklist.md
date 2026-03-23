@@ -48,19 +48,19 @@
 
 ## 2. API 契约与边界验证
 
-- [ ] 🔴 **2.1 路由层 rid 参数无格式校验**
+- [x] 🔴 **2.1 路由层 rid 参数无格式校验**
   恶意 RID（超长/特殊字符）直接传入 DB 查询，应统一校验 `ri.` 前缀格式。
   `routers/object_types.py`, `routers/link_types.py`, `routers/ontology.py`
 
-- [ ] 🟡 **2.2 分页参数上限不一致**
+- [x] 🟡 **2.2 分页参数上限不一致**
   history 限 `page_size le=100`，OT/LT/Property list 是否有同样限制？
   `routers/ontology.py:55`, `routers/object_types.py`, `routers/properties.py`
 
-- [ ] 🟡 **2.3 search types 参数无枚举校验**
+- [x] 🟡 **2.3 search types 参数无枚举校验**
   未知类型（如 `"actionType"`）静默忽略，掩盖前端拼写错误。
   `routers/search.py`, `search_service.py:23-45`
 
-- [ ] 🟡 **2.4 skipGlobalError mutation 缺本地 onError**
+- [x] 🟡 **2.4 skipGlobalError mutation 缺本地 onError**
   15 个设置 `skipGlobalError` 的 mutation 是否都有对应错误处理？
   `api/object-types.ts`, `api/link-types.ts`, `api/properties.ts`
 
