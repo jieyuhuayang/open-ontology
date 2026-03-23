@@ -1,0 +1,373 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - img "deployment-unit" [ref=e7]:
+          - img [ref=e8]
+        - strong [ref=e11]: Ontology Management
+      - generic [ref=e13]:
+        - img "search" [ref=e15]:
+          - img [ref=e16]
+        - textbox "Search by name, RID, aliases..." [ref=e18]
+        - generic [ref=e20]: ⌘K
+      - generic [ref=e21]:
+        - generic [ref=e23]:
+          - button "Save (20)" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26]: Save (20)
+          - button "Discard" [ref=e28] [cursor=pointer]:
+            - generic [ref=e29]: Discard
+        - button "plus New" [ref=e30] [cursor=pointer]:
+          - img "plus" [ref=e32]:
+            - img [ref=e33]
+          - generic [ref=e36]: New
+        - generic [ref=e37] [cursor=pointer]:
+          - img "global" [ref=e38]:
+            - img [ref=e39]
+          - text: English
+    - generic [ref=e41]:
+      - complementary [ref=e42]:
+        - navigation [ref=e44]:
+          - strong [ref=e47]: Default Ontology
+          - menu [ref=e48]:
+            - menuitem "compass Discover" [ref=e49] [cursor=pointer]:
+              - img "compass" [ref=e50]:
+                - img [ref=e51]
+              - generic [ref=e53]: Discover
+            - text: Resources
+            - group [ref=e54]:
+              - menuitem "appstore Object Types 2" [ref=e55] [cursor=pointer]:
+                - img "appstore" [ref=e56]:
+                  - img [ref=e57]
+                - generic [ref=e60]:
+                  - text: Object Types
+                  - generic [ref=e61]: "2"
+              - menuitem "unordered-list Properties" [ref=e62] [cursor=pointer]:
+                - img "unordered-list" [ref=e63]:
+                  - img [ref=e64]
+                - generic [ref=e66]: Properties
+              - menuitem "link Link Types 0" [ref=e67] [cursor=pointer]:
+                - img "link" [ref=e68]:
+                  - img [ref=e69]
+                - generic [ref=e72]:
+                  - text: Link Types
+                  - generic [ref=e73]: "0"
+              - menuitem "thunderbolt Action Types" [ref=e74] [cursor=pointer]:
+                - img "thunderbolt" [ref=e75]:
+                  - img [ref=e76]
+                - generic [ref=e78]: Action Types
+            - text: Data Connection
+            - group [ref=e79]:
+              - menuitem "database Data Connection" [ref=e80] [cursor=pointer]:
+                - img "database" [ref=e81]:
+                  - img [ref=e82]
+                - generic [ref=e84]: Data Connection
+            - menuitem "history History" [ref=e85] [cursor=pointer]:
+              - img "history" [ref=e86]:
+                - img [ref=e87]
+              - generic [ref=e89]: History
+          - button "edit Unsaved changes (20)" [ref=e90] [cursor=pointer]:
+            - img "edit" [ref=e91]:
+              - img [ref=e92]
+            - text: Unsaved changes (20)
+          - button "left" [ref=e94] [cursor=pointer]:
+            - img "left" [ref=e95]:
+              - img [ref=e96]
+      - main [ref=e98]:
+        - main [ref=e99]:
+          - generic [ref=e100]:
+            - generic [ref=e101]:
+              - heading "Object Types" [level=4] [ref=e102]
+              - button "plus New object type" [ref=e103] [cursor=pointer]:
+                - img "plus" [ref=e105]:
+                  - img [ref=e106]
+                - generic [ref=e109]: New object type
+            - generic [ref=e110]:
+              - generic [ref=e111] [cursor=pointer]:
+                - generic [ref=e113]:
+                  - combobox [ref=e117]
+                  - generic: Status
+                - generic:
+                  - img:
+                    - img
+              - generic [ref=e118] [cursor=pointer]:
+                - generic [ref=e120]:
+                  - combobox [ref=e124]
+                  - generic: Visibility
+                - generic:
+                  - img:
+                    - img
+            - generic [ref=e127]:
+              - table [ref=e131]:
+                - rowgroup [ref=e137]:
+                  - row "Name Status Visibility Change State" [ref=e138]:
+                    - columnheader "Name" [ref=e139]
+                    - columnheader "Status" [ref=e140]
+                    - columnheader "Visibility" [ref=e141]
+                    - columnheader "Change State" [ref=e142]
+                - rowgroup [ref=e143]:
+                  - row "appstore 公司 Experimental Normal New" [ref=e144] [cursor=pointer]:
+                    - cell "appstore 公司" [ref=e145]:
+                      - generic [ref=e146]:
+                        - img "appstore" [ref=e147]:
+                          - img [ref=e148]
+                        - text: 公司
+                    - cell "Experimental" [ref=e150]:
+                      - generic [ref=e151]: Experimental
+                    - cell "Normal" [ref=e152]:
+                      - generic [ref=e153]: Normal
+                    - cell "New" [ref=e154]:
+                      - generic [ref=e155]: New
+                  - row "appstore 研究员 Experimental Normal New" [ref=e156] [cursor=pointer]:
+                    - cell "appstore 研究员" [ref=e157]:
+                      - generic [ref=e158]:
+                        - img "appstore" [ref=e159]:
+                          - img [ref=e160]
+                        - text: 研究员
+                    - cell "Experimental" [ref=e162]:
+                      - generic [ref=e163]: Experimental
+                    - cell "Normal" [ref=e164]:
+                      - generic [ref=e165]: Normal
+                    - cell "New" [ref=e166]:
+                      - generic [ref=e167]: New
+              - list [ref=e168]:
+                - listitem "Previous Page" [ref=e169]:
+                  - button "left" [disabled] [ref=e170]:
+                    - img "left" [ref=e171]:
+                      - img [ref=e172]
+                - listitem "1" [ref=e174] [cursor=pointer]:
+                  - generic [ref=e175]: "1"
+                - listitem "Next Page" [ref=e176]:
+                  - button "right" [disabled] [ref=e177]:
+                    - img "right" [ref=e178]:
+                      - img [ref=e179]
+                - listitem [ref=e181]:
+                  - generic "Page Size" [ref=e182] [cursor=pointer]:
+                    - generic [ref=e184]:
+                      - combobox "Page Size" [ref=e186]
+                      - generic "20 / page" [ref=e187]
+                    - generic:
+                      - img:
+                        - img
+  - generic [ref=e188]:
+    - dialog "Create Object Type":
+      - generic [ref=e189]:
+        - button "Close" [ref=e190] [cursor=pointer]:
+          - generic "Close" [ref=e191]:
+            - img "close" [ref=e192]:
+              - img [ref=e193]
+        - generic [ref=e196]: Create Object Type
+        - generic [ref=e197]:
+          - generic [ref=e198]:
+            - generic [ref=e200]:
+              - img "check" [ref=e203]:
+                - img [ref=e204]
+              - generic [ref=e207]: Datasource
+            - generic [ref=e209]:
+              - img "check" [ref=e212]:
+                - img [ref=e213]
+              - generic [ref=e216]: Metadata
+            - generic [ref=e218]:
+              - generic [ref=e219]: "3"
+              - generic [ref=e221]: Properties
+            - generic [ref=e223]:
+              - generic [ref=e224]: "4"
+              - generic [ref=e226]: Actions
+            - generic [ref=e228]:
+              - generic [ref=e229]: "5"
+              - generic [ref=e231]: Save Location
+          - generic [ref=e232]:
+            - generic [ref=e233]:
+              - generic [ref=e234]:
+                - strong [ref=e236]: Primary Key
+                - generic [ref=e237] [cursor=pointer]:
+                  - generic [ref=e239]:
+                    - combobox [ref=e241]
+                    - generic "id" [ref=e242]
+                  - generic:
+                    - img:
+                      - img
+                  - img [ref=e244]:
+                    - img [ref=e245]
+              - generic [ref=e247]:
+                - strong [ref=e249]: Title Key
+                - generic [ref=e250] [cursor=pointer]:
+                  - generic [ref=e252]:
+                    - combobox [expanded] [active] [ref=e254]:
+                      - listbox:
+                        - option "id": prop-bu2nh5
+                        - option "analyst_id": prop-xhwe7t
+                    - generic: Select a property
+                  - generic:
+                    - img:
+                      - img
+            - table [ref=e261]:
+              - rowgroup [ref=e267]:
+                - row "Source Property" [ref=e268]:
+                  - columnheader "Source" [ref=e269]
+                  - columnheader [ref=e270]
+                  - columnheader "Property" [ref=e271]
+                  - columnheader [ref=e272]
+              - rowgroup [ref=e273]:
+                - row "id string id Primary Key delete" [ref=e274]:
+                  - cell "id" [ref=e275]
+                  - cell "string" [ref=e276]:
+                    - generic [ref=e277] [cursor=pointer]:
+                      - generic [ref=e279]:
+                        - combobox [ref=e281]
+                        - generic "string" [ref=e282]
+                      - generic:
+                        - img:
+                          - img
+                  - cell "id Primary Key" [ref=e283]:
+                    - generic [ref=e284]:
+                      - textbox [ref=e285]: id
+                      - generic [ref=e286]: Primary Key
+                  - cell "delete" [ref=e287]:
+                    - button "delete" [ref=e288] [cursor=pointer]:
+                      - img "delete" [ref=e290]:
+                        - img [ref=e291]
+                - row "analyst_id string analyst_id delete" [ref=e293]:
+                  - cell "analyst_id" [ref=e294]
+                  - cell "string" [ref=e295]:
+                    - generic [ref=e296] [cursor=pointer]:
+                      - generic [ref=e298]:
+                        - combobox [ref=e300]
+                        - generic "string" [ref=e301]
+                      - generic:
+                        - img:
+                          - img
+                  - cell "analyst_id" [ref=e302]:
+                    - textbox [ref=e304]: analyst_id
+                  - cell "delete" [ref=e305]:
+                    - button "delete" [ref=e306] [cursor=pointer]:
+                      - img "delete" [ref=e308]:
+                        - img [ref=e309]
+                - row "company_id string company_id delete" [ref=e311]:
+                  - cell "company_id" [ref=e312]
+                  - cell "string" [ref=e313]:
+                    - generic [ref=e314] [cursor=pointer]:
+                      - generic [ref=e316]:
+                        - combobox [ref=e318]
+                        - generic "string" [ref=e319]
+                      - generic:
+                        - img:
+                          - img
+                  - cell "company_id" [ref=e320]:
+                    - textbox [ref=e322]: company_id
+                  - cell "delete" [ref=e323]:
+                    - button "delete" [ref=e324] [cursor=pointer]:
+                      - img "delete" [ref=e326]:
+                        - img [ref=e327]
+                - row "rating string rating delete" [ref=e329]:
+                  - cell "rating" [ref=e330]
+                  - cell "string" [ref=e331]:
+                    - generic [ref=e332] [cursor=pointer]:
+                      - generic [ref=e334]:
+                        - combobox [ref=e336]
+                        - generic "string" [ref=e337]
+                      - generic:
+                        - img:
+                          - img
+                  - cell "rating" [ref=e338]:
+                    - textbox [ref=e340]: rating
+                  - cell "delete" [ref=e341]:
+                    - button "delete" [ref=e342] [cursor=pointer]:
+                      - img "delete" [ref=e344]:
+                        - img [ref=e345]
+                - row "target_price double target_price delete" [ref=e347]:
+                  - cell "target_price" [ref=e348]
+                  - cell "double" [ref=e349]:
+                    - generic [ref=e350] [cursor=pointer]:
+                      - generic [ref=e352]:
+                        - combobox [ref=e354]
+                        - generic "double" [ref=e355]
+                      - generic:
+                        - img:
+                          - img
+                  - cell "target_price" [ref=e356]:
+                    - textbox [ref=e358]: target_price
+                  - cell "delete" [ref=e359]:
+                    - button "delete" [ref=e360] [cursor=pointer]:
+                      - img "delete" [ref=e362]:
+                        - img [ref=e363]
+                - row "report_date date report_date delete" [ref=e365]:
+                  - cell "report_date" [ref=e366]
+                  - cell "date" [ref=e367]:
+                    - generic [ref=e368] [cursor=pointer]:
+                      - generic [ref=e370]:
+                        - combobox [ref=e372]
+                        - generic "date" [ref=e373]
+                      - generic:
+                        - img:
+                          - img
+                  - cell "report_date" [ref=e374]:
+                    - textbox [ref=e376]: report_date
+                  - cell "delete" [ref=e377]:
+                    - button "delete" [ref=e378] [cursor=pointer]:
+                      - img "delete" [ref=e380]:
+                        - img [ref=e381]
+                - row "summary string summary delete" [ref=e383]:
+                  - cell "summary" [ref=e384]
+                  - cell "string" [ref=e385]:
+                    - generic [ref=e386] [cursor=pointer]:
+                      - generic [ref=e388]:
+                        - combobox [ref=e390]
+                        - generic "string" [ref=e391]
+                      - generic:
+                        - img:
+                          - img
+                  - cell "summary" [ref=e392]:
+                    - textbox [ref=e394]: summary
+                  - cell "delete" [ref=e395]:
+                    - button "delete" [ref=e396] [cursor=pointer]:
+                      - img "delete" [ref=e398]:
+                        - img [ref=e399]
+                - row "created_at timestamp created_at delete" [ref=e401]:
+                  - cell "created_at" [ref=e402]
+                  - cell "timestamp" [ref=e403]:
+                    - generic [ref=e404] [cursor=pointer]:
+                      - generic [ref=e406]:
+                        - combobox [ref=e408]
+                        - generic "timestamp" [ref=e409]
+                      - generic:
+                        - img:
+                          - img
+                  - cell "created_at" [ref=e410]:
+                    - textbox [ref=e412]: created_at
+                  - cell "delete" [ref=e413]:
+                    - button "delete" [ref=e414] [cursor=pointer]:
+                      - img "delete" [ref=e416]:
+                        - img [ref=e417]
+            - button "plus Add Property" [ref=e419] [cursor=pointer]:
+              - img "plus" [ref=e421]:
+                - img [ref=e422]
+              - generic [ref=e425]: Add Property
+        - generic [ref=e427]:
+          - button "Finish Later" [ref=e428] [cursor=pointer]:
+            - generic [ref=e429]: Finish Later
+          - generic [ref=e430]:
+            - button "Back" [ref=e431] [cursor=pointer]:
+              - generic [ref=e432]: Back
+            - button "Next" [ref=e433] [cursor=pointer]:
+              - generic [ref=e434]: Next
+  - generic [ref=e440]:
+    - generic "id" [ref=e441] [cursor=pointer]:
+      - generic [ref=e442]: id
+    - generic "analyst_id" [ref=e443] [cursor=pointer]:
+      - generic [ref=e444]: analyst_id
+    - generic "company_id" [ref=e445] [cursor=pointer]:
+      - generic [ref=e446]: company_id
+    - generic "rating" [ref=e447] [cursor=pointer]:
+      - generic [ref=e448]: rating
+    - generic "target_price" [ref=e449] [cursor=pointer]:
+      - generic [ref=e450]: target_price
+    - generic "report_date" [ref=e451] [cursor=pointer]:
+      - generic [ref=e452]: report_date
+    - generic "summary" [ref=e453] [cursor=pointer]:
+      - generic [ref=e454]: summary
+    - generic "created_at" [ref=e455] [cursor=pointer]:
+      - generic [ref=e456]: created_at
+```

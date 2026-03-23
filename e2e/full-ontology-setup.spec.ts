@@ -277,7 +277,7 @@ test.describe.serial('Full Ontology Setup — OT + LT creation', () => {
       datasetName: 'rating_reports',
       displayName: '评级报告',
       pkColumn: 'id',
-      tkColumn: 'title',
+      tkColumn: 'summary',
     });
   });
 
