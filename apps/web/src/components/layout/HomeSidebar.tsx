@@ -46,6 +46,7 @@ export default function HomeSidebar() {
 
   const objectTypeCount = objectTypesData?.total;
   const linkTypeCount = linkTypesData?.total;
+  const propertyCount = allPropertiesData?.total;
 
   const menuItems: MenuProps['items'] = [
     {
