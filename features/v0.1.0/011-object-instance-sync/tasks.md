@@ -140,7 +140,7 @@
 
 ### Phase 6：前端
 
-- [ ] **T010**: API Hooks + i18n
+- [x] **T010**: API Hooks + i18n
   **文件**: `apps/web/src/api/object-instances.ts`, `apps/web/src/locales/en-US/common.json`, `apps/web/src/locales/zh-CN/common.json`
   **逻辑**:
   - API hooks：`useObjectInstances(otRid, page, pageSize)`, `useObjectInstance(otRid, rid)`, `useTriggerSync(otRid)`, `useSyncStatus(otRid)`
