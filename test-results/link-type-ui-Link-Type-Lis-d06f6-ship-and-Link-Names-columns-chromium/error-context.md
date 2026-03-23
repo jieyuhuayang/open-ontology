@@ -1,0 +1,91 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - img "deployment-unit" [ref=e7]:
+          - img [ref=e8]
+        - strong [ref=e11]: Ontology Management
+      - generic [ref=e13]:
+        - img "search" [ref=e15]:
+          - img [ref=e16]
+        - textbox "Search by name, RID, aliases..." [ref=e18]
+        - generic [ref=e20]: ⌘K
+      - generic [ref=e21]:
+        - button "plus New" [ref=e22] [cursor=pointer]:
+          - img "plus" [ref=e24]:
+            - img [ref=e25]
+          - generic [ref=e28]: New
+        - generic [ref=e29] [cursor=pointer]:
+          - img "global" [ref=e30]:
+            - img [ref=e31]
+          - text: English
+    - generic [ref=e33]:
+      - complementary [ref=e34]:
+        - navigation [ref=e36]:
+          - strong [ref=e39]: Default Ontology
+          - menu [ref=e40]:
+            - menuitem "compass Discover" [ref=e41] [cursor=pointer]:
+              - img "compass" [ref=e42]:
+                - img [ref=e43]
+              - generic [ref=e45]: Discover
+            - text: Resources
+            - group [ref=e46]:
+              - menuitem "appstore Object Types 0" [ref=e47] [cursor=pointer]:
+                - img "appstore" [ref=e48]:
+                  - img [ref=e49]
+                - generic [ref=e52]:
+                  - text: Object Types
+                  - generic [ref=e53]: "0"
+              - menuitem "unordered-list Properties" [ref=e54] [cursor=pointer]:
+                - img "unordered-list" [ref=e55]:
+                  - img [ref=e56]
+                - generic [ref=e58]: Properties
+              - menuitem "link Link Types 0" [ref=e59] [cursor=pointer]:
+                - img "link" [ref=e60]:
+                  - img [ref=e61]
+                - generic [ref=e64]:
+                  - text: Link Types
+                  - generic [ref=e65]: "0"
+              - menuitem "thunderbolt Action Types" [ref=e66] [cursor=pointer]:
+                - img "thunderbolt" [ref=e67]:
+                  - img [ref=e68]
+                - generic [ref=e70]: Action Types
+            - text: Data Connection
+            - group [ref=e71]:
+              - menuitem "database Data Connection" [ref=e72] [cursor=pointer]:
+                - img "database" [ref=e73]:
+                  - img [ref=e74]
+                - generic [ref=e76]: Data Connection
+            - menuitem "history History" [ref=e77] [cursor=pointer]:
+              - img "history" [ref=e78]:
+                - img [ref=e79]
+              - generic [ref=e81]: History
+          - button "left" [ref=e82] [cursor=pointer]:
+            - img "left" [ref=e83]:
+              - img [ref=e84]
+      - main [ref=e86]:
+        - main [ref=e87]:
+          - generic [ref=e88]:
+            - generic [ref=e89]:
+              - heading "Link Types" [level=4] [ref=e90]
+              - button "plus New link type" [ref=e91] [cursor=pointer]:
+                - img "plus" [ref=e93]:
+                  - img [ref=e94]
+                - generic [ref=e97]: New link type
+            - generic [ref=e98]:
+              - img "No data" [ref=e100]
+              - generic [ref=e113]:
+                - generic [ref=e114]: Create your first link type
+                - generic [ref=e115]: Link types define semantic relationships between object types.
+              - button "plus New link type" [ref=e117] [cursor=pointer]:
+                - img "plus" [ref=e119]:
+                  - img [ref=e120]
+                - generic [ref=e123]: New link type
+  - generic [ref=e125]:
+    - img "close-circle" [ref=e126]:
+      - img [ref=e127]
+    - generic [ref=e129]: No active working state
+```
