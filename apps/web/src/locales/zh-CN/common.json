@@ -25,7 +25,8 @@
   "detail": {
     "overview": "概览",
     "properties": "属性",
-    "datasources": "数据源"
+    "datasources": "数据源",
+    "instances": "实例"
   },
   "discover": {
     "recentlyViewed": "最近查看的对象类型",
