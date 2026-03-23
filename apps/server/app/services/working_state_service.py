@@ -349,13 +349,24 @@ class WorkingStateService:
         await self._validate_completeness(ws.changes)
         await self._validate_type_compatibility(ws.changes)
 
-        # Apply changes to main tables (OT first, then LinkType, then Property for FK ordering)
-        type_order = {
+        # Apply changes respecting FK ordering:
+        # CREATE/UPDATE: OT → LinkType → Property (parent before child)
+        # DELETE: Property → LinkType → OT (child before parent)
+        create_update_order = {
             ResourceType.OBJECT_TYPE: 0,
             ResourceType.LINK_TYPE: 1,
             ResourceType.PROPERTY: 2,
         }
-        sorted_changes = sorted(ws.changes, key=lambda c: type_order.get(c.resource_type, 99))
+        delete_order = {
+            ResourceType.PROPERTY: 0,
+            ResourceType.LINK_TYPE: 1,
+            ResourceType.OBJECT_TYPE: 2,
+        }
+        non_deletes = [c for c in ws.changes if c.change_type != ChangeType.DELETE]
+        deletes = [c for c in ws.changes if c.change_type == ChangeType.DELETE]
+        non_deletes.sort(key=lambda c: create_update_order.get(c.resource_type, 99))
+        deletes.sort(key=lambda c: delete_order.get(c.resource_type, 99))
+        sorted_changes = non_deletes + deletes
         for change in sorted_changes:
             if change.resource_type == ResourceType.OBJECT_TYPE:
                 await self._apply_object_type_change(change)
