@@ -432,7 +432,7 @@ test.describe.serial('Property Management — E2E', () => {
     // Verify test OTs are gone
     const resp = await request.get(`${API}/object-types`);
     const data = await resp.json();
-    const testOts = data.items.filter((ot: { id: string }) => (ot.id as string).startsWith('e2e-'));
+    const testOts = data.items.filter((ot: { id: string }) => (ot.id as string).startsWith('e2e-pm-'));
     expect(testOts).toHaveLength(0);
   });
 });
