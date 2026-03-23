@@ -318,44 +318,52 @@ class ObjectTypeService:
 
         now = datetime.now(timezone.utc)
 
-        # Cascade: generate DELETE changes for related Properties
+        # Collect all cascade + OT DELETE changes, then batch-add
         from app.storage.property_storage import PropertyStorage
 
+        cascade_changes: list[Change] = []
+
+        # Cascade: Properties
         related_props = await PropertyStorage.list_by_object_type(self._session, rid)
         for prop in related_props:
-            prop_change = Change(
-                id=uuid.uuid4().hex[:12],
-                resource_type=ResourceType.PROPERTY,
-                resource_rid=prop.rid,
-                change_type=ChangeType.DELETE,
-                before={"rid": prop.rid},
-                after=None,
-                timestamp=now,
+            cascade_changes.append(
+                Change(
+                    id=uuid.uuid4().hex[:12],
+                    resource_type=ResourceType.PROPERTY,
+                    resource_rid=prop.rid,
+                    change_type=ChangeType.DELETE,
+                    before=prop.model_dump(mode="json", by_alias=True),
+                    after=None,
+                    timestamp=now,
+                )
             )
-            await self._ws_service.add_change(DEFAULT_ONTOLOGY_RID, prop_change)
 
-        # Cascade: generate DELETE changes for related LinkTypes (AD-4)
+        # Cascade: LinkTypes (AD-4)
         related_lt_rids = await ObjectTypeStorage.get_related_link_type_rids(self._session, rid)
         for lt_rid in related_lt_rids:
-            lt_change = Change(
+            cascade_changes.append(
+                Change(
+                    id=uuid.uuid4().hex[:12],
+                    resource_type=ResourceType.LINK_TYPE,
+                    resource_rid=lt_rid,
+                    change_type=ChangeType.DELETE,
+                    before={"rid": lt_rid},
+                    after=None,
+                    timestamp=now,
+                )
+            )
+
+        # The ObjectType itself
+        cascade_changes.append(
+            Change(
                 id=uuid.uuid4().hex[:12],
-                resource_type=ResourceType.LINK_TYPE,
-                resource_rid=lt_rid,
+                resource_type=ResourceType.OBJECT_TYPE,
+                resource_rid=rid,
                 change_type=ChangeType.DELETE,
-                before={"rid": lt_rid},
+                before=data,
                 after=None,
                 timestamp=now,
             )
-            await self._ws_service.add_change(DEFAULT_ONTOLOGY_RID, lt_change)
-
-        # DELETE the ObjectType itself
-        ot_change = Change(
-            id=uuid.uuid4().hex[:12],
-            resource_type=ResourceType.OBJECT_TYPE,
-            resource_rid=rid,
-            change_type=ChangeType.DELETE,
-            before=data,
-            after=None,
-            timestamp=now,
         )
-        await self._ws_service.add_change(DEFAULT_ONTOLOGY_RID, ot_change)
+
+        await self._ws_service.add_changes(DEFAULT_ONTOLOGY_RID, cascade_changes)
