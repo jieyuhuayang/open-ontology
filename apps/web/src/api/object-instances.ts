@@ -1,42 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/api/client';
+import type {
+  ObjectInstanceItem,
+  ObjectInstanceListResponse,
+  SyncJob,
+} from '@/api/types';
 
-export interface ObjectInstanceItem {
-  rid: string;
-  objectTypeRid: string;
-  primaryKeyValue: string | null;
-  titleValue: string | null;
-  properties: Record<string, unknown>;
-  sourceDatasetRid: string | null;
-  sourceRowIndex: number | null;
-  dataHash: string | null;
-  syncedAt: string;
-  createdAt: string;
-}
-
-export interface ObjectInstanceListResponse {
-  items: ObjectInstanceItem[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
-export interface SyncJobResponse {
-  rid: string;
-  objectTypeRid: string;
-  datasetRid: string;
-  status: 'running' | 'completed' | 'failed';
-  syncType: 'full' | 'incremental';
-  totalRows: number;
-  insertedCount: number;
-  updatedCount: number;
-  deletedCount: number;
-  unchangedCount: number;
-  errorMessage: string | null;
-  startedAt: string;
-  completedAt: string | null;
-  triggeredBy: string;
-}
+export type { ObjectInstanceItem, ObjectInstanceListResponse, SyncJob };
 
 export const instanceKeys = {
   all: ['object-instances'] as const,
@@ -79,9 +49,7 @@ export function useTriggerSync(otRid: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      const { data } = await apiClient.post<SyncJobResponse>(
-        `/object-types/${otRid}/sync`,
-      );
+      const { data } = await apiClient.post<SyncJob>(`/object-types/${otRid}/sync`);
       return data;
     },
     onSuccess: () => {
@@ -95,7 +63,7 @@ export function useSyncStatus(otRid: string) {
   return useQuery({
     queryKey: instanceKeys.syncStatus(otRid),
     queryFn: async () => {
-      const { data } = await apiClient.get<SyncJobResponse | null>(
+      const { data } = await apiClient.get<SyncJob | null>(
         `/object-types/${otRid}/sync/status`,
       );
       return data;
