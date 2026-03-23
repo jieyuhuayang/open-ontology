@@ -18,10 +18,18 @@ export function useWorkingState(ontologyRid: string = DEFAULT_ONTOLOGY_RID) {
   return useQuery({
     queryKey: workingStateKeys.detail(ontologyRid),
     queryFn: async () => {
-      const { data } = await apiClient.get<WorkingState>(
-        `/ontologies/${ontologyRid}/working-state`,
-      );
-      return data;
+      try {
+        const { data } = await apiClient.get<WorkingState>(
+          `/ontologies/${ontologyRid}/working-state`,
+        );
+        return data;
+      } catch (err: unknown) {
+        const status = (err as { response?: { status?: number } })?.response?.status;
+        if (status === 404) {
+          return { changes: [] } as WorkingState;
+        }
+        throw err;
+      }
     },
     retry: false,
     staleTime: 5000,
