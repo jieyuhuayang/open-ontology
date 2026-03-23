@@ -131,7 +131,7 @@
 
 ### Phase 5：OpenAPI + TS 类型重生成
 
-- [ ] **T009**: 重生成 openapi.json + TypeScript 类型
+- [x] **T009**: 重生成 openapi.json + TypeScript 类型
   **文件**: `apps/server/openapi.json`, `apps/web/src/generated/api.ts`
   **逻辑**:
   - 后端：`PYTHONPATH=. uv run python -c "..."` 重生成 openapi.json
