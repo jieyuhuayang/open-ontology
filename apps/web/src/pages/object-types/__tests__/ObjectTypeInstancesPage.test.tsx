@@ -147,7 +147,7 @@ describe('ObjectTypeInstancesPage', () => {
   });
 
   it('renders empty state when no sync record (AC-17)', async () => {
-    syncStatusReturn = () => ({ data: null, isLoading: false });
+    syncStatusReturn.mockReturnValue({ data: null, isLoading: false });
     renderPage();
     await waitFor(() => {
       expect(screen.getByText('No sync has been performed yet')).toBeInTheDocument();
@@ -187,7 +187,7 @@ describe('ObjectTypeInstancesPage', () => {
 
   it('shows configure datasource message when no datasource and no sync (AC-17)', async () => {
     otBackingDatasource = null;
-    syncStatusReturn = () => ({ data: null, isLoading: false });
+    syncStatusReturn.mockReturnValue({ data: null, isLoading: false });
     renderPage();
     await waitFor(() => {
       expect(
