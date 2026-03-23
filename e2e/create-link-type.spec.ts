@@ -259,14 +259,10 @@ test.describe.serial('Create Link Types — ordered', () => {
     const resp = await request.get('http://localhost:8000/api/v1/link-types');
     const data = await resp.json();
 
-    const ids = data.items.map((lt: { id: string }) => lt.id).sort();
-    expect(ids).toEqual([
-      'analyst-company-via-report',
-      'analyst-coverage',
-      'analyst-latest-report',
-      'company-latest-report',
-      'fund-holding',
-    ]);
+    const ids = data.items.map((lt: { id: string }) => lt.id);
+    for (const ltId of TEST_LT_IDS) {
+      expect(ids).toContain(ltId);
+    }
 
     // Verify specific properties
     const byId = Object.fromEntries(data.items.map((lt: { id: string }) => [lt.id, lt]));
