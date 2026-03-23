@@ -177,7 +177,7 @@ describe('ObjectTypeInstancesPage', () => {
 
   it('disables Sync Now when no datasource (AC-20)', async () => {
     otBackingDatasource = null;
-    syncStatusReturn = () => ({ data: mockSyncStatus, isLoading: false });
+    syncStatusReturn.mockReturnValue({ data: mockSyncStatus, isLoading: false });
     renderPage();
     await waitFor(() => {
       const btn = screen.getByText('Sync Now').closest('button');
