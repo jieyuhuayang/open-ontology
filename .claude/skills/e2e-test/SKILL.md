@@ -177,14 +177,18 @@ DEBUG=pw:api npx playwright test e2e/<file>.spec.ts
 | 导出 | 用途 |
 |------|------|
 | `API` | 后端 API 基础 URL 常量 |
+| `ONTOLOGY_RID` | 默认 ontology RID 常量 |
 | `createObjectType(request, id, displayName)` | 创建 Object Type，返回 RID |
 | `createProperty(request, otRid, id, opts?)` | 创建 Property |
+| `createPublishableObjectType(request, id, displayName)` | 创建带 dataset + PK + TK 的完整 OT（用于 publish 流程测试） |
+| `publishChanges(request)` | 发布（保存）所有待处理变更 |
+| `discardAll(request)` | 丢弃所有待处理变更 |
 
 ### `e2e/helpers/fixtures.ts`
 
 | 函数 | 用途 |
 |------|------|
-| `cleanupByPrefix(request, prefix)` | 安全删除指定前缀的 OTs（处理 PK/active 约束） |
+| `cleanupByPrefix(request, prefix)` | 安全删除指定前缀的 OTs（处理 PK/active 约束）。**前缀必须 ≥5 字符**，否则抛错防止误删 |
 
 ---
 
