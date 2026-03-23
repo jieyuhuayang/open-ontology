@@ -5,7 +5,7 @@ Tests validate_api_name() and validate_object_type_id().
 
 import pytest
 
-from app.domain.validators import validate_api_name, validate_object_type_id
+from app.domain.validators import validate_api_name, validate_object_type_id, validate_rid
 from app.exceptions import AppError
 
 
