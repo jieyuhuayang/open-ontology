@@ -105,8 +105,8 @@ test.describe.serial('Link Type UI — List + Detail + Edit', () => {
     await page.waitForLoadState('networkidle');
     await expect(page.locator('.ant-table-thead')).toBeVisible({ timeout: 10000 });
 
-    // Find the row containing our test link type
-    const row = page.locator('.ant-table-tbody tr').filter({ hasText: LINK_ID });
+    // Find the row containing our test link type (search by OT display names since ID column is removed)
+    const row = page.locator('.ant-table-tbody tr').filter({ hasText: 'Company' });
     await expect(row.first()).toBeVisible();
 
     // Should have two .ant-tag elements (OT-A and OT-B names)
