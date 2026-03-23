@@ -42,7 +42,7 @@ export default function ObjectTypeHistoryPage() {
           {pendingChanges.map((change) => (
             <div key={change.id} style={{ padding: '4px 0' }}>
               <Tag color={CHANGE_TYPE_COLORS[change.changeType]}>
-                {change.changeType}
+                {t(CHANGE_TYPE_KEYS[change.changeType] ?? change.changeType)}
               </Tag>
               {displayName(change)}
             </div>
@@ -67,7 +67,7 @@ export default function ObjectTypeHistoryPage() {
               {record.changes.map((change: Change) => (
                 <div key={change.id} style={{ padding: '2px 0' }}>
                   <Tag color={CHANGE_TYPE_COLORS[change.changeType]}>
-                    {change.changeType}
+                    {t(CHANGE_TYPE_KEYS[change.changeType] ?? change.changeType)}
                   </Tag>
                   {displayName(change)}
                 </div>
