@@ -2,8 +2,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { MemoryRouter } from 'react-router-dom';
 import ChangeActions from '@/components/ChangeActions';
 import { useSaveDialogStore } from '@/stores/save-dialog-store';
+
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return { ...actual, useNavigate: () => mockNavigate };
+});
 
 const mockChanges = [
   {
@@ -33,7 +40,6 @@ vi.mock('@/api/working-state', () => ({
 }));
 
 function renderWithProviders() {
-  // Create portal target
   const slot = document.createElement('div');
   slot.id = 'change-status-slot';
   document.body.appendChild(slot);
@@ -41,7 +47,9 @@ function renderWithProviders() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const result = render(
     <QueryClientProvider client={queryClient}>
-      <ChangeActions />
+      <MemoryRouter>
+        <ChangeActions />
+      </MemoryRouter>
     </QueryClientProvider>,
   );
   return { ...result, slot };
@@ -52,15 +60,10 @@ describe('ChangeActions', () => {
     document.body.innerHTML = '';
     useSaveDialogStore.setState({ open: false, activeTab: 'changes' });
     mockMutateAsync.mockClear();
+    mockNavigate.mockClear();
   });
 
-  it('renders Save and Discard buttons when there are changes', () => {
-    renderWithProviders();
-    expect(screen.getByText(/Save \(1\)/)).toBeInTheDocument();
-    expect(screen.getByText(/Discard/)).toBeInTheDocument();
-  });
-
-  it('does not render when there are no changes', async () => {
+  it('always renders History button even without changes', async () => {
     const { useWorkingState } = await import('@/api/working-state');
     vi.mocked(useWorkingState).mockReturnValue({
       data: { changes: [] },
@@ -69,7 +72,9 @@ describe('ChangeActions', () => {
     } as unknown as ReturnType<typeof useWorkingState>);
 
     renderWithProviders();
-    expect(screen.queryByText(/Save/)).not.toBeInTheDocument();
+    expect(screen.getByText('History')).toBeInTheDocument();
+    expect(screen.queryByText(/edits/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Save')).not.toBeInTheDocument();
 
     // Restore
     vi.mocked(useWorkingState).mockReturnValue({
@@ -79,18 +84,44 @@ describe('ChangeActions', () => {
     } as unknown as ReturnType<typeof useWorkingState>);
   });
 
+  it('renders Save, Discard, edits count and History when there are changes', () => {
+    renderWithProviders();
+    expect(screen.getByText('History')).toBeInTheDocument();
+    expect(screen.getByText('1 edits')).toBeInTheDocument();
+    expect(screen.getByText('Save')).toBeInTheDocument();
+    expect(screen.getByText('Discard')).toBeInTheDocument();
+  });
+
+  it('shows +N badge on History button when changes exist', () => {
+    renderWithProviders();
+    expect(screen.getByText('+1')).toBeInTheDocument();
+  });
+
+  it('clicking History navigates to /history', async () => {
+    const user = userEvent.setup();
+    renderWithProviders();
+    await user.click(screen.getByText('History'));
+    expect(mockNavigate).toHaveBeenCalledWith('/history');
+  });
+
+  it('clicking edits count opens save dialog', async () => {
+    const user = userEvent.setup();
+    renderWithProviders();
+    await user.click(screen.getByText('1 edits'));
+    expect(useSaveDialogStore.getState().open).toBe(true);
+  });
+
   it('clicking Save opens dialog', async () => {
     const user = userEvent.setup();
     renderWithProviders();
-    await user.click(screen.getByText(/Save \(1\)/));
+    await user.click(screen.getByText('Save'));
     expect(useSaveDialogStore.getState().open).toBe(true);
   });
 
   it('clicking Discard shows confirm modal', async () => {
     const user = userEvent.setup();
     renderWithProviders();
-    await user.click(screen.getByText(/Discard/));
-    // Ant Design Modal.confirm renders in document.body
+    await user.click(screen.getByText('Discard'));
     expect(document.body.textContent).toContain('Discard all changes?');
   });
 });
