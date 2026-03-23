@@ -159,6 +159,115 @@ const deleteBtn = batchBar.locator('button').filter({ hasText: /Delete|删除/ }
 
 ---
 
+## 陷阱 9：假设 Dataset 列名导致失败
+
+**症状**：`selectAntOption` 在 Properties 步骤选 PK/TK 时找不到选项。
+
+**原因**：不同 dataset 的列名不同（如 rating_reports 没有 `title` 列，实际是 `summary`）。凭假设写列名必然出错。
+
+**修复**：
+```typescript
+// ✅ 写测试前通过 API 查询 dataset 实际列
+const resp = await request.get(`${API}/datasets/${datasetRid}`);
+const data = await resp.json();
+const columnNames = data.columns.map(c => c.name);
+// 然后用实际列名
+
+// ✅ 或在命令行快速查
+// curl -s http://localhost:8000/api/v1/datasets/<rid> | python3 -c "import sys,json; d=json.load(sys.stdin); print([c['name'] for c in d['columns']])"
+```
+
+**教训**：永远不要假设 dataset schema——先查后写。
+
+---
+
+## 陷阱 10：多实体 cleanup 顺序错误
+
+**症状**：`DELETE /object-types/:rid` 返回 400/409，因为仍有 Link Type 引用该 OT。
+
+**原因**：Link Type 持有对 Object Type 的外键引用，必须先删 LT 再删 OT。
+
+**修复**：
+```typescript
+// ✅ 正确的 cleanup 顺序
+test('cleanup', async ({ request }) => {
+  // 1. 删除所有 Link Types（它们引用 OTs）
+  const ltResp = await request.get(`${API}/link-types`);
+  if (ltResp.ok()) {
+    for (const lt of (await ltResp.json()).items) {
+      await request.delete(`${API}/link-types/${lt.rid}`);
+    }
+  }
+
+  // 2. 删除 Object Types（先处理 properties）
+  await cleanupByPrefix(request, PREFIX);
+
+  // 3. 丢弃所有 pending changes
+  await request.delete(`${API}/ontologies/ri.ontology.ontology.default/working-state`);
+});
+```
+
+**规则**：cleanup 顺序 = **依赖关系的逆序**：Link Types → Properties → Object Types → Working State。
+
+---
+
+## 陷阱 11：`inUse` Dataset 导致向导中无法选择
+
+**症状**：点击 dataset 行无反应，或行显示半透明 + 禁止光标。
+
+**原因**：Dataset 已关联到某个 Object Type（`inUse: true`），向导禁止重复绑定。
+
+**修复**：
+```typescript
+// ✅ cleanup 必须先删 OT 释放 dataset，再创建新 OT
+// cleanupByPrefix 删除 OT 后，dataset 自动变为 inUse: false
+await cleanupByPrefix(request, PREFIX);
+```
+
+**注意**：如果是跨 spec 文件共用 dataset，需要确保 spec 之间不会并行运行（已有 `serial` 保证）。
+
+---
+
+## 陷阱 12：BO 链接创建时 API Name 冲突
+
+**症状**：创建 Backing Object 链接时，Step 2 提交失败，提示 API Name 冲突。
+
+**原因**：BO 链接的 sideA/sideB 自动生成的 API Name（如 `gongSi`、`yanJiuYuan`）与已存在的 FK 链接冲突。
+
+**修复**：
+```typescript
+// ✅ 在 Step 2 手动修改 API Name 避免冲突
+const sideAApiName = page.locator('.ant-card').nth(0).locator('input').nth(1);
+await sideAApiName.clear();
+await sideAApiName.fill('boCompany');  // 加前缀区分
+
+const sideBApiName = page.locator('.ant-card').nth(1).locator('input').nth(1);
+await sideBApiName.clear();
+await sideBApiName.fill('boAnalyst');
+```
+
+**规则**：当同一对 OT 间有多个链接时，后创建的必须自定义 API Name。
+
+---
+
+## 陷阱 13：BO 链接的 Side Link 可能自动选中
+
+**症状**：手动选择 side link 时报错或选了错误选项，因为已经自动选中。
+
+**原因**：当某个方向只有一个符合条件的 M:1 链接时，wizard 会自动选中。
+
+**修复**：
+```typescript
+// ✅ 先检查是否已自动选中，未选中时才手动选
+const sideALinkSelect = modal.locator('.ant-select').nth(3);
+const hasValue = await sideALinkSelect.locator('.ant-select-selection-item').count();
+if (hasValue === 0) {
+  await selectAntOption(page, sideALinkSelect, 'analyst-latest-report');
+}
+```
+
+---
+
 ## 快速诊断表
 
 | 错误关键词 | 可能原因 | 首先检查 |
