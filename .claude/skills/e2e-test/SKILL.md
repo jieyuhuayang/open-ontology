@@ -81,6 +81,7 @@ e2e/helpers/
 
 **⚠️ 强制生成规则**：
 
+0. **先查后写**：涉及 Dataset 列名时，必须先通过 API 查询实际 schema（`GET /api/v1/datasets/<rid>`），**禁止假设列名**
 1. **数据隔离**：测试数据 ID 统一 `e2e-<feature>-` 前缀
 2. **共享 helpers**：导入 `e2e/helpers/antd.ts` 的函数，**禁止在文件内重新定义** `selectAntOption` 等
 3. **i18n 安全**：用户可见文本用 `/English|中文/` 双语 RegExp
