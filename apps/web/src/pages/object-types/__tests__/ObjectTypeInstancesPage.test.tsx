@@ -45,8 +45,8 @@ const mockInstances = {
   pageSize: 20,
 };
 
-let syncStatusReturn: ReturnType<typeof vi.fn> = vi.fn();
-let instancesReturn: ReturnType<typeof vi.fn> = vi.fn();
+let syncStatusReturn = vi.fn();
+let instancesReturn = vi.fn();
 
 vi.mock('@/api/object-instances', () => ({
   useObjectInstances: (..._args: unknown[]) => instancesReturn(),
