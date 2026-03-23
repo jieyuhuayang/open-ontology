@@ -8,7 +8,7 @@ import time
 import aiomysql
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.common import generate_rid
+from app.domain.common import generate_rid, quote_mysql_identifier
 from app.domain.constants import DEFAULT_ONTOLOGY_RID, DEFAULT_USER_ID
 from app.domain.serialization import serialize_value
 from app.domain.dataset import Dataset, LiveDatasetCreateRequest
