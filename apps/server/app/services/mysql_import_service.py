@@ -238,10 +238,11 @@ class MySQLImportService:
             password,
         )
         try:
+            tbl = quote_mysql_identifier(table)
             async with conn.cursor(aiomysql.DictCursor) as cur:
-                await cur.execute(f"SELECT * FROM `{table}` LIMIT %s", (limit,))
+                await cur.execute(f"SELECT * FROM {tbl} LIMIT %s", (limit,))
                 rows = await cur.fetchall()
-                await cur.execute(f"SELECT COUNT(*) FROM `{table}`")
+                await cur.execute(f"SELECT COUNT(*) FROM {tbl}")
                 count_row = await cur.fetchone()
                 total = count_row["COUNT(*)"] if count_row else 0
             return MySQLTablePreview(columns=columns, rows=rows, total_rows=total)
