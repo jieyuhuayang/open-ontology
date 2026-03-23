@@ -140,6 +140,7 @@ class TestDatasetServiceDelete:
         svc = DatasetService(mock_session)
         with (
             patch.object(svc, "get_in_use_map", return_value={}),
+            patch.object(svc, "_is_join_table_dataset", new_callable=AsyncMock, return_value=None),
             patch("app.services.dataset_service.DatasetStorage.delete") as mock_delete,
         ):
             await svc.delete("ri.ontology.dataset.ds1")
