@@ -720,6 +720,7 @@
     "objectTypes": "对象类型",
     "properties": "属性",
     "linkTypes": "链接类型",
-    "pendingChanges": "待处理变更"
+    "pendingChanges": "待处理变更",
+    "missingDisplayName": "{{type}}: 缺少展示名称"
   }
 }
