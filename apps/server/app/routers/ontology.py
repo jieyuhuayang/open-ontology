@@ -6,6 +6,7 @@ from starlette.responses import Response
 
 from app.database import get_db_session
 from app.domain.working_state import ChangeRecord, HistoryListResponse, WorkingState
+from app.domain.validators import validate_rid
 from app.exceptions import AppError
 from app.services.working_state_service import WorkingStateService
 
