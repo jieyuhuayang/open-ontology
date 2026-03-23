@@ -1169,7 +1169,19 @@ Ontology 还支持**日期和时间格式化**，以及user ID 格式化、resou
 
 #### 6.1.1 保存更改
 
-在本体管理平台（Ontology Manager）中进行的任何更改，都会先以本地进行中（work-in-progress）的状态保存。要让这些本体更改对其他人可见，并在面向用户的应用中生效，必须保存更改。保存更改的步骤如下：
+在本体管理平台（Ontology Manager）中进行的任何更改，都会先以本地进行中（work-in-progress）的状态保存。要让这些本体更改对其他人可见，并在面向用户的应用中生效，必须保存更改。
+
+系统追踪的变更覆盖三类本体资源的三种操作：
+
+| 资源类型 | 追踪的操作 |
+|---------|-----------|
+| 对象类型（Object Type） | 创建（Created）、修改（Modified）、删除（Deleted） |
+| 属性（Property） | 创建（Created）、修改（Modified）、删除（Deleted） |
+| 链接类型（Link Type） | 创建（Created）、修改（Modified）、删除（Deleted） |
+
+在 **Review edits（审阅编辑）** 对话框中，变更按资源类型分组展示，每组标题显示该组的变更数量；每条变更包含资源名称和操作类型标签（Created / Modified / Deleted）。
+
+保存更改的步骤如下：
 
 1. 在应用右上角的应用标题栏中选择 **Save（保存）**。
 
