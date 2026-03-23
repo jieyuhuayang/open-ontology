@@ -100,15 +100,15 @@
 
 ## 5. 前端状态管理与缓存
 
-- [ ] 🟡 **5.1 staleTime 策略不一致**
+- [x] 🟡 **5.1 staleTime 策略不一致**
   search 30s 缓存 vs OT 无 staleTime，修改 OT 后搜索结果可能延迟更新。
   `api/search.ts:20`, `api/working-state.ts:36`
 
-- [ ] 🟡 **5.2 LT 删除缺少 properties 缓存失效**
+- [x] 🟡 **5.2 LT 删除缺少 properties 缓存失效**
   BO LinkType 删除可能级联清理属性，但 `propertyKeys` 未失效。
   `api/link-types.ts:116-117`
 
-- [ ] 🟢 **5.3 useWorkingState 404→null 语义模糊**
+- [x] 🟢 **5.3 useWorkingState 404→null 语义模糊**
   无法区分"无草稿"和"网络错误"，消费方处理是否正确。
   `api/working-state.ts:22-34`
 
