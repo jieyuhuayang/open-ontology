@@ -36,8 +36,10 @@ test.describe.serial('Object Instance Sync — E2E', () => {
       `${PREFIX}employee`,
       'E2E Sync Employee',
     );
+  });
 
-    // OT WITHOUT datasource
+  test('setup: create OT without datasource (after publish)', async ({ request }) => {
+    // Create AFTER publish so it doesn't block the incomplete validation
     const nodsResp = await request.post(`${API}/object-types`, {
       data: {
         id: `${PREFIX}no-ds`,
