@@ -39,6 +39,7 @@
   - 创建索引：`ix_sj_ot`(object_type_rid)
   - 在 `models.py` 新增 `ObjectInstanceModel` 和 `SyncJobModel` ORM 类
   - 运行 `alembic upgrade head` 验证
+  - Downgrade 方案：`drop table sync_jobs; drop table object_instances;`（含索引），标准可逆迁移
   **依赖**: 无
 
 - [ ] **T002**: Domain 模型 + Storage 层
