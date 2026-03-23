@@ -410,3 +410,48 @@ npx playwright test --reporter=list
 - **结论**: 误报（已有保护）
 - **分析**: `mysql_import_service.py` 在 `start_import()` 中有 `_MAX_IMPORT_ROWS = 100_000` 硬限制。`fetchall()` 执行前先 `SELECT COUNT(*)` 校验行数，超限返回 `ROW_LIMIT_EXCEEDED` 错误。100K 行 × 20 列 ≈ 30-40MB 内存，在 Python 进程限制范围内。
 - **日期**: 2026-03-24
+
+### 9.1 discard_single_change 无级联场景测试
+- **结论**: 已修复（与 1.1 同步完成）
+- **修复内容**: 在 `test_history_service.py` 中新增 `test_discard_ot_delete_cascades_property_and_lt_deletes`，覆盖撤销 OT DELETE 后级联移除 Property/LT DELETE 变更
+- **日期**: 2026-03-24
+
+### 9.2 前端 components 测试覆盖
+- **结论**: 延后 v0.2.0
+- **分析**: 实际覆盖率约 50%（13/22 组件文件有测试）。核心交互组件（SaveDialog、Layout、Search）覆盖 67%+。缺失的主要是细粒度展示组件（ChangeStateBadge、DynamicIcon、StatusBadge 等），复杂度低且不影响 MVP 核心流程。
+- **日期**: 2026-03-24
+
+### 9.3 并发场景无测试
+- **结论**: 延后 v0.2.0
+- **分析**: 并发竞态条件在单元测试层难以有效复现。4.1 的 `SELECT ... FOR UPDATE` 行锁已在数据库层面防止并发写入冲突。MVP 为单用户单 worker 部署，并发风险极低。v0.2.0 可用集成测试模拟并发 `add_change` 场景。
+- **日期**: 2026-03-24
+
+### 9.4 object_sync 边界测试不足
+- **结论**: 延后 v0.2.0
+- **分析**: 当前测试覆盖 happy path + 主要 error path（约 70%，6 个 AC 测试用例）。缺失的是压力场景（大数据量）、NULL 主键处理、特殊字符等边界。MVP 数据量有限，这些边界问题通常在实际使用中发现。
+- **日期**: 2026-03-24
+
+### 9.5 E2E 缺数据连接页面测试
+- **结论**: 延后 v0.2.0
+- **分析**: `object-instance-sync.spec.ts` 已覆盖 dataset 导入和 sync 基本流程。MySQL 连接管理 CRUD 和 Live Connection 模式无专项 E2E。MVP 阶段数据连接功能相对独立，缺少 E2E 不影响其他页面回归验证。
+- **日期**: 2026-03-24
+
+### 10.1 in-method import 规避循环依赖
+- **结论**: 延后 v0.2.0
+- **分析**: 确认 8 处方法内 import（working_state_service 3 处、dataset_service 2 处、mysql_import_service 3 处等）。根本原因是服务间双向依赖链（working_state → object_sync → mysql_import → dataset → working_state）。延迟导入不影响运行时性能，仅影响代码可读性。v0.2.0 可通过事件/回调系统或重组服务边界解耦。
+- **日期**: 2026-03-24
+
+### 10.2 camelCase→snake_case key_map 三处重复
+- **结论**: 延后 v0.2.0
+- **分析**: `_apply_object_type_change`、`_apply_link_type_change`、`_apply_property_change` 各维护独立的 key_map。其中 `lastModifiedAt`/`lastModifiedBy`、`status` 等字段在多处重复。但每个 key_map 有特定上下文（OT 有 `backingDatasource`、LT 有嵌套 `sideA/sideB`），提取公共 map 需仔细设计。当前 MVP 字段稳定，维护风险可控。
+- **日期**: 2026-03-24
+
+### 10.3 Alembic downgrade 实质性缺失
+- **结论**: 误报（downgrade 已完善）
+- **分析**: 扫描全部 10 个迁移文件，除 `0001_initial.py`（初始迁移合理使用 `pass`）外，其余 9 个迁移均有实质性 downgrade 操作（DROP TABLE、DROP COLUMN、DROP TRIGGER 等）。
+- **日期**: 2026-03-24
+
+### 10.4 property_service.py 行数评估
+- **结论**: MVP 可接受
+- **分析**: 当前 718 行、16 个方法。所有方法围绕 Property CRUD，内聚性强。复杂度主要集中在 `create`（96 行）和 `update`（153 行），包含多层校验和 PK/TK 级联逻辑。在 Python FastAPI 项目中属中等规模，未触发严重耦合。v0.2.0 可考虑提取 `PropertyValidator` 类降至 ~600 行。
+- **日期**: 2026-03-24
