@@ -156,6 +156,73 @@ const card = page.locator('[role="button"]').filter({ hasText: /Many to One|多�
 await card.first().click();
 ```
 
+## Multi-Step Wizard（Modal 内多步骤向导）
+
+```typescript
+// ── 通用向导导航 ──
+
+// Next 按钮（Step 0~N-1）
+const nextBtn = page.locator('.ant-modal-footer .ant-btn-primary')
+  .filter({ hasText: /Next|下一步/ });
+await expect(nextBtn).toBeEnabled({ timeout: 5000 });
+await nextBtn.click();
+
+// Create/Submit 按钮（最后一步）
+const createBtn = page.locator('.ant-modal-footer .ant-btn-primary')
+  .filter({ hasText: /Create|创建/ });
+await createBtn.click();
+
+// ── OT 创建向导（5 步）──
+
+// Step 0 - Datasource：点击表格行选择 dataset
+const modal = page.locator('.ant-modal-content');
+const dsRow = modal.locator('.ant-table-row').filter({ hasText: 'companies' });
+await dsRow.first().click();
+
+// Step 1 - Metadata：填写 displayName（第 2 个 form item，第 1 个是 icon）
+const formItems = modal.locator('.ant-form-item');
+await formItems.nth(1).locator('input').fill('公司');
+
+// Step 2 - Properties：PK/TK Select（自动映射了 dataset 列）
+await selectAntOption(page, modal.locator('.ant-select').first(), 'id');      // PK
+await selectAntOption(page, modal.locator('.ant-select').nth(1), 'name');     // TK
+
+// Step 3 - Actions：通常直接 Next 跳过
+// Step 4 - Save Location：点击 Create
+
+// ── LT 创建向导（3 步）──
+
+// Step 0 - Cardinality：选卡片
+const card = page.locator('[role="button"]').filter({ hasText: /Many to One|多对一/ });
+await card.first().click();
+
+// M:N 子选择器（仅 many-to-many 时出现）
+const simpleCard = page.locator('[role="button"]')
+  .filter({ hasText: /Simple Relationship|简单关系/ });
+await simpleCard.first().click();
+
+// Step 1 - OT 选择 + 配置（Select 索引因模式不同而异）
+// FK 模式：nth(0)=SideA, nth(1)=SideB, nth(2)=FK Property
+// JT 模式：nth(0)=SideA, nth(1)=SideB, nth(2)=Dataset, nth(3)=ColA, nth(4)=ColB
+// BO 模式：nth(0)=SideA, nth(1)=BackingOT, nth(2)=SideB, nth(3)=SideLinkA, nth(4)=SideLinkB
+
+// BO 模式：先检查 side link 是否自动选中
+const sideLinkSelect = modal.locator('.ant-select').nth(3);
+const hasValue = await sideLinkSelect.locator('.ant-select-selection-item').count();
+if (hasValue === 0) {
+  await selectAntOption(page, sideLinkSelect, 'analyst-latest-report');
+}
+
+// Step 2 - ID + Names
+const idInput = page.locator('input[placeholder*="e.g."]');
+await idInput.fill('my-link-id');
+
+// 修改 API Name（避免冲突时）：Card 内第 2 个 input
+const apiNameInput = page.locator('.ant-card').nth(0).locator('input').nth(1);
+await apiNameInput.clear();
+await apiNameInput.fill('customApiName');
+```
+
 ## 通用定位技巧
 
 ```typescript
