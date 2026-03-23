@@ -199,7 +199,11 @@ class SearchService:
         return SearchTypeResult(items=items, total=len(seen_rids))
 
     async def _search_link_types(
-        self, ontology_rid: str, query: str, limit: int
+        self,
+        ontology_rid: str,
+        query: str,
+        limit: int,
+        merged: list[tuple[dict, ChangeState]],
     ) -> SearchTypeResult:
         db_results = await SearchStorage.search_link_types(
             self._session, ontology_rid, query, limit
