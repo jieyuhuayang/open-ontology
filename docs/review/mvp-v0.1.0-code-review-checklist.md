@@ -136,19 +136,19 @@
 
 ## 7. 安全性
 
-- [ ] 🔴 **7.1 MySQL import SQL 注入风险**
+- [x] 🔴 **7.1 MySQL import SQL 注入风险**
   f-string 构造 SQL `f"SELECT {cols_sql} FROM \`{table}\`"`，table 名含反引号时可注入。
   `mysql_import_service.py:472-474`
 
-- [ ] 🔴 **7.2 Live Dataset 预览 SQL 注入风险**
+- [x] 🔴 **7.2 Live Dataset 预览 SQL 注入风险**
   `dataset_service._get_live_preview()` 中同样使用 f-string 构造 SQL。
   `dataset_service.py:186-191`
 
-- [ ] 🟡 **7.3 ENCRYPTION_KEY 空值重启丢失**
+- [x] 🟡 **7.3 ENCRYPTION_KEY 空值重启丢失**
   自动生成 key 进程重启后变化，已加密的 MySQL 连接密码无法解密。
   `crypto_service.py:12-44`, `config.py:8`
 
-- [ ] 🟡 **7.4 文件上传临时目录无清理机制**
+- [x] 🟡 **7.4 文件上传临时目录无清理机制**
   长期运行积累垃圾文件，无后台 cron 清理。
   `file_import_service.py`, `config.py:9-11`
 
