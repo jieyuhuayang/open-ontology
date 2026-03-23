@@ -1,0 +1,193 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - img "deployment-unit" [ref=e7]:
+        - img [ref=e8]
+      - strong [ref=e11]: Ontology Management
+    - generic [ref=e13]:
+      - img "search" [ref=e15]:
+        - img [ref=e16]
+      - textbox "Search by name, RID, aliases..." [ref=e18]
+      - generic [ref=e20]: ⌘K
+    - generic [ref=e21]:
+      - button "plus New" [ref=e22] [cursor=pointer]:
+        - img "plus" [ref=e24]:
+          - img [ref=e25]
+        - generic [ref=e28]: New
+      - generic [ref=e29] [cursor=pointer]:
+        - img "global" [ref=e30]:
+          - img [ref=e31]
+        - text: English
+  - generic [ref=e33]:
+    - complementary [ref=e34]:
+      - complementary [ref=e35]:
+        - navigation [ref=e37]:
+          - link "arrow-left Back home" [ref=e39] [cursor=pointer]:
+            - /url: /link-types
+            - img "arrow-left" [ref=e40]:
+              - img [ref=e41]
+            - text: Back home
+          - generic [ref=e44]:
+            - img "api" [ref=e45]:
+              - img [ref=e46]
+            - strong [ref=e48]: e2e-lt-ui-coverage
+            - generic [ref=e49]: Experimental
+            - generic [ref=e50]: New
+            - button "more" [ref=e51] [cursor=pointer]:
+              - img "more" [ref=e53]:
+                - img [ref=e54]
+          - menu [ref=e56]:
+            - menuitem "file-text Overview" [ref=e57] [cursor=pointer]:
+              - img "file-text" [ref=e58]:
+                - img [ref=e59]
+              - generic [ref=e62]: Overview
+    - main [ref=e63]:
+      - main [ref=e64]:
+        - generic [ref=e65]:
+          - generic [ref=e68]:
+            - generic [ref=e71]:
+              - generic [ref=e72]: Status
+              - generic [ref=e73]:
+                - generic [ref=e74] [cursor=pointer]:
+                  - generic [ref=e75]:
+                    - radio "Experimental" [checked]
+                  - text: Experimental
+                - generic [ref=e76] [cursor=pointer]:
+                  - generic [ref=e77]:
+                    - radio "Active"
+                  - text: Active
+                - generic [ref=e78] [cursor=pointer]:
+                  - generic [ref=e79]:
+                    - radio "Deprecated"
+                  - text: Deprecated
+            - generic [ref=e80]:
+              - generic [ref=e82]:
+                - generic [ref=e83]: ID
+                - generic [ref=e84]:
+                  - text: e2e-lt-ui-coverage
+                  - button "Copy" [ref=e85] [cursor=pointer]:
+                    - img "copy" [ref=e86]:
+                      - img [ref=e87]
+              - generic [ref=e90]:
+                - generic [ref=e91]: RID
+                - generic [ref=e92]:
+                  - text: ri.ontology.link-type.d02767811279
+                  - button "Copy" [ref=e93] [cursor=pointer]:
+                    - img "copy" [ref=e94]:
+                      - img [ref=e95]
+          - generic [ref=e97]:
+            - heading "Configuration" [level=5] [ref=e98]
+            - generic [ref=e101]:
+              - generic [ref=e102]:
+                - generic [ref=e103]: Join Method
+                - generic [ref=e104]:
+                  - generic [ref=e107]:
+                    - img "key" [ref=e109]:
+                      - img [ref=e110]
+                    - strong [ref=e113]: Foreign Key
+                  - generic [ref=e116]:
+                    - img "table" [ref=e118]:
+                      - img [ref=e119]
+                    - generic [ref=e121]: Join Table
+                  - generic [ref=e124]:
+                    - img "appstore" [ref=e126]:
+                      - img [ref=e127]
+                    - generic [ref=e129]: Backing Object
+              - separator [ref=e130]
+              - generic [ref=e131]:
+                - generic [ref=e132]: Cardinality — Many to One
+                - generic [ref=e133]:
+                  - link "Company" [ref=e134] [cursor=pointer]:
+                    - /url: /object-types/ri.ontology.object-type.738ec49ba69a
+                    - strong [ref=e138]: Company
+                  - generic [ref=e139]:
+                    - generic [ref=e140]: "N"
+                    - generic [ref=e143]: "1"
+                  - link "Analyst" [ref=e144] [cursor=pointer]:
+                    - /url: /object-types/ri.ontology.object-type.a6e65762023b
+                    - strong [ref=e148]: Analyst
+                - generic [ref=e150]: "FK: e2e-lt-ui-analyst-id"
+          - generic [ref=e151]:
+            - heading "Company → Analyst" [level=5] [ref=e152]
+            - generic [ref=e153]:
+              - generic [ref=e157]:
+                - link "Company" [ref=e159] [cursor=pointer]:
+                  - /url: /object-types/ri.ontology.object-type.738ec49ba69a
+                  - generic [ref=e160]: Company
+                - img "arrow-right" [ref=e162]:
+                  - img [ref=e163]
+                - link "Analyst" [ref=e166] [cursor=pointer]:
+                  - /url: /object-types/ri.ontology.object-type.a6e65762023b
+                  - generic [ref=e167]: Analyst
+              - generic [ref=e169]:
+                - generic [ref=e170]: Each Company has one Analyst
+                - generic [ref=e171]:
+                  - generic [ref=e172]: Display Name
+                  - textbox [ref=e173]: Coverage
+                - generic [ref=e174]:
+                  - generic [ref=e175]: API Name
+                  - generic [ref=e176]:
+                    - code [ref=e178]: Company.
+                    - textbox [ref=e179]: coverage
+                    - code [ref=e181]: .get()
+                - generic [ref=e182]:
+                  - generic [ref=e183]: Visibility
+                  - generic [ref=e184] [cursor=pointer]:
+                    - generic [ref=e186]:
+                      - combobox [ref=e188]
+                      - generic "Normal" [ref=e189]
+                    - generic:
+                      - img:
+                        - img
+                - generic [ref=e190]:
+                  - generic [ref=e191]: FK Property
+                  - code [ref=e193]: e2e-lt-ui-analyst-id
+          - generic [ref=e194]:
+            - heading "Analyst → Company" [level=5] [ref=e195]
+            - generic [ref=e196]:
+              - generic [ref=e200]:
+                - link "Analyst" [ref=e202] [cursor=pointer]:
+                  - /url: /object-types/ri.ontology.object-type.a6e65762023b
+                  - generic [ref=e203]: Analyst
+                - img "arrow-right" [ref=e205]:
+                  - img [ref=e206]
+                - link "Company" [ref=e209] [cursor=pointer]:
+                  - /url: /object-types/ri.ontology.object-type.738ec49ba69a
+                  - generic [ref=e210]: Company
+              - generic [ref=e212]:
+                - generic [ref=e213]: Each Analyst has many Company
+                - generic [ref=e214]:
+                  - generic [ref=e215]: Display Name
+                  - textbox [ref=e216]: Analysts
+                - generic [ref=e217]:
+                  - generic [ref=e218]: API Name
+                  - generic [ref=e219]:
+                    - code [ref=e221]: Analyst.
+                    - textbox [ref=e222]: analysts
+                    - code [ref=e224]: .all()
+                - generic [ref=e225]:
+                  - generic [ref=e226]: Visibility
+                  - generic [ref=e227] [cursor=pointer]:
+                    - generic [ref=e229]:
+                      - combobox [ref=e231]
+                      - generic "Normal" [ref=e232]
+                    - generic:
+                      - img:
+                        - img
+          - generic [ref=e235]:
+            - generic [ref=e236]:
+              - generic [ref=e237]: Created At
+              - text: 3/23/2026, 11:56:20 AM
+            - generic [ref=e238]:
+              - generic [ref=e239]: Created By
+              - text: default
+            - generic [ref=e240]:
+              - generic [ref=e241]: Last Modified At
+              - text: 3/23/2026, 11:56:20 AM
+            - generic [ref=e242]:
+              - generic [ref=e243]: Last Modified By
+              - text: default
+```

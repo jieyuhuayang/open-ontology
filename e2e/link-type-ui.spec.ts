@@ -228,7 +228,7 @@ test.describe.serial('Link Type UI — List + Detail + Edit', () => {
     expect(await visibilityLabels.count()).toBeGreaterThanOrEqual(2);
 
     // FK property should be shown for the FK side
-    await expect(page.getByText(`${TEST_PREFIX}-analyst-id`)).toBeVisible();
+    await expect(page.getByText(`${TEST_PREFIX}-analyst-id`).first()).toBeVisible();
   });
 
   test('detail: Section 6 — Audit info card', async ({ page }) => {
