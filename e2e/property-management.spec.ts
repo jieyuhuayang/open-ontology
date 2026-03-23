@@ -27,7 +27,7 @@ test.describe.serial('Property Management — E2E', () => {
   // ──────── Setup ────────
   test('setup: create object types and properties', async ({ request }) => {
     // Clean any leftover test data
-    await cleanupByPrefix(request, 'e2e-');
+    await cleanupByPrefix(request, 'e2e-pm-');
 
     // Create two object types
     otRidA = await createObjectType(request, 'e2e-employee', 'E2E Employee');
@@ -427,7 +427,7 @@ test.describe.serial('Property Management — E2E', () => {
 
   // ──────── Cleanup ────────
   test('cleanup: delete test object types', async ({ request }) => {
-    await cleanupByPrefix(request, 'e2e-');
+    await cleanupByPrefix(request, 'e2e-pm-');
 
     // Verify test OTs are gone
     const resp = await request.get(`${API}/object-types`);
