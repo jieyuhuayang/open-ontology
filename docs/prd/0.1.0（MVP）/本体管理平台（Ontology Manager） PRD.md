@@ -1394,3 +1394,18 @@ Ontology 还支持**日期和时间格式化**，以及user ID 格式化、resou
 
 Ontology Manager 中的对象类型创建/编辑流程通过选择平台内已有 Dataset 来关联底层数据集，不再内嵌数据导入向导。
 
+### 8.1 数据从外部到实例的完整流转
+
+Data Connection 模块不仅负责将外部数据引入平台（创建 Dataset），还在 Publish 后为 Ontology Manager 提供数据读取能力，将 Dataset 数据同步为对象实例。完整的数据流转路径如下：
+
+```
+外部数据源 ──→ Data Connection（导入/连接）──→ Dataset ──→ OT 关联 ──→ [Publish] ──→ 对象实例
+```
+
+两种数据模式的流转路径略有不同：
+
+- **快照模式**：外部数据源 → 一次性导入到平台内部 → Dataset（含完整数据副本）→ Publish 后从内部读取 → 同步为对象实例
+- **实时连接模式**：外部数据源 ← 按需实时查询 ← Live Dataset（仅 schema 元数据）→ Publish 后实时查询外部 → 同步为对象实例
+
+关于 Publish 后自动同步的详细行为，见 [§6.1.7 保存后的数据同步](#617-保存后的数据同步)。关于 Dataset 的创建、管理和连接配置，见独立的《[数据连接（Data Connection）PRD](数据连接（Data Connection）PRD.md)》。
+
