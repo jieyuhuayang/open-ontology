@@ -411,3 +411,115 @@ interface ChangeRecord {
 3. `active` 状态的链接类型不能删除，不能修改 apiName
 4. Many-to-Many 链接类型需要 join table 数据源
 5. 对象支撑链接需要先建立两条 many-to-one 链接作为前置条件
+
+---
+
+## v0.2.0 Agent Domain Model（Agent 领域模型）
+
+v0.2.0 引入 Agent 辅助本体构建能力，新增以下领域实体。完整不变量见 `features/v0.2.0/release-contract.md`（INV-10 ~ INV-16）。
+
+### AgentSession（Agent 会话）
+
+```typescript
+interface AgentSession {
+  rid: string;                     // 系统唯一标识
+  ontologyRid: string;             // 关联的 Ontology
+  userId?: string;                 // 发起用户（预留，当前 nullable）
+  title?: string;                  // 会话标题
+  domain?: string;                 // 业务领域提示
+  goal?: string;                   // 会话目标
+  scopeHint?: string;              // 范围提示
+  status: SessionStatus;           // active → completed | failed | cancelled
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+enum SessionStatus {
+  Active = "active",               // 进行中
+  Completed = "completed",         // 正常结束
+  Failed = "failed",               // 异常终止
+  Cancelled = "cancelled",         // 用户取消
+}
+```
+
+**规则**: 单用户同一时间仅 1 个 active 会话（INV-12）。
+
+### AgentMessage（Agent 消息）
+
+```typescript
+interface AgentMessage {
+  rid: string;
+  sessionRid: string;              // 所属会话
+  role: MessageRole;               // user | assistant | system
+  content: string;                 // 消息内容
+  metadata: Record<string, any>;   // 扩展元数据
+  createdAt: Timestamp;
+}
+
+enum MessageRole {
+  User = "user",
+  Assistant = "assistant",
+  System = "system",
+}
+```
+
+### AgentAuditLog（Agent 审计日志）
+
+```typescript
+interface AgentAuditLog {
+  rid: string;
+  sessionRid?: string;             // 关联会话（可选）
+  action: string;                  // 操作类型
+  details: Record<string, any>;    // 操作详情（JSONB）
+  createdAt: Timestamp;
+}
+```
+
+### Blueprint（蓝图）— F014 定义，尚未实现
+
+```typescript
+interface Blueprint {
+  rid: string;
+  sessionRid: string;              // 生成此蓝图的 Agent 会话
+  ontologyRid: string;
+  status: BlueprintStatus;         // draft → pending_review → applied | discarded
+  items: BlueprintItem[];
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+enum BlueprintStatus {
+  Draft = "draft",
+  PendingReview = "pending_review",
+  Applied = "applied",
+  Discarded = "discarded",
+}
+```
+
+**规则**: 蓝图只能 pending_review → applied，且需至少 1 个 accepted/edited 项（INV-10）。Apply 按依赖顺序：ObjectType → Property → LinkType（INV-15）。
+
+### BlueprintItem（蓝图项）— F014 定义，尚未实现
+
+```typescript
+interface BlueprintItem {
+  rid: string;
+  blueprintRid: string;
+  resourceType: "ObjectType" | "Property" | "LinkType";
+  action: "create" | "update";
+  payload: Record<string, any>;    // 建议的资源定义
+  confidence: number;              // 0.0-1.0 置信度（INV-16）
+  reasoning: string;               // 推理来源标签（INV-16）
+  userDecision?: "accepted" | "edited" | "rejected";  // 人工审查决定（INV-11: 单向）
+}
+```
+
+### SSE 事件模型
+
+Agent 流式通信使用 Server-Sent Events，定义以下事件类型：
+
+| 事件类型 | 数据结构 | 说明 |
+|---------|---------|------|
+| `text_delta` | `{ text: string }` | 增量文本输出 |
+| `plan_step` | `{ step: string, index: number, total: number }` | Agent 规划步骤 |
+| `done` | `{ sessionRid: string, summary: string }` | 对话完成 |
+| `error` | `{ code: string, message: string }` | 错误事件 |
