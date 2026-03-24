@@ -62,7 +62,7 @@
   - Alembic 迁移：`upgrade()` 创建 3 张表 + 2 个索引；`downgrade()` 按反序删除
   **依赖**: 无
 
-- [ ] **T003**: Storage 层实现
+- [x] **T003**: Storage 层实现
   **文件**: `apps/server/app/storage/agent_storage.py`
   **逻辑**:
   - `AgentStorage` 类，接收 `AsyncSession`
