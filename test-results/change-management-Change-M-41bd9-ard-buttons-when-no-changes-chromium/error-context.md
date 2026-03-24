@@ -13,69 +13,84 @@
       - textbox "Search by name, RID, aliases..." [ref=e18]
       - generic [ref=e20]: ⌘K
     - generic [ref=e21]:
-      - button "history History" [ref=e26] [cursor=pointer]:
-        - img "history" [ref=e28]:
-          - img [ref=e29]
-        - generic [ref=e31]: History
-      - button "plus New" [ref=e32] [cursor=pointer]:
-        - img "plus" [ref=e34]:
-          - img [ref=e35]
-        - generic [ref=e38]: New
-      - generic [ref=e39] [cursor=pointer]:
-        - img "global" [ref=e40]:
-          - img [ref=e41]
+      - generic [ref=e23]:
+        - generic [ref=e25]:
+          - button "history History" [ref=e26] [cursor=pointer]:
+            - img "history" [ref=e28]:
+              - img [ref=e29]
+            - generic [ref=e31]: History
+          - superscript [ref=e32]:
+            - generic [ref=e33]:
+              - generic [ref=e34]: +
+              - generic [ref=e35]: "8"
+        - generic [ref=e36]: 8 edits
+        - button "Discard" [ref=e38] [cursor=pointer]:
+          - generic [ref=e39]: Discard
+        - button "Save" [ref=e41] [cursor=pointer]:
+          - generic [ref=e42]: Save
+      - button "plus New" [ref=e43] [cursor=pointer]:
+        - img "plus" [ref=e45]:
+          - img [ref=e46]
+        - generic [ref=e49]: New
+      - generic [ref=e50] [cursor=pointer]:
+        - img "global" [ref=e51]:
+          - img [ref=e52]
         - text: English
-  - generic [ref=e43]:
-    - complementary [ref=e44]:
-      - navigation [ref=e46]:
-        - strong [ref=e49]: Default Ontology
-        - menu [ref=e50]:
-          - menuitem "compass Discover" [ref=e51] [cursor=pointer]:
-            - img "compass" [ref=e52]:
-              - img [ref=e53]
-            - generic [ref=e55]: Discover
+  - generic [ref=e54]:
+    - complementary [ref=e55]:
+      - navigation [ref=e57]:
+        - strong [ref=e60]: Default Ontology
+        - menu [ref=e61]:
+          - menuitem "compass Discover" [ref=e62] [cursor=pointer]:
+            - img "compass" [ref=e63]:
+              - img [ref=e64]
+            - generic [ref=e66]: Discover
           - text: Resources
-          - group [ref=e56]:
-            - menuitem "appstore Object Types 4" [ref=e57] [cursor=pointer]:
-              - img "appstore" [ref=e58]:
-                - img [ref=e59]
-              - generic [ref=e62]:
+          - group [ref=e67]:
+            - menuitem "appstore Object Types 6" [ref=e68] [cursor=pointer]:
+              - img "appstore" [ref=e69]:
+                - img [ref=e70]
+              - generic [ref=e73]:
                 - text: Object Types
-                - generic [ref=e63]: "4"
-            - menuitem "unordered-list Properties 33" [ref=e64] [cursor=pointer]:
-              - img "unordered-list" [ref=e65]:
-                - img [ref=e66]
-              - generic [ref=e69]:
+                - generic [ref=e74]: "6"
+            - menuitem "unordered-list Properties 39" [ref=e75] [cursor=pointer]:
+              - img "unordered-list" [ref=e76]:
+                - img [ref=e77]
+              - generic [ref=e80]:
                 - text: Properties
-                - generic [ref=e70]: "33"
-            - menuitem "link Link Types 5" [ref=e71] [cursor=pointer]:
-              - img "link" [ref=e72]:
-                - img [ref=e73]
-              - generic [ref=e76]:
+                - generic [ref=e81]: "39"
+            - menuitem "link Link Types 5" [ref=e82] [cursor=pointer]:
+              - img "link" [ref=e83]:
+                - img [ref=e84]
+              - generic [ref=e87]:
                 - text: Link Types
-                - generic [ref=e77]: "5"
-            - menuitem "thunderbolt Action Types" [ref=e78] [cursor=pointer]:
-              - img "thunderbolt" [ref=e79]:
-                - img [ref=e80]
-              - generic [ref=e82]: Action Types
+                - generic [ref=e88]: "5"
+            - menuitem "thunderbolt Action Types" [ref=e89] [cursor=pointer]:
+              - img "thunderbolt" [ref=e90]:
+                - img [ref=e91]
+              - generic [ref=e93]: Action Types
           - text: Data Connection
-          - group [ref=e83]:
-            - menuitem "database Data Connection" [ref=e84] [cursor=pointer]:
-              - img "database" [ref=e85]:
-                - img [ref=e86]
-              - generic [ref=e88]: Data Connection
-          - menuitem "history History" [ref=e89] [cursor=pointer]:
-            - img "history" [ref=e90]:
-              - img [ref=e91]
-            - generic [ref=e93]: History
-        - button "left" [ref=e94] [cursor=pointer]:
-          - img "left" [ref=e95]:
-            - img [ref=e96]
-    - main [ref=e98]:
-      - main [ref=e99]:
-        - generic [ref=e100]:
-          - heading "Recently viewed object types" [level=4] [ref=e102]
-          - generic [ref=e103]:
-            - img "No data" [ref=e105]
-            - generic [ref=e117]: No recently viewed object types
+          - group [ref=e94]:
+            - menuitem "database Data Connection" [ref=e95] [cursor=pointer]:
+              - img "database" [ref=e96]:
+                - img [ref=e97]
+              - generic [ref=e99]: Data Connection
+          - menuitem "history History" [ref=e100] [cursor=pointer]:
+            - img "history" [ref=e101]:
+              - img [ref=e102]
+            - generic [ref=e104]: History
+        - button "edit Unsaved changes (8)" [ref=e105] [cursor=pointer]:
+          - img "edit" [ref=e106]:
+            - img [ref=e107]
+          - text: Unsaved changes (8)
+        - button "left" [ref=e109] [cursor=pointer]:
+          - img "left" [ref=e110]:
+            - img [ref=e111]
+    - main [ref=e113]:
+      - main [ref=e114]:
+        - generic [ref=e115]:
+          - heading "Recently viewed object types" [level=4] [ref=e117]
+          - generic [ref=e118]:
+            - img "No data" [ref=e120]
+            - generic [ref=e132]: No recently viewed object types
 ```
