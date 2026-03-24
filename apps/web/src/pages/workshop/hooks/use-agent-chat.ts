@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { blueprintKeys } from '@/api/blueprints';
 import { useWorkshopStore } from '../stores/workshop-store';
@@ -11,7 +11,7 @@ interface AgentMessage {
   content: string;
 }
 
-interface UseAgentChatReturn {
+export interface UseAgentChatReturn {
   messages: AgentMessage[];
   streamingText: string;
   isStreaming: boolean;
@@ -31,50 +31,63 @@ export function useAgentChat(
   const abortRef = useRef<AbortController | null>(null);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const reconnectDelayRef = useRef(1000);
+  const streamingTextRef = useRef('');
   const queryClient = useQueryClient();
 
   const store = useWorkshopStore.getState;
+
+  // Cleanup on unmount: abort active stream + clear reconnect timer
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleEvent = useCallback(
     (event: SSEEvent) => {
       switch (event.type) {
         case 'text-delta':
-          setStreamingText((prev) => prev + event.data.text);
+          streamingTextRef.current += event.data.text;
+          setStreamingText(streamingTextRef.current);
           break;
         case 'plan-step':
-          useWorkshopStore.getState().addPlanStep(event.data);
+          store().addPlanStep(event.data);
           break;
         case 'blueprint-item':
-          useWorkshopStore.getState().addPendingCrystallization(event.data);
+          store().addPendingCrystallization(event.data);
           queryClient.invalidateQueries({ queryKey: blueprintKeys.lists() });
           break;
         case 'blueprint-complete':
-          useWorkshopStore.getState().setPageState('blueprint_pending');
+          store().setPageState('blueprint_pending');
           break;
-        case 'done':
-          setStreamingText((prev) => {
-            if (prev) {
-              setMessages((msgs) => [
-                ...msgs,
-                {
-                  rid: `assistant-${Date.now()}`,
-                  role: 'assistant',
-                  content: prev,
-                },
-              ]);
-            }
-            return '';
-          });
+        case 'done': {
+          const finalText = streamingTextRef.current;
+          if (finalText) {
+            setMessages((msgs) => [
+              ...msgs,
+              {
+                rid: `assistant-${Date.now()}`,
+                role: 'assistant',
+                content: finalText,
+              },
+            ]);
+          }
+          streamingTextRef.current = '';
+          setStreamingText('');
           setIsStreaming(false);
-          useWorkshopStore.getState().setConnectionStatus('idle');
+          store().setConnectionStatus('idle');
           break;
+        }
         case 'error':
           setIsStreaming(false);
-          useWorkshopStore.getState().setConnectionStatus('idle');
+          store().setConnectionStatus('idle');
           break;
       }
     },
-    [queryClient],
+    [queryClient, store],
   );
 
   const startStream = useCallback(
@@ -86,12 +99,12 @@ export function useAgentChat(
       abortRef.current = controller;
 
       setIsStreaming(true);
+      streamingTextRef.current = '';
       setStreamingText('');
       store().setConnectionStatus('connected');
       store().setPageState('analyzing');
       reconnectDelayRef.current = 1000;
 
-      // Add user message
       setMessages((msgs) => [
         ...msgs,
         { rid: `user-${Date.now()}`, role: 'user', content },
@@ -125,7 +138,6 @@ export function useAgentChat(
           }
         }
 
-        // Process any remaining buffer
         const remaining = parser.feed('\n\n');
         for (const event of remaining) {
           handleEvent(event);
@@ -133,7 +145,6 @@ export function useAgentChat(
       } catch (err) {
         if ((err as Error).name === 'AbortError') return;
 
-        // Start reconnection with exponential backoff
         store().setConnectionStatus('reconnecting');
         setIsStreaming(false);
 
@@ -149,8 +160,6 @@ export function useAgentChat(
               delay * 2,
               MAX_RECONNECT_DELAY,
             );
-            // In a real implementation, we'd retry the connection here.
-            // For now, escalate to disconnected after max delay.
             store().setConnectionStatus('disconnected');
           }, delay);
         };
