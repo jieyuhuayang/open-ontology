@@ -1128,7 +1128,9 @@ oo working-state save --message "初始本体创建"
 
 所有命令支持 `--format json|table` 输出切换，默认输出简明纯文本（LLM-Native，详见 §4.5 设计原则）。
 
-### deepagents Skill 定义示例
+### SKILL.md 知识定义（唯一知识源）
+
+SKILL.md 是 Agent 的"操作手册"——描述何时/如何调用 `oo` CLI 命令，本身不实现任何逻辑。所有 SKILL.md 统一存放在 `apps/server/app/agent/skills/` 目录下：
 
 ```
 skills/
@@ -1170,23 +1172,43 @@ description: 在本体中创建一个新的对象类型，包括其属性定义�
 - 属性的 apiName 格式：camelCase
 - 支持的 baseType: string, integer, double, boolean, date, timestamp, long, float, short, byte, decimal, geohash, geoshape, marking, attachment, mediaReference
 
+## 对应 CLI
+
+`oo object-type create --name <displayName> [--api-name <apiName>] [--description <desc>]`
+
+属性通过后续命令逐个添加：
+`oo property create --object-type <rid> --name <displayName> --api-name <apiName> --type <baseType>`
+
 ## 使用场景
 
 当 Agent 分析资料后识别到一个新的业务实体需要在本体中表示时调用此 Skill。
 ```
 
-### Claude Code Skills
+### Claude Code Skills（薄壳封装）
 
-```
-.claude/skills/
-├── ontology-create/
-│   └── SKILL.md          # /ontology-create: 快速创建对象类型
-├── ontology-analyze/
-│   └── SKILL.md          # /ontology-analyze: 分析文件生成蓝图
-├── ontology-validate/
-│   └── SKILL.md          # /ontology-validate: 校验本体一致性
-└── ontology-blueprint/
-    └── SKILL.md          # /ontology-blueprint: 蓝图管理
+Claude Code Skills 不独立定义能力——它们是 SKILL.md 在 IDE 中的快捷入口，内部调用 `oo` CLI 命令。每个 Claude Code Skill 与一个或多个 deepagents SKILL.md 对应：
+
+| Claude Code Skill | 对应 SKILL.md | 实际执行 |
+|---|---|---|
+| `/ontology-create` | `create-object-type` + `create-link-type` | `oo object-type create` / `oo link-type create` |
+| `/ontology-analyze` | `analyze-materials` + `generate-blueprint` | `oo blueprint analyze` |
+| `/ontology-validate` | `validate-ontology` | `oo validate` |
+| `/ontology-blueprint` | `generate-blueprint` | `oo blueprint list/show/apply` |
+| `/ontology-search` | `search-ontology` | `oo search` |
+| `/ontology-optimize` | `optimize-ontology` | `oo validate` + Agent 建议 |
+
+示例 `.claude/skills/ontology-create/SKILL.md`：
+
+```markdown
+---
+name: ontology-create
+description: 在本体中创建对象类型或链接类型
+---
+
+使用 `oo` CLI 命令创建本体资源。参数约束详见 deepagents Skill 定义。
+
+对象类型：`oo object-type create --name <名称> [--api-name <API名>] [--description <描述>]`
+链接类型：`oo link-type create --name <名称> --side-a-object <A> --side-b-object <B> --cardinality <基数>`
 ```
 
 ---
