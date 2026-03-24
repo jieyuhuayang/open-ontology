@@ -105,6 +105,7 @@
   - `MessageList.tsx`: 可滚动容器（flex:1, overflow-y:auto），渲染 MessageBubble 数组。新消息自动滚动到底部（useEffect + scrollIntoView）
   - `ChatInput.tsx`: 底部固定输入框（Ant Design Input.TextArea 暗色主题）+ 发送按钮（Paper Plane 图标）+ 📎 上传触发按钮。props: onSend(content), onUploadClick, disabled(流式中禁用), placeholder。按 Enter 发送（Shift+Enter 换行）
   - 所有用户可见字符串使用 `t('workshop.xxx')`
+  **测试**: 由 T022 补充 ChatInput 渲染测试（验证 Enter 发送、Shift+Enter 换行、disabled 状态禁用发送按钮）
   **覆盖 AC**: AC-08, AC-12
   **依赖**: T004
 
