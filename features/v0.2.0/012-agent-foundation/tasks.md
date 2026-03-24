@@ -176,6 +176,7 @@
     - `get_checkpointer() → AsyncPostgresSaver`：创建/复用 PostgresCheckpointer 实例
   - `prompts/ontology_builder.md`：基础 system prompt（本体构建 Agent 角色定义）
   - `skills/.gitkeep`：空目录占位
+  - `main.py`：在 lifespan 中调用 `AsyncPostgresSaver.setup()` 初始化 checkpoint 表（checkpoint setup 必须在应用启动时完成）
   **测试**: T008 全部通过
   **覆盖 AC**: AC-17, AC-18, AC-19, AC-20
   **依赖**: T001
