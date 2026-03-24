@@ -260,7 +260,14 @@ class BlueprintService:
     # --- Apply ---
 
     async def apply(self, rid: str) -> BlueprintApplyResult:
-        bp_orm = await self._get_blueprint_or_404(rid)
+        # Use row-level lock to prevent concurrent apply
+        bp_orm = await BlueprintStorage.get_for_update(self._session, rid)
+        if bp_orm is None:
+            raise AppError(
+                code="BLUEPRINT_NOT_FOUND",
+                message=f"Blueprint '{rid}' not found",
+                status_code=404,
+            )
 
         # INV-10: must be pending_review
         if bp_orm.status != BlueprintStatus.PENDING_REVIEW.value:
