@@ -99,7 +99,8 @@ Discover page customization, object type groups, shared properties, Action Type 
 |-------|-------|-----------------|
 | Frontend | React 18+ TS, Ant Design 5.x, TanStack Query v5, Zustand v5, Vite | pnpm |
 | Backend | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy 2.0 async + asyncpg | uv |
-| Database | PostgreSQL 16+, PG Full-Text Search (no Elasticsearch for MVP) | — |
+| Agent/CLI | deepagents, LangGraph checkpoint, Typer, Rich | uv |
+| Database | PostgreSQL 16+, PG Full-Text Search (no Elasticsearch) | — |
 | Testing | pytest + pytest-asyncio (backend), Vitest (frontend unit), Playwright (E2E) | — |
 | Monorepo | Just (justfile) as task runner | — |
 
