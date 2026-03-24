@@ -197,6 +197,10 @@ class ValidationService:
 | | `--cardinality` | 是 | one-to-one / one-to-many / many-to-one / many-to-many |
 | `list` | `--object-type` | 否 | 按 OT 筛选 |
 | `get` | `<rid>` | 是 | |
+| `update` | `<rid>` | 是 | |
+| | `--side-a-name`, `--side-a-api-name` | 否 | Side A 可更新字段 |
+| | `--side-b-name`, `--side-b-api-name` | 否 | Side B 可更新字段 |
+| | `--status` | 否 | 资源状态 |
 | `delete` | `<rid>` | 是 | |
 
 ### 6.5 dataset 命令组
