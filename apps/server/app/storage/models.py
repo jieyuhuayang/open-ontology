@@ -569,3 +569,75 @@ class AgentAuditLogModel(Base):
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     session = relationship("AgentSessionModel", back_populates="audit_logs")
+
+
+# ---------------------------------------------------------------------------
+# Material & Blueprint Models (v0.2.0 — F014)
+# ---------------------------------------------------------------------------
+
+
+class AgentMaterialModel(Base):
+    __tablename__ = "agent_materials"
+    __table_args__ = (Index("idx_agent_materials_session", "session_rid"),)
+
+    rid = Column(Text, primary_key=True)
+    session_rid = Column(Text, ForeignKey("agent_sessions.rid", ondelete="CASCADE"), nullable=False)
+    file_name = Column(Text, nullable=False)
+    file_type = Column(Text, nullable=False)
+    file_size = Column(Integer, nullable=False)
+    storage_path = Column(Text, nullable=False)
+    analysis_status = Column(Text, nullable=False, server_default="pending")
+    analysis_result = Column(JSONB, nullable=True)
+    error_message = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    session = relationship("AgentSessionModel", backref="materials")
+
+
+class BlueprintModel(Base):
+    __tablename__ = "blueprints"
+    __table_args__ = (
+        Index("idx_blueprints_session", "session_rid"),
+        Index("idx_blueprints_ontology", "ontology_rid"),
+    )
+
+    rid = Column(Text, primary_key=True)
+    session_rid = Column(Text, ForeignKey("agent_sessions.rid", ondelete="CASCADE"), nullable=False)
+    ontology_rid = Column(Text, ForeignKey("ontologies.rid"), nullable=False)
+    name = Column(Text, nullable=False)
+    status = Column(Text, nullable=False, server_default="draft")
+    source_summary = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+    session = relationship("AgentSessionModel", backref="blueprints")
+    items = relationship(
+        "BlueprintItemModel", back_populates="blueprint", cascade="all, delete-orphan"
+    )
+
+
+class BlueprintItemModel(Base):
+    __tablename__ = "blueprint_items"
+    __table_args__ = (Index("idx_blueprint_items_blueprint", "blueprint_rid", "sort_order"),)
+
+    rid = Column(Text, primary_key=True)
+    blueprint_rid = Column(Text, ForeignKey("blueprints.rid", ondelete="CASCADE"), nullable=False)
+    item_type = Column(Text, nullable=False)
+    suggestion = Column(JSONB, nullable=False)
+    confidence = Column(sa.Float, nullable=False)
+    confidence_level = Column(Text, nullable=False)
+    reasoning = Column(Text, nullable=True)
+    source = Column(Text, nullable=False)
+    user_decision = Column(Text, nullable=True)
+    user_edits = Column(JSONB, nullable=True)
+    rejection_reason = Column(Text, nullable=True)
+    created_entity_rid = Column(Text, nullable=True)
+    sort_order = Column(Integer, nullable=False, server_default="0")
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+    blueprint = relationship("BlueprintModel", back_populates="items")
