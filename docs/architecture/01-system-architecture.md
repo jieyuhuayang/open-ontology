@@ -141,7 +141,7 @@ Security Service (安全服务)
 
 ```
 Ontology Manager (Web UI)
-├── MVP 的核心交付物
+├── v0.1.0 的核心交付物
 ├── 基于 React 的 SPA
 ├── 提供 Object Type / Link Type / Property 的可视化管理
 └── 变更管理、搜索、导入导出
@@ -152,17 +152,30 @@ REST API (通用 API)
 ├── 供第三方应用集成
 └── 供 OSDK 的后端支撑
 
+Agent Engine (AI 辅助本体构建) [v0.2.0]
+├── 基于 deepagents 框架的 Agent 引擎
+├── SSE (Server-Sent Events) 流式通信
+├── Agent 会话管理 + 消息持久化
+├── SKILL.md 知识体系（16+ 预定义技能，L1/L2/L3 分层）
+└── 详见 features/v0.2.0/012-agent-foundation/spec.md
+
+oo CLI (统一能力层) [v0.2.0]
+├── 基于 Typer 的命令行工具
+├── 所有本体操作的统一入口（object-type, property, link-type, search, validate 等）
+├── Agent 通过 CLI 执行破坏性操作（INV-14: 需人工授权）
+└── 详见 features/v0.2.0/013-cli-and-skills/spec.md
+
 MCP Server (Agent 接口)
 ├── 实现 Model Context Protocol
 ├── 将 Ontology 暴露为 Resources + Tools + Prompts
 ├── 供 AI Agent 框架（Claude Code, LangChain 等）接入
-└── 详见 03-agent-context-architecture.md
+└── 后续版本实现，详见 03-agent-context-architecture.md
 
 OSDK (Code Generation)
 ├── 从 Ontology Schema 生成类型安全的 SDK
 ├── 支持 TypeScript / Python
 ├── 供开发者以编程方式操作 Ontology
-└── 后期功能，MVP 不实现
+└── 后期功能
 ```
 
 ## Key Architecture Decisions
