@@ -72,6 +72,10 @@ F012 是 v0.2.0 的基础设施层，为后续所有 Agent 相关 feature（F013
 | AC-20 | 开发者 | `.env` 未设置 `ANTHROPIC_API_KEY` 时调用 chat | 422，错误码 `LLM_NOT_CONFIGURED`，消息 "LLM API key not configured" |
 | **Token 预算** | | | |
 | AC-21 | 用户 | 单会话 token 消耗接近配置上限（默认 100K） | SSE 流发送 `error` 事件（code: `TOKEN_BUDGET_EXCEEDED`），Agent 停止响应 |
+| **会话状态转换** | | | |
+| AC-23 | 用户 | DELETE 一个 active 会话 | 会话 status 变为 `cancelled`，然后删除（级联删除 messages 和 audit_logs） |
+| AC-24 | 系统 | Agent 完成回复（done 事件发送后） | 会话 status 保持 `active`（用户可继续对话）；仅用户显式关闭或删除时才变为 completed/cancelled |
+| AC-25 | 用户 | POST `/api/v1/agent/sessions/{rid}/complete` 关闭会话 | 200，会话 status 从 `active` 变为 `completed`，此后新会话可创建（INV-12 释放） |
 | **安全约束** | | | |
 | AC-22 | 用户 | POST chat 消息 content 超过 4096 字符 | 422，错误码 `MESSAGE_TOO_LONG` |
 
