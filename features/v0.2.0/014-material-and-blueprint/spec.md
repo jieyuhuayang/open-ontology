@@ -108,7 +108,7 @@ F014 还包含文件解析器模块（parsers），作为 deepagents 可调用�
 | **SSE 事件** | | | |
 | AC-40 | Agent | Agent 生成蓝图项时通过 SSE 发送 blueprint-item 事件 | 前端可实时接收蓝图项数据 |
 | AC-41 | Agent | 蓝图生成完成时通过 SSE 发送 blueprint-complete 事件 | 前端可感知蓝图生成完毕 |
-| AC-42 | 系统 | 素材上传完成后通过 SSE 发送 material-uploaded 事件 | 前端可感知文件上传状态 |
+| AC-42 | 系统 | SSE 事件格式定义：material-uploaded 事件类型及数据结构 | 事件格式化函数可用，待 F015 Workshop SSE 集成时通过活跃连接推送 |
 | **CLI 命令** | | | |
 | AC-43 | 开发者 | `oo blueprint list --session-rid <rid>` | 输出蓝图列表（纯文本格式） |
 | AC-44 | 开发者 | `oo blueprint show <rid>` | 输出蓝图详情 + 所有蓝图项 |
