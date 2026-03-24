@@ -388,8 +388,21 @@ class WorkingStateService:
             )
 
         # Phase 2: completeness + type compatibility validation
-        await self._validate_completeness(ws.changes)
-        await self._validate_type_compatibility(ws.changes)
+        # Delegated to ValidationService (extracted in F013)
+        from app.services.validation_service import ValidationService
+
+        validation_svc = ValidationService(self._session)
+        issues = await validation_svc._check_completeness(ws.changes)
+        issues.extend(await validation_svc._check_type_compatibility(ws.changes, ontology_rid))
+        errors = [i for i in issues if i.severity == "error"]
+        if errors:
+            first = errors[0]
+            raise AppError(
+                code=first.code,
+                message=first.message,
+                status_code=400,
+                details={"resource_rid": first.resource_rid} if first.resource_rid else {},
+            )
 
         # Apply changes respecting FK ordering:
         # CREATE/UPDATE: OT → LinkType → Property (parent before child)
