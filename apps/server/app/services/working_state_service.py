@@ -246,7 +246,7 @@ class WorkingStateService:
                 return (data, state)
         return None
 
-    async def _has_mapped_properties(self, ot_rid: str, changes: list[Change]) -> bool:
+    async def has_mapped_properties(self, ot_rid: str, changes: list[Change]) -> bool:
         """Check if OT has at least one property with backingColumn set.
 
         Must account for DELETE changes that remove mapped properties and
