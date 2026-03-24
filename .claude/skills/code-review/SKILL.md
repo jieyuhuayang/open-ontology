@@ -70,7 +70,7 @@ codex exec -s read-only --ephemeral "$(cat /tmp/code-review-prompt.md)" > /tmp/c
 
 For all modes:
 ```bash
-gemini -p "$(cat /tmp/code-review-prompt.md)" --approval-mode plan -o text > /tmp/code-review-gemini.md 2>&1
+gemini -p "$(cat /tmp/code-review-prompt.md)" --sandbox=none -o text > /tmp/code-review-gemini.md 2>&1
 ```
 
 **Important**: Set a timeout of 300000ms (5 minutes) for the gemini call.
