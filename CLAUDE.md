@@ -141,6 +141,7 @@ cd apps/web && pnpm dev
 - **禁止同步 SQLAlchemy** — 必须使用 async session + asyncpg
 - **禁止在前端手写 API 类型** — 必须从 openapi.json 生成
 - **禁止将服务端数据放入 Zustand** — 服务端状态属于 TanStack Query cache
+- **Agent/CLI 禁止直接访问 storage** — 必须通过 services 层操作数据
 
 ### 命名规范
 
