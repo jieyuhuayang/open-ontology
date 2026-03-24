@@ -22,17 +22,22 @@ apps/
 │   ├── app/services/                 # 业务逻辑，事务边界
 │   ├── app/domain/                   # Pydantic 模型，纯逻辑，无 I/O
 │   ├── app/storage/                  # SQLAlchemy 查询，返回 domain 模型
+│   ├── app/agent/                    # Agent 引擎（deepagents + SSE + prompts + skills）
+│   ├── cli/                          # `oo` CLI 入口（Typer，8 个命令模块）
 │   ├── alembic/                      # 数据库迁移
 │   ├── tests/                        # 测试（unit/ + integration/）
 │   └── openapi.json                  # 提交产物——路由变更后重新生成
 docs/
 ├── architecture/                     # 00~06 架构设计文档 + README
+├── operations/                       # 运维操作文档
 ├── prd/                              # 产品需求文档 + UI 设计截图
+├── review/                           # 代码审查记录
 ├── specs/                            # 领域模型规格（术语、属性类型、元数据等）
 └── research/                         # 技术调研笔记
 features/                             # SDD 特性目录
 ├── _templates/                       # spec / tasks 模板
-└── v0.1.0/                           # 001 ~ 011 特性包
+├── v0.1.0/                           # 001 ~ 011 特性包（已完成）
+└── v0.2.0/                           # 012 ~ 019 特性包 + release-contract.md
 e2e/                                  # Playwright E2E 测试
 ├── helpers/                          # 共享工具（antd.ts, api.ts, fixtures.ts）
 └── *.spec.ts                         # 测试文件
