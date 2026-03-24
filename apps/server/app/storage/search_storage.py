@@ -167,6 +167,7 @@ class SearchStorage:
                 LinkTypeModel.ontology_rid == ontology_rid,
                 LinkTypeModel.search_vector.op("@@")(tsquery),
             )
+            .options(selectinload(LinkTypeModel.endpoints))
             .order_by(text("rank DESC"))
             .limit(limit)
         )
