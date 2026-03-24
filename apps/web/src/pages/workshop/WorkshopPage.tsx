@@ -5,16 +5,15 @@ import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useObjectTypes } from '@/api/object-types';
 import { useWorkshopStore } from './stores/workshop-store';
 import { useAgentChat } from './hooks/use-agent-chat';
+import { useWorkshopGraph } from './hooks/use-workshop-graph';
 import ChatPanel from './components/ChatPanel';
 import StarfieldWorkbench from './components/StarfieldWorkbench';
 import SidekickPanel from './components/SidekickPanel';
 import EntityPopover from './components/EntityPopover';
 import EntityDrawer from './components/EntityDrawer';
 import ConnectionBanner from './components/ConnectionBanner';
-import { useWorkshopGraph } from './hooks/use-workshop-graph';
 import styles from './styles/workshop.module.css';
 
-// TODO: get from context or route param; for now use a default
 const DEFAULT_ONTOLOGY_RID = 'ri.ontology.main.default';
 
 export function Component() {
@@ -38,10 +37,10 @@ export function Component() {
     }
   }, [otData, currentSessionRid, pageState, setPageState]);
 
-  // Agent chat for reconnect
-  const { reconnect } = useAgentChat(currentSessionRid);
+  // Single instance of useAgentChat — shared by ChatPanel and ConnectionBanner
+  const agentChat = useAgentChat(currentSessionRid);
 
-  // Graph data for entity exploration
+  // Single instance of useWorkshopGraph — shared by StarfieldWorkbench, EntityPopover, EntityDrawer
   const { nodes, edges } = useWorkshopGraph(DEFAULT_ONTOLOGY_RID, null);
 
   // Reset store on unmount
@@ -53,19 +52,20 @@ export function Component() {
 
   return (
     <div className={styles.workshopPage}>
-      {/* Back button */}
       <Link to="/" className={styles.backButton} data-testid="back-button">
         <LeftOutlined />
         <span>{t('workshop.backToManager')}</span>
       </Link>
 
-      {/* Left: Chat Panel */}
       <div
         className={`${styles.chatPanel} ${!isChatPanelExpanded ? styles.chatPanelCollapsed : ''}`}
         data-testid="chat-panel"
       >
         {isChatPanelExpanded && (
-          <ChatPanel ontologyRid={DEFAULT_ONTOLOGY_RID} />
+          <ChatPanel
+            ontologyRid={DEFAULT_ONTOLOGY_RID}
+            agentChat={agentChat}
+          />
         )}
         <div
           className={`${styles.panelToggle} ${styles.chatToggle}`}
@@ -76,17 +76,12 @@ export function Component() {
         </div>
       </div>
 
-      {/* Center: Canvas Area */}
       <div className={styles.canvasArea} data-testid="canvas-area">
-        <StarfieldWorkbench
-          ontologyRid={DEFAULT_ONTOLOGY_RID}
-          blueprintRid={null}
-        />
+        <StarfieldWorkbench nodes={nodes} edges={edges} />
         <EntityPopover nodes={nodes} />
-        <ConnectionBanner onReconnect={reconnect} />
+        <ConnectionBanner onReconnect={agentChat.reconnect} />
       </div>
 
-      {/* Right: Sidekick Panel */}
       <div
         className={`${styles.sidekickPanel} ${!isSidekickOpen ? styles.sidekickPanelClosed : ''}`}
         data-testid="sidekick-panel"
@@ -115,7 +110,6 @@ export function Component() {
         </div>
       )}
 
-      {/* Entity Drawer (renders as portal) */}
       <EntityDrawer nodes={nodes} edges={edges} />
     </div>
   );
