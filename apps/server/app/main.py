@@ -67,6 +67,8 @@ app.add_exception_handler(AppError, app_error_handler)
 
 app.include_router(health.router)
 app.include_router(agent.router)
+app.include_router(materials.router)
+app.include_router(blueprints.router)
 app.include_router(object_types.router)
 app.include_router(properties.router)
 app.include_router(link_types.router)
