@@ -258,7 +258,7 @@
   **覆盖 AC**: AC-08, AC-09, AC-11, AC-12, AC-14, AC-22
   **依赖**: T013, T007
 
-- [ ] **T015**: Chat 端点实现
+- [x] **T015**: Chat 端点实现
   **文件**: `apps/server/app/routers/agent.py`（追加到 T007 创建的文件）
   **逻辑**:
   - `POST /chat` 端点：
