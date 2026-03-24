@@ -41,13 +41,11 @@ _SAMPLE_OT = ObjectTypeWithChangeState(
     change_state=ChangeState.CREATED,
 )
 
+_MOD = "cli.commands.object_type"
 
-@patch("cli.commands.object_type._create_service")
-def test_create_success(mock_factory: AsyncMock) -> None:
-    mock_svc = AsyncMock()
-    mock_svc.create.return_value = _SAMPLE_OT
-    mock_factory.return_value = (mock_svc, AsyncMock())
 
+@patch(f"{_MOD}._do_create", new_callable=AsyncMock, return_value=_SAMPLE_OT)
+def test_create_success(mock_do: AsyncMock) -> None:
     result = runner.invoke(app, ["object-type", "create", "--name", "Order"])
     assert result.exit_code == 0
     assert "Created object type" in result.output
@@ -55,13 +53,10 @@ def test_create_success(mock_factory: AsyncMock) -> None:
     assert "ri.ontology.object-type.abc123" in result.output
 
 
-@patch("cli.commands.object_type._create_service")
-def test_create_with_api_name(mock_factory: AsyncMock) -> None:
-    mock_svc = AsyncMock()
+@patch(f"{_MOD}._do_create", new_callable=AsyncMock)
+def test_create_with_api_name(mock_do: AsyncMock) -> None:
     ot = _SAMPLE_OT.model_copy(update={"api_name": "OrderV2"})
-    mock_svc.create.return_value = ot
-    mock_factory.return_value = (mock_svc, AsyncMock())
-
+    mock_do.return_value = ot
     result = runner.invoke(
         app, ["object-type", "create", "--name", "Order", "--api-name", "OrderV2"]
     )
@@ -69,66 +64,45 @@ def test_create_with_api_name(mock_factory: AsyncMock) -> None:
     assert "OrderV2" in result.output
 
 
-@patch("cli.commands.object_type._create_service")
-def test_list(mock_factory: AsyncMock) -> None:
-    mock_svc = AsyncMock()
-    mock_svc.list.return_value = ObjectTypeListResponse(
-        items=[_SAMPLE_OT], total=1, page=1, page_size=20
-    )
-    mock_factory.return_value = (mock_svc, AsyncMock())
-
+@patch(f"{_MOD}._do_list", new_callable=AsyncMock)
+def test_list(mock_do: AsyncMock) -> None:
+    mock_do.return_value = ObjectTypeListResponse(items=[_SAMPLE_OT], total=1, page=1, page_size=20)
     result = runner.invoke(app, ["object-type", "list"])
     assert result.exit_code == 0
     assert "Order" in result.output
 
 
-@patch("cli.commands.object_type._create_service")
-def test_list_json(mock_factory: AsyncMock) -> None:
-    mock_svc = AsyncMock()
-    mock_svc.list.return_value = ObjectTypeListResponse(
-        items=[_SAMPLE_OT], total=1, page=1, page_size=20
-    )
-    mock_factory.return_value = (mock_svc, AsyncMock())
-
+@patch(f"{_MOD}._do_list", new_callable=AsyncMock)
+def test_list_json(mock_do: AsyncMock) -> None:
+    mock_do.return_value = ObjectTypeListResponse(items=[_SAMPLE_OT], total=1, page=1, page_size=20)
     result = runner.invoke(app, ["object-type", "list", "--format", "json"])
     assert result.exit_code == 0
     assert '"Order"' in result.output
     assert '"ri.ontology.object-type.abc123"' in result.output
 
 
-@patch("cli.commands.object_type._create_service")
-def test_get_success(mock_factory: AsyncMock) -> None:
-    mock_svc = AsyncMock()
-    mock_svc.get_by_rid.return_value = _SAMPLE_OT
-    mock_factory.return_value = (mock_svc, AsyncMock())
-
+@patch(f"{_MOD}._do_get", new_callable=AsyncMock, return_value=_SAMPLE_OT)
+def test_get_success(mock_do: AsyncMock) -> None:
     result = runner.invoke(app, ["object-type", "get", "ri.ontology.object-type.abc123"])
     assert result.exit_code == 0
     assert "Order" in result.output
     assert "ri.ontology.object-type.abc123" in result.output
 
 
-@patch("cli.commands.object_type._create_service")
-def test_get_not_found(mock_factory: AsyncMock) -> None:
-    mock_svc = AsyncMock()
-    mock_svc.get_by_rid.side_effect = AppError(
+@patch(f"{_MOD}._do_get", new_callable=AsyncMock)
+def test_get_not_found(mock_do: AsyncMock) -> None:
+    mock_do.side_effect = AppError(
         code="OBJECT_TYPE_NOT_FOUND",
         message="Object type 'ri.ontology.object-type.xxx' not found",
         status_code=404,
     )
-    mock_factory.return_value = (mock_svc, AsyncMock())
-
     result = runner.invoke(app, ["object-type", "get", "ri.ontology.object-type.xxx"])
     assert result.exit_code == 1
     assert "not found" in result.output
 
 
-@patch("cli.commands.object_type._create_service")
-def test_update(mock_factory: AsyncMock) -> None:
-    mock_svc = AsyncMock()
-    mock_svc.update.return_value = _SAMPLE_OT
-    mock_factory.return_value = (mock_svc, AsyncMock())
-
+@patch(f"{_MOD}._do_update", new_callable=AsyncMock, return_value=_SAMPLE_OT)
+def test_update(mock_do: AsyncMock) -> None:
     result = runner.invoke(
         app, ["object-type", "update", "ri.ontology.object-type.abc123", "--name", "新名称"]
     )
@@ -136,27 +110,20 @@ def test_update(mock_factory: AsyncMock) -> None:
     assert "Updated" in result.output
 
 
-@patch("cli.commands.object_type._create_service")
-def test_delete(mock_factory: AsyncMock) -> None:
-    mock_svc = AsyncMock()
-    mock_svc.delete.return_value = None
-    mock_factory.return_value = (mock_svc, AsyncMock())
-
+@patch(f"{_MOD}._do_delete", new_callable=AsyncMock, return_value=None)
+def test_delete(mock_do: AsyncMock) -> None:
     result = runner.invoke(app, ["object-type", "delete", "ri.ontology.object-type.abc123"])
     assert result.exit_code == 0
     assert "Deleted" in result.output
 
 
-@patch("cli.commands.object_type._create_service")
-def test_delete_active(mock_factory: AsyncMock) -> None:
-    mock_svc = AsyncMock()
-    mock_svc.delete.side_effect = AppError(
+@patch(f"{_MOD}._do_delete", new_callable=AsyncMock)
+def test_delete_active(mock_do: AsyncMock) -> None:
+    mock_do.side_effect = AppError(
         code="OBJECT_TYPE_DELETE_ACTIVE",
         message="Cannot delete an active object type",
         status_code=400,
     )
-    mock_factory.return_value = (mock_svc, AsyncMock())
-
     result = runner.invoke(app, ["object-type", "delete", "ri.ontology.object-type.abc123"])
     assert result.exit_code == 1
     assert "Cannot delete" in result.output
