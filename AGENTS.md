@@ -331,7 +331,6 @@ Before implementing a feature, **read the relevant doc first**:
 | Object Type CRUD | `docs/architecture/02-domain-model.md` + `docs/specs/object-type-metadata.md` |
 | Link Type CRUD | `docs/architecture/02-domain-model.md` (LinkType section) + `docs/specs/link-type-metadata.md` |
 | Property types | `docs/specs/supported-property-types.md` |
-| Property formatting | `docs/specs/property-value-formatting.md` |
 | Data connectivity | `docs/architecture/05-data-connectivity.md` |
 | Change management / versioning | `docs/architecture/06-change-management.md` |
 | UI design / interaction flows | PRD + `docs/prd/0.1.0（MVP）/images/` |
