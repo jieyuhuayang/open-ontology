@@ -440,7 +440,7 @@ data: {"sessionRid": "ri.ontology.agent-session.a1b2c3d4e5f6", "summary": "已�
 |-------------|------|------|---------|
 | 409 | `AGENT_SESSION_CONFLICT` | 创建会话时已存在 active 会话（INV-12） | AC-02 |
 | 404 | `AGENT_SESSION_NOT_FOUND` | session rid 不存在 | AC-05, AC-07, AC-11 |
-| 422 | `AGENT_SESSION_NOT_ACTIVE` | 向非 active 状态的会话发送消息 | AC-12 |
+| 422 | `AGENT_SESSION_NOT_ACTIVE` | 向非 active 状态的会话发送消息或关闭非 active 会话 | AC-12, AC-25 |
 | 422 | `LLM_NOT_CONFIGURED` | LLM API key 未配置 | AC-20 |
 | 422 | `MESSAGE_TOO_LONG` | 用户消息超过 4096 字符 | AC-22 |
 | SSE error | `LLM_API_ERROR` | LLM API 调用失败（网络/认证） | AC-10 |
