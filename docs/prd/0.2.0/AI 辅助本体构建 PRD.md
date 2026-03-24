@@ -1452,7 +1452,7 @@ apps/server/
 │   ├── agent/                          # Agent 模块（v0.2.0 新增）
 │   │   ├── __init__.py
 │   │   ├── engine.py                   # deepagents Agent 主体配置
-│   │   ├── skills/                     # SKILL.md 目录
+│   │   ├── skills/                     # Skill 知识定义（SSoT）— Agent 读取后调用 oo CLI
 │   │   │   ├── analyze-materials/
 │   │   │   ├── create-object-type/
 │   │   │   ├── create-link-type/
@@ -1461,10 +1461,6 @@ apps/server/
 │   │   │   ├── validate-ontology/
 │   │   │   ├── generate-blueprint/
 │   │   │   └── optimize-ontology/
-│   │   ├── tools/                      # Tool Adapter（Python 函数封装）
-│   │   │   ├── ontology_tools.py       # 本体 CRUD 工具
-│   │   │   ├── analysis_tools.py       # 文件分析工具
-│   │   │   └── blueprint_tools.py      # 蓝图管理工具
 │   │   ├── parsers/                    # 文件解析器
 │   │   │   ├── csv_parser.py
 │   │   │   ├── excel_parser.py
