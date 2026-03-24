@@ -6,10 +6,10 @@
 > 测试策略由 CLAUDE.md §测试要求统一管理，此处不重复。
 > 如有跨 feature 依赖，必须在"依赖与约束"节中声明，并对照 release-contract.md。
 
-**关联 PRD**: [docs/prd/0.1.0（MVP）/本体管理平台（Ontology Manager） PRD.md §章节名]
+**关联 PRD**: [docs/prd/<版本>/<PRD 文件名> §章节名]
 **架构参考**: [docs/architecture/01-system-architecture.md §章节]
 **优先级**: P0 / P1 / P2
-**所属版本**: v0.1.0
+**所属版本**: <vX.X.X>
 
 ---
 
