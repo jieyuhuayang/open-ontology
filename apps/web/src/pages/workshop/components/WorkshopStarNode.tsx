@@ -70,15 +70,16 @@ export default function WorkshopStarNode({
     }
   });
 
-  const baseSize = isSelected ? 0.6 : isHovered ? 0.55 : 0.5;
+  // Use scale instead of recreating geometry on hover/select
+  const scale = isSelected ? 1.2 : isHovered ? 1.1 : 1.0;
   const opacity = getOpacity(node);
   const emissiveIntensity = getEmissiveIntensity(node);
 
   return (
     <group position={[node.position.x, node.position.y, node.position.z]}>
-      {/* Main sphere */}
       <mesh
         ref={meshRef}
+        scale={scale}
         onPointerOver={(e) => {
           e.stopPropagation();
           onPointerOver();
@@ -96,7 +97,7 @@ export default function WorkshopStarNode({
           onDoubleClick();
         }}
       >
-        <sphereGeometry args={[baseSize, 32, 32]} />
+        <sphereGeometry args={[0.5, 32, 32]} />
         <meshStandardMaterial
           color={node.color}
           emissive={node.color}
