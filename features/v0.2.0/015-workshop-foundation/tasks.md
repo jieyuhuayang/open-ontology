@@ -387,13 +387,22 @@
   **覆盖 AC**: AC-05, AC-18, AC-19
   **依赖**: T020
 
-- [ ] **T022**: 前端测试
-  **文件**: `apps/web/src/pages/workshop/__tests__/WorkshopPage.test.tsx`（新建）, `apps/web/src/pages/workshop/hooks/__tests__/use-sse-parser.test.ts`（新建）, `apps/web/src/pages/workshop/stores/__tests__/workshop-store.test.ts`（已在 T003 创建）
+- [ ] **T022**: 前端补充测试（集中覆盖各组件 AC）
+  **文件**: `apps/web/src/pages/workshop/__tests__/WorkshopPage.test.tsx`（新建）, `apps/web/src/pages/workshop/__tests__/components.test.tsx`（新建）
   **逻辑**:
-  - `WorkshopPage.test.tsx`: 渲染测试 — 验证三面板布局存在、返回按钮可点击、路由跳转正确
-  - `use-sse-parser.test.ts`: 纯函数测试 — parseSSELine 解析 text-delta/plan-step/blueprint-item/done/error 事件；处理多行 data；处理空行分隔；处理格式错误的行返回 null
-  - `workshop-store.test.ts`（补充）: 验证完整状态转换流程：empty→existing→analyzing→blueprint_pending；reconnecting 超时→disconnected；pendingCrystallizations 增删
-  **覆盖 AC**: AC-01, AC-04, AC-09, AC-10, AC-11, AC-36, AC-37, AC-38, AC-39, AC-40
+  - `WorkshopPage.test.tsx`: 集成渲染测试 — 验证页面状态条件渲染（empty→GuidanceCard, existing→上传引导, disconnected→ConnectionBanner）
+  - `components.test.tsx`: 各子组件渲染测试（T004/T010 已有的测试不重复，此处补充其他组件）：
+    - GuidanceCard: 领域选择器渲染、确认/跳过按钮回调 → AC-05, AC-06, AC-07
+    - ChatInput: Enter 发送、disabled 禁用 → AC-08, AC-12
+    - FileUploadArea: 文件类型/大小前端校验 Toast → AC-14, AC-18, AC-19
+    - ChatPanel: 错误提示条渲染 → AC-11
+    - ConfidenceIndicator: high/medium/low 颜色 → AC-42, AC-43, AC-44
+    - EntityPopover: 200ms 延迟显示 → AC-29
+    - EntityDrawer: 属性列表 + 推理来源 + 跳转按钮 → AC-30, AC-31, AC-32
+    - PlanProgressTree: 步骤列表渲染 → AC-33
+    - SuggestionCard: 点击回调 → AC-34, AC-35
+    - ConnectionBanner: 断连遮罩 + 重连按钮 → AC-40, AC-41
+  **覆盖 AC**: AC-05, AC-06, AC-07, AC-08, AC-11, AC-12, AC-14, AC-18, AC-19, AC-29, AC-30, AC-31, AC-32, AC-33, AC-34, AC-35, AC-36, AC-37, AC-38, AC-39, AC-40, AC-41, AC-42, AC-43, AC-44
   **依赖**: T020
 
 ---
