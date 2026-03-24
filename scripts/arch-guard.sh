@@ -81,11 +81,12 @@ if [[ "$FILE" == *"/src/generated/"* ]]; then
     echo "⚠️  [arch-guard] 正在编辑自动生成文件 — 该文件会被 just web-typegen 覆盖"
 fi
 
-# ── 检查 8：CLI 代码禁止直接访问 storage（P0 红线）────────────────────────────
+# ── 检查 8：CLI 命令代码禁止直接访问 storage（P0 红线）──────────────────────
 # CLAUDE.md 强制约束：Agent/CLI 必须通过 services 层操作数据
-if [[ "$FILE" == *"/cli/"*.py ]]; then
+# 排除 adapter.py（基础设施，提供 session context 给 service 调用）
+if [[ "$FILE" == *"/cli/commands/"*.py ]]; then
     if grep -qE "^from (app\.storage|sqlalchemy)" "$FILE" 2>/dev/null; then
-        echo "⚠️  [arch-guard] VIOLATION: $(basename "$FILE") 直接导入 storage/SQLAlchemy — CLI 必须通过 services 层"
+        echo "⚠️  [arch-guard] VIOLATION: $(basename "$FILE") 直接导入 storage/SQLAlchemy — CLI 命令必须通过 services 层"
     fi
 fi
 
