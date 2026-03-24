@@ -56,27 +56,15 @@ Based on the review mode and tool availability, launch reviews **in parallel** (
 
 ### Codex Review
 
-For `--uncommitted` mode:
-```bash
-codex review --uncommitted "$(cat /tmp/code-review-prompt.md)" > /tmp/code-review-codex.md 2>&1
-```
+**Always use `codex exec`** — `codex review` does not support passing a custom prompt alongside `--base`/`--commit` flags. Using `exec` with the assembled prompt ensures consistent behavior across all modes.
 
-For `--base <branch>` mode:
 ```bash
-codex review --base <branch> "$(cat /tmp/code-review-prompt.md)" > /tmp/code-review-codex.md 2>&1
-```
-
-For `--commit <sha>` mode:
-```bash
-codex review --commit <sha> "$(cat /tmp/code-review-prompt.md)" > /tmp/code-review-codex.md 2>&1
-```
-
-For `--files` mode (fallback to exec):
-```bash
-codex exec -s read-only "$(cat /tmp/code-review-prompt.md)" > /tmp/code-review-codex.md 2>&1
+codex exec -s read-only --ephemeral "$(cat /tmp/code-review-prompt.md)" > /tmp/code-review-codex.md 2>&1
 ```
 
 **Important**: Set a timeout of 300000ms (5 minutes) for the codex call.
+
+> **Lesson learned**: `codex review --base <branch> "prompt"` fails with "cannot be used with [PROMPT]". The `review` subcommand generates its own prompt from the diff; it cannot accept an external prompt. Always use `codex exec` with our assembled prompt instead.
 
 ### Gemini Review
 
