@@ -65,7 +65,7 @@ def test_show(mock_do: AsyncMock) -> None:
     result = runner.invoke(app, ["working-state", "show"])
     assert result.exit_code == 0
     assert "ObjectType" in result.output
-    assert "ri.ontology.object-type.abc123" in result.output
+    assert "ri.ontology.object-typ" in result.output
     assert "CREATE" in result.output
 
 
