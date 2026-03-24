@@ -247,7 +247,7 @@
   **覆盖 AC**: AC-08, AC-09, AC-10, AC-11, AC-12, AC-14, AC-15, AC-16, AC-20, AC-21, AC-22, AC-24
   **依赖**: T005, T009, T011
 
-- [ ] **T014**: Chat 端点集成测试
+- [x] **T014**: Chat 端点集成测试
   **文件**: `apps/server/tests/integration/test_agent_api.py`（追加到 T006 创建的文件）
   **逻辑**:
   - `test_chat_sse_stream` → POST /api/v1/agent/chat 返回 text/event-stream，包含 text-delta + done 事件
