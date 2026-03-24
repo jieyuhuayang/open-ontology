@@ -95,7 +95,7 @@ Feature spec 只能引用不变量 ID，不能重新定义或覆盖。
 | 012-agent-foundation | v0.1.0 全部完成 | 需要现有 DB 基础设施和 Service 层 |
 | 013-cli-and-skills | v0.1.0 全部完成 | 封装 v0.1.0 Service 层为 CLI 命令 |
 | 014-material-and-blueprint | 012-agent-foundation, 013-cli-and-skills | 需要 Agent Engine + SSE + CLI 框架 |
-| 015-workshop-foundation | 012-agent-foundation | 需要 Agent SSE 端点和会话数据 |
+| 015-workshop-foundation | 012-agent-foundation, 014-material-and-blueprint | 需要 Agent SSE 端点和会话数据 + Material/Blueprint API |
 | 016-workshop-enhancement | 015-workshop-foundation | 需要工坊基础布局和画布组件 |
 | 017-hitl-review-and-apply | 014-material-and-blueprint, 015-workshop-foundation, 013-cli-and-skills | 需要蓝图 API + 工坊布局 + CLI apply 命令 |
 | 018-agent-sidekick | 012-agent-foundation | 需要 Agent Engine（P1，可延后） |
