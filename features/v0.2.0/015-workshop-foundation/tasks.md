@@ -80,7 +80,7 @@
   **逻辑**:
   - `WorkshopPage.tsx`: 全屏三面板 Flexbox 容器（100vw × 100vh，暗色背景 #0a0a1a）。左侧预留 ChatPanel slot（宽度 380px，可折叠到 48px），中央 flex:1 预留 StarfieldWorkbench slot，右侧预留 SidekickPanel slot（宽度 320px，可折叠到 0px）。左上角返回按钮（Link to `/`）。面板折叠/展开从 workshop-store 读取 + 控制
   - `workshop.module.css`: 暗色主题变量（--ws-bg, --ws-panel-bg, --ws-text, --ws-border），面板过渡动画，全屏布局
-  - `router.tsx`: 在 routeConfig 顶层添加 `{ path: '/workshop', lazy: () => import('@/pages/workshop/WorkshopPage') }`，与 `/demo/canvas` 同级，独立于 HomeLayout
+  - `router.tsx`: 在 routeConfig 顶层添加 `{ path: '/workshop', lazy: () => import('@/pages/workshop/WorkshopPage') }`，与 `/demo/canvas` 同级，独立于 HomeLayout。**影响范围**: 仅追加一条新路由，不修改现有路由配置
   - 初始阶段各 slot 渲染占位 div（后续任务逐步替换）
   **测试**: 渲染测试验证三面板布局 + 返回按钮 + 面板折叠
   **覆盖 AC**: AC-01, AC-02, AC-03, AC-04
