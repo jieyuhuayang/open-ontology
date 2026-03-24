@@ -102,11 +102,17 @@ cd apps/web && pnpm dev
 | 共享属性 | Shared Property | 可跨对象类型复用的属性 |
 | 对象集 / 空间 | Object Set / Space | 对象实例集合 / 顶层项目容器 |
 
-## MVP 优先级（v0.1.0）
+## 版本路线图
 
-- **P0**：UI 框架、Object Type CRUD、Link Type CRUD、本体搜索、变更管理/版本控制
-- **P1**：属性值格式化、对象关联链接、~~对象类型复制~~（延后到 v0.2.0）、~~本体导入导出（JSON）~~（延后到 v0.2.0）
-- **P2（延后）**：Discover 页定制、对象类型分组、共享属性、Action Type CRUD
+### v0.1.0（MVP）— 已完成
+UI 框架、Object Type CRUD、Link Type CRUD、属性管理、本体搜索、变更管理/版本控制、数据连接、对象实例同步。
+
+### v0.2.0（AI-Assisted Ontology Building）— 进行中
+- **已完成**：F012 Agent Foundation（deepagents 引擎 + SSE 流式通信 + 会话管理）、F013 CLI & Skills（`oo` 统一能力层 + 16 个 Agent Skills）
+- **计划中**：F014 素材与蓝图、F015-016 Workshop、F017 人机审查与应用、F018 Agent Sidekick、F019 本体导入导出
+
+### 延后
+Discover 页定制、对象类型分组、共享属性、Action Type CRUD、对象类型复制
 
 ## 代码分层规则
 
