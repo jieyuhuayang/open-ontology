@@ -155,49 +155,64 @@
   **覆盖 AC**: AC-21, AC-22, AC-23, AC-24
   **依赖**: T002, T009
 
-- [ ] **T011**: search 命令 — 单元测试 + 实现
-  **文件**: `apps/server/tests/unit/test_cli_search.py`, `apps/server/cli/commands/search.py`
-  **逻辑**:
-  - 测试（test_cli_search.py）：
-    - `test_search`：mock SearchService.search()，验证按 objectType/property/linkType 分区输出
-    - `test_search_with_type`：传 --type objectType，验证仅搜索该类型
-    - `test_search_no_results`：mock 返回空，验证 "No results found."，exit 0
-  - 实现（search.py）：
-    - `search(query, type, limit)` → SearchService.search(ontology_rid, query, types, limit) → 分区格式化输出
-    - 在 main.py 注册为顶级命令（非子 app）
+- [ ] **T011**: search 命令 — 单元测试
+  **文件**: `apps/server/tests/unit/test_cli_search.py`
+  **逻辑**: CliRunner + mock SearchService：
+  - `test_search`：mock SearchService.search()，验证按 objectType/property/linkType 分区输出
+  - `test_search_with_type`：传 --type objectType，验证仅搜索该类型
+  - `test_search_no_results`：mock 返回空，验证 "No results found."，exit 0
   **覆盖 AC**: AC-25, AC-26, AC-27
   **依赖**: T002
 
-- [ ] **T012**: working-state 命令 — 单元测试 + 实现
-  **文件**: `apps/server/tests/unit/test_cli_working_state.py`, `apps/server/cli/commands/working_state.py`
+- [ ] **T012**: search 命令 — 实现
+  **文件**: `apps/server/cli/commands/search.py`
   **逻辑**:
-  - 测试：
-    - `test_show`：mock WorkingStateService，验证变更列表输出
-    - `test_show_empty`：无草稿时验证 "No pending changes."
-    - `test_save`：mock publish()，验证 "Published N changes (version M)."，exit 0
-    - `test_save_empty`：mock 抛 AppError("WORKING_STATE_EMPTY")，验证 stderr "No changes to publish"，exit 1
-    - `test_discard`：验证 "Discarded all draft changes."，exit 0
-  - 实现：
-    - `show()` → get_or_create() → 遍历 changes 输出表格
-    - `save()` → publish()
-    - `discard()` → discard()
-    - 在 main.py 注册
+  - `search(query, type, limit)` → SearchService.search(ontology_rid, query, types, limit) → 分区格式化输出
+  - 在 main.py 注册为顶级命令（非子 app）
+  **测试**: T011 全部通过
+  **覆盖 AC**: AC-25, AC-26, AC-27
+  **依赖**: T002, T011
+
+- [ ] **T013**: working-state 命令 — 单元测试
+  **文件**: `apps/server/tests/unit/test_cli_working_state.py`
+  **逻辑**: CliRunner + mock WorkingStateService：
+  - `test_show`：mock 返回 WorkingState with changes，验证变更列表输出
+  - `test_show_empty`：无草稿时验证 "No pending changes."
+  - `test_save`：mock publish() 返回 ChangeRecord，验证 "Published N changes (version M)."，exit 0
+  - `test_save_empty`：mock 抛 AppError("WORKING_STATE_EMPTY")，验证 stderr "No changes to publish"，exit 1
+  - `test_discard`：验证 "Discarded all draft changes."，exit 0
   **覆盖 AC**: AC-32, AC-33, AC-34, AC-35
   **依赖**: T002
 
-- [ ] **T013**: blueprint 存根命令 — 单元测试 + 实现
-  **文件**: `apps/server/tests/unit/test_cli_blueprint.py`, `apps/server/cli/commands/blueprint.py`
+- [ ] **T014**: working-state 命令 — 实现
+  **文件**: `apps/server/cli/commands/working_state.py`
   **逻辑**:
-  - 测试：
-    - `test_analyze_stub`：验证 stderr 含 "not yet implemented"，exit 2
-    - `test_list_stub`：验证 stderr 含 "not yet implemented"，exit 2
-    - `test_show_stub`：验证 stderr 含 "not yet implemented"，exit 2
-    - `test_apply_stub`：验证 stderr 含 "not yet implemented"，exit 2
-  - 实现：
-    - analyze/list/show/apply 四个方法均 print_error("Blueprint commands not yet implemented (requires F014).") + raise SystemExit(2)
-    - 在 main.py 注册
+  - `show()` → WorkingStateService.get_or_create() → 遍历 changes 输出表格（ResourceType, RID, ChangeType）
+  - `save()` → WorkingStateService.publish()
+  - `discard()` → WorkingStateService.discard()
+  - 在 main.py 注册
+  **测试**: T013 全部通过
+  **覆盖 AC**: AC-32, AC-33, AC-34, AC-35
+  **依赖**: T002, T013
+
+- [ ] **T015**: blueprint 存根命令 — 单元测试
+  **文件**: `apps/server/tests/unit/test_cli_blueprint.py`
+  **逻辑**: CliRunner 测试四个存根子命令：
+  - `test_analyze_stub`：验证 stderr 含 "not yet implemented"，exit 2
+  - `test_list_stub`：验证 stderr 含 "not yet implemented"，exit 2
+  - `test_show_stub`：验证 stderr 含 "not yet implemented"，exit 2
+  - `test_apply_stub`：验证 stderr 含 "not yet implemented"，exit 2
   **覆盖 AC**: AC-36
   **依赖**: T002
+
+- [ ] **T016**: blueprint 存根命令 — 实现
+  **文件**: `apps/server/cli/commands/blueprint.py`
+  **逻辑**:
+  - analyze/list/show/apply 四个方法均 print_error("Blueprint commands not yet implemented (requires F014).") + raise SystemExit(2)
+  - 在 main.py 注册
+  **测试**: T015 全部通过
+  **覆盖 AC**: AC-36
+  **依赖**: T002, T015
 
 ### Phase 3: ValidationService 提取
 
