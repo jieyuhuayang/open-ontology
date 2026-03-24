@@ -253,48 +253,61 @@ v0.2.0 标志着本体管理系统从"底层数据治理工具"跃升为"企业�
 
 Agent 分析资料后生成的本体初稿，是用户审查和微调的中间产物。蓝图不是正式本体——它是一组"建议"，需要经过用户 HITL 审查后才转化为 WorkingState 中的草稿。
 
+### 蓝图生命周期
+
+```mermaid
+stateDiagram-v2
+    [*] --> draft : Agent 开始分析
+    draft --> pending_review : Agent 完成蓝图生成（done 事件）
+    pending_review --> pending_review : 用户逐项审查（接受/编辑/拒绝）
+    pending_review --> applied : 用户点击"应用蓝图"→ 批量创建到 WorkingState
+    pending_review --> discarded : 用户放弃蓝图
+    applied --> [*]
+    discarded --> [*]
+```
+
+### 蓝图数据结构
+
+**Blueprint 顶层字段**：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `blueprintRid` | string | 蓝图唯一标识（`ri.ontology.blueprint.<uuid>`） |
+| `name` | string | 蓝图名称（如"电商平台本体蓝图"） |
+| `status` | enum | `draft` / `pending_review` / `applied` / `discarded` |
+| `sourceFiles` | string[] | 来源文件列表 |
+| `items` | BlueprintItem[] | 蓝图项列表 |
+
+**BlueprintItem 字段**：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `itemRid` | string | 蓝图项唯一标识 |
+| `type` | enum | `object_type` / `property` / `link_type` |
+| `suggestion` | object | 建议内容（对象类型/属性/链接的完整定义） |
+| `confidence` | float | 置信度分值（0.0–1.0） |
+| `confidenceLevel` | enum | `high`（≥0.8）/ `medium`（0.5–0.8）/ `low`（<0.5） |
+| `reasoning` | string | 推理说明 |
+| `source` | enum | `field_analysis` / `pattern_matching` / `semantic_inference` / `best_practices` |
+| `userDecision` | enum? | `null`（未审查）/ `accepted` / `edited` / `rejected` |
+
+**示例**（对象类型蓝图项）：
+
 ```json
 {
-  "blueprintRid": "ri.ontology.blueprint.abc123",
-  "name": "电商平台本体蓝图",
-  "status": "pending_review",
-  "sourceFiles": ["orders.csv", "products.xlsx", "业务流程说明.pdf"],
-  "items": [
-    {
-      "itemRid": "ri.ontology.blueprint-item.001",
-      "type": "object_type",
-      "suggestion": {
-        "displayName": "订单",
-        "apiName": "Order",
-        "description": "表示一次客户购买行为",
-        "properties": [
-          { "displayName": "订单编号", "apiName": "orderId", "baseType": "string", "isPrimaryKey": true },
-          { "displayName": "金额", "apiName": "amount", "baseType": "double" },
-          { "displayName": "下单时间", "apiName": "createdAt", "baseType": "timestamp" }
-        ]
-      },
-      "confidence": 0.92,
-      "confidenceLevel": "high",
-      "reasoning": "从 orders.csv 的列结构直接推断：order_id(主键), amount(金额), created_at(时间戳)",
-      "source": "field_analysis",
-      "userDecision": null
-    },
-    {
-      "itemRid": "ri.ontology.blueprint-item.002",
-      "type": "link_type",
-      "suggestion": {
-        "displayName": "包含",
-        "apiName": "contains",
-        "sideA": { "objectType": "Order", "cardinality": "one" },
-        "sideB": { "objectType": "Product", "cardinality": "many" }
-      },
-      "confidence": 0.78,
-      "confidenceLevel": "medium",
-      "reasoning": "orders.csv 中的 product_id 列与 products.xlsx 的 id 列存在外键模式匹配",
-      "source": "pattern_matching",
-      "userDecision": null
-    }
-  ]
+  "itemRid": "ri.ontology.blueprint-item.001",
+  "type": "object_type",
+  "suggestion": {
+    "displayName": "订单", "apiName": "Order",
+    "description": "表示一次客户购买行为",
+    "properties": [
+      { "displayName": "订单编号", "apiName": "orderId", "baseType": "string", "isPrimaryKey": true },
+      { "displayName": "金额", "apiName": "amount", "baseType": "double" }
+    ]
+  },
+  "confidence": 0.92, "confidenceLevel": "high",
+  "reasoning": "从 orders.csv 的列结构直接推断",
+  "source": "field_analysis", "userDecision": null
 }
 ```
 
