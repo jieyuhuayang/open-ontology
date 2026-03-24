@@ -1379,6 +1379,9 @@ CREATE TABLE agent_sessions (
     rid TEXT PRIMARY KEY,                    -- ri.ontology.agent-session.<uuid>
     ontology_rid TEXT NOT NULL REFERENCES ontologies(rid),
     title TEXT,                              -- 会话标题（自动生成或用户命名）
+    domain TEXT,                             -- 业务领域（电商/金融/供应链等，Phase 0 引导）
+    goal TEXT,                               -- 建模目标（搜索/决策/知识探索/AI 应用等）
+    scope_hint TEXT,                         -- 概念范围提示（用户自定义文本）
     status TEXT NOT NULL DEFAULT 'active',   -- active | archived
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
