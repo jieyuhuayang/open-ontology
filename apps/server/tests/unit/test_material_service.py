@@ -111,8 +111,12 @@ class TestUploadSuccess:
             mock_settings.MATERIAL_MAX_FILE_SIZE_MB = 10
             mock_settings.MATERIAL_MAX_FILES_PER_SESSION = 20
 
-            # Mock create to return the ORM passed in
-            mock_create.side_effect = lambda _sess, orm: orm
+            # Mock create to simulate DB setting created_at, then return ORM
+            def _fake_create(_sess, orm):
+                orm.created_at = datetime(2026, 3, 24, 10, 0, 0, tzinfo=timezone.utc)
+                return orm
+
+            mock_create.side_effect = _fake_create
 
             result = await service.upload(SESSION_RID, file)
 
