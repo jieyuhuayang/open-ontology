@@ -92,6 +92,7 @@
   - 底部工具栏（fixed 在画布区域底部居中），包含 3 个按钮：缩放适配（fit-to-view）、重置视角（reset camera）、缩放+/缩放-
   - 按钮通过 callback props 驱动（与 R3F 的 OrbitControls ref 交互，由 T012 WorkshopCanvas 连接）
   - 暗色半透明背景，图标使用 Ant Design Icons
+  **测试**: 由 T022 WorkshopPage 渲染测试覆盖（验证工具栏按钮存在 + 点击回调触发）
   **覆盖 AC**: AC-27, AC-28
   **依赖**: T004
 
