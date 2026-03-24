@@ -288,23 +288,38 @@ User (with roles & markings)
 
 ## Implementation Roadmap
 
+> **注意**: v0.2.0 实际采用 deepagents 框架而非纯 MCP 作为 Agent 引擎。MCP Server 调整为后续版本的互补接口。
+
 ```
-MVP (v0.1.0):
+v0.1.0 (MVP) — 已完成:
   ✅ REST API — 基础的 Ontology CRUD
   ✅ JSON Export — 可供外部工具消费的 Schema 导出
-  ⬜ Schema-as-Context — L1 概览的自动生成接口
 
-v0.2.0:
-  ⬜ MCP Server — Resources + Tools
-  ⬜ L0/L1/L2 分层信息模型
-  ⬜ 基于 MCP 的 Agent 安全上下文传递
+v0.2.0 (AI-Assisted Ontology Building) — 进行中:
+  ✅ Agent Foundation — deepagents 引擎 + SSE 流式通信 + 会话管理（F012）
+  ✅ CLI & Skills — oo 统一能力层 + 16 Agent Skills + SKILL.md 知识体系（F013）
+  ⬜ Material & Blueprint — 素材上传 + Agent 分析 + 蓝图生成（F014）
+  ⬜ Workshop — Agent 交互 UI + 3D 工坊（F015-016）
+  ⬜ HITL Review & Apply — 人工审查蓝图 + 应用到本体（F017）
 
-v0.3.0:
+v0.3.0+:
+  ⬜ MCP Server — Resources + Tools（与 deepagents 互补）
+  ⬜ L0/L1/L2 分层信息模型 + Schema-as-Context
   ⬜ Ontology Filesystem — OpenViking 适配层
   ⬜ 语义搜索（向量索引）
   ⬜ OSDK 代码生成
   ⬜ Multi-Agent 场景的实时变更通知
 ```
+
+### deepagents 架构说明（v0.2.0 实际实现）
+
+v0.2.0 选择 deepagents 作为 Agent 引擎（而非直接实现 MCP Server），原因：
+- deepagents 自带 Planning、Skill、ContextManagement 中间件栈
+- SSE 适配层将 deepagents 事件映射为 PRD 定义的事件格式（text_delta, plan_step, done, error）
+- PostgresCheckpointer + agent_messages 双写保证 Agent 图状态和用户消息的持久化
+- 所有破坏性操作通过 `oo` CLI 执行，需人工授权（INV-14）
+
+详见 `features/v0.2.0/012-agent-foundation/spec.md` 和 `features/v0.2.0/013-cli-and-skills/spec.md`。
 
 ## Palantir Lessons Applied
 
