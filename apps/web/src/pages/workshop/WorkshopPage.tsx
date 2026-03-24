@@ -1,20 +1,62 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { useObjectTypes } from '@/api/object-types';
 import { useWorkshopStore } from './stores/workshop-store';
+import { useAgentChat } from './hooks/use-agent-chat';
+import ChatPanel from './components/ChatPanel';
+import StarfieldWorkbench from './components/StarfieldWorkbench';
+import SidekickPanel from './components/SidekickPanel';
+import EntityPopover from './components/EntityPopover';
+import EntityDrawer from './components/EntityDrawer';
+import ConnectionBanner from './components/ConnectionBanner';
+import { useWorkshopGraph } from './hooks/use-workshop-graph';
 import styles from './styles/workshop.module.css';
 
+// TODO: get from context or route param; for now use a default
+const DEFAULT_ONTOLOGY_RID = 'ri.ontology.main.default';
+
 export function Component() {
+  const { t } = useTranslation();
   const isChatPanelExpanded = useWorkshopStore((s) => s.isChatPanelExpanded);
   const isSidekickOpen = useWorkshopStore((s) => s.isSidekickOpen);
   const toggleChatPanel = useWorkshopStore((s) => s.toggleChatPanel);
   const toggleSidekick = useWorkshopStore((s) => s.toggleSidekick);
+  const pageState = useWorkshopStore((s) => s.pageState);
+  const setPageState = useWorkshopStore((s) => s.setPageState);
+  const currentSessionRid = useWorkshopStore((s) => s.currentSessionRid);
+
+  // Determine initial page state based on existing ObjectTypes
+  const { data: otData } = useObjectTypes(1, 1);
+  useEffect(() => {
+    if (!currentSessionRid && pageState === 'empty') {
+      const hasOT = (otData?.items?.length ?? 0) > 0;
+      if (hasOT) {
+        setPageState('existing');
+      }
+    }
+  }, [otData, currentSessionRid, pageState, setPageState]);
+
+  // Agent chat for reconnect
+  const { reconnect } = useAgentChat(currentSessionRid);
+
+  // Graph data for entity exploration
+  const { nodes, edges } = useWorkshopGraph(DEFAULT_ONTOLOGY_RID, null);
+
+  // Reset store on unmount
+  useEffect(() => {
+    return () => {
+      useWorkshopStore.getState().reset();
+    };
+  }, []);
 
   return (
     <div className={styles.workshopPage}>
       {/* Back button */}
-      <Link to="/" className={styles.backButton}>
+      <Link to="/" className={styles.backButton} data-testid="back-button">
         <LeftOutlined />
-        <span>Back</span>
+        <span>{t('workshop.backToManager')}</span>
       </Link>
 
       {/* Left: Chat Panel */}
@@ -23,7 +65,7 @@ export function Component() {
         data-testid="chat-panel"
       >
         {isChatPanelExpanded && (
-          <div className={styles.placeholder}>Chat Panel</div>
+          <ChatPanel ontologyRid={DEFAULT_ONTOLOGY_RID} />
         )}
         <div
           className={`${styles.panelToggle} ${styles.chatToggle}`}
@@ -36,7 +78,12 @@ export function Component() {
 
       {/* Center: Canvas Area */}
       <div className={styles.canvasArea} data-testid="canvas-area">
-        <div className={styles.placeholder}>3D Canvas</div>
+        <StarfieldWorkbench
+          ontologyRid={DEFAULT_ONTOLOGY_RID}
+          blueprintRid={null}
+        />
+        <EntityPopover nodes={nodes} />
+        <ConnectionBanner onReconnect={reconnect} />
       </div>
 
       {/* Right: Sidekick Panel */}
@@ -53,7 +100,7 @@ export function Component() {
             >
               <RightOutlined />
             </div>
-            <div className={styles.placeholder}>Sidekick</div>
+            <SidekickPanel />
           </>
         )}
       </div>
@@ -67,6 +114,9 @@ export function Component() {
           <LeftOutlined />
         </div>
       )}
+
+      {/* Entity Drawer (renders as portal) */}
+      <EntityDrawer nodes={nodes} edges={edges} />
     </div>
   );
 }
