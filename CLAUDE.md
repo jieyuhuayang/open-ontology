@@ -53,7 +53,8 @@ justfile                              # Monorepo 任务运行器
 |---|------|--------|
 | 前端 | React 18+ TS, Ant Design 5.x, TanStack Query v5, Zustand v5, Vite | pnpm |
 | 后端 | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy 2.0 async + asyncpg | uv |
-| 数据库 | PostgreSQL 16+, PG 全文搜索（MVP 不引入 Elasticsearch） | — |
+| Agent/CLI | deepagents, LangGraph checkpoint, Typer, Rich | uv |
+| 数据库 | PostgreSQL 16+, PG 全文搜索（不引入 Elasticsearch） | — |
 | 测试 | pytest + pytest-asyncio（后端）, Vitest（前端单元）, Playwright（E2E） | — |
 | Monorepo | Just（justfile）任务运行器 | — |
 
