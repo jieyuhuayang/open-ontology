@@ -75,8 +75,12 @@ $UNTRACKED"
     SCOPE_DESC="Uncommitted changes (staged + unstaged + untracked)"
     ;;
   base)
-    DIFF_CONTENT=$(git diff "$BASE_BRANCH"...HEAD)
-    CHANGED_FILES=$(git diff --name-only "$BASE_BRANCH"...HEAD)
+    # Use two-dot syntax (BASE..HEAD) instead of three-dot (BASE...HEAD).
+    # Three-dot finds the merge-base, which can include stale commits when
+    # auto-save hooks create frequent commits on both main and feature branches.
+    # Two-dot shows exactly "what is on HEAD but not on BASE" — the intended diff.
+    DIFF_CONTENT=$(git diff "$BASE_BRANCH"..HEAD)
+    CHANGED_FILES=$(git diff --name-only "$BASE_BRANCH"..HEAD)
     SCOPE_DESC="Changes relative to branch: $BASE_BRANCH"
     ;;
   commit)

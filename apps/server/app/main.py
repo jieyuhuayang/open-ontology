@@ -10,6 +10,7 @@ from app.database import engine
 from app.exceptions import AppError, app_error_handler
 from app.seed import ensure_seed_data
 from app.routers import (
+    agent,
     datasets,
     health,
     imports,
@@ -29,6 +30,19 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
     async with engine.connect() as conn:
         await conn.execute(text("SELECT 1"))
     await ensure_seed_data(engine)
+
+    # Initialize LangGraph checkpoint tables (v0.2.0 Agent)
+    if settings.ANTHROPIC_API_KEY:
+        from app.agent.engine import AgentEngine
+
+        agent_engine = AgentEngine(settings)
+        try:
+            await agent_engine.setup_checkpointer()
+        except Exception:
+            import logging
+
+            logging.getLogger(__name__).warning("Failed to setup Agent checkpointer", exc_info=True)
+
     yield
     await engine.dispose()
 
@@ -50,6 +64,7 @@ app.add_middleware(
 app.add_exception_handler(AppError, app_error_handler)
 
 app.include_router(health.router)
+app.include_router(agent.router)
 app.include_router(object_types.router)
 app.include_router(properties.router)
 app.include_router(link_types.router)

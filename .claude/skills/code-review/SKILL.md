@@ -27,7 +27,7 @@ If no arguments provided, default to uncommitted changes.
 Run the build-prompt.sh script to collect diff and assemble the review prompt:
 
 ```bash
-bash .claude/plugins/code-review-multi-ai/skills/code-review/scripts/build-prompt.sh [ARGS]
+bash .claude/skills/code-review/scripts/build-prompt.sh [ARGS]
 ```
 
 Where `[ARGS]` matches the parsed mode:
@@ -56,33 +56,21 @@ Based on the review mode and tool availability, launch reviews **in parallel** (
 
 ### Codex Review
 
-For `--uncommitted` mode:
-```bash
-codex review --uncommitted "$(cat /tmp/code-review-prompt.md)" > /tmp/code-review-codex.md 2>&1
-```
+**Use `codex exec` with our assembled prompt** — `codex review` supports `--base`/`--commit`/`[PROMPT]` individually, but `--base <branch>` and `[PROMPT]` **cannot be used together** (v0.114.0 limitation: "the argument '--base' cannot be used with '[PROMPT]'"). Since we need custom checklists in the prompt, always use `codex exec`:
 
-For `--base <branch>` mode:
 ```bash
-codex review --base <branch> "$(cat /tmp/code-review-prompt.md)" > /tmp/code-review-codex.md 2>&1
-```
-
-For `--commit <sha>` mode:
-```bash
-codex review --commit <sha> "$(cat /tmp/code-review-prompt.md)" > /tmp/code-review-codex.md 2>&1
-```
-
-For `--files` mode (fallback to exec):
-```bash
-codex exec -s read-only "$(cat /tmp/code-review-prompt.md)" > /tmp/code-review-codex.md 2>&1
+codex exec -s read-only --ephemeral "$(cat /tmp/code-review-prompt.md)" > /tmp/code-review-codex.md 2>&1
 ```
 
 **Important**: Set a timeout of 300000ms (5 minutes) for the codex call.
+
+> **Note**: `codex review --base main` (without prompt) works — it uses codex's built-in review logic with its own diff. But we use `exec` instead because our prompt includes project-specific checklists and conventions that codex's built-in review doesn't know about.
 
 ### Gemini Review
 
 For all modes:
 ```bash
-gemini -p "$(cat /tmp/code-review-prompt.md)" --approval-mode plan -o text > /tmp/code-review-gemini.md 2>&1
+gemini -p "$(cat /tmp/code-review-prompt.md)" --sandbox=none -o text > /tmp/code-review-gemini.md 2>&1
 ```
 
 **Important**: Set a timeout of 300000ms (5 minutes) for the gemini call.

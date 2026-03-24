@@ -56,7 +56,7 @@ F012 是 v0.2.0 的基础设施层，为后续所有 Agent 相关 feature（F013
 | AC-08 | 用户 | POST `/api/v1/agent/chat` 发送消息（sessionRid + content） | 返回 SSE stream（Content-Type: `text/event-stream`），流中包含 `text-delta` 事件（data: `{"text": "..."}`） |
 | AC-09 | 用户 | POST chat 后 Agent 回复完毕 | 流发送 `done` 事件（data: `{"sessionRid": "...", "summary": "..."}`），然后关闭连接 |
 | AC-10 | 用户 | POST chat 时 LLM 调用失败（API key 无效或网络超时） | 流发送 `error` 事件（data: `{"code": "LLM_API_ERROR", "message": "..."}`），然后关闭连接 |
-| AC-11 | 用户 | POST chat 时 sessionRid 不存在 | 422，错误码 `AGENT_SESSION_NOT_FOUND`（非 SSE，直接 JSON 错误） |
+| AC-11 | 用户 | POST chat 时 sessionRid 不存在 | 404，错误码 `AGENT_SESSION_NOT_FOUND`（非 SSE，直接 JSON 错误） |
 | AC-12 | 用户 | POST chat 时 session status 非 `active` | 422，错误码 `AGENT_SESSION_NOT_ACTIVE` |
 | AC-13 | 用户 | POST chat，Agent 生成规划步骤 | SSE 流包含 `plan-step` 事件（data: `{"step": "...", "index": 0, "total": 3}`） |
 | **消息持久化** | | | |
@@ -286,6 +286,7 @@ class ErrorEvent(DomainModel):
 | GET | `/api/v1/agent/sessions` | 会话列表（分页） | P0 |
 | GET | `/api/v1/agent/sessions/{rid}` | 会话详情（含消息历史） | P0 |
 | DELETE | `/api/v1/agent/sessions/{rid}` | 删除会话 | P0 |
+| POST | `/api/v1/agent/sessions/{rid}/complete` | 关闭会话（active→completed） | P0 |
 | POST | `/api/v1/agent/chat` | SSE 流式对话 | P0 |
 
 ### 6.2 请求/响应示例
@@ -387,6 +388,17 @@ class ErrorEvent(DomainModel):
 // Response 204 No Content
 ```
 
+**POST /api/v1/agent/sessions/{rid}/complete — 关闭会话**
+
+```json
+// Response 200
+{
+  "rid": "ri.ontology.agent-session.a1b2c3d4e5f6",
+  "status": "completed",
+  "updatedAt": "2026-03-24T10:30:00Z"
+}
+```
+
 **POST /api/v1/agent/chat — SSE 流式对话**
 
 ```json
@@ -428,7 +440,7 @@ data: {"sessionRid": "ri.ontology.agent-session.a1b2c3d4e5f6", "summary": "已�
 |-------------|------|------|---------|
 | 409 | `AGENT_SESSION_CONFLICT` | 创建会话时已存在 active 会话（INV-12） | AC-02 |
 | 404 | `AGENT_SESSION_NOT_FOUND` | session rid 不存在 | AC-05, AC-07, AC-11 |
-| 422 | `AGENT_SESSION_NOT_ACTIVE` | 向非 active 状态的会话发送消息 | AC-12 |
+| 422 | `AGENT_SESSION_NOT_ACTIVE` | 向非 active 状态的会话发送消息或关闭非 active 会话 | AC-12, AC-25 |
 | 422 | `LLM_NOT_CONFIGURED` | LLM API key 未配置 | AC-20 |
 | 422 | `MESSAGE_TOO_LONG` | 用户消息超过 4096 字符 | AC-22 |
 | SSE error | `LLM_API_ERROR` | LLM API 调用失败（网络/认证） | AC-10 |
@@ -443,7 +455,7 @@ data: {"sessionRid": "ri.ontology.agent-session.a1b2c3d4e5f6", "summary": "已�
 ### 7.1 AgentService（`app/services/agent_service.py`）
 
 职责：
-- **会话管理**：创建（含 INV-12 检查）、查询列表、查询详情（含消息历史）、删除（级联）
+- **会话管理**：创建（含 INV-12 检查）、查询列表、查询详情（含消息历史）、关闭（active→completed）、删除（级联）
 - **Agent 引擎编排**：初始化 deepagents Agent（含中间件配置）、调用 `astream()` 获取事件流
 - **消息双写**：用户消息和 Agent 完整回复均写入 agent_messages
 - **审计日志写入**：每次 chat 交互写入 agent_audit_logs
