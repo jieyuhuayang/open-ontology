@@ -375,7 +375,7 @@ apps/server/
 │   └── services/
 │       └── validation_service.py  # 新增：从 WorkingStateService 提取的验证逻辑
 ├── app/agent/
-│   └── skills/                    # 13 个 SKILL.md（见 §8）
+│   └── skills/                    # 16 个 SKILL.md（见 §8）
 │       └── <name>/SKILL.md
 
 .claude/skills/                    # 6 个 Claude Code Skills（见 §9）
