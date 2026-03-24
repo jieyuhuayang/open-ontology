@@ -16,6 +16,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import REGCONFIG
+from sqlalchemy.orm import selectinload
 
 from app.storage.models import (
     LinkTypeEndpointModel,
