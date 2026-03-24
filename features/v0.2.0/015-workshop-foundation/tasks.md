@@ -60,6 +60,7 @@
   - `materials.ts`: materialKeys 工厂 + useMaterials(sessionRid) + useUploadMaterial() mutation（multipart/form-data，使用 `apiClient.post('/agent/materials/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } })`）+ useDeleteMaterial() mutation
   - `blueprints.ts`: blueprintKeys 工厂 + useBlueprints(params: { sessionRid?, ontologyRid? }) + useBlueprintDetail(rid) 查询 hooks
   - 所有 mutation 的 onSuccess 做适当的 queryClient.invalidateQueries
+  **测试**: TypeScript 编译通过即可验证类型正确性；hook 功能由 T007(GuidanceCard)/T008(FileUpload)/T009(ChatPanel) 组件集成测试覆盖
   **覆盖 AC**: AC-06, AC-07, AC-15
   **依赖**: T001
 
