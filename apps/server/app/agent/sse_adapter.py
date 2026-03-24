@@ -3,6 +3,7 @@
 import enum
 import json
 from collections.abc import AsyncGenerator
+from dataclasses import dataclass, field
 
 
 class SSEEventType(str, enum.Enum):
@@ -10,6 +11,17 @@ class SSEEventType(str, enum.Enum):
     PLAN_STEP = "plan-step"
     DONE = "done"
     ERROR = "error"
+
+
+@dataclass
+class StreamResult:
+    """Accumulated result from an adapt_stream() run."""
+
+    text_parts: list[str] = field(default_factory=list)
+
+    @property
+    def full_text(self) -> str:
+        return "".join(self.text_parts)
 
 
 def format_sse_event(event_type: SSEEventType | str, data: dict) -> str:
@@ -26,28 +38,28 @@ def format_sse_event(event_type: SSEEventType | str, data: dict) -> str:
 async def adapt_stream(
     astream_events: AsyncGenerator,
     session_rid: str,
+    result: StreamResult | None = None,
 ) -> AsyncGenerator[str, None]:
     """Transform LangGraph astream_events() into PRD-defined SSE events.
 
     Yields SSE-formatted strings for: text-delta, plan-step, done, error.
-    F014+ will extend with blueprint-item, subgraph-update, etc.
+    If a StreamResult is provided, accumulated text is stored there for the caller.
     """
-    accumulated_text = ""
+    if result is None:
+        result = StreamResult()
 
     try:
         async for event in astream_events:
             event_kind = event.get("event", "")
             event_name = event.get("name", "")
 
-            # Text streaming from chat model
             if event_kind == "on_chat_model_stream":
                 chunk = event.get("data", {})
                 if hasattr(chunk, "content") and chunk.content:
                     text = chunk.content
-                    accumulated_text += text
+                    result.text_parts.append(text)
                     yield format_sse_event(SSEEventType.TEXT_DELTA, {"text": text})
 
-            # Planning tool (write_todos) output
             elif event_kind == "on_tool_end" and event_name == "write_todos":
                 tool_output = event.get("data", {})
                 if hasattr(tool_output, "content"):
@@ -67,12 +79,11 @@ async def adapt_stream(
                     except (json.JSONDecodeError, AttributeError):
                         pass
 
-        # Stream completed successfully
         yield format_sse_event(
             SSEEventType.DONE,
             {
                 "sessionRid": session_rid,
-                "summary": accumulated_text[:200] if accumulated_text else "",
+                "summary": result.full_text[:200] if result.text_parts else "",
             },
         )
 
