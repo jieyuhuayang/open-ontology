@@ -167,7 +167,7 @@
 ### Phase 3: 3D 星空画布（StarfieldWorkbench）
 
 - [ ] **T011**: useWorkshopGraph Hook — 图模型合并
-  **文件**: `apps/web/src/pages/workshop/hooks/use-workshop-graph.ts`（新建）
+  **文件**: `apps/web/src/pages/workshop/hooks/use-workshop-graph.ts`（新建）, `apps/web/src/pages/workshop/hooks/__tests__/use-workshop-graph.test.ts`（新建）
   **逻辑**:
   - Hook 签名: `useWorkshopGraph(ontologyRid: string, sessionRid: string | null)`（与 spec §7 一致）
   - 数据源 1: useObjectTypes() 获取已有 ObjectType → 转为 WorkshopNode (status='confirmed', 明亮)
