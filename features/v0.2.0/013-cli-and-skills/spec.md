@@ -318,6 +318,9 @@ apps/server/app/agent/skills/
 ├── delete-object-type/SKILL.md      # L1
 ├── create-property/SKILL.md         # L1
 ├── create-link-type/SKILL.md        # L1
+├── update-link-type/SKILL.md        # L1
+├── import-dataset/SKILL.md          # L1
+├── list-object-types/SKILL.md       # L1
 ├── search-ontology/SKILL.md         # L1
 ├── validate-ontology/SKILL.md       # L1
 ├── create-object-type-with-properties/SKILL.md  # L2
