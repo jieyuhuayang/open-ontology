@@ -158,61 +158,47 @@ When writing `spec.md`, always link back to the relevant PRD section and referen
 
 ## Version Index
 
-### v0.1.0 (MVP)
+### v0.1.0 (MVP) — 已完成
+
+| # | Feature | Priority | 状态 |
+|---|---------|---------|------|
+| 001 | Project Scaffolding | P0 | ✅ 完成 |
+| 002 | Database Schema | P0 | ✅ 完成 |
+| 003 | Object Type CRUD — 后端 | P0 | ✅ 完成 |
+| 004 | App Shell & UI 基础框架 | P0 | ✅ 完成 |
+| 005 | Object Type CRUD — 前端 | P0 | ✅ 完成 |
+| 006 | Link Type CRUD（全栈） | P0 | ✅ 完成 |
+| 007 | Property Management（全栈） | P0 | ✅ 完成 |
+| 008 | Search | P0 | ✅ 完成 |
+| 009 | Change Management | P0 | ✅ 完成 |
+| 010 | Data Connection | P1 | 📋 有 spec |
+| 011 | Object Instance Sync | P1 | ✅ 完成 |
+
+### v0.2.0 (AI-Assisted Ontology Building) — 进行中
 
 | # | Feature | Phase | Priority | 状态 |
 |---|---------|-------|---------|------|
-| 001 | Project Scaffolding | 1 | P0 | ✅ 完成 |
-| 002 | Database Schema | 2 | P0 | ✅ 完成 |
-| 003 | Object Type CRUD — 后端 | 2 | P0 | ✅ 完成（含 Working State 服务层） |
-| 004 | App Shell & UI 基础框架 | 3 | P0 | 📋 下一个开发 |
-| 005 | Object Type CRUD — 前端 | 4 | P0 | 📋 待开发 |
-| — | **🔍 Demo 走查检查点** | — | — | Phase 4 完成后执行 |
-| 006 | Link Type CRUD（全栈） | 5 | P0 | 📋 待开发 |
-| 007 | Property Management（全栈） | 6 | P0 | 📋 待开发 |
-| 008 | Search | 7 | P0 | 📋 待开发 |
-| 009 | Change Management UI | 7 | P0 | 📋 待开发 |
+| 012 | Agent Foundation | 1 | P0 | ✅ 完成 |
+| 013 | CLI & Skills | 1 | P0 | ✅ 完成 |
+| 014 | Material & Blueprint | 2 | P0 | 📋 待规格 |
+| 015 | Workshop Foundation | 3 | P0 | 📋 待规格 |
+| 016 | Workshop Enhancement | 3 | P0 | 📋 待规格 |
+| 017 | HITL Review & Apply | 3 | P0 | 📋 待规格 |
+| 018 | Agent Sidekick | 4 | P1 | 📋 可延后 |
+| 019 | Ontology Import/Export | 4 | P1 | 📋 可延后 |
 
 > 查看各 feature 状态：`just features-status`（扫描各目录 tasks.md 自动汇总）
 
-> **关于 Working State**：原 009-working-state 的核心逻辑已在 F003 中一并实现（见 003 tasks.md T005–T006），已归档。后续如需扩展 Working State 能力（如支持新的 ResourceType），在各资源 CRUD 特性中增量完成。
-
-### Phase 说明
-
-| Phase | 描述 | 特性 | 里程碑 |
-|-------|------|------|--------|
-| 1 | 基础设施 | F001 | ✅ |
-| 2 | Schema + Object Type 后端 | F002, F003 | ✅ |
-| 3 | App Shell（UI 骨架） | F004 | 所有前端页面的基础 |
-| 4 | Object Type 前端 | F005 | **端到端闭环 → Demo 走查** |
-| 5 | Link Type 全栈 | F006 | 复用 F003 模式快速推进 |
-| 6 | Property 全栈 | F007 | |
-| 7 | 高级特性 | F008, F009 | F008 ∥ F009 可并行 |
-
-### 依赖关系图
+### v0.2.0 依赖关系图
 
 ```
-F001 ✅ ──→ F002 ✅ ──→ F003 ✅ (后端+WorkingState)
-                          │
-F001 ✅ ──→ F004 ──→ F005 ──→ 🔍 Demo 走查
-                │
-                ├──→ F006 (link-type 全栈)
-                ├──→ F007 (property 全栈)
-                ├──→ F008 (search) ←── F006, F007
-                └──→ F009 (change-management UI)
+Phase 1 (并行):  F012 ✅ ──┐     F013 ✅
+                           │       │
+Phase 2:           F014 ←──┴───────┘
+                     │
+Phase 3:     F015 ←──┤
+               │     │
+             F016 ←──┘     F017 ←── F014 + F015 + F013
+
+Phase 4:     F018 (P1)     F019 (P1)
 ```
-
-### 重编号说明（2026-02-28）
-
-目录编号已重新排列，使编号 = 执行顺序：
-
-| 旧编号 | 新编号 | 说明 |
-|--------|--------|------|
-| 001–003 | 001–003 | 不变 |
-| 008 app-shell | **004** | 提前，下一个开发 |
-| *新增* | **005** object-type-crud-frontend | 从 F003b 拆出为独立特性 |
-| 004 link-type-crud | **006** | 重编号 |
-| 005 property-management | **007** | 重编号 |
-| 006 search | **008** | 重编号 |
-| 007 change-management | **009** | 重编号 |
-| 009 working-state | **归档** | 已合并到 F003 |
