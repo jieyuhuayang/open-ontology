@@ -44,6 +44,7 @@ class AgentStorage:
             return None
         orm.status = status
         await session.flush()
+        await session.refresh(orm)
         return orm
 
     @staticmethod
