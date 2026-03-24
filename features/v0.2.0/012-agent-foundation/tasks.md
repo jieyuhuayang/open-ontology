@@ -30,7 +30,7 @@
 
 ### 基础设施
 
-- [ ] **T001**: LLM 配置项 + Pydantic Domain 模型
+- [x] **T001**: LLM 配置项 + Pydantic Domain 模型
   **文件**: `apps/server/app/config.py`, `apps/server/app/domain/agent.py`
   **逻辑**:
   - `config.py`: 在 Settings 类中新增 LLM 配置项：
