@@ -215,7 +215,7 @@
     - 带方向箭头（cone mesh 在 target 端）
     - label 显示关系名称（drei Text）
   **测试**: R3F 组件由 E2E 测试覆盖（WebGL 不支持 jsdom）；置信度分级渲染逻辑由 T011 适配函数单元测试间接覆盖
-  **覆盖 AC**: AC-20, AC-42, AC-43, AC-44, AC-45
+  **覆盖 AC**: AC-20, AC-21, AC-42, AC-43, AC-44, AC-45
   **依赖**: T012
 
 - [ ] **T014**: VortexEffect + 实时结晶动画
