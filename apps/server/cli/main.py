@@ -8,6 +8,7 @@ from cli.commands import (
     blueprint,
     dataset,
     link_type,
+    material,
     object_type,
     property_cmd,
     search,
