@@ -221,10 +221,10 @@
   - `test_chat_message_too_long` → content > 4096 时抛 AppError(MESSAGE_TOO_LONG, 422)
   - `test_chat_persists_user_message` → 验证 user message 写入 agent_messages
   - `test_chat_persists_assistant_message` → 验证流结束后 assistant message 写入 agent_messages
-  - `test_chat_creates_audit_log` → 验证 audit_log 写入（action="chat"）
+  - `test_chat_creates_audit_log` → 验证 audit_log 写入：action="chat"，details 包含 sessionRid、用户消息前 100 字符摘要、输入/输出 token 估算
   - `test_chat_context_continuity` → 多轮对话时 Agent 感知历史消息
   - `test_chat_session_stays_active_after_done` → done 事件后 session status 仍为 active
-  - `test_chat_token_budget_exceeded` → token 超限时产生 error 事件
+  - `test_chat_token_budget_exceeded` → 累计 token 超过 settings.LLM_TOKEN_BUDGET 时产生 error 事件（code=TOKEN_BUDGET_EXCEEDED）
   **覆盖 AC**: AC-08, AC-09, AC-10, AC-11, AC-12, AC-14, AC-15, AC-16, AC-20, AC-21, AC-22, AC-24
   **依赖**: T005, T009, T011
 
