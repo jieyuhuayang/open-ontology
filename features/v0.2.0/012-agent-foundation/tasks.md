@@ -239,9 +239,10 @@
     5. 通过 AgentEngine 创建/恢复 Agent（session_rid 作为 thread_id）
     6. 构建包含 domain/goal/scope_hint 的 system prompt
     7. 调用 agent.astream()，通过 sse_adapter.adapt_stream() 转换
-    8. 累积 assistant 文本片段
-    9. yield 每个 SSE 事件
-    10. 流结束后：持久化 assistant message + 创建 audit_log
+    8. 累积 assistant 文本片段，同时跟踪输入/输出 token 消耗（从 LangGraph 回调或 usage metadata 获取）
+    9. 若累计 token 超过 settings.LLM_TOKEN_BUDGET → yield error 事件（TOKEN_BUDGET_EXCEEDED）并中断流
+    10. yield 每个 SSE 事件
+    11. 流结束后：持久化 assistant message + 创建 audit_log（details: {sessionRid, messageSummary: content[:100], inputTokens, outputTokens}）
   **测试**: T012 全部通过
   **覆盖 AC**: AC-08, AC-09, AC-10, AC-11, AC-12, AC-14, AC-15, AC-16, AC-20, AC-21, AC-22, AC-24
   **依赖**: T005, T009, T011
