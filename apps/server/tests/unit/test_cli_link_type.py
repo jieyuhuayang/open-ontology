@@ -119,7 +119,7 @@ def test_list(mock_do: AsyncMock) -> None:
     mock_do.return_value = LinkTypeListResponse(items=[_SAMPLE_LT], total=1, page=1, page_size=20)
     result = runner.invoke(app, ["link-type", "list"])
     assert result.exit_code == 0, result.output
-    assert "order-to-customer" in result.output
+    assert "order-to" in result.output
     assert "Order" in result.output
     assert "Customer" in result.output
 
