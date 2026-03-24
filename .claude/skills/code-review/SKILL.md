@@ -56,7 +56,7 @@ Based on the review mode and tool availability, launch reviews **in parallel** (
 
 ### Codex Review
 
-**Always use `codex exec`** — `codex review` does not support passing a custom prompt alongside `--base`/`--commit` flags. Using `exec` with the assembled prompt ensures consistent behavior across all modes.
+**Use `codex exec` with our assembled prompt** — `codex review` supports `--base`/`--commit`/`[PROMPT]` individually, but `--base <branch>` and `[PROMPT]` **cannot be used together** (v0.114.0 limitation: "the argument '--base' cannot be used with '[PROMPT]'"). Since we need custom checklists in the prompt, always use `codex exec`:
 
 ```bash
 codex exec -s read-only --ephemeral "$(cat /tmp/code-review-prompt.md)" > /tmp/code-review-codex.md 2>&1
@@ -64,7 +64,7 @@ codex exec -s read-only --ephemeral "$(cat /tmp/code-review-prompt.md)" > /tmp/c
 
 **Important**: Set a timeout of 300000ms (5 minutes) for the codex call.
 
-> **Lesson learned**: `codex review --base <branch> "prompt"` fails with "cannot be used with [PROMPT]". The `review` subcommand generates its own prompt from the diff; it cannot accept an external prompt. Always use `codex exec` with our assembled prompt instead.
+> **Note**: `codex review --base main` (without prompt) works — it uses codex's built-in review logic with its own diff. But we use `exec` instead because our prompt includes project-specific checklists and conventions that codex's built-in review doesn't know about.
 
 ### Gemini Review
 
