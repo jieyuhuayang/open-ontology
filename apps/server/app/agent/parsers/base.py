@@ -73,7 +73,7 @@ def is_audit_field(name: str) -> bool:
 
 def is_primary_key_candidate(name: str) -> bool:
     lower = name.lower()
-    return lower == "id" or lower.endswith("_id") or lower.endswith("id") and len(lower) <= 20
+    return lower == "id" or lower.endswith("_id")
 
 
 def get_parser(parser_name: str, file_path: Path) -> BaseParser:

@@ -1,0 +1,271 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - img "deployment-unit" [ref=e7]:
+          - img [ref=e8]
+        - strong [ref=e11]: Ontology Management
+      - generic [ref=e13]:
+        - img "search" [ref=e15]:
+          - img [ref=e16]
+        - textbox "Search by name, RID, aliases..." [ref=e18]
+        - generic [ref=e20]: ⌘K
+      - generic [ref=e21]:
+        - button "history History" [ref=e26] [cursor=pointer]:
+          - img "history" [ref=e28]:
+            - img [ref=e29]
+          - generic [ref=e31]: History
+        - button "plus New" [ref=e32] [cursor=pointer]:
+          - img "plus" [ref=e34]:
+            - img [ref=e35]
+          - generic [ref=e38]: New
+        - generic [ref=e39] [cursor=pointer]:
+          - img "global" [ref=e40]:
+            - img [ref=e41]
+          - text: English
+    - generic [ref=e43]:
+      - complementary [ref=e44]:
+        - navigation [ref=e46]:
+          - strong [ref=e49]: Default Ontology
+          - menu [ref=e50]:
+            - menuitem "compass Discover" [ref=e51] [cursor=pointer]:
+              - img "compass" [ref=e52]:
+                - img [ref=e53]
+              - generic [ref=e55]: Discover
+            - text: Resources
+            - group [ref=e56]:
+              - menuitem "appstore Object Types 4" [ref=e57] [cursor=pointer]:
+                - img "appstore" [ref=e58]:
+                  - img [ref=e59]
+                - generic [ref=e62]:
+                  - text: Object Types
+                  - generic [ref=e63]: "4"
+              - menuitem "unordered-list Properties 33" [ref=e64] [cursor=pointer]:
+                - img "unordered-list" [ref=e65]:
+                  - img [ref=e66]
+                - generic [ref=e69]:
+                  - text: Properties
+                  - generic [ref=e70]: "33"
+              - menuitem "link Link Types 5" [ref=e71] [cursor=pointer]:
+                - img "link" [ref=e72]:
+                  - img [ref=e73]
+                - generic [ref=e76]:
+                  - text: Link Types
+                  - generic [ref=e77]: "5"
+              - menuitem "thunderbolt Action Types" [ref=e78] [cursor=pointer]:
+                - img "thunderbolt" [ref=e79]:
+                  - img [ref=e80]
+                - generic [ref=e82]: Action Types
+            - text: Data Connection
+            - group [ref=e83]:
+              - menuitem "database Data Connection" [ref=e84] [cursor=pointer]:
+                - img "database" [ref=e85]:
+                  - img [ref=e86]
+                - generic [ref=e88]: Data Connection
+            - menuitem "history History" [ref=e89] [cursor=pointer]:
+              - img "history" [ref=e90]:
+                - img [ref=e91]
+              - generic [ref=e93]: History
+          - button "left" [ref=e94] [cursor=pointer]:
+            - img "left" [ref=e95]:
+              - img [ref=e96]
+      - main [ref=e98]:
+        - main [ref=e99]:
+          - generic [ref=e100]:
+            - generic [ref=e101]:
+              - heading "Link Types" [level=4] [ref=e102]
+              - button "plus New link type" [ref=e103] [cursor=pointer]:
+                - img "plus" [ref=e105]:
+                  - img [ref=e106]
+                - generic [ref=e109]: New link type
+            - generic [ref=e110]:
+              - generic [ref=e111] [cursor=pointer]:
+                - generic [ref=e113]:
+                  - combobox [ref=e115]
+                  - generic: Object Type
+                - generic:
+                  - img:
+                    - img
+              - generic [ref=e116] [cursor=pointer]:
+                - generic [ref=e118]:
+                  - combobox [ref=e122]
+                  - generic: Status
+                - generic:
+                  - img:
+                    - img
+              - generic [ref=e123] [cursor=pointer]:
+                - generic [ref=e125]:
+                  - combobox [ref=e129]
+                  - generic: Visibility
+                - generic:
+                  - img:
+                    - img
+            - generic [ref=e132]:
+              - table [ref=e136]:
+                - rowgroup [ref=e144]:
+                  - row "Relationship Link Names Cardinality Join Method Status Change State" [ref=e145]:
+                    - columnheader "Relationship" [ref=e146]
+                    - columnheader "Link Names" [ref=e147]
+                    - columnheader "Cardinality" [ref=e148]
+                    - columnheader "Join Method" [ref=e149]
+                    - columnheader "Status" [ref=e150]
+                    - columnheader "Change State" [ref=e151]
+                - rowgroup [ref=e152]:
+                  - row "研究员 → 评级报告 评级报告 / 研究员 Many to One Foreign Key Experimental" [ref=e153] [cursor=pointer]:
+                    - cell "研究员 → 评级报告" [ref=e154]:
+                      - generic [ref=e155]:
+                        - generic [ref=e156]: 研究员
+                        - text: →
+                        - generic [ref=e157]: 评级报告
+                    - cell "评级报告 / 研究员" [ref=e158]:
+                      - generic [ref=e159]: 评级报告 / 研究员
+                    - cell "Many to One" [ref=e160]
+                    - cell "Foreign Key" [ref=e161]
+                    - cell "Experimental" [ref=e162]:
+                      - generic [ref=e163]: Experimental
+                    - cell [ref=e164]
+                  - row "公司 → 评级报告 评级报告 / 公司 Many to One Foreign Key Experimental" [ref=e165] [cursor=pointer]:
+                    - cell "公司 → 评级报告" [ref=e166]:
+                      - generic [ref=e167]:
+                        - generic [ref=e168]: 公司
+                        - text: →
+                        - generic [ref=e169]: 评级报告
+                    - cell "评级报告 / 公司" [ref=e170]:
+                      - generic [ref=e171]: 评级报告 / 公司
+                    - cell "Many to One" [ref=e172]
+                    - cell "Foreign Key" [ref=e173]
+                    - cell "Experimental" [ref=e174]:
+                      - generic [ref=e175]: Experimental
+                    - cell [ref=e176]
+                  - row "研究员 → 公司 公司 / 研究员 Many to One Foreign Key Experimental" [ref=e177] [cursor=pointer]:
+                    - cell "研究员 → 公司" [ref=e178]:
+                      - generic [ref=e179]:
+                        - generic [ref=e180]: 研究员
+                        - text: →
+                        - generic [ref=e181]: 公司
+                    - cell "公司 / 研究员" [ref=e182]:
+                      - generic [ref=e183]: 公司 / 研究员
+                    - cell "Many to One" [ref=e184]
+                    - cell "Foreign Key" [ref=e185]
+                    - cell "Experimental" [ref=e186]:
+                      - generic [ref=e187]: Experimental
+                    - cell [ref=e188]
+                  - row "基金 → 公司 公司 / 基金 Many to Many Join Table Experimental" [ref=e189] [cursor=pointer]:
+                    - cell "基金 → 公司" [ref=e190]:
+                      - generic [ref=e191]:
+                        - generic [ref=e192]: 基金
+                        - text: →
+                        - generic [ref=e193]: 公司
+                    - cell "公司 / 基金" [ref=e194]:
+                      - generic [ref=e195]: 公司 / 基金
+                    - cell "Many to Many" [ref=e196]
+                    - cell "Join Table" [ref=e197]
+                    - cell "Experimental" [ref=e198]:
+                      - generic [ref=e199]: Experimental
+                    - cell [ref=e200]
+                  - row "研究员 → 公司 公司 / 研究员 Many to Many Backing Object Experimental" [ref=e201] [cursor=pointer]:
+                    - cell "研究员 → 公司" [ref=e202]:
+                      - generic [ref=e203]:
+                        - generic [ref=e204]: 研究员
+                        - text: →
+                        - generic [ref=e205]: 公司
+                    - cell "公司 / 研究员" [ref=e206]:
+                      - generic [ref=e207]: 公司 / 研究员
+                    - cell "Many to Many" [ref=e208]
+                    - cell "Backing Object" [ref=e209]
+                    - cell "Experimental" [ref=e210]:
+                      - generic [ref=e211]: Experimental
+                    - cell [ref=e212]
+              - list [ref=e213]:
+                - listitem "Previous Page" [ref=e214]:
+                  - button "left" [disabled] [ref=e215]:
+                    - img "left" [ref=e216]:
+                      - img [ref=e217]
+                - listitem "1" [ref=e219] [cursor=pointer]:
+                  - generic [ref=e220]: "1"
+                - listitem "Next Page" [ref=e221]:
+                  - button "right" [disabled] [ref=e222]:
+                    - img "right" [ref=e223]:
+                      - img [ref=e224]
+                - listitem [ref=e226]:
+                  - generic "Page Size" [ref=e227] [cursor=pointer]:
+                    - generic [ref=e229]:
+                      - combobox "Page Size" [ref=e231]
+                      - generic "20 / page" [ref=e232]
+                    - generic:
+                      - img:
+                        - img
+  - generic [ref=e233]:
+    - dialog "Create Link Type":
+      - generic [ref=e234]:
+        - button "Close" [ref=e235] [cursor=pointer]:
+          - generic "Close" [ref=e236]:
+            - img "close" [ref=e237]:
+              - img [ref=e238]
+        - generic [ref=e241]: Create Link Type
+        - generic [ref=e242]:
+          - generic [ref=e243]:
+            - generic [ref=e245]:
+              - img "check" [ref=e248]:
+                - img [ref=e249]
+              - generic [ref=e252]: Relationship
+            - generic [ref=e254]:
+              - img "check" [ref=e257]:
+                - img [ref=e258]
+              - generic [ref=e261]: Object Types
+            - generic [ref=e263]:
+              - generic [ref=e264]: "3"
+              - generic [ref=e266]: Link Names
+          - generic [ref=e267]:
+            - generic [ref=e269]:
+              - generic "ID" [ref=e271]: "* ID"
+              - generic [ref=e272]:
+                - textbox "* ID" [ref=e275]:
+                  - /placeholder: e.g. employee-company
+                  - text: analyst-latest-report
+                - generic [ref=e278]: A link type with this ID already exists
+            - generic [ref=e279]:
+              - generic [ref=e282]: 研究员 → 评级报告
+              - generic [ref=e283]:
+                - generic [ref=e284]: "On 研究员, linked 评级报告 are shown as:"
+                - generic [ref=e285]:
+                  - generic [ref=e287]:
+                    - generic "Display Name" [ref=e289]: "* Display Name"
+                    - textbox "* Display Name" [ref=e293]: 评级报告
+                  - generic [ref=e295]:
+                    - generic "API Name" [ref=e297]: "* API Name"
+                    - textbox "* API Name" [ref=e301]: pingJiBaoGao
+            - generic [ref=e302]:
+              - generic [ref=e305]: 评级报告 → 研究员
+              - generic [ref=e306]:
+                - generic [ref=e307]: "On 评级报告, linked 研究员 are shown as:"
+                - generic [ref=e308]:
+                  - generic [ref=e310]:
+                    - generic "Display Name" [ref=e312]: "* Display Name"
+                    - textbox "* Display Name" [ref=e316]: 研究员
+                  - generic [ref=e318]:
+                    - generic "API Name" [ref=e320]: "* API Name"
+                    - textbox "* API Name" [ref=e324]: yanJiuYuan
+            - generic [ref=e326]:
+              - generic "Status" [ref=e328]
+              - generic [ref=e332]:
+                - generic [ref=e333] [cursor=pointer]:
+                  - radio "Experimental" [checked] [ref=e335]
+                  - generic [ref=e337]: Experimental
+                - generic [ref=e338] [cursor=pointer]:
+                  - radio "Active" [ref=e340]
+                  - generic [ref=e342]: Active
+                - generic [ref=e343] [cursor=pointer]:
+                  - radio "Deprecated" [ref=e345]
+                  - generic [ref=e347]: Deprecated
+        - generic [ref=e348]:
+          - button "Back" [ref=e349] [cursor=pointer]:
+            - generic [ref=e350]: Back
+          - button "loading Create" [active] [ref=e351] [cursor=pointer]:
+            - generic:
+              - img "loading"
+            - generic [ref=e352]: Create
+```

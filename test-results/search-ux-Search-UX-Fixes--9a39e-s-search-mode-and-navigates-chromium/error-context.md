@@ -1,0 +1,60 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - img "deployment-unit" [ref=e7]:
+        - img [ref=e8]
+      - strong [ref=e11]: Ontology Management
+    - generic [ref=e13]:
+      - img "search" [ref=e15]:
+        - img [ref=e16]
+      - textbox "Search by name, RID, aliases..." [active] [ref=e18]: a
+      - img "close-circle" [ref=e20] [cursor=pointer]:
+        - img [ref=e21]
+    - generic [ref=e23]:
+      - button "history History" [ref=e28] [cursor=pointer]:
+        - img "history" [ref=e30]:
+          - img [ref=e31]
+        - generic [ref=e33]: History
+      - button "plus New" [ref=e34] [cursor=pointer]:
+        - img "plus" [ref=e36]:
+          - img [ref=e37]
+        - generic [ref=e40]: New
+      - generic [ref=e41] [cursor=pointer]:
+        - img "global" [ref=e42]:
+          - img [ref=e43]
+        - text: English
+  - generic [ref=e45]:
+    - complementary [ref=e46]:
+      - navigation [ref=e48]:
+        - generic [ref=e49]:
+          - strong [ref=e51]: Search results (0)
+          - img "close" [ref=e52] [cursor=pointer]:
+            - img [ref=e53]
+        - menu [ref=e55]:
+          - menuitem "search All results" [ref=e56] [cursor=pointer]:
+            - img "search" [ref=e57]:
+              - img [ref=e58]
+            - generic [ref=e60]: All results
+          - menuitem "appstore Object Types (0)" [ref=e61] [cursor=pointer]:
+            - img "appstore" [ref=e62]:
+              - img [ref=e63]
+            - generic [ref=e65]: Object Types (0)
+          - menuitem "unordered-list Properties (0)" [ref=e66] [cursor=pointer]:
+            - img "unordered-list" [ref=e67]:
+              - img [ref=e68]
+            - generic [ref=e70]: Properties (0)
+          - menuitem "link Link Types (0)" [ref=e71] [cursor=pointer]:
+            - img "link" [ref=e72]:
+              - img [ref=e73]
+            - generic [ref=e75]: Link Types (0)
+        - button "left" [ref=e76] [cursor=pointer]:
+          - img "left" [ref=e77]:
+            - img [ref=e78]
+    - main [ref=e80]:
+      - main [ref=e81]:
+        - alert [ref=e82]:
+          - generic [ref=e84]: common.error
+```
