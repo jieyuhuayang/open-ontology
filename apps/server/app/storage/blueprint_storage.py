@@ -99,6 +99,13 @@ class BlueprintStorage:
         return orm
 
     @staticmethod
+    async def get_for_update(session: AsyncSession, rid: str) -> BlueprintModel | None:
+        """Get blueprint with row-level lock (SELECT ... FOR UPDATE) for concurrency safety."""
+        stmt = select(BlueprintModel).where(BlueprintModel.rid == rid).with_for_update()
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    @staticmethod
     async def update(session: AsyncSession, rid: str, **fields: object) -> BlueprintModel | None:
         orm = await BlueprintStorage.get(session, rid)
         if orm is None:
