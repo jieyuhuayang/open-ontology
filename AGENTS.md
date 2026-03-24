@@ -7,13 +7,13 @@ This file provides guidance to coding agents when working in this repository.
 
 Open Ontology is an open-source project inspired by the Palantir Ontology. It aims to build an ontology platform designed for the agent era, offering a business-centric unified data modeling framework so that users across different business units and functional teams—as well as LLM-based agents—can share a common set of standardized business terms.
 
-The platform will consist of multiple applications/sub-platforms. The first application being built is the **Ontology Manager** — a back-office web UI for creating, editing, searching, and deleting ontology resources (object types, link types, properties, etc.).
+The platform will consist of multiple applications/sub-platforms. The first application — **Ontology Manager** (back-office web UI for managing ontology resources) — was completed in v0.1.0 MVP. The current focus is **v0.2.0 (AI-Assisted Ontology Building)**, which adds Agent-driven ontology construction capabilities including a deepagents engine, `oo` CLI unified capability layer, and material analysis with blueprint generation.
 
-Current version: v0.1.0 (MVP), focused on Ontology Manager.
+Current version: v0.2.0, building on completed v0.1.0 MVP.
 
 ## Repository Status
 
-This repository is in the **implementation phase for MVP v0.1.0**.
+This repository is in the **implementation phase for v0.2.0**. F012 (Agent Foundation) and F013 (CLI & Skills) are completed.
 
 - Specification documents are still the source of truth for intent.
 - Backend and frontend source code are present under `apps/`.
