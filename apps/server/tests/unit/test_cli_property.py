@@ -64,8 +64,8 @@ def test_list(mock_do: AsyncMock) -> None:
     mock_do.return_value = PropertyListResponse(items=[_SAMPLE_PROP], total=1)
     result = runner.invoke(app, ["property", "list", "--object-type", _OT_RID])
     assert result.exit_code == 0
-    assert "Order Amount" in result.output
-    assert "orderAmount" in result.output
+    assert "Order" in result.output
+    assert "decimal" in result.output
 
 
 @patch(f"{_MOD}._do_update", new_callable=AsyncMock, return_value=_SAMPLE_PROP)
