@@ -29,5 +29,5 @@
   - generic [ref=e38]:
     - img "close-circle" [ref=e39]:
       - img [ref=e40]
-    - generic [ref=e42]: Object type 'ri.ontology.object-type.1ff86b74a412' not found
+    - generic [ref=e42]: Object type 'ri.ontology.object-type.8136407ccf54' not found
 ```

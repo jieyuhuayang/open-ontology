@@ -264,8 +264,6 @@
         - generic [ref=e348]:
           - button "Back" [ref=e349] [cursor=pointer]:
             - generic [ref=e350]: Back
-          - button "loading Create" [active] [ref=e351] [cursor=pointer]:
-            - generic:
-              - img "loading"
+          - button "Create" [active] [ref=e351] [cursor=pointer]:
             - generic [ref=e352]: Create
 ```
