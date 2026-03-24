@@ -96,7 +96,7 @@
   **覆盖 AC**: AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-23, AC-25
   **依赖**: T001, T003
 
-- [ ] **T005**: AgentService 会话 CRUD 实现
+- [x] **T005**: AgentService 会话 CRUD 实现
   **文件**: `apps/server/app/services/agent_service.py`
   **逻辑**:
   - `AgentService` 类，接收 `AsyncSession`
