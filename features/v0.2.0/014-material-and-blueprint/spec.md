@@ -137,6 +137,7 @@ F014 还包含文件解析器模块（parsers），作为 deepagents 可调用�
 - 当 apply 过程中所有项都失败时，蓝图状态保持 pending_review（不变为 applied），返回全部失败结果
 - 当蓝图项的 suggestion 中包含 placeholderRid 引用时，apply 按映射表解析为实际 rid
 - **不支持**：文件内容加密/压缩包解析（延后到 v0.3.0）
+- **不支持**：JSON Schema 格式解析（PRD 提及但 v0.2.0 优先支持 CSV/Excel/SQL/PDF/MD/DOCX/TXT，JSON Schema 延后到 v0.3.0）
 - **不支持**：蓝图版本对比/回滚（延后到 v0.3.0）
 - **不支持**：多用户并发审查同一蓝图（v0.2.0 单用户场景）
 
