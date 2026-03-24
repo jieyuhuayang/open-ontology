@@ -266,8 +266,7 @@ class TestChat:
             return_value=None,
         ):
             with pytest.raises(AppError) as exc_info:
-                async for _ in service.chat("ri.ontology.agent-session.nonexist0000", "hello"):
-                    pass
+                await service.validate_chat("ri.ontology.agent-session.nonexist0000", "hello")
             assert exc_info.value.code == "AGENT_SESSION_NOT_FOUND"
             assert exc_info.value.status_code == 404
 
@@ -280,24 +279,16 @@ class TestChat:
             return_value=orm,
         ):
             with pytest.raises(AppError) as exc_info:
-                async for _ in service.chat(orm.rid, "hello"):
-                    pass
+                await service.validate_chat(orm.rid, "hello")
             assert exc_info.value.code == "AGENT_SESSION_NOT_ACTIVE"
             assert exc_info.value.status_code == 422
 
     @pytest.mark.asyncio
     async def test_chat_message_too_long(self, service, db_session_mock):
-        orm = _make_session_orm()
-        with patch(
-            "app.services.agent_service.AgentStorage.get_session",
-            new_callable=AsyncMock,
-            return_value=orm,
-        ):
-            with pytest.raises(AppError) as exc_info:
-                async for _ in service.chat(orm.rid, "a" * 4097):
-                    pass
-            assert exc_info.value.code == "MESSAGE_TOO_LONG"
-            assert exc_info.value.status_code == 422
+        with pytest.raises(AppError) as exc_info:
+            await service.validate_chat("ri.ontology.agent-session.abc123", "a" * 4097)
+        assert exc_info.value.code == "MESSAGE_TOO_LONG"
+        assert exc_info.value.status_code == 422
 
     @pytest.mark.asyncio
     async def test_chat_llm_not_configured(self, service, db_session_mock):
