@@ -37,17 +37,22 @@ apps/
 │   ├── app/services/                 # Business logic, transaction boundaries
 │   ├── app/domain/                   # Pydantic models, pure logic, no I/O
 │   ├── app/storage/                  # SQLAlchemy queries, return domain models
+│   ├── app/agent/                    # Agent engine (deepagents + SSE + prompts + skills)
+│   ├── cli/                          # `oo` CLI entry point (Typer, 8 command modules)
 │   ├── alembic/                      # Database migrations
 │   ├── tests/                        # Tests (unit/ + integration/)
 │   └── openapi.json                  # Committed artifact — regenerate after route changes
 docs/
 ├── architecture/                     # 00~06 architecture design documents + README
+├── operations/                       # Operations documentation
 ├── prd/                              # Product requirements + UI design screenshots
+├── review/                           # Code review records
 ├── specs/                            # Domain model specs (terminology, property types, metadata)
 └── research/                         # Technical research notes
 features/                             # SDD feature directory
 ├── _templates/                       # spec / tasks templates
-└── v0.1.0/                           # 001 ~ 009 feature packages
+├── v0.1.0/                           # 001 ~ 011 feature packages (completed)
+└── v0.2.0/                           # 012 ~ 019 feature packages + release-contract.md
 e2e/                                  # Playwright E2E tests
 ├── helpers/                          # Shared utilities (antd.ts, api.ts, fixtures.ts)
 └── *.spec.ts                         # Test files
