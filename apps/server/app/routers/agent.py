@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.responses import Response
+from starlette.responses import Response, StreamingResponse
 
 from app.database import get_db_session
 from app.domain.agent import (
@@ -10,6 +10,7 @@ from app.domain.agent import (
     AgentSessionCreate,
     AgentSessionDetail,
     AgentSessionList,
+    ChatRequest,
 )
 from app.domain.constants import DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
 from app.services.agent_service import AgentService
