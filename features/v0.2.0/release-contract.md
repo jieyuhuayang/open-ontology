@@ -73,7 +73,7 @@ Feature spec 只能引用不变量 ID，不能重新定义或覆盖。
 | INV-12 | 单用户同一时间仅允许一个活跃分析会话（status=active 且 Agent 正在执行） | AgentSession | 012 |
 | INV-13 | 上传资料单文件 ≤ 10MB，单会话 ≤ 20 个文件 | AgentMaterial | 014 |
 | INV-14 | Agent 所有破坏性操作（删除/级联更新）必须通过 `oo` CLI 执行，且触发人工授权确认 | Agent | 012, 013 |
-| INV-15 | Blueprint apply 按依赖顺序创建：先 ObjectType → 再 Property → 最后 LinkType | Blueprint, BlueprintItem | 017 |
+| INV-15 | Blueprint apply 按依赖顺序创建：先 ObjectType → 再 Property → 最后 LinkType | Blueprint, BlueprintItem | 014 |
 | INV-16 | 所有 Agent 建议（蓝图项）必须携带置信度分值（0.0-1.0）和至少一个推理来源标签 | BlueprintItem | 014 |
 
 **规则**：
