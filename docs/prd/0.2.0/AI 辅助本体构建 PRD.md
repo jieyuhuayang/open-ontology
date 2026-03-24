@@ -71,7 +71,7 @@ v0.2.0 标志着本体管理系统从"底层数据治理工具"跃升为"企业�
 | **数据架构师** | 精通数据建模，需要快速原型 | 上传 DDL/ERD，快速生成本体骨架后精调 | 高 |
 | **开发者** | 使用 CLI/Skills 自动化本体构建流程 | 在 CI/CD 或 Claude Code 中执行批量本体操作 | 高 |
 
-## 1.4 与 ontology-agent-framework 的关系
+## 1.5 与 ontology-agent-framework 的关系
 
 项目中存在两套定位不同的 Agent 系统：
 
