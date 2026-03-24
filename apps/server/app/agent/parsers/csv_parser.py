@@ -17,7 +17,7 @@ _DATE_RE = re.compile(r"^\d{4}[-/]\d{2}[-/]\d{2}$")
 _TIMESTAMP_RE = re.compile(r"^\d{4}[-/]\d{2}[-/]\d{2}[T ]\d{2}:\d{2}")
 _INT_RE = re.compile(r"^-?\d+$")
 _FLOAT_RE = re.compile(r"^-?\d+\.\d+$")
-_BOOL_VALUES = {"true", "false", "0", "1", "yes", "no"}
+_BOOL_VALUES = {"true", "false", "0", "1", "yes", "no", "t", "f"}
 
 _MAX_INFER_ROWS = 1000
 _SAMPLE_ROWS = 5
