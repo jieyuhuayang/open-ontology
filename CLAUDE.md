@@ -66,8 +66,8 @@ justfile                              # Monorepo 任务运行器
 > 连接数据库：`docker exec -it openontology-db-1 psql -U ontology -d open_ontology`
 
 ```bash
-# 1. 启动基础设施（PostgreSQL + MySQL sample，后台运行）
-docker compose up -d db mysql-sample
+# 1. 启动 PostgreSQL（后台运行）
+docker compose up -d db
 
 # 2. 数据库迁移（幂等，每次启动前跑一下确保表结构最新）
 cd apps/server && PYTHONPATH=. uv run alembic upgrade head
@@ -77,10 +77,14 @@ cd apps/server && PYTHONPATH=. uv run uvicorn app.main:app --reload --port 8000
 
 # 4. 启动前端（另开终端）
 cd apps/web && pnpm dev
+
+# 5. Agent 功能需要 LLM API Key（可选，不影响 v0.1.0 功能）
+#    在 apps/server/.env 中配置：ANTHROPIC_API_KEY=sk-...
 ```
 
 - 后端默认连接：`postgresql+asyncpg://ontology:ontology@localhost:5432/open_ontology`
 - 前端默认：http://localhost:5173（端口被占则自动递增）
+- CLI 工具：`cd apps/server && uv run oo --help`
 - 3D 星空 Demo 路由：`/demo/canvas`
 
 ## 领域术语
