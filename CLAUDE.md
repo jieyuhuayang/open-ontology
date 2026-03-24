@@ -310,10 +310,10 @@ Discover 页定制、对象类型分组、共享属性、Action Type CRUD、对�
 
 ## 外部 MySQL 策略
 
-Open Ontology 主存储为 PostgreSQL；MVP 阶段 MySQL 仅作为外部导入源。
+Open Ontology 主存储为 PostgreSQL；MySQL 仅作为外部导入源。
 
 - **禁止**直接对生产级外部数据库执行导入测试
-- 统一使用本地样本副本流程：`ops/mysql-sample/refresh.sh`
+- 统一使用本地样本副本流程：`ops/mysql-sample/refresh.sh`（独立脚本，不在 docker-compose.yml 中）
 - 凭据仅存放在 `ops/mysql-sample/.env.mysql-sample.local`，不得提交到仓库
 - `ops/mysql-sample/runtime/` 下产物仅用于本地调试，不入 Git
 
