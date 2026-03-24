@@ -6,6 +6,7 @@ Storage layer owns ORM models; domain layer owns Pydantic models.
 
 import enum
 
+import sqlalchemy as sa
 from sqlalchemy import (
     Boolean,
     Column,
