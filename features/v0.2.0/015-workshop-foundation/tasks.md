@@ -50,6 +50,7 @@
     export type BlueprintDetail = components['schemas']['BlueprintDetail'];
     export type BlueprintList = components['schemas']['BlueprintList'];
     ```
+  **影响范围**: `api/types.ts` 仅追加新类型别名，不修改现有导出；`generated/api.ts` 完整重新生成但不影响现有类型引用
   **依赖**: 无
 
 - [ ] **T002**: API Hooks — Agent 会话 + 素材 + 蓝图

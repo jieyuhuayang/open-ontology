@@ -88,8 +88,6 @@ which codex 2>/dev/null
 codex exec -s read-only --ephemeral -o /tmp/sdd-review-output.md "$(cat references/tasks-checklist.md | sed 's|{feature_dir}|<feature_dir>|g')"
 ```
 
-**若 codex 未安装，由 Claude 直接审查**（见第三步检查清单）。
-
 ### 第三步：tasks.md 检查清单
 
 读取文件：
