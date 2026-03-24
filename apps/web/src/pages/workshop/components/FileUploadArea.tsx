@@ -106,7 +106,7 @@ export default function FileUploadArea({
           delete next[tempId];
           return next;
         });
-        message.error(`Upload failed: ${file.name}`);
+        message.error(t('workshop.upload.failed', { name: file.name, defaultValue: `Upload failed: ${file.name}` }));
       }
     },
     [sessionRid, uploadMaterial, t],
