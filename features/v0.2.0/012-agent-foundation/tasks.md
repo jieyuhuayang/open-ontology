@@ -135,7 +135,7 @@
   **覆盖 AC**: AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-23, AC-25
   **依赖**: T005
 
-- [ ] **T007**: Agent Router 会话 CRUD 实现 + main.py 注册
+- [x] **T007**: Agent Router 会话 CRUD 实现 + main.py 注册
   **文件**: `apps/server/app/routers/agent.py`, `apps/server/app/main.py`
   **逻辑**:
   - `agent.py`：`router = APIRouter(prefix="/api/v1/agent", tags=["agent"])`
