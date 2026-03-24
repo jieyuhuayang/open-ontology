@@ -1,5 +1,7 @@
 """Integration tests for Agent API endpoints (T006 + T014)."""
 
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
 from httpx import AsyncClient
 
