@@ -124,17 +124,14 @@ class AgentService:
 
     # --- Chat ---
 
-    async def chat(self, session_rid: str, content: str) -> AsyncGenerator[str, None]:
-        """Stream SSE events for an Agent chat interaction."""
-        # Validate content length
+    async def validate_chat(self, session_rid: str, content: str) -> None:
+        """Pre-validate chat request. Called before streaming starts."""
         if len(content) > 4096:
             raise AppError(
                 code="MESSAGE_TOO_LONG",
                 message="Message content exceeds 4096 characters",
                 status_code=422,
             )
-
-        # Validate session
         orm = await AgentStorage.get_session(self._session, session_rid)
         if orm is None:
             raise AppError(
@@ -148,6 +145,10 @@ class AgentService:
                 message=f"Session '{session_rid}' is not active (current: {orm.status})",
                 status_code=422,
             )
+
+    async def chat(self, session_rid: str, content: str) -> AsyncGenerator[str, None]:
+        """Stream SSE events for an Agent chat interaction."""
+        orm = await AgentStorage.get_session(self._session, session_rid)
 
         # Persist user message
         await AgentStorage.create_message(
