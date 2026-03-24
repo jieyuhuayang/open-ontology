@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { useWorkshopStore } from '../stores/workshop-store';
@@ -12,19 +12,23 @@ interface EntityPopoverProps {
 export default function EntityPopover({ nodes }: EntityPopoverProps) {
   const { t } = useTranslation();
   const hoveredEntityRid = useWorkshopStore((s) => s.hoveredEntityRid);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const mousePosRef = useRef({ x: 0, y: 0 });
   const [visible, setVisible] = useState(false);
+  const [renderPos, setRenderPos] = useState({ x: 0, y: 0 });
 
   const node = nodes.find((n) => n.id === hoveredEntityRid);
 
-  // Track mouse position
+  // Only track mouse when hovered — avoids per-frame setState
   useEffect(() => {
+    if (!hoveredEntityRid) return;
+
     const handler = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
+      mousePosRef.current = { x: e.clientX, y: e.clientY };
+      setRenderPos({ x: e.clientX, y: e.clientY });
     };
     window.addEventListener('mousemove', handler);
     return () => window.removeEventListener('mousemove', handler);
-  }, []);
+  }, [hoveredEntityRid]);
 
   // 200ms delay show, 100ms delay hide
   useEffect(() => {
@@ -54,8 +58,8 @@ export default function EntityPopover({ nodes }: EntityPopoverProps) {
     <div
       style={{
         position: 'fixed',
-        left: mousePos.x + 12,
-        top: mousePos.y + 12,
+        left: renderPos.x + 12,
+        top: renderPos.y + 12,
         padding: '10px 14px',
         background: 'rgba(20, 20, 40, 0.95)',
         border: '1px solid rgba(255,255,255,0.12)',
