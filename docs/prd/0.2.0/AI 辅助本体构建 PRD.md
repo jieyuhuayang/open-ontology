@@ -383,7 +383,7 @@ v0.2.0 的 Human-in-the-Loop 设计遵循"接受/编辑/拒绝"三级模式，�
 └──────────────────────┬──────────────────────────┘
                        │ 调用
 ┌──────────────────────┴──────────────────────────┐
-│  Level 1: 原子级 Skill（CLI 命令直接对应）        │
+│  Level 1: 原子级 Skill（与 oo CLI 命令一一对应）  │
 │  · create-object-type  · update-object-type      │
 │  · delete-object-type  · create-property         │
 │  · create-link-type    · update-link-type        │
@@ -391,6 +391,32 @@ v0.2.0 的 Human-in-the-Loop 设计遵循"接受/编辑/拒绝"三级模式，�
 │  · search-ontology     · validate-ontology       │
 └─────────────────────────────────────────────────┘
 ```
+
+### 统一能力层原则
+
+Skills 体系严格分为**能力层**和**知识层**，确保所有调用者走同一条执行路径：
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  知识层（SKILL.md）— 描述何时/如何调用能力                  │
+│  apps/server/app/agent/skills/xxx/SKILL.md               │
+│  （参数说明 + 约束规则 + 使用场景 + CLI 命令映射）          │
+│  · deepagents Agent 读取 SKILL.md → 执行 oo CLI 命令     │
+│  · Claude Code Skills 薄壳封装 → 调用 oo CLI 命令         │
+└────────────────────────────┬─────────────────────────────┘
+                              │
+┌────────────────────────────┴─────────────────────────────┐
+│  能力层（oo CLI）— 唯一的能力封装                           │
+│  oo <resource> <action> [--params]                        │
+│  CLI Adapter → Service 层 → Domain 层 → Storage 层        │
+│  · 所有调用者（Agent / 开发者 / Claude Code）走此唯一路径   │
+└──────────────────────────────────────────────────────────┘
+```
+
+- **`oo` CLI 是唯一能力封装**：每个原子操作只有一个实现，封装自 v0.1.0 Service 层
+- **SKILL.md 是唯一知识定义**：参数、约束、使用场景只维护一次，Agent 和 Claude Code 共享
+- **Claude Code Skills 是薄壳**：不重复定义能力，仅提供描述 + 调用 `oo` CLI 的快捷入口
+- **执行路径统一**：无论哪个入口，最终都是 `oo` CLI → CLI Adapter → Service 层
 
 ## 3.7 机器体验（MX）与语义设计系统
 
