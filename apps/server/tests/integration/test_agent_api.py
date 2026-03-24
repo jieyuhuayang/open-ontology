@@ -135,3 +135,110 @@ class TestDeleteSession:
         )
         assert resp.status_code == 404
         assert resp.json()["error"]["code"] == "AGENT_SESSION_NOT_FOUND"
+
+
+# ---------------------------------------------------------------------------
+# Chat SSE (T014)
+# ---------------------------------------------------------------------------
+
+
+class TestChat:
+    @pytest.mark.asyncio
+    async def test_chat_session_not_found_404(self, seeded_client: AsyncClient):
+        resp = await seeded_client.post(
+            "/api/v1/agent/chat",
+            json={
+                "sessionRid": "ri.ontology.agent-session.nonexist0000",
+                "content": "hello",
+            },
+        )
+        assert resp.status_code == 404
+        assert resp.json()["error"]["code"] == "AGENT_SESSION_NOT_FOUND"
+
+    @pytest.mark.asyncio
+    async def test_chat_session_not_active_422(self, seeded_client: AsyncClient):
+        create_resp = await seeded_client.post(
+            "/api/v1/agent/sessions",
+            json={"ontologyRid": "ri.ontology.ontology.default"},
+        )
+        rid = create_resp.json()["rid"]
+        await seeded_client.post(f"/api/v1/agent/sessions/{rid}/complete")
+
+        resp = await seeded_client.post(
+            "/api/v1/agent/chat",
+            json={"sessionRid": rid, "content": "hello"},
+        )
+        assert resp.status_code == 422
+        assert resp.json()["error"]["code"] == "AGENT_SESSION_NOT_ACTIVE"
+
+    @pytest.mark.asyncio
+    async def test_chat_message_too_long_422(self, seeded_client: AsyncClient):
+        create_resp = await seeded_client.post(
+            "/api/v1/agent/sessions",
+            json={"ontologyRid": "ri.ontology.ontology.default"},
+        )
+        rid = create_resp.json()["rid"]
+
+        resp = await seeded_client.post(
+            "/api/v1/agent/chat",
+            json={"sessionRid": rid, "content": "a" * 4097},
+        )
+        assert resp.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_chat_sse_stream(self, seeded_client: AsyncClient):
+        create_resp = await seeded_client.post(
+            "/api/v1/agent/sessions",
+            json={"ontologyRid": "ri.ontology.ontology.default"},
+        )
+        rid = create_resp.json()["rid"]
+
+        async def mock_adapt_stream(*args, **kwargs):
+            yield 'event: text-delta\ndata: {"text": "Hello"}\n\n'
+            yield 'event: done\ndata: {"sessionRid": "' + rid + '", "summary": "Hello"}\n\n'
+
+        with (
+            patch("app.services.agent_service.AgentEngine") as MockEngine,
+            patch("app.services.agent_service.adapt_stream", side_effect=mock_adapt_stream),
+        ):
+            MockEngine.return_value.create_agent.return_value = MagicMock()
+            resp = await seeded_client.post(
+                "/api/v1/agent/chat",
+                json={"sessionRid": rid, "content": "hello"},
+            )
+
+        assert resp.status_code == 200
+        assert "text/event-stream" in resp.headers.get("content-type", "")
+        body = resp.text
+        assert "text-delta" in body
+        assert "done" in body
+
+    @pytest.mark.asyncio
+    async def test_chat_persists_messages(self, seeded_client: AsyncClient):
+        create_resp = await seeded_client.post(
+            "/api/v1/agent/sessions",
+            json={"ontologyRid": "ri.ontology.ontology.default"},
+        )
+        rid = create_resp.json()["rid"]
+
+        async def mock_adapt_stream(*args, **kwargs):
+            yield 'event: text-delta\ndata: {"text": "Hi there"}\n\n'
+            yield 'event: done\ndata: {"sessionRid": "' + rid + '", "summary": "Hi there"}\n\n'
+
+        with (
+            patch("app.services.agent_service.AgentEngine") as MockEngine,
+            patch("app.services.agent_service.adapt_stream", side_effect=mock_adapt_stream),
+        ):
+            MockEngine.return_value.create_agent.return_value = MagicMock()
+            await seeded_client.post(
+                "/api/v1/agent/chat",
+                json={"sessionRid": rid, "content": "say hi"},
+            )
+
+        detail_resp = await seeded_client.get(f"/api/v1/agent/sessions/{rid}")
+        assert detail_resp.status_code == 200
+        messages = detail_resp.json()["messages"]
+        assert len(messages) >= 2
+        assert messages[0]["role"] == "user"
+        assert messages[0]["content"] == "say hi"
+        assert messages[1]["role"] == "assistant"
