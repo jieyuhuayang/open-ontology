@@ -286,6 +286,7 @@ class ErrorEvent(DomainModel):
 | GET | `/api/v1/agent/sessions` | 会话列表（分页） | P0 |
 | GET | `/api/v1/agent/sessions/{rid}` | 会话详情（含消息历史） | P0 |
 | DELETE | `/api/v1/agent/sessions/{rid}` | 删除会话 | P0 |
+| POST | `/api/v1/agent/sessions/{rid}/complete` | 关闭会话（active→completed） | P0 |
 | POST | `/api/v1/agent/chat` | SSE 流式对话 | P0 |
 
 ### 6.2 请求/响应示例
