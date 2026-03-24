@@ -236,8 +236,9 @@
 - [ ] **T015**: SidekickPanel + PlanProgressTree
   **文件**: `apps/web/src/pages/workshop/components/SidekickPanel.tsx`（新建）, `apps/web/src/pages/workshop/components/PlanProgressTree.tsx`（新建）
   **逻辑**:
-  - `SidekickPanel.tsx`: 右侧面板容器。可折叠（store.isSidekickOpen）。内部垂直布局：PlanProgressTree（顶部）→ SuggestionCard 列表（中部，可滚动）→ BlueprintSummary（底部，蓝图完成后显示）
+  - `SidekickPanel.tsx`: 右侧面板容器。可折叠（store.isSidekickOpen）。内部垂直布局：PlanProgressTree（顶部）→ 预留 SuggestionCard 列表 slot（T016 实现后在 T020 接入）→ 预留 BlueprintSummary slot（T016 实现后在 T020 接入）
   - `PlanProgressTree.tsx`: 从 store.planSteps 渲染步骤列表。每个步骤显示：序号（圆形徽标）+ 步骤文字 + 状态（当前步骤显示 loading spinner，已完成显示 ✓）。当前进度：step.index / step.total
+  **测试**: 由 T022 补充 PlanProgressTree 渲染测试（验证步骤列表渲染、进度显示）
   **覆盖 AC**: AC-33
   **依赖**: T003, T004
 
