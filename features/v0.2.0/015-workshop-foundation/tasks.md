@@ -302,6 +302,7 @@
     - existing: 画布渲染 OT + "上传资料扩展本体"引导文字
     - analyzing: 画布结晶动画 + Sidekick 进度
     - disconnected: ConnectionBanner 遮罩
+  **测试**: 由 T022 补充页面状态机测试（验证初始状态推导、状态切换条件渲染）；ConnectionBanner 渲染测试（验证 disconnected 时显示遮罩、reconnect 按钮触发回调）
   **覆盖 AC**: AC-36, AC-37, AC-38, AC-39, AC-40, AC-41
   **依赖**: T009, T010, T014, T015
 
