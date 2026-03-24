@@ -1440,7 +1440,7 @@ Agent: 我从 orders.csv 中识别到 [Order] 对象类型，
 
 ### 核心设计原则
 
-1. **Agent 是 Service 的消费者，不是替代者** — deepagents Agent 通过 Tool Adapter 调用现有 Service 层，不绕过 Domain 层校验
+1. **Agent 是 Service 的消费者，不是替代者** — deepagents Agent 通过 `oo` CLI 调用现有 Service 层，与开发者使用同一能力接口，不绕过 Domain 层校验
 2. **Skill 按需加载** — 仅描述常驻上下文，完整定义按需加载，节省 token
 3. **子 Agent 上下文隔离** — 大文件分析不污染主 Agent 上下文
 
