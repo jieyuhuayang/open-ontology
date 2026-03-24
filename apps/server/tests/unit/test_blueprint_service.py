@@ -1138,8 +1138,8 @@ class TestApply:
         mock_created_lt = MagicMock()
         mock_created_lt.rid = "ri.ontology.link-type.real001"
 
-        # Mock service classes at construction level so Pydantic request model
-        # validation (which happens before .create) is bypassed entirely.
+        # Mock service classes at construction level AND domain request models
+        # so that Pydantic validation (which runs before .create) is bypassed.
         mock_ot_svc = MagicMock()
         mock_ot_svc.create = AsyncMock(return_value=mock_created_ot)
         mock_ot_cls = MagicMock(return_value=mock_ot_svc)
@@ -1183,6 +1183,10 @@ class TestApply:
                 "app.services.link_type_service.LinkTypeService",
                 mock_lt_cls,
             ),
+            # Patch Pydantic domain request models so validation is skipped
+            patch("app.domain.object_type.ObjectTypeCreateRequest", MagicMock()),
+            patch("app.domain.property.PropertyCreateRequest", MagicMock()),
+            patch("app.domain.link_type.LinkTypeCreateRequest", MagicMock()),
         ):
             result = await service.apply("ri.ontology.blueprint.bp001")
 
