@@ -515,3 +515,57 @@ class MySQLConnectionModel(Base):
     last_used_at = Column(DateTime(timezone=True), nullable=True)
     status = Column(String(20), nullable=False, server_default="untested")
     last_tested_at = Column(DateTime(timezone=True), nullable=True)
+
+
+# ---------------------------------------------------------------------------
+# Agent Models (v0.2.0 — F012)
+# ---------------------------------------------------------------------------
+
+
+class AgentSessionModel(Base):
+    __tablename__ = "agent_sessions"
+
+    rid = Column(Text, primary_key=True)
+    ontology_rid = Column(Text, ForeignKey("ontologies.rid"), nullable=False)
+    user_id = Column(Text, nullable=True)
+    title = Column(Text, nullable=True)
+    domain = Column(Text, nullable=True)
+    goal = Column(Text, nullable=True)
+    scope_hint = Column(Text, nullable=True)
+    status = Column(Text, nullable=False, server_default="active")
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+    messages = relationship(
+        "AgentMessageModel", back_populates="session", cascade="all, delete-orphan"
+    )
+    audit_logs = relationship("AgentAuditLogModel", back_populates="session")
+
+
+class AgentMessageModel(Base):
+    __tablename__ = "agent_messages"
+    __table_args__ = (Index("idx_agent_messages_session", "session_rid", "created_at"),)
+
+    rid = Column(Text, primary_key=True)
+    session_rid = Column(Text, ForeignKey("agent_sessions.rid", ondelete="CASCADE"), nullable=False)
+    role = Column(Text, nullable=False)
+    content = Column(Text, nullable=False)
+    metadata_ = Column("metadata", JSONB, nullable=False, server_default=text("'{}'::jsonb"))
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    session = relationship("AgentSessionModel", back_populates="messages")
+
+
+class AgentAuditLogModel(Base):
+    __tablename__ = "agent_audit_logs"
+    __table_args__ = (Index("idx_agent_audit_logs_session", "session_rid", "created_at"),)
+
+    rid = Column(Text, primary_key=True)
+    session_rid = Column(Text, ForeignKey("agent_sessions.rid", ondelete="SET NULL"), nullable=True)
+    action = Column(Text, nullable=False)
+    details = Column(JSONB, nullable=False, server_default=text("'{}'::jsonb"))
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    session = relationship("AgentSessionModel", back_populates="audit_logs")
