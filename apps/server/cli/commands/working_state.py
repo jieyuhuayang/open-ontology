@@ -2,7 +2,6 @@
 
 import typer
 
-from app.domain.constants import DEFAULT_ONTOLOGY_RID
 from app.exceptions import AppError
 from app.services.working_state_service import WorkingStateService
 from cli.adapter import async_session_context, get_ontology_rid, run_async
