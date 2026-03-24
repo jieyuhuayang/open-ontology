@@ -238,28 +238,45 @@ Edit → Working State (本地) → Save → Published State (全局)
 | API Name | 开发者引用 | `Employee` | 可变（active 后不可改） |
 | Display Name | 用户界面展示 | `员工` / `Employee` | 随时可改，支持 i18n |
 
-## MVP Architecture Scope
+## Architecture Scope by Version
 
-对于 v0.1.0 MVP，架构范围聚焦于：
+### v0.1.0 MVP — 已完成
 
 ```
-✅ MVP 范围:
+✅ 已完成:
 ├── Ontology Manager Web UI（前端）
 ├── Ontology Service（Object Type + Link Type CRUD）
+├── Property Management（属性管理全栈）
 ├── Change Management Service（Working State + Save + History）
 ├── Search Service（基础全文搜索）
 ├── REST API（基础 CRUD）
 ├── Schema Store（关系型数据库）
 ├── Change History Store
-├── JSON Import/Export
+├── Data Connection（MySQL 数据连接 + 对象实例同步）
 └── MySQL Dataset 导入：在对象类型编辑流程内配置连接并导入快照
+```
 
-⬜ 后续版本:
-├── MCP Server（Agent 接口）
+### v0.2.0 AI-Assisted Ontology Building — 进行中
+
+```
+✅ 已完成:
+├── Agent Foundation（deepagents 引擎 + SSE 流式通信 + 会话管理）
+└── CLI & Skills（oo 统一能力层 + 16 个 Agent Skills + SKILL.md 知识体系）
+
+⬜ 计划中:
+├── Material & Blueprint（素材上传 + 蓝图生成 + HITL 审查）
+├── Workshop（Agent 交互 UI）
+└── Agent Sidekick（Agent 助手）
+```
+
+### 后续版本
+
+```
+⬜ 待规划:
+├── MCP Server（Agent 接口，详见 03-agent-context-architecture.md）
 ├── OSDK 代码生成
 ├── Security Service（完整的 RBAC + MAC）
 ├── 向量索引 + 语义搜索
-├── Data Source 定期同步 + 增量更新（基础版已在 MVP 完成）
 ├── Action Type 执行引擎
 └── Function Runtime
 ```
