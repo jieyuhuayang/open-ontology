@@ -24,6 +24,852 @@
         }
       }
     },
+    "/api/v1/agent/sessions": {
+      "post": {
+        "tags": [
+          "agent"
+        ],
+        "summary": "Create Session",
+        "operationId": "create_session_api_v1_agent_sessions_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentSessionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSession"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "agent"
+        ],
+        "summary": "List Sessions",
+        "operationId": "list_sessions_api_v1_agent_sessions_get",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Pagesize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSessionList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agent/sessions/{rid}": {
+      "get": {
+        "tags": [
+          "agent"
+        ],
+        "summary": "Get Session Detail",
+        "operationId": "get_session_detail_api_v1_agent_sessions__rid__get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSessionDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "agent"
+        ],
+        "summary": "Delete Session",
+        "operationId": "delete_session_api_v1_agent_sessions__rid__delete",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agent/sessions/{rid}/complete": {
+      "post": {
+        "tags": [
+          "agent"
+        ],
+        "summary": "Complete Session",
+        "operationId": "complete_session_api_v1_agent_sessions__rid__complete_post",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSession"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agent/chat": {
+      "post": {
+        "tags": [
+          "agent"
+        ],
+        "summary": "Chat",
+        "operationId": "chat_api_v1_agent_chat_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agent/materials/upload": {
+      "post": {
+        "tags": [
+          "materials"
+        ],
+        "summary": "Upload Material",
+        "operationId": "upload_material_api_v1_agent_materials_upload_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_material_api_v1_agent_materials_upload_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentMaterial"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agent/materials/": {
+      "get": {
+        "tags": [
+          "materials"
+        ],
+        "summary": "List Materials",
+        "operationId": "list_materials_api_v1_agent_materials__get",
+        "parameters": [
+          {
+            "name": "sessionRid",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sessionrid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AgentMaterial"
+                  },
+                  "title": "Response List Materials Api V1 Agent Materials  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agent/materials/{rid}": {
+      "get": {
+        "tags": [
+          "materials"
+        ],
+        "summary": "Get Material",
+        "operationId": "get_material_api_v1_agent_materials__rid__get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentMaterial"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "materials"
+        ],
+        "summary": "Delete Material",
+        "operationId": "delete_material_api_v1_agent_materials__rid__delete",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/blueprints": {
+      "post": {
+        "tags": [
+          "blueprints"
+        ],
+        "summary": "Create Blueprint",
+        "operationId": "create_blueprint_api_v1_blueprints_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlueprintCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Blueprint"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "blueprints"
+        ],
+        "summary": "List Blueprints",
+        "operationId": "list_blueprints_api_v1_blueprints_get",
+        "parameters": [
+          {
+            "name": "sessionRid",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sessionrid"
+            }
+          },
+          {
+            "name": "ontologyRid",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ontologyrid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Pagesize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlueprintList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/blueprints/{rid}": {
+      "get": {
+        "tags": [
+          "blueprints"
+        ],
+        "summary": "Get Blueprint Detail",
+        "operationId": "get_blueprint_detail_api_v1_blueprints__rid__get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlueprintDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "blueprints"
+        ],
+        "summary": "Update Blueprint",
+        "operationId": "update_blueprint_api_v1_blueprints__rid__patch",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlueprintUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Blueprint"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/blueprints/{rid}/items": {
+      "post": {
+        "tags": [
+          "blueprints"
+        ],
+        "summary": "Create Blueprint Items",
+        "operationId": "create_blueprint_items_api_v1_blueprints__rid__items_post",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/BlueprintItemCreate"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/BlueprintItemCreate"
+                    }
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BlueprintItem"
+                  },
+                  "title": "Response Create Blueprint Items Api V1 Blueprints  Rid  Items Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "blueprints"
+        ],
+        "summary": "List Blueprint Items",
+        "operationId": "list_blueprint_items_api_v1_blueprints__rid__items_get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BlueprintItem"
+                  },
+                  "title": "Response List Blueprint Items Api V1 Blueprints  Rid  Items Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/blueprints/{rid}/items/{item_rid}": {
+      "patch": {
+        "tags": [
+          "blueprints"
+        ],
+        "summary": "Update Blueprint Item Decision",
+        "operationId": "update_blueprint_item_decision_api_v1_blueprints__rid__items__item_rid__patch",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          },
+          {
+            "name": "item_rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Item Rid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlueprintItemUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlueprintItem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/blueprints/{rid}/apply": {
+      "post": {
+        "tags": [
+          "blueprints"
+        ],
+        "summary": "Apply Blueprint",
+        "operationId": "apply_blueprint_api_v1_blueprints__rid__apply_post",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlueprintApplyResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/object-types": {
       "get": {
         "tags": [
@@ -2241,6 +3087,365 @@
   },
   "components": {
     "schemas": {
+      "AgentMaterial": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "sessionRid": {
+            "type": "string",
+            "title": "Sessionrid"
+          },
+          "fileName": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "fileType": {
+            "$ref": "#/components/schemas/MaterialFileType"
+          },
+          "fileSize": {
+            "type": "integer",
+            "title": "Filesize"
+          },
+          "storagePath": {
+            "type": "string",
+            "title": "Storagepath"
+          },
+          "analysisStatus": {
+            "$ref": "#/components/schemas/AnalysisStatus",
+            "default": "pending"
+          },
+          "analysisResult": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Analysisresult"
+          },
+          "errorMessage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Errormessage"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "sessionRid",
+          "fileName",
+          "fileType",
+          "fileSize",
+          "storagePath",
+          "createdAt"
+        ],
+        "title": "AgentMaterial"
+      },
+      "AgentMessage": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "sessionRid": {
+            "type": "string",
+            "title": "Sessionrid"
+          },
+          "role": {
+            "$ref": "#/components/schemas/MessageRole"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "sessionRid",
+          "role",
+          "content",
+          "createdAt"
+        ],
+        "title": "AgentMessage"
+      },
+      "AgentSession": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "ontologyRid": {
+            "type": "string",
+            "title": "Ontologyrid"
+          },
+          "userId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Userid"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain"
+          },
+          "goal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal"
+          },
+          "scopeHint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scopehint"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SessionStatus",
+            "default": "active"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updatedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "ontologyRid",
+          "createdAt",
+          "updatedAt"
+        ],
+        "title": "AgentSession"
+      },
+      "AgentSessionCreate": {
+        "properties": {
+          "ontologyRid": {
+            "type": "string",
+            "title": "Ontologyrid"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain"
+          },
+          "goal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal"
+          },
+          "scopeHint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scopehint"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ontologyRid"
+        ],
+        "title": "AgentSessionCreate"
+      },
+      "AgentSessionDetail": {
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/AgentSession"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/AgentMessage"
+            },
+            "type": "array",
+            "title": "Messages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session",
+          "messages"
+        ],
+        "title": "AgentSessionDetail"
+      },
+      "AgentSessionList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AgentSession"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "totalCount": {
+            "type": "integer",
+            "title": "Totalcount"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "pageSize": {
+            "type": "integer",
+            "title": "Pagesize"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "totalCount",
+          "page",
+          "pageSize"
+        ],
+        "title": "AgentSessionList"
+      },
+      "AnalysisStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "analyzing",
+          "completed",
+          "failed"
+        ],
+        "title": "AnalysisStatus"
+      },
+      "ApplyItemResult": {
+        "properties": {
+          "itemRid": {
+            "type": "string",
+            "title": "Itemrid"
+          },
+          "itemType": {
+            "$ref": "#/components/schemas/BlueprintItemType"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "createdEntityRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Createdentityrid"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "itemRid",
+          "itemType",
+          "status"
+        ],
+        "title": "ApplyItemResult"
+      },
       "BatchOperationResponse": {
         "properties": {
           "processed": {
@@ -2273,6 +3478,458 @@
         ],
         "title": "BatchOperationResponse",
         "description": "Response for batch operations showing what was done and what was skipped."
+      },
+      "Blueprint": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "sessionRid": {
+            "type": "string",
+            "title": "Sessionrid"
+          },
+          "ontologyRid": {
+            "type": "string",
+            "title": "Ontologyrid"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "status": {
+            "$ref": "#/components/schemas/BlueprintStatus",
+            "default": "draft"
+          },
+          "sourceSummary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sourcesummary"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updatedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "sessionRid",
+          "ontologyRid",
+          "name",
+          "createdAt",
+          "updatedAt"
+        ],
+        "title": "Blueprint"
+      },
+      "BlueprintApplyResult": {
+        "properties": {
+          "blueprintRid": {
+            "type": "string",
+            "title": "Blueprintrid"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "succeeded": {
+            "type": "integer",
+            "title": "Succeeded"
+          },
+          "failed": {
+            "type": "integer",
+            "title": "Failed"
+          },
+          "skipped": {
+            "type": "integer",
+            "title": "Skipped"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ApplyItemResult"
+            },
+            "type": "array",
+            "title": "Results"
+          }
+        },
+        "type": "object",
+        "required": [
+          "blueprintRid",
+          "total",
+          "succeeded",
+          "failed",
+          "skipped",
+          "results"
+        ],
+        "title": "BlueprintApplyResult"
+      },
+      "BlueprintCreate": {
+        "properties": {
+          "sessionRid": {
+            "type": "string",
+            "title": "Sessionrid"
+          },
+          "ontologyRid": {
+            "type": "string",
+            "title": "Ontologyrid"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "sourceSummary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sourcesummary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sessionRid",
+          "ontologyRid",
+          "name"
+        ],
+        "title": "BlueprintCreate"
+      },
+      "BlueprintDetail": {
+        "properties": {
+          "blueprint": {
+            "$ref": "#/components/schemas/Blueprint"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BlueprintItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "blueprint",
+          "items"
+        ],
+        "title": "BlueprintDetail"
+      },
+      "BlueprintItem": {
+        "properties": {
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          },
+          "blueprintRid": {
+            "type": "string",
+            "title": "Blueprintrid"
+          },
+          "itemType": {
+            "$ref": "#/components/schemas/BlueprintItemType"
+          },
+          "suggestion": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Suggestion"
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence"
+          },
+          "confidenceLevel": {
+            "$ref": "#/components/schemas/ConfidenceLevel"
+          },
+          "reasoning": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ItemSource"
+          },
+          "userDecision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserDecision"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "userEdits": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Useredits"
+          },
+          "rejectionReason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejectionreason"
+          },
+          "createdEntityRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Createdentityrid"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "title": "Sortorder",
+            "default": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updatedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rid",
+          "blueprintRid",
+          "itemType",
+          "suggestion",
+          "confidence",
+          "confidenceLevel",
+          "source",
+          "createdAt",
+          "updatedAt"
+        ],
+        "title": "BlueprintItem"
+      },
+      "BlueprintItemCreate": {
+        "properties": {
+          "itemType": {
+            "$ref": "#/components/schemas/BlueprintItemType"
+          },
+          "suggestion": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Suggestion"
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence"
+          },
+          "reasoning": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ItemSource"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "title": "Sortorder",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "itemType",
+          "suggestion",
+          "confidence",
+          "source"
+        ],
+        "title": "BlueprintItemCreate"
+      },
+      "BlueprintItemType": {
+        "type": "string",
+        "enum": [
+          "object_type",
+          "property",
+          "link_type"
+        ],
+        "title": "BlueprintItemType"
+      },
+      "BlueprintItemUpdate": {
+        "properties": {
+          "userDecision": {
+            "$ref": "#/components/schemas/UserDecision"
+          },
+          "userEdits": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Useredits"
+          },
+          "rejectionReason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejectionreason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "userDecision"
+        ],
+        "title": "BlueprintItemUpdate"
+      },
+      "BlueprintList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Blueprint"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "totalCount": {
+            "type": "integer",
+            "title": "Totalcount"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "pageSize": {
+            "type": "integer",
+            "title": "Pagesize"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "totalCount",
+          "page",
+          "pageSize"
+        ],
+        "title": "BlueprintList"
+      },
+      "BlueprintStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "pending_review",
+          "applied",
+          "discarded"
+        ],
+        "title": "BlueprintStatus"
+      },
+      "BlueprintUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BlueprintStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sourceSummary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sourcesummary"
+          }
+        },
+        "type": "object",
+        "title": "BlueprintUpdate"
+      },
+      "Body_upload_material_api_v1_agent_materials_upload_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "session_rid": {
+            "type": "string",
+            "title": "Session Rid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "session_rid"
+        ],
+        "title": "Body_upload_material_api_v1_agent_materials_upload_post"
       },
       "Body_upload_preview_api_v1_datasets_upload_preview_post": {
         "properties": {
@@ -2426,6 +4083,34 @@
           "DELETE"
         ],
         "title": "ChangeType"
+      },
+      "ChatRequest": {
+        "properties": {
+          "sessionRid": {
+            "type": "string",
+            "title": "Sessionrid"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 4096,
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sessionRid",
+          "content"
+        ],
+        "title": "ChatRequest"
+      },
+      "ConfidenceLevel": {
+        "type": "string",
+        "enum": [
+          "high",
+          "medium",
+          "low"
+        ],
+        "title": "ConfidenceLevel"
       },
       "ConnectionTestResponse": {
         "properties": {
@@ -3009,6 +4694,16 @@
         "title": "ImportedTableInfo",
         "description": "Table already imported/registered from a connection."
       },
+      "ItemSource": {
+        "type": "string",
+        "enum": [
+          "field_analysis",
+          "pattern_matching",
+          "semantic_inference",
+          "best_practices"
+        ],
+        "title": "ItemSource"
+      },
       "JoinMethod": {
         "type": "string",
         "enum": [
@@ -3533,6 +5228,28 @@
         "title": "LiveDatasetCreateRequest",
         "description": "Request to register a Live Dataset (schema only, no data copy)."
       },
+      "MaterialFileType": {
+        "type": "string",
+        "enum": [
+          "csv",
+          "xlsx",
+          "sql",
+          "pdf",
+          "md",
+          "docx",
+          "txt"
+        ],
+        "title": "MaterialFileType"
+      },
+      "MessageRole": {
+        "type": "string",
+        "enum": [
+          "user",
+          "assistant",
+          "system"
+        ],
+        "title": "MessageRole"
+      },
       "MySQLColumnInfo": {
         "properties": {
           "name": {
@@ -3884,8 +5601,7 @@
           "properties": {
             "additionalProperties": true,
             "type": "object",
-            "title": "Properties",
-            "default": {}
+            "title": "Properties"
           },
           "sourceDatasetRid": {
             "anyOf": [
@@ -5104,6 +6820,16 @@
         ],
         "title": "SearchTypeResult"
       },
+      "SessionStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
+        "title": "SessionStatus"
+      },
       "StructField": {
         "properties": {
           "name": {
@@ -5213,6 +6939,15 @@
           "startedAt"
         ],
         "title": "SyncJob"
+      },
+      "UserDecision": {
+        "type": "string",
+        "enum": [
+          "accepted",
+          "edited",
+          "rejected"
+        ],
+        "title": "UserDecision"
       },
       "ValidationError": {
         "properties": {

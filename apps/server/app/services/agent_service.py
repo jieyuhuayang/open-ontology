@@ -108,6 +108,13 @@ class AgentService:
 
     async def delete_session(self, rid: str) -> None:
         await self._get_session_or_404(rid)
+
+        # Clean up local material files (DB records cascade-deleted by FK)
+        from app.services.material_service import MaterialService
+
+        material_service = MaterialService(self._session)
+        await material_service.cleanup_session_files(rid)
+
         # Write audit log BEFORE delete (FK ON DELETE SET NULL preserves the log)
         await AgentStorage.create_audit_log(
             self._session,

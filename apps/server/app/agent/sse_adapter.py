@@ -11,6 +11,10 @@ class SSEEventType(str, enum.Enum):
     PLAN_STEP = "plan-step"
     DONE = "done"
     ERROR = "error"
+    # F014: Material & Blueprint events
+    MATERIAL_UPLOADED = "material-uploaded"
+    BLUEPRINT_ITEM = "blueprint-item"
+    BLUEPRINT_COMPLETE = "blueprint-complete"
 
 
 @dataclass
@@ -92,3 +96,46 @@ async def adapt_stream(
             SSEEventType.ERROR,
             {"code": "LLM_API_ERROR", "message": str(e)},
         )
+
+
+# --- F014: Material & Blueprint event formatters ---
+
+
+def format_material_uploaded_event(rid: str, file_name: str, file_type: str) -> str:
+    return format_sse_event(
+        SSEEventType.MATERIAL_UPLOADED,
+        {"rid": rid, "fileName": file_name, "fileType": file_type},
+    )
+
+
+def format_blueprint_item_event(
+    rid: str,
+    item_type: str,
+    suggestion: dict,
+    confidence: float,
+    confidence_level: str,
+) -> str:
+    return format_sse_event(
+        SSEEventType.BLUEPRINT_ITEM,
+        {
+            "rid": rid,
+            "itemType": item_type,
+            "suggestion": suggestion,
+            "confidence": confidence,
+            "confidenceLevel": confidence_level,
+        },
+    )
+
+
+def format_blueprint_complete_event(
+    blueprint_rid: str, name: str, status: str, item_count: int
+) -> str:
+    return format_sse_event(
+        SSEEventType.BLUEPRINT_COMPLETE,
+        {
+            "blueprintRid": blueprint_rid,
+            "name": name,
+            "status": status,
+            "itemCount": item_count,
+        },
+    )

@@ -11,10 +11,12 @@ from app.exceptions import AppError, app_error_handler
 from app.seed import ensure_seed_data
 from app.routers import (
     agent,
+    blueprints,
     datasets,
     health,
     imports,
     link_types,
+    materials,
     mysql_connections,
     object_instances,
     object_types,
@@ -65,6 +67,8 @@ app.add_exception_handler(AppError, app_error_handler)
 
 app.include_router(health.router)
 app.include_router(agent.router)
+app.include_router(materials.router)
+app.include_router(blueprints.router)
 app.include_router(object_types.router)
 app.include_router(properties.router)
 app.include_router(link_types.router)

@@ -19,6 +19,11 @@ class Settings(BaseSettings):
     LLM_TOKEN_BUDGET: int = 100000  # per-session token budget
     LLM_MAX_STEPS: int = 50  # agent recursion limit (L8)
 
+    # Material upload configuration (v0.2.0 — F014)
+    MATERIAL_UPLOAD_DIR: str = "uploads/materials"
+    MATERIAL_MAX_FILE_SIZE_MB: int = 10
+    MATERIAL_MAX_FILES_PER_SESSION: int = 20
+
     model_config = {"env_file": ".env", "extra": "ignore"}
 
 
