@@ -510,6 +510,7 @@ event: skill-call        # Skill 调用通知（data: { skillName, params, statu
 event: blueprint-item    # 蓝图项建议（data: { item: BlueprintItem }）
 event: subgraph-update   # 3D 星空子图更新（data: { nodes, edges, action }）
 event: confidence-update # 置信度更新（data: { itemRid, confidence, reasoning }）
+event: clarification-req # 澄清请求（data: { questionId, question, options[], context }）
 event: done              # 流结束（data: { blueprintRid, summary }）
 event: error             # 错误（data: { code, message }）
 ```
