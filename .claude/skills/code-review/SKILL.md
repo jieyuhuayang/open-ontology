@@ -27,7 +27,7 @@ If no arguments provided, default to uncommitted changes.
 Run the build-prompt.sh script to collect diff and assemble the review prompt:
 
 ```bash
-bash .claude/plugins/code-review-multi-ai/skills/code-review/scripts/build-prompt.sh [ARGS]
+bash .claude/skills/code-review/scripts/build-prompt.sh [ARGS]
 ```
 
 Where `[ARGS]` matches the parsed mode:
