@@ -216,9 +216,9 @@
 
 ### Phase 3: ValidationService 提取
 
-- [ ] **T014**: ValidationService — 单元测试
+- [ ] **T017**: ValidationService — 单元测试
   **文件**: `apps/server/tests/unit/test_validation_service.py`
-  **逻辑**: mock db session + WorkingStateService 内部调用：
+  **逻辑**: mock db session + Storage 调用：
   - `test_validate_complete_ontology`：无问题时返回空 list
   - `test_validate_incomplete_ot`：缺字段时返回 ValidationResult(severity="error", code="INCOMPLETE_OBJECT_TYPE")
   - `test_validate_type_incompatibility`：属性类型与列类型不兼容时返回 error
@@ -227,168 +227,149 @@
   **覆盖 AC**: AC-28, AC-29, AC-30, AC-31
   **依赖**: T002
 
-- [ ] **T015**: ValidationService — 实现 + WorkingStateService 重构
+- [ ] **T018**: ValidationService — 实现 + WorkingStateService 重构
   **文件**: `apps/server/app/services/validation_service.py`, `apps/server/app/services/working_state_service.py`
   **逻辑**:
   - 创建 `ValidationService(session)`，方法 `async def validate(ontology_rid) -> list[ValidationResult]`
-  - 提取 `WorkingStateService._validate_completeness()` 逻辑 → `_check_completeness()` 方法，返回 ValidationResult 列表（不抛异常）
-  - 提取 `WorkingStateService._validate_type_compatibility()` 逻辑 → `_check_type_compatibility()`
-  - 新增 `_check_orphan_link_types()`：查询 LinkType 端点引用的 OT 是否在 merged view 中存在
-  - 新增 `_check_apiname_conflicts()`：查询 merged view 中 apiName 重复
-  - 重构 `WorkingStateService.publish()`：调用 `ValidationService.validate()`，将 severity="error" 的结果转为 AppError
-  - **影响范围**：仅修改 validation 逻辑的提取方式，不修改 ObjectType/Property/LinkType 的写入行为。WorkingState 仍归属 003+009。现有 `test_working_state_service.py` 必须全部通过。
-  **测试**: T014 全部通过 + `uv run pytest tests/unit/test_working_state_service.py -v` 通过
+  - 提取 `_validate_completeness()` → `_check_completeness()`（返回 list 而非抛异常）
+  - 提取 `_validate_type_compatibility()` → `_check_type_compatibility()`
+  - 新增 `_check_orphan_link_types()` + `_check_apiname_conflicts()`
+  - 重构 `WorkingStateService.publish()`：调用 `ValidationService.validate()`，将 error 转 AppError
+  - **影响范围**：仅提取验证逻辑，不修改 OT/Property/LT 写入行为。WS 仍归属 003+009。现有 `test_working_state_service.py` + `test_completeness_validation.py` 必须全部通过。
+  **测试**: T017 全部通过 + 现有 WS 测试通过
   **覆盖 AC**: AC-28, AC-29, AC-30, AC-31
-  **依赖**: T002, T014
+  **依赖**: T002, T017
 
-- [ ] **T016**: validate CLI 命令 — 单元测试
+- [ ] **T019**: validate CLI 命令 — 单元测试
   **文件**: `apps/server/tests/unit/test_cli_validate.py`
   **逻辑**: CliRunner + mock ValidationService：
-  - `test_validate_pass`：mock 返回空列表，验证 "Validation passed. No issues found."，exit 0
-  - `test_validate_errors`：mock 返回 error 级别结果，验证 stdout 含 "ERROR:"，exit 1
-  - `test_validate_warnings_only`：mock 返回仅 warning，验证 "WARNING:" + exit 0
-  - `test_validate_mixed`：mock 返回 error + warning，验证两者都输出 + exit 1
+  - `test_validate_pass`：mock 返回空列表，验证 "Validation passed."，exit 0
+  - `test_validate_errors`：mock 返回 error 结果，验证 "ERROR:"，exit 1
+  - `test_validate_warnings_only`：mock 返回 warning，验证 "WARNING:" + exit 0
+  - `test_validate_mixed`：验证两者都输出 + exit 1
   **覆盖 AC**: AC-28, AC-29, AC-30, AC-31
-  **依赖**: T015
+  **依赖**: T018
 
-- [ ] **T017**: validate CLI 命令 — 实现
+- [ ] **T020**: validate CLI 命令 — 实现
   **文件**: `apps/server/cli/commands/validate.py`
   **逻辑**:
-  - `validate()` → ValidationService.validate(ontology_rid) → 遍历结果输出 `{SEVERITY}: {message}`
-  - 末尾汇总 `Result: N errors, M warnings`
-  - 有 error → exit 1；仅 warning 或无问题 → exit 0
+  - `validate(ctx)` → `adapter.get_ontology_rid(ctx)` → `ValidationService.validate()` → 格式化输出
+  - 有 error → exit 1；仅 warning → exit 0
   - 在 main.py 注册为顶级命令
-  **测试**: T016 全部通过
+  **测试**: T019 全部通过
   **覆盖 AC**: AC-28, AC-29, AC-30, AC-31
-  **依赖**: T002, T015, T016
+  **依赖**: T002, T018, T019
 
 ### Phase 4: 全局行为
 
-- [ ] **T018**: 全局选项 — 单元测试
+- [ ] **T021**: 全局选项 — 单元测试
   **文件**: `apps/server/tests/unit/test_cli_global.py`
   **逻辑**: CliRunner 测试全局选项和边界情况：
   - `test_format_json_global`：`oo object-type list --format json` 验证 JSON 输出
-  - `test_format_invalid`：`oo object-type list --format xml` 验证 stderr 含 "Unsupported format"，exit 1（typer 内置校验或 adapter 手动校验）
-  - `test_ontology_override`：`oo --ontology ri.test object-type list` 验证 ontology_rid 传递给 Service
-  - `test_ontology_not_found`：mock Service 抛 AppError("ONTOLOGY_NOT_FOUND")，验证 stderr + exit 1
-  - `test_db_connection_error`：mock session 抛连接异常，验证 stderr 含 "Database connection failed"，exit 1
+  - `test_format_invalid`：`oo object-type list --format xml` 验证 typer enum 拒绝无效值
+  - `test_ontology_override`：`oo --ontology ri.test object-type list` 验证 ontology_rid 传递
+  - `test_ontology_not_found`：mock 抛 AppError，验证 stderr + exit 1
+  - `test_db_connection_error`：mock 连接异常，验证 stderr "Database connection failed"，exit 1
   **覆盖 AC**: AC-37, AC-38, AC-39
-  **依赖**: T004（需要已实现的 object-type 命令作为测试载体）
+  **依赖**: T004
 
-- [ ] **T019**: 全局选项 — 实现
+- [ ] **T022**: 全局选项 — 实现
   **文件**: `apps/server/cli/main.py`（更新）, `apps/server/cli/adapter.py`（更新）
   **逻辑**:
-  - main.py：添加 `--ontology` 全局选项（typer.Option, default `ri.ontology.ontology.default`），通过 typer.Context 传递给子命令
-  - main.py：添加 `--format` 全局选项（typer.Option, enum OutputFormat），通过 Context 传递
-  - adapter.py：添加 `get_ontology_rid(ctx)` 和 `get_format(ctx)` 辅助函数
-  - adapter.py：在 `async_session_context()` 中捕获 DB 连接异常 → handle_db_error
-  - **注**：T001 仅创建骨架（空子 app + --version），T019 添加 --ontology/--format 全局选项的完整实现
-  **测试**: T018 全部通过
+  - main.py 全局 callback：设置 `--ontology`/`--format` 到 `ctx.obj` dict
+  - adapter.py：`get_ontology_rid(ctx)` + `get_format(ctx)` 从 ctx.obj 读取
+  - adapter.py：`async_session_context()` 捕获 DB 连接异常 → handle_db_error
+  - **全局选项传递**：所有子命令（T004~T020）通过 `ctx: typer.Context` + adapter 辅助函数读取全局值。各命令实现已预设接收 ctx 参数。
+  **测试**: T021 全部通过
   **覆盖 AC**: AC-37, AC-38, AC-39
-  **依赖**: T002, T004, T018
+  **依赖**: T002, T004, T021
 
 ### Phase 5: SKILL.md 知识定义
 
-- [ ] **T020**: L1 SKILL.md — 前 5 个（OT + Property 相关）
+- [ ] **T023**: L1 SKILL.md — 前 5 个（OT + Property 相关）
   **文件**: `apps/server/app/agent/skills/{create-object-type,update-object-type,delete-object-type,create-property,list-object-types}/SKILL.md`
-  **逻辑**: 每个 SKILL.md 按以下结构创建：
-  - frontmatter: `name`, `description`（一句话，Agent 懒加载用）, `level: L1`
-  - `## 参数`：表格（参数名 | 类型 | 必填 | 说明）
-  - `## 约束`：业务规则列表（如 apiName 唯一、PascalCase 格式）
-  - `## CLI 命令`：精确的 `oo` 命令和参数
-  - `## 使用场景`：Agent 何时调用此 Skill
-  - `## 示例`：完整命令示例
-  - **create-object-type** 参数：displayName(必填), apiName(可选,自动推断PascalCase), description(可选), id(可选,自动推断kebab-case)。约束：apiName 在 Ontology 内唯一(INV-1)。CLI: `oo object-type create --name <name> [--api-name <api>]`
-  - **update-object-type** 参数：rid(必填), displayName/apiName/description/status(可选)。CLI: `oo object-type update <rid> [--name <n>]`
-  - **delete-object-type** 参数：rid(必填)。约束：active 状态不可删除(INV-4)。CLI: `oo object-type delete <rid>`
-  - **create-property** 参数：objectTypeRid(必填), displayName(必填), apiName(必填), baseType(必填), id(可选)。约束：支持类型列表。CLI: `oo property create --object-type <rid> --name <n> --api-name <a> --type <t>`
-  - **list-object-types** 参数：page(可选), pageSize(可选)。CLI: `oo object-type list [--page N]`
+  **逻辑**: 每个 SKILL.md 含：frontmatter(name, description, level: L1) + ## 参数(表格) + ## 约束 + ## CLI 命令 + ## 使用场景 + ## 示例。
+  - **create-object-type**：参数 displayName(必填), apiName(可选,PascalCase), description(可选), id(可选,kebab-case)。约束 INV-1(apiName唯一)。CLI `oo object-type create --name <n> [--api-name <a>]`
+  - **update-object-type**：参数 rid(必填), displayName/apiName/description/status(可选)。CLI `oo object-type update <rid> [--name <n>]`
+  - **delete-object-type**：参数 rid(必填)。约束 INV-4(active不可删)。CLI `oo object-type delete <rid>`
+  - **create-property**：参数 objectTypeRid(必填), displayName(必填), apiName(必填,camelCase), baseType(必填)。支持类型：string,integer,double,boolean,date,timestamp,long,float,short,byte,decimal,geohash,geoshape,marking,attachment,mediaReference。CLI `oo property create --object-type <rid> --name <n> --api-name <a> --type <t>`
+  - **list-object-types**：参数 page(可选), pageSize(可选)。CLI `oo object-type list [--page N]`
   **覆盖 AC**: AC-40
-  **依赖**: T004, T006（CLI 命令已实现，确保示例准确）
+  **依赖**: T004, T006
 
-- [ ] **T021**: L1 SKILL.md — 后 5 个（LT + Dataset + Search + Validate）
+- [ ] **T024**: L1 SKILL.md — 后 5 个（LT + Dataset + Search + Validate）
   **文件**: `apps/server/app/agent/skills/{create-link-type,update-link-type,import-dataset,search-ontology,validate-ontology}/SKILL.md`
-  **逻辑**: 同 T020 格式：
-  - **create-link-type** 参数：id, sideA(objectTypeRid+displayName+apiName), sideB(同), cardinality。约束：INV-7(端点apiName唯一), INV-8(m2m需joinTable), INV-9(id唯一)。CLI: `oo link-type create --id <id> --side-a-object <rid> ...`
-  - **update-link-type** 参数：rid, sideAName/sideAApiName/sideBName/sideBApiName/status(可选)。CLI: `oo link-type update <rid> [--side-a-name <n>]`
-  - **import-dataset** 参数：filepath(必填), format(csv/excel), sheet(可选), name(可选)。约束：文件≤50MB。CLI: `oo dataset import-csv <path>` / `oo dataset import-excel <path>`
-  - **search-ontology** 参数：query(必填), type(可选), limit(可选)。CLI: `oo search <query> [--type objectType]`
-  - **validate-ontology** 无参数。CLI: `oo validate`。使用场景：创建一批资源后验证整体一致性
+  **逻辑**: 同 T023 格式：
+  - **create-link-type**：参数 id, sideA(objectTypeRid+displayName+apiName), sideB(同), cardinality, joinTableDatasetRid(m2m时必填)。约束 INV-7, INV-8, INV-9。CLI `oo link-type create --id <id> --side-a-object <rid> ... [--join-table-dataset <rid>]`
+  - **update-link-type**：参数 rid, sideAName/sideAApiName/sideBName/sideBApiName/status(可选)。CLI `oo link-type update <rid> [--side-a-name <n>]`
+  - **import-dataset**：参数 filepath(必填), format(csv/excel), sheet(可选), name(可选)。约束 文件≤50MB。CLI `oo dataset import-csv <path>` / `oo dataset import-excel <path>`
+  - **search-ontology**：参数 query(必填), type(可选), limit(可选)。CLI `oo search <query> [--type objectType]`
+  - **validate-ontology**：无参数。CLI `oo validate`。场景：创建一批资源后验证一致性
   **覆盖 AC**: AC-40
-  **依赖**: T008, T010, T011, T017（相关 CLI 命令已实现）
+  **依赖**: T008, T010, T012, T020
 
-- [ ] **T022**: L2 SKILL.md（3 个组合级 Skill）
+- [ ] **T025**: L2 SKILL.md（3 个组合级 Skill）
   **文件**: `apps/server/app/agent/skills/{create-object-type-with-properties,create-link-type-with-validation,batch-create-from-blueprint}/SKILL.md`
-  **逻辑**: L1 格式 + 额外「组合步骤」和「错误处理」：
-  - **create-object-type-with-properties**：步骤 1) create-object-type → 获得 OT RID 2) 逐个 create-property（传入 OT RID）。失败时：OT 已创建但部分属性失败 → 报告失败属性，不回滚 OT
-  - **create-link-type-with-validation**：步骤 1) validate-ontology 预检 2) 检查两端 OT 存在 3) create-link-type。失败时：预检不通过 → 报告问题，不执行创建
-  - **batch-create-from-blueprint**：步骤 1) 按依赖排序（OT→Property→LT）2) 逐项调用 L1 Skills 3) 记录每项成功/失败。失败时：标记失败项，继续处理后续项
+  **逻辑**: L1 格式 + `## 组合步骤`（引用 L1 skill 名称和调用顺序）+ `## 错误处理`（失败时策略）：
+  - **create-object-type-with-properties**：1) create-object-type → OT RID 2) 逐个 create-property。失败策略：OT 已创建但部分属性失败 → 报告失败属性
+  - **create-link-type-with-validation**：1) validate-ontology 预检 2) 检查两端 OT 存在 3) create-link-type。失败策略：预检不通过 → 不执行创建
+  - **batch-create-from-blueprint**：1) 按依赖排序（OT→Property→LT）2) 逐项调用 L1 3) 记录成功/失败
   **覆盖 AC**: AC-41
-  **依赖**: T020, T021
+  **依赖**: T023, T024
 
-- [ ] **T023**: L3 SKILL.md（3 个编排级 Skill）
+- [ ] **T026**: L3 SKILL.md（3 个编排级 Skill）
   **文件**: `apps/server/app/agent/skills/{analyze-materials,generate-blueprint,optimize-ontology}/SKILL.md`
-  **逻辑**: L1 格式 + 额外「编排策略」「子 Agent 调度」「上下文管理」：
-  - **analyze-materials**：编排策略 — 按文件类型分流（结构化直接解析无需 LLM token，非结构化用 LLM 提取）。子 Agent — 多文件时每文件派子 Agent 并行。上下文 — 注入目标领域/范围
-  - **generate-blueprint**：编排 — 汇总子 Agent 结果 → 合并同名实体 → 检测冲突 → 评估置信度。上下文 — 加载已有本体 Schema 避免重复
-  - **optimize-ontology**：编排 — 1) validate-ontology 获取问题列表 2) 分析命名一致性 3) 识别缺失关系 4) 提出优化建议。上下文 — 加载完整本体 Schema
-  - **注**：这些 Skill 的实际执行逻辑由 F012/F014 实现，此处仅定义 Agent 的知识手册
+  **逻辑**: L1 格式 + `## 编排策略` + `## 子 Agent 调度` + `## 上下文管理`：
+  - **analyze-materials**：编排 — 按文件类型分流。子 Agent — 多文件并行。上下文 — 注入领域/范围
+  - **generate-blueprint**：编排 — 汇总→合并→冲突检测→置信度。上下文 — 加载已有 Schema
+  - **optimize-ontology**：编排 — validate→命名分析→缺失关系→优化建议。上下文 — 完整 Schema
+  - **注**：实际执行逻辑由 F012/F014 实现，此处仅定义知识手册
   **覆盖 AC**: AC-42
-  **依赖**: T020, T021
+  **依赖**: T023, T024
 
 ### Phase 6: Claude Code Skills
 
-- [ ] **T024**: Claude Code Skills（3 个：ontology-create, ontology-search, ontology-validate）
+- [ ] **T027**: Claude Code Skills — 前 3 个
   **文件**: `.claude/skills/{ontology-create,ontology-search,ontology-validate}/SKILL.md`
-  **逻辑**: 使用 `/skill-creator` 创建，每个文件含：
-  - frontmatter: name, description（触发条件描述）
-  - 正文：对应 `oo` CLI 命令调用示例
-  - **ontology-create**: description="在本体中创建对象类型、属性或链接类型。TRIGGER when: 用户要求创建本体资源。"，正文含 `oo object-type create`, `oo property create`, `oo link-type create` 示例
-  - **ontology-search**: description="搜索本体资源。TRIGGER when: 用户搜索本体。"，正文含 `oo search <query>` 示例
-  - **ontology-validate**: description="验证本体一致性。TRIGGER when: 用户要求校验本体。"，正文含 `oo validate` 示例
+  **逻辑**: 使用 `/skill-creator` 创建，每个含 frontmatter(name, description) + oo CLI 示例：
+  - **ontology-create**: TRIGGER when 用户创建本体资源。含 `oo object-type create`, `oo property create`, `oo link-type create`
+  - **ontology-search**: TRIGGER when 用户搜索。含 `oo search`
+  - **ontology-validate**: TRIGGER when 用户校验。含 `oo validate`
   **覆盖 AC**: AC-43
-  **依赖**: T004, T011, T017（对应 CLI 命令已实现）
+  **依赖**: T004, T012, T020
 
-- [ ] **T025**: Claude Code Skills（3 个：ontology-blueprint, ontology-analyze, ontology-optimize）
+- [ ] **T028**: Claude Code Skills — 后 3 个
   **文件**: `.claude/skills/{ontology-blueprint,ontology-analyze,ontology-optimize}/SKILL.md`
   **逻辑**: 使用 `/skill-creator` 创建：
-  - **ontology-blueprint**: description="管理本体蓝图。TRIGGER when: 用户管理蓝图。"，正文含 `oo blueprint list/show/apply` 示例（当前为存根）
-  - **ontology-analyze**: description="分析资料生成本体。TRIGGER when: 用户要求分析文件。"，正文含 `oo blueprint analyze` 示例（当前为存根）
-  - **ontology-optimize**: description="优化现有本体。TRIGGER when: 用户要求优化本体。"，正文含 `oo validate` + Agent 建议流程
+  - **ontology-blueprint**: TRIGGER when 蓝图管理。含 `oo blueprint list/show/apply`（存根）
+  - **ontology-analyze**: TRIGGER when 分析文件。含 `oo blueprint analyze`（存根）
+  - **ontology-optimize**: TRIGGER when 优化本体。含 `oo validate` + 建议流程
   **覆盖 AC**: AC-43
-  **依赖**: T013（blueprint 存根已实现）
+  **依赖**: T016
 
 ### Phase 7: 集成验证
 
-- [ ] **T026**: SKILL.md 格式验证
+- [ ] **T029**: SKILL.md + CC Skills 格式验证
   **文件**: 无新文件（仅验证）
   **逻辑**:
-  - 验证 16 个 SKILL.md 文件存在：`ls apps/server/app/agent/skills/*/SKILL.md | wc -l` = 16
-  - 每个文件必须含 frontmatter（`---` 分隔的 name + description）
-  - L1 文件（10 个）frontmatter 含 `level: L1`，正文含 ## 参数、## 约束、## CLI 命令、## 使用场景、## 示例
-  - L2 文件（3 个）额外含 ## 组合步骤
-  - L3 文件（3 个）额外含 ## 编排策略
-  **覆盖 AC**: AC-40, AC-41, AC-42
-  **依赖**: T020, T021, T022, T023
+  - 16 个 SKILL.md 存在且含 frontmatter（name + description + level）
+  - L1（10 个）含 ## 参数、## 约束、## CLI 命令、## 使用场景、## 示例
+  - L2（3 个）额外含 ## 组合步骤 + ## 错误处理
+  - L3（3 个）额外含 ## 编排策略 + ## 子 Agent 调度 + ## 上下文管理
+  - 6 个 CC Skills 存在且含 frontmatter(name+description) + oo 命令示例
+  **覆盖 AC**: AC-40, AC-41, AC-42, AC-43
+  **依赖**: T023, T024, T025, T026, T027, T028
 
-- [ ] **T027**: Claude Code Skills 格式验证
-  **文件**: 无新文件（仅验证）
-  **逻辑**:
-  - 验证 6 个 Claude Code Skills 文件存在：`ls .claude/skills/ontology-*/SKILL.md | wc -l` = 6
-  - 每个文件含 frontmatter（name + description）
-  - 每个文件正文含至少一个 `oo` 命令示例
-  **覆盖 AC**: AC-43
-  **依赖**: T024, T025
-
-- [ ] **T028**: 端到端集成验证
+- [ ] **T030**: 端到端集成验证
   **文件**: 无新文件
   **逻辑**:
-  - 运行 `cd apps/server && uv run pytest tests/ -v` 确认所有现有测试通过（含 WorkingState 重构后）
-  - 运行 `cd apps/server && uv run pytest tests/unit/test_cli_*.py -v` 确认所有 CLI 测试通过
-  - 手动验证 `uv run oo --help` 显示所有命令组
-  - 手动验证 `uv run oo --version` 输出 `oo 0.2.0`
+  - `cd apps/server && uv run pytest tests/ -v` 全部通过（含 WS 重构后）
+  - `cd apps/server && uv run pytest tests/unit/test_cli_*.py -v` 全部通过
+  - `uv run oo --help` 显示所有 8 个命令组
+  - `uv run oo --version` 输出 `oo 0.2.0`
+  - **E2E 说明**：F013 为纯 CLI 后端特性，无前端页面变更，E2E 测试在后续 feature（F015+ 工坊页面）中覆盖 CLI 的端到端效果
   **覆盖 AC**: AC-01, AC-02
-  **依赖**: T019, T026, T027
+  **依赖**: T004, T006, T008, T010, T012, T014, T016, T020, T022, T029
 
 ---
 
