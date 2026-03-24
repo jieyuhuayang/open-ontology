@@ -764,6 +764,7 @@
       "dropHint": "释放以上传文件",
       "invalidType": "不支持的文件类型，请上传 CSV、Excel、SQL、PDF、Markdown、Word 或文本文件",
       "tooLarge": "文件大小超过 10MB 限制",
+      "failed": "上传失败: {{name}}",
       "uploaded": "已上传"
     },
     "sidekick": {
