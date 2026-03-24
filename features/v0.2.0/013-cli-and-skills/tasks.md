@@ -112,6 +112,7 @@
   **文件**: `apps/server/tests/unit/test_cli_link_type.py`
   **逻辑**: CliRunner + mock LinkTypeService：
   - `test_create`：传 --id, --side-a-object, --side-a-name, --side-a-api-name, --side-b-*, --cardinality，验证 "Created link type"，exit 0
+  - `test_create_m2m_with_join_table`：传 --cardinality many-to-many --join-table-dataset <rid>，验证 Request 含 join_table_dataset_rid
   - `test_list`：验证表格输出
   - `test_get`：验证详情输出
   - `test_update`：传 --side-a-name，验证 "Updated"，exit 0
@@ -122,7 +123,8 @@
 - [ ] **T008**: link-type 命令 — 实现
   **文件**: `apps/server/cli/commands/link_type.py`
   **逻辑**:
-  - `create(id, side_a_object, side_a_name, side_a_api_name, side_b_*, cardinality)` → LinkTypeCreateRequest（含 LinkSideCreateInput）→ service.create()
+  - `create(id, side_a_object, side_a_name, side_a_api_name, side_b_*, cardinality, join_table_dataset)` → LinkTypeCreateRequest（含 LinkSideCreateInput + join_table_dataset_rid）→ service.create()
+  - `--join-table-dataset` 可选参数：many-to-many 时必填（INV-8 校验由 Service 层保证）
   - `list(object_type)`, `get(rid)`, `update(rid, side_a_name, side_a_api_name, side_b_name, side_b_api_name, status)`, `delete(rid)`
   - 在 main.py 注册
   **测试**: T007 全部通过
