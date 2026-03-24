@@ -4,7 +4,6 @@ from typing import Optional
 
 import typer
 
-from app.domain.constants import DEFAULT_ONTOLOGY_RID
 from app.exceptions import AppError
 from app.services.search_service import SearchService
 from cli.adapter import async_session_context, get_ontology_rid, run_async
