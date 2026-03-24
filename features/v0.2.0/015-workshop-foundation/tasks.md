@@ -119,6 +119,7 @@
     3. 关键概念范围：文本框，placeholder "例如：聚焦订单履约流程，不含财务对账"
   - "确认并继续"按钮：调用 useCreateAgentSession() mutation，传入 { ontologyRid, domain, goal, scopeHint }，成功后 store.setCurrentSessionRid(rid) + store.setPageState('existing')
   - "跳过"按钮：调用 useCreateAgentSession() 不传可选字段
+  **测试**: 由 T022 补充 GuidanceCard 渲染测试（验证领域选择器渲染、确认按钮调用 mutation、跳过按钮调用 mutation）
   **覆盖 AC**: AC-05, AC-06, AC-07
   **依赖**: T002, T003, T006
 
