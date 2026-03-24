@@ -45,6 +45,7 @@ async def get_session_detail(
     rid: str,
     service: AgentService = Depends(_get_service),
 ):
+    validate_rid(rid)
     return await service.get_session_detail(rid)
 
 
@@ -53,6 +54,7 @@ async def complete_session(
     rid: str,
     service: AgentService = Depends(_get_service),
 ):
+    validate_rid(rid)
     return await service.complete_session(rid)
 
 
@@ -61,6 +63,7 @@ async def delete_session(
     rid: str,
     service: AgentService = Depends(_get_service),
 ):
+    validate_rid(rid)
     await service.delete_session(rid)
     return Response(status_code=204)
 
