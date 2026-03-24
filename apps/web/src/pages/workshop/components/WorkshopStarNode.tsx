@@ -119,7 +119,7 @@ export default function WorkshopStarNode({
 
       {/* Label */}
       <Html
-        position={[0, baseSize + 0.4, 0]}
+        position={[0, 0.9, 0]}
         center
         style={{ pointerEvents: 'none' }}
       >
