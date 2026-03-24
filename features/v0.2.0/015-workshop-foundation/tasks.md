@@ -139,7 +139,9 @@
   - 页面加载时：检查是否有 active 的 AgentSession（调用 useAgentSessions 查询 status=active）。若有，自动恢复：setCurrentSessionRid + 通过 useAgentSessionDetail 加载消息历史到 MessageList
   - 面板头部显示当前会话标题（可编辑，或显示"新工坊"）
   - 折叠状态下仅显示窄条 + 展开按钮
-  **覆盖 AC**: AC-13
+  - 错误提示条渲染：当 useAgentChat 返回 error 状态时，在消息列表底部显示红色错误提示条（含错误码 + 消息），流终止后可关闭
+  **测试**: 由 T022 补充 ChatPanel 测试（验证会话恢复加载消息、错误提示条渲染）
+  **覆盖 AC**: AC-11, AC-13
   **依赖**: T006, T007, T008
 
 - [ ] **T010**: useAgentChat Hook — SSE 流式对话
