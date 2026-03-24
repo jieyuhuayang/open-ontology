@@ -1,29 +1,23 @@
 """CLI output formatting — text tables and JSON."""
 
-import enum
 import json
-import sys
 from typing import Any
 
 import typer
 from rich.console import Console
 from rich.table import Table
 
-
-class OutputFormat(str, enum.Enum):
-    TEXT = "text"
-    JSON = "json"
+_console = Console()
 
 
 def format_table(headers: list[str], rows: list[list[str]], title: str | None = None) -> None:
     """Print a rich table to stdout."""
-    console = Console()
     table = Table(title=title, show_lines=False)
     for h in headers:
         table.add_column(h)
     for row in rows:
         table.add_row(*row)
-    console.print(table)
+    _console.print(table)
 
 
 def format_json(data: Any) -> None:
@@ -40,9 +34,3 @@ def format_detail(fields: dict[str, Any]) -> None:
 def print_success(msg: str) -> None:
     """Print success message to stdout."""
     typer.echo(msg)
-
-
-def print_error(msg: str) -> None:
-    """Print error message to stderr."""
-    typer.echo(f"Error: {msg}", err=True)
-    sys.exit(1)
