@@ -799,6 +799,40 @@ Agent 使用 LLM 提取以下信息：
 
 ### 3D 星空与 Agent 联动
 
+Agent 与画布通过 SSE 事件流实现实时联动，核心消息流如下：
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant Chat as 对话面板
+    participant Agent as Agent 后端
+    participant SSE as SSE 事件流
+    participant Canvas as 3D 星空画布
+    participant Side as Sidekick
+
+    U->>Chat: 上传文件 + "开始分析"
+    Chat->>Agent: POST /agent/chat
+    Agent-->>SSE: plan-step（规划步骤）
+    SSE-->>Side: 展示规划进度树
+
+    loop 逐文件分析
+        Agent-->>SSE: skill-call（解析文件）
+        Agent-->>SSE: blueprint-item（识别实体）
+        SSE-->>Canvas: subgraph-update → 结晶新星体
+        SSE-->>Side: 建议卡片
+    end
+
+    opt 遇到歧义
+        Agent-->>SSE: clarification-req
+        SSE-->>Chat: 展示澄清选择题
+        U->>Chat: 选择选项
+        Chat->>Agent: POST /agent/chat/clarify
+    end
+
+    Agent-->>SSE: done（蓝图完成）
+    SSE-->>Canvas: 全部星体就位
+```
+
 #### 实时结晶动画
 
 Agent 识别新实体时，3D 星空中实时"结晶"出新星体：
