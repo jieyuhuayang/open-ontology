@@ -314,7 +314,7 @@ class WorkingStateService:
                 missing.append("titleKeyPropertyId")
 
             ot_rid = change.resource_rid
-            has_mapped = await self._has_mapped_properties(ot_rid, changes)
+            has_mapped = await self.has_mapped_properties(ot_rid, changes)
             if not has_mapped:
                 missing.append("mappedProperties")
 
