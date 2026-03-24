@@ -132,6 +132,8 @@ cd apps/web && pnpm dev
 | Services | `app/services/` | Business logic, transaction boundaries | domain, storage |
 | Domain | `app/domain/` | Pydantic models, pure logic, no I/O | nothing (leaf layer) |
 | Storage | `app/storage/` | SQLAlchemy queries, return domain models | domain |
+| Agent | `app/agent/` | deepagents engine, SSE adapter, Prompt/Skill definitions | services, domain |
+| CLI | `cli/` | Typer CLI commands (`oo`), delegate to services | services, domain |
 
 ### Frontend
 
