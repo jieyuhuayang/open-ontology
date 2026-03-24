@@ -62,3 +62,18 @@ async def delete_session(
 ):
     await service.delete_session(rid)
     return Response(status_code=204)
+
+
+@router.post("/chat")
+async def chat(
+    req: ChatRequest,
+    service: AgentService = Depends(_get_service),
+):
+    return StreamingResponse(
+        service.chat(req.session_rid, req.content),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
