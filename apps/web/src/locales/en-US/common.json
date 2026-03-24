@@ -763,6 +763,7 @@
       "dropHint": "Release to upload files",
       "invalidType": "Unsupported file type. Supported: CSV, Excel, SQL, PDF, Markdown, Word, Text",
       "tooLarge": "File exceeds 10MB limit",
+      "failed": "Upload failed: {{name}}",
       "uploaded": "Uploaded"
     },
     "sidekick": {
