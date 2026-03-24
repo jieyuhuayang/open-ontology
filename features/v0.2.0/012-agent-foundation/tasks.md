@@ -211,7 +211,7 @@
 
 ### Chat 流式对话
 
-- [ ] **T012**: AgentService chat 单元测试
+- [x] **T012**: AgentService chat 单元测试
   **文件**: `apps/server/tests/unit/test_agent_service.py`（追加到 T004 创建的文件）
   **逻辑**: mock AgentEngine 和 SSE adapter，测试 chat 方法：
   - `test_chat_success_yields_sse_events` → 返回 SSE 事件 async generator
