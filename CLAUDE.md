@@ -334,3 +334,5 @@ Open Ontology 主存储为 PostgreSQL；MVP 阶段 MySQL 仅作为外部导入�
 | 变更管理/版本控制 | `docs/architecture/06-change-management.md` |
 | UI 设计/交互流程 | PRD + `docs/prd/0.1.0（MVP）/images/` |
 | 完整技术栈论证 | `docs/architecture/04-tech-stack-recommendations.md` |
+| Agent / 本体构建 | `docs/prd/0.2.0/` + `features/v0.2.0/release-contract.md` |
+| CLI 统一能力层 | `features/v0.2.0/013-cli-and-skills/spec.md` |
