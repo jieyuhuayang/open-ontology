@@ -12,6 +12,9 @@ Thumbs.db
 # Claude Code local settings
 .claude/settings.local.json
 
+# Uploaded materials (F014)
+uploads/
+
 # Python
 __pycache__/
 *.py[cod]
