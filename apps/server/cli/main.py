@@ -33,6 +33,7 @@ app = typer.Typer(
 
 @app.callback()
 def main(
+    ctx: typer.Context,
     version: Optional[bool] = typer.Option(  # noqa: UP007
         None,
         "--version",
@@ -40,8 +41,23 @@ def main(
         callback=_version_callback,
         is_eager=True,
     ),
+    ontology: str = typer.Option(
+        "ri.ontology.ontology.default",
+        "--ontology",
+        "-o",
+        help="Target ontology RID.",
+    ),
+    format: str = typer.Option(  # noqa: A002
+        "text",
+        "--format",
+        "-f",
+        help="Output format: text or json.",
+    ),
 ) -> None:
     """Open Ontology CLI."""
+    ctx.ensure_object(dict)
+    ctx.obj["ontology_rid"] = ontology
+    ctx.obj["format"] = format
 
 
 app.add_typer(object_type.app, name="object-type", help="Manage object types.")
