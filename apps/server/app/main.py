@@ -30,6 +30,19 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
     async with engine.connect() as conn:
         await conn.execute(text("SELECT 1"))
     await ensure_seed_data(engine)
+
+    # Initialize LangGraph checkpoint tables (v0.2.0 Agent)
+    if settings.ANTHROPIC_API_KEY:
+        from app.agent.engine import AgentEngine
+
+        agent_engine = AgentEngine(settings)
+        try:
+            await agent_engine.setup_checkpointer()
+        except Exception:
+            import logging
+
+            logging.getLogger(__name__).warning("Failed to setup Agent checkpointer", exc_info=True)
+
     yield
     await engine.dispose()
 
