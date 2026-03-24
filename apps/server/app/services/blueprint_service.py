@@ -58,11 +58,15 @@ class BlueprintService:
                 status_code=404,
             )
 
-        # Validate ontology exists
-        from app.storage.object_type_storage import ObjectTypeStorage
+        # Validate ontology exists (direct query to avoid cross-domain storage import)
+        from sqlalchemy import select
 
-        ontology = await ObjectTypeStorage.get_ontology(self._session, req.ontology_rid)
-        if ontology is None:
+        from app.storage.models import OntologyModel
+
+        ontology_result = await self._session.execute(
+            select(OntologyModel.rid).where(OntologyModel.rid == req.ontology_rid)
+        )
+        if ontology_result.scalar_one_or_none() is None:
             raise AppError(
                 code="ONTOLOGY_NOT_FOUND",
                 message=f"Ontology '{req.ontology_rid}' not found",
