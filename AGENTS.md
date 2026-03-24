@@ -335,6 +335,8 @@ Before implementing a feature, **read the relevant doc first**:
 | Change management / versioning | `docs/architecture/06-change-management.md` |
 | UI design / interaction flows | PRD + `docs/prd/0.1.0（MVP）/images/` |
 | Full tech stack rationale | `docs/architecture/04-tech-stack-recommendations.md` |
+| Agent / ontology building | `docs/prd/0.2.0/` + `features/v0.2.0/release-contract.md` |
+| CLI unified capability layer | `features/v0.2.0/013-cli-and-skills/spec.md` |
 
 ## Workflow: Auto-format + Auto-commit on File Edit
 
