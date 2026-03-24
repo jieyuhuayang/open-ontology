@@ -69,6 +69,8 @@ async def chat(
     req: ChatRequest,
     service: AgentService = Depends(_get_service),
 ):
+    # Pre-validate before starting the stream (so errors return JSON, not SSE)
+    await service.validate_chat(req.session_rid, req.content)
     return StreamingResponse(
         service.chat(req.session_rid, req.content),
         media_type="text/event-stream",
