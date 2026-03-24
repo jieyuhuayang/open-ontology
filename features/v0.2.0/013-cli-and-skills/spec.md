@@ -52,7 +52,8 @@ v0.2.0 引入 **统一能力层** 原则：`oo` CLI 是本体操作的唯一执�
 | AC-16 | 开发者 | `oo link-type create --id "order-items" --side-a-object <ot_a> --side-a-name "Items" --side-a-api-name "items" --side-b-object <ot_b> --side-b-name "Order" --side-b-api-name "order" --cardinality many-to-one` | stdout: `Created link type "order-items". RID: ri.ontology.link-type.<uuid>`，exit 0 |
 | AC-17 | 开发者 | `oo link-type list` | stdout 文本表格 |
 | AC-18 | 开发者 | `oo link-type get <rid>` | stdout 详情 |
-| AC-19 | 开发者 | `oo link-type delete <rid>` | stdout: `Deleted link type "<rid>".`，exit 0 |
+| AC-19 | 开发者 | `oo link-type update <rid> --side-a-name "新名称"` | stdout: `Updated link type "<rid>".`，exit 0 |
+| AC-20 | 开发者 | `oo link-type delete <rid>` | stdout: `Deleted link type "<rid>".`，exit 0 |
 | **dataset 组** | | | |
 | AC-20 | 开发者 | `oo dataset list` | stdout 文本表格（RID, Name, Source, RowCount） |
 | AC-21 | 开发者 | `oo dataset import-csv <filepath>` | 读取本地 CSV，stdout: `Imported dataset "<name>". RID: ri.ontology.dataset.<uuid>. Columns: N, Rows: M`，exit 0 |
