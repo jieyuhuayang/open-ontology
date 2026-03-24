@@ -194,7 +194,7 @@
   **覆盖 AC**: AC-08, AC-09, AC-10, AC-13
   **依赖**: T001
 
-- [ ] **T011**: SSE 适配器实现
+- [x] **T011**: SSE 适配器实现
   **文件**: `apps/server/app/agent/sse_adapter.py`
   **逻辑**:
   - `format_sse_event(event_type: str, data: dict) → str`：格式化为 `event: {type}\ndata: {json}\n\n`
