@@ -109,7 +109,7 @@ export default function WorkshopStarNode({
 
       {/* Glow sphere */}
       <mesh ref={glowRef}>
-        <sphereGeometry args={[baseSize * 1.4, 16, 16]} />
+        <sphereGeometry args={[0.7, 16, 16]} />
         <meshBasicMaterial
           color={node.color}
           transparent
