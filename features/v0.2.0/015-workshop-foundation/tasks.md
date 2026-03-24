@@ -227,6 +227,7 @@
     3. 消费完成后调用 store.consumeCrystallization(rid)
   - `StarfieldWorkbench.tsx`: 中央面板容器，组合 WorkshopCanvas + WorkshopToolbar。预留 EntityPopover/EntityDrawer 的 slot（T017/T018 实现后在 T020 集成阶段接入）。从 useWorkshopGraph 获取 nodes/edges，传入 WorkshopCanvas。监听 store.pendingCrystallizations 驱动 VortexEffect
   - blueprint-complete 事件到达时：停止 VortexEffect，画布 fit-to-view（通过 OrbitControls ref）
+  **测试**: R3F 动画组件由 E2E 测试覆盖
   **覆盖 AC**: AC-22, AC-23, AC-24
   **依赖**: T012, T013
 
