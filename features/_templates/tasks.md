@@ -79,6 +79,36 @@
 
 ---
 
+### CLI 命令（如适用）
+
+> 仅当特性包含 `oo` CLI 命令时使用此模板，否则删除。
+
+- [ ] **TCLI-N**: <命令组>单元测试
+  **文件**: `apps/server/tests/unit/test_cli_<cmd>.py`
+  **逻辑**: 使用 `typer.testing.CliRunner` + mock Service 测试命令
+  **覆盖 AC**: AC-NN, AC-NN
+  **依赖**: <基础设施任务>
+
+- [ ] **TCLI-N+1**: <命令组>实现
+  **文件**: `apps/server/cli/commands/<cmd>.py`
+  **逻辑**: typer 子命令组实现，调用 Service 层
+  **测试**: 前一任务全部通过
+  **覆盖 AC**: AC-NN, AC-NN
+  **依赖**: <测试任务>
+
+### SKILL.md 文档（如适用）
+
+> 仅当特性包含 Agent Skills 时使用此模板，否则删除。
+
+- [ ] **TSKILL-N**: SKILL.md 编写与验证
+  **文件**: `apps/server/app/agent/skills/<skill-name>/SKILL.md`
+  **逻辑**: 包含 frontmatter（name, description, level）+ 参数表 + 约束 + CLI 命令 + 使用场景 + 示例
+  **验证**: 文件存在、格式合规（frontmatter + Markdown）
+  **覆盖 AC**: AC-NN
+  **依赖**: <对应 CLI 命令实现任务>
+
+---
+
 ## 实际偏差记录
 
 > 完成后，在此记录实现与 spec.md 的偏差，供后续参考。
