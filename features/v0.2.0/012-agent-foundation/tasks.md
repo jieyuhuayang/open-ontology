@@ -113,8 +113,8 @@
     - 调用 storage.update_session_status(rid, "completed")
   - `delete_session(rid) → None`：
     - 验证 session 存在，否则抛 AGENT_SESSION_NOT_FOUND(404)
-    - 调用 storage.delete_session(rid)（级联删除 messages + audit_logs）
-    - 写入 audit_log（action="session_delete"）
+    - 写入 audit_log（action="session_delete", details 含 rid）— **必须在 delete 之前写入**，因为 FK ON DELETE SET NULL
+    - 调用 storage.delete_session(rid)（级联删除 messages；audit_logs 的 session_rid 被 SET NULL 保留记录）
   **测试**: T004 全部通过
   **覆盖 AC**: AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-23, AC-25
   **依赖**: T001, T003
