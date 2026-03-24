@@ -169,10 +169,10 @@
 - [ ] **T011**: useWorkshopGraph Hook — 图模型合并
   **文件**: `apps/web/src/pages/workshop/hooks/use-workshop-graph.ts`（新建）
   **逻辑**:
-  - Hook 签名: `useWorkshopGraph(ontologyRid: string, blueprintRid: string | null)`
+  - Hook 签名: `useWorkshopGraph(ontologyRid: string, sessionRid: string | null)`（与 spec §7 一致）
   - 数据源 1: useObjectTypes() 获取已有 ObjectType → 转为 WorkshopNode (status='confirmed', 明亮)
   - 数据源 2: useLinkTypes() 获取已有 LinkType → 转为 WorkshopEdge (status='confirmed')
-  - 数据源 3: useBlueprintDetail(blueprintRid) 获取蓝图项 → item_type='object_type' 转为 WorkshopNode (status='pending'), item_type='link_type' 转为 WorkshopEdge (status='pending')
+  - 数据源 3: useBlueprints({ sessionRid }) 获取蓝图 → useBlueprintDetail(blueprintRid) 获取蓝图项 → item_type='object_type' 转为 WorkshopNode (status='pending'), item_type='link_type' 转为 WorkshopEdge (status='pending')
   - 合并逻辑：confirmed 节点 + pending 节点统一计算球面分布位置（参考 Demo 的 sphereLayout 算法）
   - 返回: `{ nodes: WorkshopNode[], edges: WorkshopEdge[], isLoading }`
   - 适配函数: `objectTypeToNode(ot: ObjectType) → WorkshopNode`, `blueprintItemToNode(item: BlueprintItem) → WorkshopNode`, `linkTypeToEdge(lt: LinkType) → WorkshopEdge`, `blueprintItemToEdge(item: BlueprintItem) → WorkshopEdge`
