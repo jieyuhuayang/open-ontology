@@ -769,6 +769,18 @@ Agent 发送 blueprint-item 事件（type: link_type）
 
 三者共享底层逻辑——均调用同一套 Python Service 层 API。
 
+### LLM-Native 设计原则（Unix 哲学）
+
+CLI 工具的设计遵循面向 LLM 的最佳实践——**扁平化输入 + 纯文本输出**，摒弃复杂的 JSON 交互：
+
+| 传统 REST API 模式（对 LLM 不友好） | CLI 工具模式（LLM-Native） |
+|--------------------------------------|---------------------------|
+| 构造十几层嵌套的 JSON body，通过 HTTP POST 提交 | `oo create-object-type --name "Invoice" --source "db_billing.inv"`，扁平化且语义清晰 |
+| 返回 5000 行全量元数据 JSON 树，极度消耗 Token | 类似 grep 的简明输出：`SUCCESS: Created Object [Invoice] with 5 properties. RID: ri.ontology.object-type.abc123`，极低 Token 消耗 |
+| 需要模型解析深层嵌套的 errorCode 字段 | 直接将 stderr 暴露给模型：`Error: API name 'Invoice' already exists`，模型天然适应这种报错修正循环 |
+
+这种设计的核心洞察是：LLM 在阅读和生成类似终端命令行的纯文本时，表现出异乎寻常的稳定性和高效性，远优于处理复杂 JSON 结构。
+
 ### 架构
 
 ```
