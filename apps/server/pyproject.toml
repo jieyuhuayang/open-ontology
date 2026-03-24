@@ -23,6 +23,9 @@ dependencies = [
 [project.scripts]
 oo = "cli.main:app"
 
+[tool.setuptools.packages.find]
+include = ["app*", "cli*"]
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.3.0",
