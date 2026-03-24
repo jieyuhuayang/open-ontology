@@ -121,6 +121,7 @@ cd apps/web && pnpm dev
 
 - Backend default connection: `postgresql+asyncpg://ontology:ontology@localhost:5432/open_ontology`
 - Frontend default: http://localhost:5173 (auto-increments if port is occupied)
+- CLI tool: `cd apps/server && uv run oo --help`
 
 ## Code Layering Rules
 
