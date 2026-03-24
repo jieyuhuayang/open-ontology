@@ -228,7 +228,7 @@
   **覆盖 AC**: AC-08, AC-09, AC-10, AC-11, AC-12, AC-14, AC-15, AC-16, AC-20, AC-21, AC-22, AC-24
   **依赖**: T005, T009, T011
 
-- [ ] **T013**: AgentService chat 实现
+- [x] **T013**: AgentService chat 实现
   **文件**: `apps/server/app/services/agent_service.py`（追加到 T005 创建的文件）
   **逻辑**:
   - `async def chat(session_rid: str, content: str) → AsyncGenerator[str, None]`：
