@@ -73,7 +73,7 @@ export default function GuidanceCard({ ontologyRid }: GuidanceCardProps) {
       setCurrentSessionRid(session.rid);
       setPageState('existing');
     } catch {
-      message.error('Failed to create session');
+      message.error(t('workshop.guidance.createFailed', 'Failed to create session'));
     }
   };
 
