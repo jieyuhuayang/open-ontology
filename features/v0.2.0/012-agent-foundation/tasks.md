@@ -121,7 +121,7 @@
 
 ### 会话管理 Router
 
-- [ ] **T006**: Agent Router 会话 CRUD 集成测试
+- [x] **T006**: Agent Router 会话 CRUD 集成测试
   **文件**: `apps/server/tests/integration/test_agent_api.py`
   **逻辑**: 使用 `seeded_client`（或 `async_client` + 真实 DB），测试 HTTP 端点：
   - `test_create_session_201` → POST /api/v1/agent/sessions 返回 201 + AgentSession JSON（camelCase 字段）
