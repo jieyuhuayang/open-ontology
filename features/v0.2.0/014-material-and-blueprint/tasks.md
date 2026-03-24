@@ -289,6 +289,7 @@
   **逻辑**:
   - 修改 delete_session(): 在写审计日志和删除会话之前，调用 MaterialService(self._session).cleanup_session_files(rid) 清理本地文件
   - DB 记录由 FK CASCADE 自动清理，此处只需清理文件系统
+  - **跨 feature 影响**: 修改 F012 产出文件 agent_service.py，仅在 delete_session() 方法中追加一行 cleanup 调用，不改变原有逻辑
   **覆盖 AC**: AC-39
   **依赖**: T008
 
