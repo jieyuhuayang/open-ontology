@@ -99,6 +99,17 @@ def list_cmd(
         raise typer.Exit(code=1)
 
 
+def _validate_file(filepath: str) -> None:
+    """Check file exists and is within size limit."""
+    if not os.path.exists(filepath):
+        typer.echo(f"Error: File not found: {filepath}", err=True)
+        raise typer.Exit(code=1)
+    file_size = os.path.getsize(filepath)
+    if file_size > _MAX_FILE_SIZE_BYTES:
+        typer.echo(f"Error: File exceeds maximum size of 50MB ({file_size} bytes)", err=True)
+        raise typer.Exit(code=1)
+
+
 @app.command(name="import-csv")
 def import_csv(
     ctx: typer.Context,
@@ -106,18 +117,7 @@ def import_csv(
     name: Optional[str] = typer.Option(None, "--name", help="Dataset name"),  # noqa: UP007
 ) -> None:
     """Import a CSV file as a dataset."""
-    if not os.path.exists(filepath):
-        typer.echo(f"Error: File not found: {filepath}", err=True)
-        raise typer.Exit(code=1)
-
-    file_size = os.path.getsize(filepath)
-    if file_size > _MAX_FILE_SIZE_BYTES:
-        typer.echo(
-            f"Error: File exceeds maximum size of 50MB ({file_size} bytes)",
-            err=True,
-        )
-        raise typer.Exit(code=1)
-
+    _validate_file(filepath)
     dataset_name = name or os.path.splitext(os.path.basename(filepath))[0]
     try:
         task = run_async(_do_import_csv(filepath, dataset_name))
@@ -135,18 +135,7 @@ def import_excel(
     name: Optional[str] = typer.Option(None, "--name", help="Dataset name"),  # noqa: UP007
 ) -> None:
     """Import an Excel file as a dataset."""
-    if not os.path.exists(filepath):
-        typer.echo(f"Error: File not found: {filepath}", err=True)
-        raise typer.Exit(code=1)
-
-    file_size = os.path.getsize(filepath)
-    if file_size > _MAX_FILE_SIZE_BYTES:
-        typer.echo(
-            f"Error: File exceeds maximum size of 50MB ({file_size} bytes)",
-            err=True,
-        )
-        raise typer.Exit(code=1)
-
+    _validate_file(filepath)
     dataset_name = name or os.path.splitext(os.path.basename(filepath))[0]
     try:
         task = run_async(_do_import_excel(filepath, dataset_name, sheet))
