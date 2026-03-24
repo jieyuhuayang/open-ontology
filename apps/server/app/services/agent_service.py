@@ -1,7 +1,12 @@
 """Agent service — session management + Agent orchestration."""
 
+from collections.abc import AsyncGenerator
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.agent.engine import AgentEngine
+from app.agent.sse_adapter import adapt_stream
+from app.config import settings
 from app.domain.agent import (
     AgentMessage,
     AgentSession,
