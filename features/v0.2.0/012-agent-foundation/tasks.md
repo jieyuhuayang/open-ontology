@@ -52,7 +52,7 @@
     - 所有模型继承 `DomainModel`（自动 camelCase alias）
   **依赖**: 无
 
-- [ ] **T002**: Alembic 迁移 + SQLAlchemy ORM 模型
+- [x] **T002**: Alembic 迁移 + SQLAlchemy ORM 模型
   **文件**: `apps/server/alembic/versions/xxx_add_agent_tables.py`, `apps/server/app/storage/models.py`
   **逻辑**:
   - `storage/models.py`: 新增 3 个 ORM 模型：
