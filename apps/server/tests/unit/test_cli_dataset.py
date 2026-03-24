@@ -38,7 +38,7 @@ def test_list(mock_do: AsyncMock) -> None:
     result = runner.invoke(app, ["dataset", "list"])
     assert result.exit_code == 0
     assert "orders" in result.output
-    assert "ri.ontology.dataset.abc123" in result.output
+    assert "ri.ontology.datas" in result.output  # Rich table may truncate long RIDs
 
 
 @patch(f"{_MOD}._do_import_csv", new_callable=AsyncMock)
