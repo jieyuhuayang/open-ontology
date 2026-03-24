@@ -629,6 +629,7 @@ Agent 汇总所有分析结果
 
 - 首列或名含 `id`/`_id`/`Id` 的列自动标记为主键候选
 - 列名含 `name`/`title`/`label` 的列自动标记为标题键候选
+- **审计字段自动剔除**：列名匹配 `created_at`/`updated_at`/`created_by`/`updated_by`/`deleted_at`/`is_deleted` 等技术性审计字段，自动从属性列表中排除（在蓝图中标记为"已跳过·审计字段"，用户可手动恢复）
 
 #### SQL DDL
 
