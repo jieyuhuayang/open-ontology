@@ -280,6 +280,7 @@
     - 推理来源（仅 pending）：来源标签 + reasoning 文字（可展开/折叠）
   - 双击标题或点击"查看完整详情"按钮 → window.open(`/object-types/${rid}`, '_blank')（仅 confirmed 状态可用）
   - 点击 Drawer 外部或关闭按钮 → store.setSelectedEntityRid(null)
+  **测试**: 由 T022 补充 EntityDrawer 渲染测试（验证属性列表、推理来源展开、confirmed 状态跳转按钮）
   **覆盖 AC**: AC-30, AC-31, AC-32
   **依赖**: T003, T016
 
