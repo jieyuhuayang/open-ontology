@@ -741,5 +741,82 @@
     "pendingChanges": "待处理变更",
     "missingDisplayName": "{{type}}: 缺少展示名称",
     "editsCount": "{{count}} 项编辑"
+  },
+  "workshop": {
+    "title": "本体工坊",
+    "backToManager": "返回",
+    "guidance": {
+      "title": "开始构建本体",
+      "domain": "业务领域（可选）",
+      "goal": "建模目标（可选）",
+      "scope": "概念范围（可选）",
+      "scopePlaceholder": "例如：聚焦订单履约流程，不含财务对账",
+      "confirm": "确认并继续",
+      "skip": "跳过"
+    },
+    "chat": {
+      "placeholder": "向 Agent 提问…",
+      "thinking": "Agent 正在思考…",
+      "send": "发送"
+    },
+    "upload": {
+      "dropHint": "释放以上传文件",
+      "invalidType": "不支持的文件类型，请上传 CSV、Excel、SQL、PDF、Markdown、Word 或文本文件",
+      "tooLarge": "文件大小超过 10MB 限制",
+      "uploaded": "已上传"
+    },
+    "sidekick": {
+      "title": "AI 建议",
+      "planSteps": "规划",
+      "blueprintComplete": "蓝图已完成"
+    },
+    "confidence": {
+      "high": "高",
+      "medium": "中",
+      "low": "低"
+    },
+    "source": {
+      "field_analysis": "字段分析",
+      "pattern_matching": "模式匹配",
+      "semantic_inference": "语义推断",
+      "best_practices": "最佳实践"
+    },
+    "connection": {
+      "reconnecting": "重新连接中…",
+      "disconnected": "连接已断开",
+      "reconnect": "重新连接"
+    },
+    "state": {
+      "uploadGuide": "上传资料扩展本体"
+    },
+    "entity": {
+      "objectType": "对象类型",
+      "linkType": "链接类型",
+      "properties": "属性",
+      "relationships": "关系",
+      "reasoning": "推理来源",
+      "viewDetail": "查看完整详情"
+    },
+    "toolbar": {
+      "fit": "适配",
+      "reset": "重置",
+      "zoomIn": "放大",
+      "zoomOut": "缩小"
+    },
+    "domains": {
+      "ecommerce": "电商零售",
+      "finance": "金融银行",
+      "supplyChain": "供应链物流",
+      "healthcare": "医疗健康",
+      "manufacturing": "制造业",
+      "hr": "人力资源"
+    },
+    "goals": {
+      "dataIntegration": "数据整合与搜索",
+      "analytics": "决策分析与报表",
+      "knowledgeGraph": "知识图谱探索",
+      "aiFoundation": "AI 应用基座",
+      "dataGovernance": "数据治理合规"
+    }
   }
 }
