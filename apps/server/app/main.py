@@ -10,6 +10,7 @@ from app.database import engine
 from app.exceptions import AppError, app_error_handler
 from app.seed import ensure_seed_data
 from app.routers import (
+    agent,
     datasets,
     health,
     imports,
