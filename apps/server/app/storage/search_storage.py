@@ -187,6 +187,7 @@ class SearchStorage:
                     LinkTypeModel.id.ilike(pattern),
                 ),
             )
+            .options(selectinload(LinkTypeModel.endpoints))
             .distinct()
             .limit(limit)
         )
