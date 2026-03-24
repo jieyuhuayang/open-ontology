@@ -319,6 +319,7 @@
   - 连接数据流：useWorkshopGraph → StarfieldWorkbench → 节点交互 → EntityPopover/EntityDrawer
   - 连接 SSE 流：useAgentChat → 事件分发 → 各面板更新
   - 确保所有面板的折叠/展开联动正常
+  **测试**: 由 T022 WorkshopPage 集成渲染测试覆盖
   **覆盖 AC**: AC-01, AC-02, AC-03
   **依赖**: T019
 
