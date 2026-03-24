@@ -253,6 +253,7 @@
     - 推理来源标签（field_analysis → "字段分析" / pattern_matching → "模式匹配" / semantic_inference → "语义推断" / best_practices → "最佳实践"）
     - 点击卡片 → store.setSelectedEntityRid(节点 id) + 画布聚焦（通过回调）
   - `BlueprintSummary.tsx`: 蓝图完成后显示摘要：蓝图名称 + 总项数 + 各类型数量
+  **测试**: 由 T022 补充 ConfidenceIndicator 渲染测试（验证 high/medium/low 颜色和百分比）+ SuggestionCard 点击回调测试
   **覆盖 AC**: AC-34, AC-35, AC-42, AC-43, AC-44
   **依赖**: T003, T015
 
