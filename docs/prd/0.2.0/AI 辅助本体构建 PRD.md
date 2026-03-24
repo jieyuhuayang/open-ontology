@@ -1076,48 +1076,34 @@ CLI 工具的设计遵循面向 LLM 的最佳实践——**扁平化输入 + 纯
 
 ### CLI 命令设计（`oo` 工具）
 
+| 资源组 | 命令 | 说明 |
+|--------|------|------|
+| **object-type** | `list` / `create` / `get` / `update` / `delete` | 对象类型 CRUD |
+| **property** | `list` / `create` / `update` / `delete` | 属性 CRUD（需 `--object-type`） |
+| **link-type** | `list` / `create` / `get` / `update` / `delete` | 链接类型 CRUD |
+| **dataset** | `list` / `import-csv` / `import-excel` | 数据集管理 |
+| **blueprint** | `analyze` / `list` / `show` / `apply` | 蓝图分析与管理 |
+| **search** | — | 全文搜索（`--type` 筛选类型） |
+| **validate** | — | 本体一致性校验 |
+| **working-state** | `show` / `save` / `discard` | 变更管理 |
+
+**代表性用例**：
+
 ```bash
-# 对象类型操作
-oo object-type list [--ontology <rid>] [--format json|table]
-oo object-type create --name "Order" --api-name "Order" --description "订单" [--ontology <rid>]
-oo object-type get <rid-or-id>
-oo object-type update <rid-or-id> --description "更新描述"
-oo object-type delete <rid-or-id> [--force]
+# 创建对象类型
+oo object-type create --name "Order" --api-name "Order" --description "订单"
 
-# 属性操作
-oo property list --object-type <rid-or-id>
-oo property create --object-type <rid-or-id> --name "金额" --api-name "amount" --type double
-oo property update <rid-or-id> --name "新名称"
-oo property delete <rid-or-id>
+# 分析文件生成蓝图
+oo blueprint analyze schema.sql products.csv --ontology ri.ontology.main.xxx
 
-# 链接类型操作
-oo link-type list [--ontology <rid>]
-oo link-type create --name "包含" --api-name "contains" \
-   --side-a-object "Order" --side-b-object "Product" \
-   --cardinality "one-to-many"
+# 自动接受高置信度建议并应用蓝图
+oo blueprint apply <rid> --auto-accept-high-confidence
 
-# 数据集操作
-oo dataset list
-oo dataset import-csv <file-path> --name "订单数据"
-oo dataset import-excel <file-path> --name "产品数据"
-
-# 搜索
-oo search "客户" [--type object_type|property|link_type]
-
-# 校验
-oo validate [--ontology <rid>]
-
-# 蓝图操作
-oo blueprint analyze <file1> [file2] [file3] --ontology <rid>
-oo blueprint list
-oo blueprint show <rid>
-oo blueprint apply <rid> [--auto-accept-high-confidence]
-
-# 变更管理
-oo working-state show
-oo working-state save [--message "初始本体创建"]
-oo working-state discard [--all | --item <rid>]
+# 保存变更
+oo working-state save --message "初始本体创建"
 ```
+
+所有命令支持 `--format json|table` 输出切换，默认输出简明纯文本（LLM-Native，详见 §4.5 设计原则）。
 
 ### deepagents Skill 定义示例
 
