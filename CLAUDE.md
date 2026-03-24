@@ -176,6 +176,11 @@ Discover 页定制、对象类型分组、共享属性、Action Type CRUD、对�
 - 主键使用 `rid`（text，格式：`ri.<namespace>.<type>.<uuid4>`）— 不使用自增 ID
 - 错误响应格式：`{ "error": { "code": "...", "message": "...", "details": {} } }`
 
+### 环境变量
+
+- LLM API Key（`ANTHROPIC_API_KEY`、`OPENAI_API_KEY`）必须通过 `.env` 文件或环境变量注入，禁止硬编码
+- Agent 配置项（`LLM_MODEL`、`LLM_MAX_TOKENS`、`LLM_TEMPERATURE`、`LLM_TOKEN_BUDGET`、`LLM_MAX_STEPS`）均有默认值，仅需在调优时覆盖
+
 ### i18n
 
 - **禁止在组件中硬编码用户可见字符串** — 必须使用 `t('key')`
