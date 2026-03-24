@@ -250,3 +250,146 @@ class TestDeleteSession:
                 await service.delete_session("ri.ontology.agent-session.nonexist0000")
             assert exc_info.value.code == "AGENT_SESSION_NOT_FOUND"
             assert exc_info.value.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# chat (T012)
+# ---------------------------------------------------------------------------
+
+
+class TestChat:
+    @pytest.mark.asyncio
+    async def test_chat_session_not_found(self, service, db_session_mock):
+        with patch(
+            "app.services.agent_service.AgentStorage.get_session",
+            new_callable=AsyncMock,
+            return_value=None,
+        ):
+            with pytest.raises(AppError) as exc_info:
+                async for _ in service.chat("ri.ontology.agent-session.nonexist0000", "hello"):
+                    pass
+            assert exc_info.value.code == "AGENT_SESSION_NOT_FOUND"
+            assert exc_info.value.status_code == 404
+
+    @pytest.mark.asyncio
+    async def test_chat_session_not_active(self, service, db_session_mock):
+        orm = _make_session_orm(status="completed")
+        with patch(
+            "app.services.agent_service.AgentStorage.get_session",
+            new_callable=AsyncMock,
+            return_value=orm,
+        ):
+            with pytest.raises(AppError) as exc_info:
+                async for _ in service.chat(orm.rid, "hello"):
+                    pass
+            assert exc_info.value.code == "AGENT_SESSION_NOT_ACTIVE"
+            assert exc_info.value.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_chat_message_too_long(self, service, db_session_mock):
+        orm = _make_session_orm()
+        with patch(
+            "app.services.agent_service.AgentStorage.get_session",
+            new_callable=AsyncMock,
+            return_value=orm,
+        ):
+            with pytest.raises(AppError) as exc_info:
+                async for _ in service.chat(orm.rid, "a" * 4097):
+                    pass
+            assert exc_info.value.code == "MESSAGE_TOO_LONG"
+            assert exc_info.value.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_chat_llm_not_configured(self, service, db_session_mock):
+        orm = _make_session_orm()
+        with (
+            patch(
+                "app.services.agent_service.AgentStorage.get_session",
+                new_callable=AsyncMock,
+                return_value=orm,
+            ),
+            patch(
+                "app.services.agent_service.AgentStorage.create_message",
+                new_callable=AsyncMock,
+            ),
+            patch("app.services.agent_service.settings") as mock_settings,
+        ):
+            mock_settings.ANTHROPIC_API_KEY = ""
+            mock_settings.LLM_MODEL = "test"
+            mock_settings.LLM_MAX_STEPS = 50
+            mock_settings.LLM_TOKEN_BUDGET = 100000
+            mock_settings.DATABASE_URL = "postgresql+asyncpg://test:test@localhost/test"
+            with pytest.raises(AppError) as exc_info:
+                async for _ in service.chat(orm.rid, "hello"):
+                    pass
+            assert exc_info.value.code == "LLM_NOT_CONFIGURED"
+
+    @pytest.mark.asyncio
+    async def test_chat_success_yields_sse_events(self, service, db_session_mock):
+        orm = _make_session_orm()
+
+        async def mock_adapt_stream(*args, **kwargs):
+            yield 'event: text-delta\ndata: {"text": "hello"}\n\n'
+            yield 'event: done\ndata: {"sessionRid": "test", "summary": "hello"}\n\n'
+
+        with (
+            patch(
+                "app.services.agent_service.AgentStorage.get_session",
+                new_callable=AsyncMock,
+                return_value=orm,
+            ),
+            patch(
+                "app.services.agent_service.AgentStorage.create_message",
+                new_callable=AsyncMock,
+            ),
+            patch(
+                "app.services.agent_service.AgentStorage.create_audit_log",
+                new_callable=AsyncMock,
+            ),
+            patch("app.services.agent_service.AgentEngine") as MockEngine,
+            patch("app.services.agent_service.adapt_stream", side_effect=mock_adapt_stream),
+        ):
+            mock_agent = MagicMock()
+            MockEngine.return_value.create_agent.return_value = mock_agent
+
+            events = []
+            async for event in service.chat(orm.rid, "hello"):
+                events.append(event)
+
+        assert len(events) >= 2
+        assert "text-delta" in events[0]
+        assert "done" in events[-1]
+
+    @pytest.mark.asyncio
+    async def test_chat_persists_user_message(self, service, db_session_mock):
+        orm = _make_session_orm()
+
+        async def mock_adapt_stream(*args, **kwargs):
+            yield 'event: done\ndata: {"sessionRid": "test", "summary": ""}\n\n'
+
+        with (
+            patch(
+                "app.services.agent_service.AgentStorage.get_session",
+                new_callable=AsyncMock,
+                return_value=orm,
+            ),
+            patch(
+                "app.services.agent_service.AgentStorage.create_message",
+                new_callable=AsyncMock,
+            ) as mock_create_msg,
+            patch(
+                "app.services.agent_service.AgentStorage.create_audit_log",
+                new_callable=AsyncMock,
+            ),
+            patch("app.services.agent_service.AgentEngine") as MockEngine,
+            patch("app.services.agent_service.adapt_stream", side_effect=mock_adapt_stream),
+        ):
+            MockEngine.return_value.create_agent.return_value = MagicMock()
+            async for _ in service.chat(orm.rid, "test message"):
+                pass
+
+        # First call should be user message
+        first_call = mock_create_msg.call_args_list[0]
+        msg_model = first_call[0][1]
+        assert msg_model.role == "user"
+        assert msg_model.content == "test message"
