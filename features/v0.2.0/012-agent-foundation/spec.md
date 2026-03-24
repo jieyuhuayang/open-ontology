@@ -388,6 +388,17 @@ class ErrorEvent(DomainModel):
 // Response 204 No Content
 ```
 
+**POST /api/v1/agent/sessions/{rid}/complete — 关闭会话**
+
+```json
+// Response 200
+{
+  "rid": "ri.ontology.agent-session.a1b2c3d4e5f6",
+  "status": "completed",
+  "updatedAt": "2026-03-24T10:30:00Z"
+}
+```
+
 **POST /api/v1/agent/chat — SSE 流式对话**
 
 ```json
