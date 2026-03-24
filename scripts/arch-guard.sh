@@ -81,4 +81,20 @@ if [[ "$FILE" == *"/src/generated/"* ]]; then
     echo "⚠️  [arch-guard] 正在编辑自动生成文件 — 该文件会被 just web-typegen 覆盖"
 fi
 
+# ── 检查 8：CLI 代码禁止直接访问 storage（P0 红线）────────────────────────────
+# CLAUDE.md 强制约束：Agent/CLI 必须通过 services 层操作数据
+if [[ "$FILE" == *"/cli/"*.py ]]; then
+    if grep -qE "^from (app\.storage|sqlalchemy)" "$FILE" 2>/dev/null; then
+        echo "⚠️  [arch-guard] VIOLATION: $(basename "$FILE") 直接导入 storage/SQLAlchemy — CLI 必须通过 services 层"
+    fi
+fi
+
+# ── 检查 9：Agent skills 禁止直接 DB 操作 ──────────────────────────────────
+# Agent skills 应通过 service 层或 CLI adapter 调用，不直接操作数据库
+if [[ "$FILE" == *"/agent/skills/"*.py ]]; then
+    if grep -qE "^from (app\.storage|sqlalchemy)" "$FILE" 2>/dev/null; then
+        echo "⚠️  [arch-guard] VIOLATION: $(basename "$FILE") 直接导入 storage/SQLAlchemy — Skills 必须通过 services 层"
+    fi
+fi
+
 exit 0
