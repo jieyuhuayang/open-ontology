@@ -101,6 +101,10 @@ cd apps/web && pnpm dev
 | 函数 / 接口 | Function / Interface | 自定义逻辑 / 多态形状描述符 |
 | 共享属性 | Shared Property | 可跨对象类型复用的属性 |
 | 对象集 / 空间 | Object Set / Space | 对象实例集合 / 顶层项目容器 |
+| Agent 会话 | Agent Session | Agent 与用户的交互会话 |
+| 蓝图 | Blueprint | Agent 生成的本体建模方案（含多个蓝图项） |
+| 蓝图项 | Blueprint Item | 蓝图中的单个建议（创建 OT/Property/LinkType） |
+| 素材 | Agent Material | 用户上传的待分析资料（文件） |
 
 ## 版本路线图
 
