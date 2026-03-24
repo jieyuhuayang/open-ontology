@@ -1482,7 +1482,7 @@ apps/server/
 │       ├── agent_storage.py            # 会话/消息持久化
 │       ├── blueprint_storage.py        # 蓝图持久化
 │       └── material_storage.py         # 资料元数据持久化
-├── cli/                                # CLI 工具（v0.2.0 新增）
+├── cli/                                # oo CLI 工具 — 唯一能力封装层（v0.2.0 新增）
 │   ├── __init__.py
 │   ├── main.py                         # oo 命令入口
 │   ├── commands/
