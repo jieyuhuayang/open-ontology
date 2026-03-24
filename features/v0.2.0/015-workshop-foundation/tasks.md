@@ -64,7 +64,7 @@
   **依赖**: T001
 
 - [ ] **T003**: Workshop Store + 前端类型定义
-  **文件**: `apps/web/src/pages/workshop/stores/workshop-store.ts`（新建）, `apps/web/src/pages/workshop/types.ts`（新建）
+  **文件**: `apps/web/src/pages/workshop/stores/workshop-store.ts`（新建）, `apps/web/src/pages/workshop/types.ts`（新建）, `apps/web/src/pages/workshop/stores/__tests__/workshop-store.test.ts`（新建）
   **逻辑**:
   - `types.ts`: 定义 WorkshopPageState('empty'|'existing'|'analyzing'|'blueprint_pending'|'disconnected'), WorkshopNode(id/type/displayName/apiName/description/icon/color/properties/position/status/confidence/confidenceLevel/reasoning/source/blueprintItemRid), WorkshopEdge(id/sourceNodeId/targetNodeId/label/cardinality/status/confidence/confidenceLevel/blueprintItemRid), WorkshopProperty(displayName/apiName/baseType), DragLinkState(sourceNodeId/sourcePosition/currentPointerPosition/hoveredTargetId), SSEEvent 联合类型(7 种事件), SSEBlueprintItemData
   - `workshop-store.ts`: Zustand store，包含：pageState + setPageState, currentSessionRid + setCurrentSessionRid, connectionStatus('idle'|'connected'|'reconnecting'|'disconnected') + setConnectionStatus, selectedEntityRid + hoveredEntityRid, isChatPanelExpanded + isSidekickOpen + toggle 方法, planSteps + addPlanStep + clearPlanSteps, pendingCrystallizations + addPendingCrystallization + consumeCrystallization, reset()
