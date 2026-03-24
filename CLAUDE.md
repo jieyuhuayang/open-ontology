@@ -118,6 +118,8 @@ cd apps/web && pnpm dev
 | Services | `app/services/` | 业务逻辑，事务边界 | domain, storage |
 | Domain | `app/domain/` | Pydantic 模型，纯逻辑，无 I/O | 无（叶子层） |
 | Storage | `app/storage/` | SQLAlchemy 查询，返回 domain 模型 | domain |
+| Agent | `app/agent/` | deepagents 引擎、SSE 适配、Prompt/Skill 定义 | services, domain |
+| CLI | `cli/` | Typer CLI 命令（`oo`），委托给 services | services, domain |
 
 ### 前端
 
