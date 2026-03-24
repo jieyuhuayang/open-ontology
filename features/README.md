@@ -24,17 +24,27 @@ features/
 │   ├── spec.md
 │   ├── tasks.md
 │   └── release-contract.md
-└── v0.1.0/                      # MVP feature set
-    ├── 001-project-scaffolding/          ✅ 完成
-    ├── 002-database-schema/              ✅ 完成
-    ├── 003-object-type-crud/             ✅ 后端完成（含 Working State）
-    ├── 004-app-shell/                    📋 下一个开发
-    ├── 005-object-type-crud-frontend/    📋 待开发（Demo 走查目标）
-    ├── 006-link-type-crud/               📋 全栈
-    ├── 007-property-management/          📋 全栈
-    ├── 008-search/                       📋
-    ├── 009-change-management/            📋
-    └── 009-working-state/                📦 已归档（merged into F003）
+├── v0.1.0/                      # MVP feature set (已完成)
+│   ├── 001-project-scaffolding/          ✅ 完成
+│   ├── 002-database-schema/              ✅ 完成
+│   ├── 003-object-type-crud/             ✅ 完成
+│   ├── 004-app-shell/                    ✅ 完成
+│   ├── 005-object-type-crud-frontend/    ✅ 完成
+│   ├── 006-link-type-crud/               ✅ 完成
+│   ├── 007-property-management/          ✅ 完成
+│   ├── 008-search/                       ✅ 完成
+│   ├── 009-change-management/            ✅ 完成
+│   ├── 010-data-connection/              📋 有 spec
+│   └── 011-object-instance-sync/         ✅ 完成
+└── v0.2.0/                      # AI-Assisted Ontology Building (进行中)
+    ├── 012-agent-foundation/             ✅ 完成
+    ├── 013-cli-and-skills/               ✅ 完成
+    ├── 014-material-and-blueprint/       📋 待规格
+    ├── 015-workshop-foundation/          📋 待规格
+    ├── 016-workshop-enhancement/         📋 待规格
+    ├── 017-hitl-review-and-apply/        📋 待规格
+    ├── 018-agent-sidekick/               📋 P1 可延后
+    └── 019-ontology-import-export/       📋 P1 可延后
 ```
 
 ---
