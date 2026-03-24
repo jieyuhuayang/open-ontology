@@ -152,7 +152,7 @@
 
 ### Agent 引擎
 
-- [ ] **T008**: AgentEngine 单元测试
+- [x] **T008**: AgentEngine 单元测试
   **文件**: `apps/server/tests/unit/test_agent_engine.py`
   **逻辑**: mock deepagents 的 `create_deep_agent`，测试 AgentEngine 的初始化和配置：
   - `test_create_agent_with_anthropic_key` → 使用 Anthropic API key 正确初始化
