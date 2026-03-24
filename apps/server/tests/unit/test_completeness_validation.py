@@ -55,7 +55,7 @@ class TestCompletenessValidation:
         svc = WorkingStateService(AsyncMock())
         change = _make_ot_create_change()
         # Mock _has_mapped_properties to return True
-        with patch.object(svc, "_has_mapped_properties", return_value=True):
+        with patch.object(svc, "has_mapped_properties", return_value=True):
             await svc._validate_completeness([change])
         # No exception means pass
 
@@ -65,7 +65,7 @@ class TestCompletenessValidation:
         svc = WorkingStateService(AsyncMock())
         change = _make_ot_create_change(after={"displayName": ""})
         with (
-            patch.object(svc, "_has_mapped_properties", return_value=True),
+            patch.object(svc, "has_mapped_properties", return_value=True),
             pytest.raises(AppError) as exc_info,
         ):
             await svc._validate_completeness([change])
@@ -77,7 +77,7 @@ class TestCompletenessValidation:
         svc = WorkingStateService(AsyncMock())
         change = _make_ot_create_change(after={"backingDatasource": None})
         with (
-            patch.object(svc, "_has_mapped_properties", return_value=True),
+            patch.object(svc, "has_mapped_properties", return_value=True),
             pytest.raises(AppError) as exc_info,
         ):
             await svc._validate_completeness([change])
@@ -95,7 +95,7 @@ class TestCompletenessValidation:
             }
         )
         with (
-            patch.object(svc, "_has_mapped_properties", return_value=True),
+            patch.object(svc, "has_mapped_properties", return_value=True),
             pytest.raises(AppError) as exc_info,
         ):
             await svc._validate_completeness([change])
@@ -126,7 +126,7 @@ class TestCompletenessValidation:
         svc = WorkingStateService(AsyncMock())
         change = _make_ot_create_change()
         with (
-            patch.object(svc, "_has_mapped_properties", return_value=False),
+            patch.object(svc, "has_mapped_properties", return_value=False),
             pytest.raises(AppError) as exc_info,
         ):
             await svc._validate_completeness([change])
@@ -174,7 +174,7 @@ class TestCompletenessValidation:
                 new_callable=AsyncMock,
                 return_value=published_ot,
             ),
-            patch.object(svc, "_has_mapped_properties", return_value=True),
+            patch.object(svc, "has_mapped_properties", return_value=True),
         ):
             # Should NOT raise — published data has all required fields
             await svc._validate_completeness([change])
