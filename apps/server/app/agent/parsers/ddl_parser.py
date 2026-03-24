@@ -23,7 +23,7 @@ _FK_RE = re.compile(
 )
 _UNIQUE_RE = re.compile(r"UNIQUE\s+(?:KEY|INDEX)?\s*(?:\w+\s*)?\(([^)]+)\)", re.IGNORECASE)
 _COLUMN_RE = re.compile(
-    r"^[`\"]?(\w+)[`\"]?\s+([\w()]+(?:\s*\(\d+(?:,\s*\d+)?\))?)\s*(.*?)$",
+    r"^[`\"]?(\w+)[`\"]?\s+(\w+(?:\s*\([^)]*\))?)\s*(.*?)$",
     re.IGNORECASE,
 )
 
