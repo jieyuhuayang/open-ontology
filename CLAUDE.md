@@ -330,7 +330,6 @@ Open Ontology 主存储为 PostgreSQL；MVP 阶段 MySQL 仅作为外部导入�
 | Object Type CRUD | `docs/architecture/02-domain-model.md` + `docs/specs/object-type-metadata.md` |
 | Link Type CRUD | `docs/architecture/02-domain-model.md`（LinkType 部分）+ `docs/specs/link-type-metadata.md` |
 | 属性类型 | `docs/specs/supported-property-types.md` |
-| 属性值格式化 | `docs/specs/property-value-formatting.md` |
 | 数据连接 | `docs/architecture/05-data-connectivity.md` |
 | 变更管理/版本控制 | `docs/architecture/06-change-management.md` |
 | UI 设计/交互流程 | PRD + `docs/prd/0.1.0（MVP）/images/` |
