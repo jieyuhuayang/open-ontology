@@ -16,7 +16,7 @@ dependencies = [
     "python-calamine>=0.2.0",
     "cryptography>=42.0.0",
     "python-multipart>=0.0.9",
-    "typer[all]>=0.12.0",
+    "typer>=0.12.0",
     "rich>=13.0.0",
 ]
 
