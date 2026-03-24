@@ -344,8 +344,8 @@ interface WorkshopStore {
   setCurrentSessionRid: (rid: string | null) => void;
 
   // SSE 连接
-  connectionStatus: 'idle' | 'connected' | 'disconnected';
-  setConnectionStatus: (s: 'idle' | 'connected' | 'disconnected') => void;
+  connectionStatus: 'idle' | 'connected' | 'reconnecting' | 'disconnected';
+  setConnectionStatus: (s: 'idle' | 'connected' | 'reconnecting' | 'disconnected') => void;
 
   // 实体交互
   selectedEntityRid: string | null;
