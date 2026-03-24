@@ -265,6 +265,7 @@
   - 内容：名称（加粗）+ 类型徽标（"对象类型"/"链接类型"标签）+ 一行描述（截断 50 字）+ ConfidenceIndicator（仅 pending 状态）
   - 使用 React portal 渲染到 document.body 避免 R3F Canvas 层级问题
   - 悬停目标移开后 100ms 消失
+  **测试**: 由 T022 补充 EntityPopover 渲染测试（验证 200ms 延迟显示、名称/类型/置信度内容）
   **覆盖 AC**: AC-29
   **依赖**: T003, T016
 
