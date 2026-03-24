@@ -2,7 +2,7 @@
 
 import asyncio
 import sys
-from collections.abc import AsyncGenerator, Callable, Coroutine
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -36,28 +36,9 @@ async def async_session_context() -> AsyncGenerator[AsyncSession]:
         raise
 
 
-def run_async(coro: Coroutine[Any, Any, Any]) -> Any:
+def run_async(coro: Any) -> Any:
     """Run an async coroutine from synchronous CLI context."""
     return asyncio.run(coro)
-
-
-def handle_app_error(e: AppError) -> None:
-    """Format AppError to stderr and exit with code 1."""
-    typer.echo(f"Error: {e.message}", err=True)
-    sys.exit(1)
-
-
-def run_command(fn: Callable[..., Coroutine[Any, Any, Any]], *args: Any, **kwargs: Any) -> Any:
-    """Convenience wrapper: run_async + handle_app_error."""
-    try:
-        return run_async(fn(*args, **kwargs))
-    except AppError as e:
-        handle_app_error(e)
-    except SystemExit:
-        raise
-    except Exception as e:
-        typer.echo(f"Error: {e}", err=True)
-        sys.exit(1)
 
 
 def get_ontology_rid(ctx: typer.Context) -> str:
