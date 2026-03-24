@@ -11,6 +11,10 @@ class SSEEventType(str, enum.Enum):
     PLAN_STEP = "plan-step"
     DONE = "done"
     ERROR = "error"
+    # F014: Material & Blueprint events
+    MATERIAL_UPLOADED = "material-uploaded"
+    BLUEPRINT_ITEM = "blueprint-item"
+    BLUEPRINT_COMPLETE = "blueprint-complete"
 
 
 @dataclass
