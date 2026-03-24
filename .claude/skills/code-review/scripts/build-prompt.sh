@@ -120,7 +120,8 @@ fi
 TOTAL_LINES=$(echo "$DIFF_CONTENT" | wc -l | tr -d ' ')
 TRUNCATED=""
 if [[ "$TOTAL_LINES" -gt "$MAX_DIFF_LINES" ]]; then
-  DIFF_CONTENT=$(echo "$DIFF_CONTENT" | head -n "$MAX_DIFF_LINES")
+  # Use printf + head with SIGPIPE protection to avoid exit 141 under pipefail
+  DIFF_CONTENT=$(printf '%s\n' "$DIFF_CONTENT" | head -n "$MAX_DIFF_LINES" || true)
   TRUNCATED="
 **NOTE: Diff truncated from $TOTAL_LINES to $MAX_DIFF_LINES lines. Some changes may not be reviewed.**"
 fi
