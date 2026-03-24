@@ -5,7 +5,7 @@ from collections.abc import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agent.engine import AgentEngine
-from app.agent.sse_adapter import adapt_stream
+from app.agent.sse_adapter import StreamResult, adapt_stream
 from app.config import settings
 from app.domain.agent import (
     AgentMessage,
@@ -25,6 +25,28 @@ from app.storage.models import AgentAuditLogModel, AgentMessageModel, AgentSessi
 class AgentService:
     def __init__(self, session: AsyncSession):
         self._session = session
+
+    # --- Private helpers ---
+
+    async def _get_session_or_404(self, rid: str) -> AgentSessionModel:
+        orm = await AgentStorage.get_session(self._session, rid)
+        if orm is None:
+            raise AppError(
+                code="AGENT_SESSION_NOT_FOUND",
+                message=f"Agent session '{rid}' not found",
+                status_code=404,
+            )
+        return orm
+
+    async def _get_active_session_or_error(self, rid: str) -> AgentSessionModel:
+        orm = await self._get_session_or_404(rid)
+        if orm.status != SessionStatus.ACTIVE.value:
+            raise AppError(
+                code="AGENT_SESSION_NOT_ACTIVE",
+                message=f"Session '{rid}' is not active (current: {orm.status})",
+                status_code=422,
+            )
+        return orm
 
     # --- Session CRUD ---
 
@@ -70,13 +92,7 @@ class AgentService:
         )
 
     async def get_session_detail(self, rid: str) -> AgentSessionDetail:
-        orm = await AgentStorage.get_session(self._session, rid)
-        if orm is None:
-            raise AppError(
-                code="AGENT_SESSION_NOT_FOUND",
-                message=f"Agent session '{rid}' not found",
-                status_code=404,
-            )
+        orm = await self._get_session_or_404(rid)
         messages = await AgentStorage.list_messages_by_session(self._session, rid)
         return AgentSessionDetail(
             session=self._to_session(orm),
@@ -84,32 +100,14 @@ class AgentService:
         )
 
     async def complete_session(self, rid: str) -> AgentSession:
-        orm = await AgentStorage.get_session(self._session, rid)
-        if orm is None:
-            raise AppError(
-                code="AGENT_SESSION_NOT_FOUND",
-                message=f"Agent session '{rid}' not found",
-                status_code=404,
-            )
-        if orm.status != SessionStatus.ACTIVE.value:
-            raise AppError(
-                code="AGENT_SESSION_NOT_ACTIVE",
-                message=f"Session '{rid}' is not active (current: {orm.status})",
-                status_code=422,
-            )
+        await self._get_active_session_or_error(rid)
         updated = await AgentStorage.update_session_status(
             self._session, rid, SessionStatus.COMPLETED.value
         )
         return self._to_session(updated)
 
     async def delete_session(self, rid: str) -> None:
-        orm = await AgentStorage.get_session(self._session, rid)
-        if orm is None:
-            raise AppError(
-                code="AGENT_SESSION_NOT_FOUND",
-                message=f"Agent session '{rid}' not found",
-                status_code=404,
-            )
+        await self._get_session_or_404(rid)
         # Write audit log BEFORE delete (FK ON DELETE SET NULL preserves the log)
         await AgentStorage.create_audit_log(
             self._session,
@@ -132,22 +130,13 @@ class AgentService:
                 message="Message content exceeds 4096 characters",
                 status_code=422,
             )
-        orm = await AgentStorage.get_session(self._session, session_rid)
-        if orm is None:
-            raise AppError(
-                code="AGENT_SESSION_NOT_FOUND",
-                message=f"Agent session '{session_rid}' not found",
-                status_code=404,
-            )
-        if orm.status != SessionStatus.ACTIVE.value:
-            raise AppError(
-                code="AGENT_SESSION_NOT_ACTIVE",
-                message=f"Session '{session_rid}' is not active (current: {orm.status})",
-                status_code=422,
-            )
+        await self._get_active_session_or_error(session_rid)
 
     async def chat(self, session_rid: str, content: str) -> AsyncGenerator[str, None]:
-        """Stream SSE events for an Agent chat interaction."""
+        """Stream SSE events for an Agent chat interaction.
+
+        Assumes validate_chat() was called beforehand.
+        """
         orm = await AgentStorage.get_session(self._session, session_rid)
 
         # Persist user message
@@ -168,25 +157,17 @@ class AgentService:
             system_prompt=self._build_context_prompt(orm),
         )
 
-        # Stream events via SSE adapter
+        # Stream events via SSE adapter — StreamResult collects accumulated text
         astream = agent.astream_events(
             {"messages": [{"role": "user", "content": content}]},
             config={"configurable": {"thread_id": session_rid}},
             version="v2",
         )
-
-        accumulated_text = ""
-        async for sse_event in adapt_stream(astream, session_rid):
-            # Track text for assistant message persistence
-            if "text-delta" in sse_event:
-                import json as _json
-
-                try:
-                    data = _json.loads(sse_event.split("data: ", 1)[1].strip())
-                    accumulated_text += data.get("text", "")
-                except (ValueError, IndexError):
-                    pass
+        stream_result = StreamResult()
+        async for sse_event in adapt_stream(astream, session_rid, result=stream_result):
             yield sse_event
+
+        accumulated_text = stream_result.full_text
 
         # Persist assistant message
         await AgentStorage.create_message(
@@ -196,7 +177,7 @@ class AgentService:
                 session_rid=session_rid,
                 role=MessageRole.ASSISTANT.value,
                 content=accumulated_text,
-                metadata_={"tokenCount": len(accumulated_text) // 4},  # rough estimate
+                metadata_={"tokenCount": len(accumulated_text) // 4},
             ),
         )
 
@@ -218,7 +199,6 @@ class AgentService:
 
     @staticmethod
     def _build_context_prompt(session_orm: AgentSessionModel) -> str | None:
-        """Build context from session metadata (domain, goal, scope_hint)."""
         parts = []
         if session_orm.domain:
             parts.append(f"Business domain: {session_orm.domain}")
@@ -228,7 +208,7 @@ class AgentService:
             parts.append(f"Scope: {session_orm.scope_hint}")
         return "\n".join(parts) if parts else None
 
-    # --- Helpers ---
+    # --- ORM → Domain converters ---
 
     @staticmethod
     def _to_session(orm: AgentSessionModel) -> AgentSession:
