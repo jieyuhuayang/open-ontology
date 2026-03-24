@@ -376,7 +376,7 @@
   **覆盖 AC**: AC-49, AC-53, AC-54
   **依赖**: T003
 
-- [ ] **T030**: Excel 解析器单元测试 + 实现
+- [ ] **T030**: Excel 解析器单元测试 + 实现（Test-Alongside：解析器为独立工具模块，无 DB 依赖）
   **文件**: `apps/server/tests/unit/test_excel_parser.py`, `apps/server/app/agent/parsers/excel_parser.py`
   **逻辑**:
   - ExcelParser(BaseParser): 使用 openpyxl 读取 .xlsx
@@ -387,7 +387,7 @@
   **覆盖 AC**: AC-50
   **依赖**: T029
 
-- [ ] **T031**: DDL 解析器单元测试 + 实现
+- [ ] **T031**: DDL 解析器单元测试 + 实现（Test-Alongside：解析器为独立工具模块，无 DB 依赖）
   **文件**: `apps/server/tests/unit/test_ddl_parser.py`, `apps/server/app/agent/parsers/ddl_parser.py`
   **逻辑**:
   - DdlParser(BaseParser): 使用 sqlparse 解析 SQL DDL
@@ -397,7 +397,7 @@
   **覆盖 AC**: AC-51
   **依赖**: T029
 
-- [ ] **T032**: 文档解析器单元测试 + 实现
+- [ ] **T032**: 文档解析器单元测试 + 实现（Test-Alongside：解析器为独立工具模块，无 DB 依赖）
   **文件**: `apps/server/tests/unit/test_document_parser.py`, `apps/server/app/agent/parsers/document_parser.py`
   **逻辑**:
   - DocumentParser(BaseParser): 根据文件扩展名选择提取方式
