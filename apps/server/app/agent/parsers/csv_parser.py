@@ -75,6 +75,9 @@ class CsvParser(BaseParser):
         try:
             dialect = csv.Sniffer().sniff(text_content[:4096])
             delimiter = dialect.delimiter
+            # Sniffer can pick up letter chars as delimiters for single-column CSVs
+            if delimiter.isalnum():
+                delimiter = ","
         except csv.Error:
             delimiter = ","
 
