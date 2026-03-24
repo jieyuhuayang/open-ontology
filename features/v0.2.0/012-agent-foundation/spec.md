@@ -56,7 +56,7 @@ F012 是 v0.2.0 的基础设施层，为后续所有 Agent 相关 feature（F013
 | AC-08 | 用户 | POST `/api/v1/agent/chat` 发送消息（sessionRid + content） | 返回 SSE stream（Content-Type: `text/event-stream`），流中包含 `text-delta` 事件（data: `{"text": "..."}`） |
 | AC-09 | 用户 | POST chat 后 Agent 回复完毕 | 流发送 `done` 事件（data: `{"sessionRid": "...", "summary": "..."}`），然后关闭连接 |
 | AC-10 | 用户 | POST chat 时 LLM 调用失败（API key 无效或网络超时） | 流发送 `error` 事件（data: `{"code": "LLM_API_ERROR", "message": "..."}`），然后关闭连接 |
-| AC-11 | 用户 | POST chat 时 sessionRid 不存在 | 422，错误码 `AGENT_SESSION_NOT_FOUND`（非 SSE，直接 JSON 错误） |
+| AC-11 | 用户 | POST chat 时 sessionRid 不存在 | 404，错误码 `AGENT_SESSION_NOT_FOUND`（非 SSE，直接 JSON 错误） |
 | AC-12 | 用户 | POST chat 时 session status 非 `active` | 422，错误码 `AGENT_SESSION_NOT_ACTIVE` |
 | AC-13 | 用户 | POST chat，Agent 生成规划步骤 | SSE 流包含 `plan-step` 事件（data: `{"step": "...", "index": 0, "total": 3}`） |
 | **消息持久化** | | | |
