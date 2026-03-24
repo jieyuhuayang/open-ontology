@@ -1138,6 +1138,20 @@ class TestApply:
         mock_created_lt = MagicMock()
         mock_created_lt.rid = "ri.ontology.link-type.real001"
 
+        # Mock service classes at construction level so Pydantic request model
+        # validation (which happens before .create) is bypassed entirely.
+        mock_ot_svc = MagicMock()
+        mock_ot_svc.create = AsyncMock(return_value=mock_created_ot)
+        mock_ot_cls = MagicMock(return_value=mock_ot_svc)
+
+        mock_prop_svc = MagicMock()
+        mock_prop_svc.create = AsyncMock(return_value=mock_created_prop)
+        mock_prop_cls = MagicMock(return_value=mock_prop_svc)
+
+        mock_lt_svc = MagicMock()
+        mock_lt_svc.create = AsyncMock(return_value=mock_created_lt)
+        mock_lt_cls = MagicMock(return_value=mock_lt_svc)
+
         with (
             patch(
                 "app.services.blueprint_service.BlueprintStorage.get_for_update",
@@ -1158,19 +1172,16 @@ class TestApply:
                 new_callable=AsyncMock,
             ),
             patch(
-                "app.services.object_type_service.ObjectTypeService.create",
-                new_callable=AsyncMock,
-                return_value=mock_created_ot,
+                "app.services.object_type_service.ObjectTypeService",
+                mock_ot_cls,
             ),
             patch(
-                "app.services.property_service.PropertyService.create",
-                new_callable=AsyncMock,
-                return_value=mock_created_prop,
+                "app.services.property_service.PropertyService",
+                mock_prop_cls,
             ),
             patch(
-                "app.services.link_type_service.LinkTypeService.create",
-                new_callable=AsyncMock,
-                return_value=mock_created_lt,
+                "app.services.link_type_service.LinkTypeService",
+                mock_lt_cls,
             ),
         ):
             result = await service.apply("ri.ontology.blueprint.bp001")
@@ -1181,6 +1192,10 @@ class TestApply:
         assert result.skipped == 0
         statuses = [r.status for r in result.results]
         assert statuses == ["success", "success", "success"]
+        # Verify each service's create was called
+        mock_ot_svc.create.assert_awaited_once()
+        mock_prop_svc.create.assert_awaited_once()
+        mock_lt_svc.create.assert_awaited_once()
 
 
 # ---------------------------------------------------------------------------
