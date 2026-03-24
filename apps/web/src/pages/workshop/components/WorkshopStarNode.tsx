@@ -140,7 +140,7 @@ export default function WorkshopStarNode({
       {/* AI badge for pending items */}
       {node.status === 'pending' && (
         <Html
-          position={[0, -baseSize - 0.3, 0]}
+          position={[0, -0.8, 0]}
           center
           style={{ pointerEvents: 'none' }}
         >
