@@ -15,6 +15,9 @@ REFS_DIR="$SCRIPT_DIR/../references"
 MAX_DIFF_LINES=3000
 OUTPUT_FILE="/tmp/code-review-prompt.md"
 
+# Always remove stale output to prevent cache poisoning
+rm -f "$OUTPUT_FILE"
+
 MODE="uncommitted"
 BASE_BRANCH=""
 COMMIT_SHA=""
