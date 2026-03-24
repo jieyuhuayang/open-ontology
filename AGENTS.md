@@ -155,6 +155,7 @@ These rules are **non-negotiable**. Violating them creates tech debt that compou
 - **NO synchronous SQLAlchemy** — always use async sessions with asyncpg
 - **NO hand-written API types in frontend** — always generate from openapi.json
 - **NO server data in Zustand** — server state belongs in TanStack Query cache
+- **Agent/CLI must NOT access storage directly** — must go through the services layer
 
 ### Naming Conventions
 
