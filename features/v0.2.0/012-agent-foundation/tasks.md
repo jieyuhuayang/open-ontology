@@ -183,7 +183,7 @@
 
 ### SSE 适配器
 
-- [ ] **T010**: SSE 适配器单元测试
+- [x] **T010**: SSE 适配器单元测试
   **文件**: `apps/server/tests/unit/test_sse_adapter.py`
   **逻辑**: 测试 LangGraph 事件到 PRD SSE 事件的映射：
   - `test_map_chat_model_stream_to_text_delta` → `on_chat_model_stream` 事件映射为 `text-delta` SSE 事件
