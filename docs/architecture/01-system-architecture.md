@@ -121,6 +121,13 @@ Search Service (搜索服务)
 ├── 按状态/可见性筛选
 └── 未来：语义搜索（Agent 场景）
 
+Agent Service (Agent 服务) [v0.2.0 新增]
+├── Agent 会话管理（创建/列表/详情/完成/删除）
+├── SSE 流式对话（deepagents 引擎驱动）
+├── 消息持久化（用户消息 + Agent 回复）
+├── 审计日志（Agent 操作记录）
+└── Token 预算管理
+
 Security Service (安全服务)
 ├── 用户认证（集成外部 IdP）
 ├── 角色管理（Owner/Editor/Viewer/Discoverer）
