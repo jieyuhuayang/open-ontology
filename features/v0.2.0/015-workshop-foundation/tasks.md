@@ -128,6 +128,7 @@
   **逻辑**:
   - `FileUploadArea.tsx`: 拖放区域组件（dragover/drop 事件），覆盖对话面板区域。拖入时显示虚线高亮边框 + "释放以上传文件" 文字。支持的 MIME 类型白名单：text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/sql, application/pdf, text/markdown, application/vnd.openxmlformats-officedocument.wordprocessingml.document, text/plain。前端预校验：类型不匹配显示 Toast（message.error）；文件大小 > 10MB 显示 Toast。校验通过后调用 useUploadMaterial() mutation
   - `FileThumbnailCard.tsx`: 接收 material: AgentMaterial, uploadProgress?: number。展示文件名、大小（格式化为 KB/MB）、类型图标（不同类型不同颜色）、上传进度条（progress < 100 时显示）、完成状态 ✓
+  **测试**: 由 T022 补充 FileUploadArea 测试（验证拖放高亮、文件类型校验 Toast、文件大小校验 Toast、上传 mutation 调用）
   **覆盖 AC**: AC-14, AC-15, AC-16, AC-17, AC-18, AC-19
   **依赖**: T002, T006
 
