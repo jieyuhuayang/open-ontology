@@ -1,9 +1,8 @@
 """validate command — ontology consistency validation."""
 
-import sys
-
 import typer
 
+from app.exceptions import AppError
 from app.services.validation_service import ValidationService
 from cli.adapter import async_session_context, get_ontology_rid, run_async
 
@@ -17,7 +16,11 @@ async def _do_validate(ontology_rid: str):  # noqa: ANN202
 def validate(ctx: typer.Context) -> None:
     """Validate ontology consistency."""
     ontology_rid = get_ontology_rid(ctx)
-    results = run_async(_do_validate(ontology_rid))
+    try:
+        results = run_async(_do_validate(ontology_rid))
+    except AppError as e:
+        typer.echo(f"Error: {e.message}", err=True)
+        raise typer.Exit(code=1)
 
     if not results:
         typer.echo("Validation passed. No issues found.")
@@ -36,4 +39,4 @@ def validate(ctx: typer.Context) -> None:
     typer.echo(f"\nResult: {errors} error(s), {warnings} warning(s)")
 
     if errors > 0:
-        sys.exit(1)
+        raise typer.Exit(code=1)
