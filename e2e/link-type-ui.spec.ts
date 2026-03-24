@@ -1,6 +1,7 @@
 import { test, expect, type Page, type APIRequestContext } from '@playwright/test';
 import { selectAntOption } from './helpers/antd';
 import { API, createObjectType, createProperty } from './helpers/api';
+import { cleanupByPrefix } from './helpers/fixtures';
 
 /**
  * E2E tests for Link Type UI optimization:
