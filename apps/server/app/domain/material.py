@@ -32,7 +32,7 @@ class AgentMaterial(DomainModel):
     file_name: str
     file_type: MaterialFileType
     file_size: int
-    storage_path: str
+    storage_path: str = Field(exclude=True)  # Internal only — not exposed in API
     analysis_status: AnalysisStatus = AnalysisStatus.PENDING
     analysis_result: dict | None = None
     error_message: str | None = None
