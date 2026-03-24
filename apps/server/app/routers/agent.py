@@ -13,6 +13,7 @@ from app.domain.agent import (
     ChatRequest,
 )
 from app.domain.constants import DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
+from app.domain.validators import validate_rid
 from app.services.agent_service import AgentService
 
 router = APIRouter(prefix="/api/v1/agent", tags=["agent"])
