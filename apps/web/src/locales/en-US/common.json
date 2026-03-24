@@ -751,7 +751,8 @@
       "scope": "Concept Scope (optional)",
       "scopePlaceholder": "e.g. Focus on order fulfillment, exclude financial reconciliation",
       "confirm": "Confirm & Continue",
-      "skip": "Skip"
+      "skip": "Skip",
+      "createFailed": "Failed to create session"
     },
     "chat": {
       "placeholder": "Ask Agent...",
