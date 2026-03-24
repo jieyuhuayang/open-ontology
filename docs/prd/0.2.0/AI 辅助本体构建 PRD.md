@@ -1052,13 +1052,10 @@ Agent 发送 blueprint-item 事件（type: link_type）
 
 ### 概述
 
-将本体原子操作包装为三种形态，服务于不同用户和场景：
+本体操作体系分为两层，服务于 Agent 和开发者两类调用者：
 
-1. **Agent Skills**（SKILL.md）— deepagents Agent 内部调用
-2. **CLI 命令**（`oo` 命令行工具）— 开发者/运维在终端中使用
-3. **Claude Code Skills**（`.claude/skills/`）— 开发者在 Claude Code 中使用
-
-三者共享底层逻辑——均调用同一套 Python Service 层 API。
+1. **能力层 — `oo` CLI**：将 Service 层 CRUD 封装为命令行原子操作，是**唯一的能力实现**。所有调用者（Agent / 开发者 / Claude Code）最终都通过 `oo` CLI 执行
+2. **知识层 — SKILL.md**：描述 Agent 在什么场景、以什么策略调用 `oo` 命令。deepagents Agent 读取 SKILL.md 获取调用知识，Claude Code Skills 是 SKILL.md 在 IDE 中的薄壳投影
 
 ### LLM-Native 设计原则（Unix 哲学）
 
