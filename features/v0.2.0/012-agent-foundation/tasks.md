@@ -81,7 +81,7 @@
 
 ### 会话管理 Service
 
-- [ ] **T004**: AgentService 会话 CRUD 单元测试
+- [x] **T004**: AgentService 会话 CRUD 单元测试
   **文件**: `apps/server/tests/unit/test_agent_service.py`
   **逻辑**: 通过 `mock_db_session` mock 数据库，测试 AgentService 的会话管理方法：
   - `test_create_session_success` → 创建成功返回 AgentSession
