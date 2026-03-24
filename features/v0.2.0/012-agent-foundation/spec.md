@@ -455,7 +455,7 @@ data: {"sessionRid": "ri.ontology.agent-session.a1b2c3d4e5f6", "summary": "已�
 ### 7.1 AgentService（`app/services/agent_service.py`）
 
 职责：
-- **会话管理**：创建（含 INV-12 检查）、查询列表、查询详情（含消息历史）、删除（级联）
+- **会话管理**：创建（含 INV-12 检查）、查询列表、查询详情（含消息历史）、关闭（active→completed）、删除（级联）
 - **Agent 引擎编排**：初始化 deepagents Agent（含中间件配置）、调用 `astream()` 获取事件流
 - **消息双写**：用户消息和 Agent 完整回复均写入 agent_messages
 - **审计日志写入**：每次 chat 交互写入 agent_audit_logs
