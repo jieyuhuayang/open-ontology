@@ -41,7 +41,7 @@ function SceneContent({
   const setHoveredEntityRid = useWorkshopStore((s) => s.setHoveredEntityRid);
   const setSelectedEntityRid = useWorkshopStore((s) => s.setSelectedEntityRid);
 
-  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+  const nodeMap = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
 
   return (
     <>
