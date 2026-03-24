@@ -1358,6 +1358,7 @@ apps/web/src/
 | 端点 | 方法 | 说明 | 优先级 |
 |------|------|------|--------|
 | `/api/v1/agent/chat` | POST | SSE 流式对话（核心） | P0 |
+| `/api/v1/agent/chat/clarify` | POST | 回复 Agent 的澄清请求（data: { questionId, selectedOption }) | P0 |
 | `/api/v1/agent/sessions` | GET | 会话列表 | P0 |
 | `/api/v1/agent/sessions/{rid}` | GET | 会话详情（含消息历史） | P0 |
 | `/api/v1/agent/sessions/{rid}` | DELETE | 删除会话 | P0 |
