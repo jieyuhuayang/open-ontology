@@ -189,11 +189,13 @@
     - AmbientLight + PointLight（参考 Demo）
     - OrbitControls（enablePan, enableRotate, enableZoom）— 暴露 ref 给 WorkshopToolbar
     - BackgroundStars（参考 Demo，可直接复制渲染逻辑）
+    - 空状态（nodes 为空）：显示空星空背景 + 中心脉冲引导动画（sphere mesh + emissive 呼吸效果）
     - 遍历 nodes 渲染 WorkshopStarNode（T013）
     - 遍历 edges 渲染 WorkshopStarLink（T013）
   - EffectComposer + Bloom 后处理（参考 Demo）
   - 接收 props: nodes, edges, onNodeHover, onNodeClick, onNodeDoubleClick, toolbarRef
-  **覆盖 AC**: AC-25, AC-26
+  **测试**: R3F Canvas 组件不做 jsdom 渲染测试（WebGL 不支持），由 E2E 测试覆盖
+  **覆盖 AC**: AC-21, AC-25, AC-26
   **依赖**: T004, T005, T011
 
 - [ ] **T013**: WorkshopStarNode + WorkshopStarLink — 星体与星链
