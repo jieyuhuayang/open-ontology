@@ -55,36 +55,36 @@ v0.2.0 引入 **统一能力层** 原则：`oo` CLI 是本体操作的唯一执�
 | AC-19 | 开发者 | `oo link-type update <rid> --side-a-name "新名称"` | stdout: `Updated link type "<rid>".`，exit 0 |
 | AC-20 | 开发者 | `oo link-type delete <rid>` | stdout: `Deleted link type "<rid>".`，exit 0 |
 | **dataset 组** | | | |
-| AC-20 | 开发者 | `oo dataset list` | stdout 文本表格（RID, Name, Source, RowCount） |
-| AC-21 | 开发者 | `oo dataset import-csv <filepath>` | 读取本地 CSV，stdout: `Imported dataset "<name>". RID: ri.ontology.dataset.<uuid>. Columns: N, Rows: M`，exit 0 |
-| AC-22 | 开发者 | `oo dataset import-excel <filepath> --sheet "Sheet1"` | 读取 Excel 指定 sheet |
-| AC-23 | 开发者 | `oo dataset import-csv <不存在的文件>` | stderr: `Error: File not found: <path>`，exit 1 |
+| AC-21 | 开发者 | `oo dataset list` | stdout 文本表格（RID, Name, Source, RowCount） |
+| AC-22 | 开发者 | `oo dataset import-csv <filepath>` | 读取本地 CSV，stdout: `Imported dataset "<name>". RID: ri.ontology.dataset.<uuid>. Columns: N, Rows: M`，exit 0 |
+| AC-23 | 开发者 | `oo dataset import-excel <filepath> --sheet "Sheet1"` | 读取 Excel 指定 sheet |
+| AC-24 | 开发者 | `oo dataset import-csv <不存在的文件>` | stderr: `Error: File not found: <path>`，exit 1 |
 | **search** | | | |
-| AC-24 | 开发者 | `oo search "客户"` | stdout 跨资源搜索结果（按 objectType/property/linkType 分区显示），exit 0 |
-| AC-25 | 开发者 | `oo search "客户" --type objectType` | 仅搜索对象类型 |
-| AC-26 | 开发者 | `oo search "无匹配"` | stdout: `No results found.`，exit 0 |
+| AC-25 | 开发者 | `oo search "客户"` | stdout 跨资源搜索结果（按 objectType/property/linkType 分区显示），exit 0 |
+| AC-26 | 开发者 | `oo search "客户" --type objectType` | 仅搜索对象类型 |
+| AC-27 | 开发者 | `oo search "无匹配"` | stdout: `No results found.`，exit 0 |
 | **validate** | | | |
-| AC-27 | 开发者 | `oo validate`（本体完整无问题） | stdout: `Validation passed. No issues found.`，exit 0 |
-| AC-28 | 开发者 | `oo validate`（存在不完整 OT） | stdout 含 `ERROR: Object type "X" is incomplete: missing <fields>`，exit 1 |
-| AC-29 | 开发者 | `oo validate`（存在类型不兼容） | stdout 含 `ERROR: Property "x" type "integer" incompatible with column "y" type "string"`，exit 1 |
-| AC-30 | 开发者 | `oo validate`（存在孤立链接类型） | stdout 含 `WARNING: Link type "x" references deleted object type`，exit 0（warning 不导致失败） |
+| AC-28 | 开发者 | `oo validate`（本体完整无问题） | stdout: `Validation passed. No issues found.`，exit 0 |
+| AC-29 | 开发者 | `oo validate`（存在不完整 OT） | stdout 含 `ERROR: Object type "X" is incomplete: missing <fields>`，exit 1 |
+| AC-30 | 开发者 | `oo validate`（存在类型不兼容） | stdout 含 `ERROR: Property "x" type "integer" incompatible with column "y" type "string"`，exit 1 |
+| AC-31 | 开发者 | `oo validate`（存在孤立链接类型） | stdout 含 `WARNING: Link type "x" references deleted object type`，exit 0（warning 不导致失败） |
 | **working-state 组** | | | |
-| AC-31 | 开发者 | `oo working-state show` | 显示草稿变更列表（ResourceType, RID, ChangeType），无草稿时输出 `No pending changes.` |
-| AC-32 | 开发者 | `oo working-state save` | 发布草稿，stdout: `Published N changes (version M).`，exit 0 |
-| AC-33 | 开发者 | `oo working-state save`（无草稿） | stderr: `Error: No changes to publish`，exit 1 |
-| AC-34 | 开发者 | `oo working-state discard` | 丢弃草稿，stdout: `Discarded all draft changes.`，exit 0 |
+| AC-32 | 开发者 | `oo working-state show` | 显示草稿变更列表（ResourceType, RID, ChangeType），无草稿时输出 `No pending changes.` |
+| AC-33 | 开发者 | `oo working-state save` | 发布草稿，stdout: `Published N changes (version M).`，exit 0 |
+| AC-34 | 开发者 | `oo working-state save`（无草稿） | stderr: `Error: No changes to publish`，exit 1 |
+| AC-35 | 开发者 | `oo working-state discard` | 丢弃草稿，stdout: `Discarded all draft changes.`，exit 0 |
 | **blueprint 存根** | | | |
-| AC-35 | 开发者 | `oo blueprint analyze/list/show/apply` | stderr: `Error: Blueprint commands not yet implemented (requires F014).`，exit 2 |
+| AC-36 | 开发者 | `oo blueprint analyze/list/show/apply` | stderr: `Error: Blueprint commands not yet implemented (requires F014).`，exit 2 |
 | **全局行为** | | | |
-| AC-36 | 开发者 | 任意命令加 `--format json` | 输出切换为 JSON |
-| AC-37 | 开发者 | 任意命令失败 | 错误信息到 stderr，exit code 非 0 |
-| AC-38 | 开发者 | `oo --ontology <rid> object-type list` | 使用指定 ontology RID |
+| AC-37 | 开发者 | 任意命令加 `--format json` | 输出切换为 JSON |
+| AC-38 | 开发者 | 任意命令失败 | 错误信息到 stderr，exit code 非 0 |
+| AC-39 | 开发者 | `oo --ontology <rid> object-type list` | 使用指定 ontology RID |
 | **SKILL.md** | | | |
-| AC-39 | Agent | 查看 L1 SKILL.md（7 个） | 每个文件含 frontmatter（name, description, level: L1）+ 参数 + 约束 + CLI 命令 + 使用场景 + 示例 |
-| AC-40 | Agent | 查看 L2 SKILL.md（3 个） | 每个文件额外含组合步骤（引用 L1 skills）和编排逻辑 |
-| AC-41 | Agent | 查看 L3 SKILL.md（3 个） | 每个文件含编排策略、子 Agent 调度建议、上下文管理提示 |
+| AC-40 | Agent | 查看 L1 SKILL.md（10 个） | 每个文件含 frontmatter（name, description, level: L1）+ 参数 + 约束 + CLI 命令 + 使用场景 + 示例 |
+| AC-41 | Agent | 查看 L2 SKILL.md（3 个） | 每个文件额外含组合步骤（引用 L1 skills）和编排逻辑 |
+| AC-42 | Agent | 查看 L3 SKILL.md（3 个） | 每个文件含编排策略、子 Agent 调度建议、上下文管理提示 |
 | **Claude Code Skills** | | | |
-| AC-42 | CC 用户 | 查看 `.claude/skills/ontology-*/SKILL.md`（6 个） | 每个文件为薄壳封装，含描述 + `oo` CLI 调用示例 |
+| AC-43 | CC 用户 | 查看 `.claude/skills/ontology-*/SKILL.md`（6 个） | 每个文件为薄壳封装，含 frontmatter（name, description）+ 对应 `oo` CLI 调用示例 |
 
 ---
 
