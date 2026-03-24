@@ -1,25 +1,23 @@
 import { useRef, useCallback } from 'react';
-import { useWorkshopGraph } from '../hooks/use-workshop-graph';
 import { useWorkshopStore } from '../stores/workshop-store';
 import WorkshopCanvas from './WorkshopCanvas';
 import WorkshopToolbar from './WorkshopToolbar';
 import type { WorkshopCanvasHandle } from './WorkshopCanvas';
+import type { WorkshopNode, WorkshopEdge } from '../types';
 
 interface StarfieldWorkbenchProps {
-  ontologyRid: string;
-  blueprintRid: string | null;
+  nodes: WorkshopNode[];
+  edges: WorkshopEdge[];
 }
 
 export default function StarfieldWorkbench({
-  ontologyRid,
-  blueprintRid,
+  nodes,
+  edges,
 }: StarfieldWorkbenchProps) {
   const canvasRef = useRef<WorkshopCanvasHandle>(null);
   const setSelectedEntityRid = useWorkshopStore(
     (s) => s.setSelectedEntityRid,
   );
-
-  const { nodes, edges } = useWorkshopGraph(ontologyRid, blueprintRid);
 
   const handleNodeClick = useCallback(
     (nodeId: string) => {
@@ -29,7 +27,6 @@ export default function StarfieldWorkbench({
   );
 
   const handleNodeDoubleClick = useCallback((nodeId: string) => {
-    // Only navigate for confirmed entities
     const node = nodes.find((n) => n.id === nodeId);
     if (node?.status === 'confirmed') {
       window.open(`/object-types/${nodeId}`, '_blank');
