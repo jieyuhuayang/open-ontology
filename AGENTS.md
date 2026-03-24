@@ -74,12 +74,22 @@ Use the bilingual terms consistently (Chinese with English in parentheses):
 | 函数 / 接口 | Function / Interface | Custom logic / polymorphic shape descriptor |
 | 共享属性 | Shared Property | Reusable property across multiple object types |
 | 对象集 / 空间 | Object Set / Space | Object instance collection / top-level project container |
+| Agent 会话 | Agent Session | Agent-user interaction session |
+| 蓝图 | Blueprint | Agent-generated ontology modeling proposal (contains blueprint items) |
+| 蓝图项 | Blueprint Item | Single suggestion within a blueprint (create OT/Property/LinkType) |
+| 素材 | Agent Material | User-uploaded file for analysis |
 
-## MVP (v0.1.0) Priority
+## Version Roadmap
 
-- **P0**: UI framework, Object Type CRUD, Link Type CRUD, ontology search, change management/versioning
-- **P1**: Property value formatting, object-supported links, object type copying, ontology import/export (JSON)
-- **P2 (deferred)**: Discover page customization, object type groups, shared properties, Action Type CRUD
+### v0.1.0 (MVP) — Completed
+UI framework, Object Type CRUD, Link Type CRUD, Property Management, ontology search, change management/versioning, data connection, object instance sync.
+
+### v0.2.0 (AI-Assisted Ontology Building) — In Progress
+- **Completed**: F012 Agent Foundation (deepagents engine + SSE streaming + session management), F013 CLI & Skills (`oo` unified capability layer + 16 Agent Skills)
+- **Planned**: F014 Material & Blueprint, F015-016 Workshop, F017 HITL Review & Apply, F018 Agent Sidekick, F019 Ontology Import/Export
+
+### Deferred
+Discover page customization, object type groups, shared properties, Action Type CRUD, object type copying
 
 ## Tech Stack Quick Reference
 
