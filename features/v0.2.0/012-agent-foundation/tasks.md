@@ -164,7 +164,7 @@
   **覆盖 AC**: AC-17, AC-18, AC-19, AC-20
   **依赖**: T001
 
-- [ ] **T009**: AgentEngine 实现
+- [x] **T009**: AgentEngine 实现
   **文件**: `apps/server/app/agent/__init__.py`, `apps/server/app/agent/engine.py`, `apps/server/app/agent/skills/.gitkeep`, `apps/server/app/agent/prompts/ontology_builder.md`
   **逻辑**:
   - `engine.py`：`AgentEngine` 类
