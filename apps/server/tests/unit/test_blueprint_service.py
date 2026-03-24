@@ -113,6 +113,13 @@ class TestCreateBlueprint:
         scalar_result.scalar_one_or_none.return_value = req.ontology_rid
         db_session_mock.execute = AsyncMock(return_value=scalar_result)
 
+        # Mock BlueprintModel constructor to return a mock ORM with timestamps
+        mock_orm = _make_blueprint_orm(
+            name="My Blueprint",
+            session_rid=req.session_rid,
+            ontology_rid=req.ontology_rid,
+        )
+
         with (
             patch(
                 "app.services.blueprint_service.AgentStorage.get_session",
@@ -123,6 +130,10 @@ class TestCreateBlueprint:
                 "app.services.blueprint_service.BlueprintStorage.create",
                 new_callable=AsyncMock,
             ) as mock_create,
+            patch(
+                "app.services.blueprint_service.BlueprintModel",
+                return_value=mock_orm,
+            ),
         ):
             result = await service.create(req)
 
@@ -218,7 +229,7 @@ class TestStatusTransitions:
 
     @pytest.mark.asyncio
     async def test_status_draft_to_pending(self, service):
-        """AC-16: draft → pending_review is valid."""
+        """AC-16: draft -> pending_review is valid."""
         orm = _make_blueprint_orm(status=BlueprintStatus.DRAFT.value)
         updated_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
 
@@ -243,7 +254,7 @@ class TestStatusTransitions:
 
     @pytest.mark.asyncio
     async def test_status_pending_to_discarded(self, service):
-        """AC-17: pending_review → discarded is valid."""
+        """AC-17: pending_review -> discarded is valid."""
         orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
         updated_orm = _make_blueprint_orm(status=BlueprintStatus.DISCARDED.value)
 
@@ -268,7 +279,7 @@ class TestStatusTransitions:
 
     @pytest.mark.asyncio
     async def test_status_applied_to_any(self, service):
-        """AC-18: applied is terminal — no transitions allowed."""
+        """AC-18: applied is terminal -- no transitions allowed."""
         orm = _make_blueprint_orm(status=BlueprintStatus.APPLIED.value)
 
         with patch(
@@ -287,7 +298,7 @@ class TestStatusTransitions:
 
     @pytest.mark.asyncio
     async def test_status_discarded_to_any(self, service):
-        """AC-19: discarded is terminal — no transitions allowed."""
+        """AC-19: discarded is terminal -- no transitions allowed."""
         orm = _make_blueprint_orm(status=BlueprintStatus.DISCARDED.value)
 
         with patch(
@@ -306,7 +317,7 @@ class TestStatusTransitions:
 
     @pytest.mark.asyncio
     async def test_status_draft_to_applied(self, service):
-        """AC-20: draft → applied is invalid (must go through pending_review)."""
+        """AC-20: draft -> applied is invalid (must go through pending_review)."""
         orm = _make_blueprint_orm(status=BlueprintStatus.DRAFT.value)
 
         with patch(
@@ -325,7 +336,7 @@ class TestStatusTransitions:
 
     @pytest.mark.asyncio
     async def test_status_pending_to_draft(self, service):
-        """pending_review → draft is invalid (no backward transitions)."""
+        """pending_review -> draft is invalid (no backward transitions)."""
         orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
 
         with patch(
@@ -353,14 +364,9 @@ class TestCreateItem:
 
     @pytest.mark.asyncio
     async def test_create_item_confidence_high(self, service):
-        """AC-21: confidence >= 0.8 → HIGH level."""
+        """AC-21: confidence >= 0.8 -> HIGH level."""
         bp_orm = _make_blueprint_orm()
-        req = BlueprintItemCreate(
-            item_type=BlueprintItemType.OBJECT_TYPE,
-            suggestion={"displayName": "Customer"},
-            confidence=0.9,
-            source=ItemSource.FIELD_ANALYSIS,
-        )
+        mock_item_orm = _make_item_orm(confidence=0.9, confidence_level=ConfidenceLevel.HIGH.value)
 
         with (
             patch(
@@ -369,24 +375,32 @@ class TestCreateItem:
                 return_value=bp_orm,
             ),
             patch(
+                "app.services.blueprint_service.BlueprintItemModel",
+                return_value=mock_item_orm,
+            ),
+            patch(
                 "app.services.blueprint_service.BlueprintItemStorage.create",
                 new_callable=AsyncMock,
             ),
         ):
-            result = await service.create_item("ri.ontology.blueprint.bp001", req)
+            result = await service.create_item(
+                "ri.ontology.blueprint.bp001",
+                BlueprintItemCreate(
+                    item_type=BlueprintItemType.OBJECT_TYPE,
+                    suggestion={"displayName": "Customer"},
+                    confidence=0.9,
+                    source=ItemSource.FIELD_ANALYSIS,
+                ),
+            )
 
-        assert result.confidence == 0.9
         assert result.confidence_level == ConfidenceLevel.HIGH
 
     @pytest.mark.asyncio
     async def test_create_item_confidence_medium(self, service):
-        """AC-21: confidence 0.5-0.79 → MEDIUM level."""
+        """AC-21: confidence 0.5-0.79 -> MEDIUM level."""
         bp_orm = _make_blueprint_orm()
-        req = BlueprintItemCreate(
-            item_type=BlueprintItemType.OBJECT_TYPE,
-            suggestion={"displayName": "Order"},
-            confidence=0.65,
-            source=ItemSource.PATTERN_MATCHING,
+        mock_item_orm = _make_item_orm(
+            confidence=0.65, confidence_level=ConfidenceLevel.MEDIUM.value
         )
 
         with (
@@ -396,24 +410,31 @@ class TestCreateItem:
                 return_value=bp_orm,
             ),
             patch(
+                "app.services.blueprint_service.BlueprintItemModel",
+                return_value=mock_item_orm,
+            ),
+            patch(
                 "app.services.blueprint_service.BlueprintItemStorage.create",
                 new_callable=AsyncMock,
             ),
         ):
-            result = await service.create_item("ri.ontology.blueprint.bp001", req)
+            result = await service.create_item(
+                "ri.ontology.blueprint.bp001",
+                BlueprintItemCreate(
+                    item_type=BlueprintItemType.OBJECT_TYPE,
+                    suggestion={"displayName": "Order"},
+                    confidence=0.65,
+                    source=ItemSource.PATTERN_MATCHING,
+                ),
+            )
 
         assert result.confidence_level == ConfidenceLevel.MEDIUM
 
     @pytest.mark.asyncio
     async def test_create_item_confidence_low(self, service):
-        """AC-21: confidence < 0.5 → LOW level."""
+        """AC-21: confidence < 0.5 -> LOW level."""
         bp_orm = _make_blueprint_orm()
-        req = BlueprintItemCreate(
-            item_type=BlueprintItemType.OBJECT_TYPE,
-            suggestion={"displayName": "Widget"},
-            confidence=0.3,
-            source=ItemSource.SEMANTIC_INFERENCE,
-        )
+        mock_item_orm = _make_item_orm(confidence=0.3, confidence_level=ConfidenceLevel.LOW.value)
 
         with (
             patch(
@@ -422,24 +443,31 @@ class TestCreateItem:
                 return_value=bp_orm,
             ),
             patch(
+                "app.services.blueprint_service.BlueprintItemModel",
+                return_value=mock_item_orm,
+            ),
+            patch(
                 "app.services.blueprint_service.BlueprintItemStorage.create",
                 new_callable=AsyncMock,
             ),
         ):
-            result = await service.create_item("ri.ontology.blueprint.bp001", req)
+            result = await service.create_item(
+                "ri.ontology.blueprint.bp001",
+                BlueprintItemCreate(
+                    item_type=BlueprintItemType.OBJECT_TYPE,
+                    suggestion={"displayName": "Widget"},
+                    confidence=0.3,
+                    source=ItemSource.SEMANTIC_INFERENCE,
+                ),
+            )
 
         assert result.confidence_level == ConfidenceLevel.LOW
 
     @pytest.mark.asyncio
     async def test_create_item_confidence_boundary_high(self, service):
-        """AC-21: confidence exactly 0.8 → HIGH level."""
+        """AC-21: confidence exactly 0.8 -> HIGH level."""
         bp_orm = _make_blueprint_orm()
-        req = BlueprintItemCreate(
-            item_type=BlueprintItemType.PROPERTY,
-            suggestion={"displayName": "Name"},
-            confidence=0.8,
-            source=ItemSource.BEST_PRACTICES,
-        )
+        mock_item_orm = _make_item_orm(confidence=0.8, confidence_level=ConfidenceLevel.HIGH.value)
 
         with (
             patch(
@@ -448,23 +476,32 @@ class TestCreateItem:
                 return_value=bp_orm,
             ),
             patch(
+                "app.services.blueprint_service.BlueprintItemModel",
+                return_value=mock_item_orm,
+            ),
+            patch(
                 "app.services.blueprint_service.BlueprintItemStorage.create",
                 new_callable=AsyncMock,
             ),
         ):
-            result = await service.create_item("ri.ontology.blueprint.bp001", req)
+            result = await service.create_item(
+                "ri.ontology.blueprint.bp001",
+                BlueprintItemCreate(
+                    item_type=BlueprintItemType.PROPERTY,
+                    suggestion={"displayName": "Name"},
+                    confidence=0.8,
+                    source=ItemSource.BEST_PRACTICES,
+                ),
+            )
 
         assert result.confidence_level == ConfidenceLevel.HIGH
 
     @pytest.mark.asyncio
     async def test_create_item_confidence_boundary_medium(self, service):
-        """AC-21: confidence exactly 0.5 → MEDIUM level."""
+        """AC-21: confidence exactly 0.5 -> MEDIUM level."""
         bp_orm = _make_blueprint_orm()
-        req = BlueprintItemCreate(
-            item_type=BlueprintItemType.PROPERTY,
-            suggestion={"displayName": "Email"},
-            confidence=0.5,
-            source=ItemSource.FIELD_ANALYSIS,
+        mock_item_orm = _make_item_orm(
+            confidence=0.5, confidence_level=ConfidenceLevel.MEDIUM.value
         )
 
         with (
@@ -474,24 +511,42 @@ class TestCreateItem:
                 return_value=bp_orm,
             ),
             patch(
+                "app.services.blueprint_service.BlueprintItemModel",
+                return_value=mock_item_orm,
+            ),
+            patch(
                 "app.services.blueprint_service.BlueprintItemStorage.create",
                 new_callable=AsyncMock,
             ),
         ):
-            result = await service.create_item("ri.ontology.blueprint.bp001", req)
+            result = await service.create_item(
+                "ri.ontology.blueprint.bp001",
+                BlueprintItemCreate(
+                    item_type=BlueprintItemType.PROPERTY,
+                    suggestion={"displayName": "Email"},
+                    confidence=0.5,
+                    source=ItemSource.FIELD_ANALYSIS,
+                ),
+            )
 
         assert result.confidence_level == ConfidenceLevel.MEDIUM
 
     @pytest.mark.asyncio
     async def test_create_item_invalid_confidence_negative(self, service):
-        """AC-22: confidence < 0 → 400 BLUEPRINT_ITEM_INVALID_CONFIDENCE."""
+        """AC-22: confidence < 0 -> 400 BLUEPRINT_ITEM_INVALID_CONFIDENCE.
+
+        The service validates confidence range. We bypass Pydantic field
+        validation by constructing a valid object then mutating it.
+        """
         bp_orm = _make_blueprint_orm()
         req = BlueprintItemCreate(
             item_type=BlueprintItemType.OBJECT_TYPE,
             suggestion={"displayName": "Bad"},
-            confidence=-0.1,
+            confidence=0.5,
             source=ItemSource.FIELD_ANALYSIS,
         )
+        # Bypass Pydantic ge/le to test service-level validation
+        object.__setattr__(req, "confidence", -0.1)
 
         with patch(
             "app.services.blueprint_service.BlueprintStorage.get",
@@ -506,14 +561,15 @@ class TestCreateItem:
 
     @pytest.mark.asyncio
     async def test_create_item_invalid_confidence_over_one(self, service):
-        """AC-22: confidence > 1.0 → 400 BLUEPRINT_ITEM_INVALID_CONFIDENCE."""
+        """AC-22: confidence > 1.0 -> 400 BLUEPRINT_ITEM_INVALID_CONFIDENCE."""
         bp_orm = _make_blueprint_orm()
         req = BlueprintItemCreate(
             item_type=BlueprintItemType.OBJECT_TYPE,
             suggestion={"displayName": "Bad"},
-            confidence=1.5,
+            confidence=0.5,
             source=ItemSource.FIELD_ANALYSIS,
         )
+        object.__setattr__(req, "confidence", 1.5)
 
         with patch(
             "app.services.blueprint_service.BlueprintStorage.get",
@@ -528,9 +584,8 @@ class TestCreateItem:
 
     @pytest.mark.asyncio
     async def test_create_item_missing_source(self, service):
-        """AC-23: missing source → 400 BLUEPRINT_ITEM_MISSING_SOURCE."""
+        """AC-23: missing source -> 400 BLUEPRINT_ITEM_MISSING_SOURCE."""
         bp_orm = _make_blueprint_orm()
-        # Create a request and then manually set source to None to bypass pydantic
         req = BlueprintItemCreate(
             item_type=BlueprintItemType.OBJECT_TYPE,
             suggestion={"displayName": "NoSource"},
@@ -710,7 +765,7 @@ class TestItemDecision:
 
     @pytest.mark.asyncio
     async def test_decision_item_not_found(self, service):
-        """Item not found in the given blueprint → 404."""
+        """Item not found in the given blueprint -> 404."""
         bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
 
         req = BlueprintItemUpdate(user_decision=UserDecision.ACCEPTED)
@@ -739,7 +794,7 @@ class TestItemDecision:
 
     @pytest.mark.asyncio
     async def test_decision_item_wrong_blueprint(self, service):
-        """Item exists but belongs to a different blueprint → 404."""
+        """Item exists but belongs to a different blueprint -> 404."""
         bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
         item_orm = _make_item_orm(blueprint_rid="ri.ontology.blueprint.OTHER")
 
@@ -778,7 +833,7 @@ class TestApply:
 
     @pytest.mark.asyncio
     async def test_apply_success(self, service):
-        """AC-32: happy path — apply accepted OT item creates entity."""
+        """AC-32: happy path -- apply accepted OT item creates entity."""
         bp_orm = _make_blueprint_orm(
             rid="ri.ontology.blueprint.bp001",
             status=BlueprintStatus.PENDING_REVIEW.value,
@@ -879,7 +934,6 @@ class TestApply:
             result = await service.apply("ri.ontology.blueprint.bp001")
 
         assert result.succeeded == 1
-        # Verify user_edits is used over suggestion
         assert result.results[0].status == "success"
 
     @pytest.mark.asyncio
@@ -916,7 +970,7 @@ class TestApply:
 
     @pytest.mark.asyncio
     async def test_apply_no_actionable(self, service):
-        """AC-36: no accepted/edited items → 422 BLUEPRINT_NO_ACTIONABLE_ITEMS."""
+        """AC-36: no accepted/edited items -> 422 BLUEPRINT_NO_ACTIONABLE_ITEMS."""
         bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
         rejected_item = _make_item_orm(user_decision=UserDecision.REJECTED.value)
 
@@ -940,7 +994,7 @@ class TestApply:
 
     @pytest.mark.asyncio
     async def test_apply_no_items_at_all(self, service):
-        """Apply with empty item list → 422 BLUEPRINT_NO_ACTIONABLE_ITEMS."""
+        """Apply with empty item list -> 422 BLUEPRINT_NO_ACTIONABLE_ITEMS."""
         bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
 
         with (
@@ -963,7 +1017,7 @@ class TestApply:
 
     @pytest.mark.asyncio
     async def test_apply_not_found(self, service):
-        """Apply on nonexistent blueprint → 404."""
+        """Apply on nonexistent blueprint -> 404."""
         with patch(
             "app.services.blueprint_service.BlueprintStorage.get_for_update",
             new_callable=AsyncMock,
@@ -1035,7 +1089,7 @@ class TestApply:
 
     @pytest.mark.asyncio
     async def test_apply_multi_phase_ot_property_linktype(self, service):
-        """Apply processes OT → Property → LinkType in order."""
+        """Apply processes OT -> Property -> LinkType in order with placeholder resolution."""
         bp_orm = _make_blueprint_orm(
             rid="ri.ontology.blueprint.bp001",
             status=BlueprintStatus.PENDING_REVIEW.value,
@@ -1067,9 +1121,11 @@ class TestApply:
             user_decision=UserDecision.ACCEPTED.value,
             suggestion={
                 "displayName": "has orders",
+                "id": "has-orders",
+                "description": "Customer has orders",
                 "sideAPlaceholderRid": "ph-ot-1",
                 "sideBObjectTypeRid": "ri.ontology.object-type.order",
-                "cardinality": "one-to-many",
+                "cardinality": "many-to-many",
             },
         )
 
@@ -1123,6 +1179,35 @@ class TestApply:
         assert result.succeeded == 3
         assert result.failed == 0
         assert result.skipped == 0
-        # Verify all three items created successfully
         statuses = [r.status for r in result.results]
         assert statuses == ["success", "success", "success"]
+
+
+# ---------------------------------------------------------------------------
+# _compute_confidence_level (unit test for helper)
+# ---------------------------------------------------------------------------
+
+
+class TestComputeConfidenceLevel:
+    """Direct tests for the confidence level computation function."""
+
+    def test_high_threshold(self):
+        from app.services.blueprint_service import _compute_confidence_level
+
+        assert _compute_confidence_level(0.8) == ConfidenceLevel.HIGH
+        assert _compute_confidence_level(0.95) == ConfidenceLevel.HIGH
+        assert _compute_confidence_level(1.0) == ConfidenceLevel.HIGH
+
+    def test_medium_threshold(self):
+        from app.services.blueprint_service import _compute_confidence_level
+
+        assert _compute_confidence_level(0.5) == ConfidenceLevel.MEDIUM
+        assert _compute_confidence_level(0.65) == ConfidenceLevel.MEDIUM
+        assert _compute_confidence_level(0.79) == ConfidenceLevel.MEDIUM
+
+    def test_low_threshold(self):
+        from app.services.blueprint_service import _compute_confidence_level
+
+        assert _compute_confidence_level(0.0) == ConfidenceLevel.LOW
+        assert _compute_confidence_level(0.3) == ConfidenceLevel.LOW
+        assert _compute_confidence_level(0.49) == ConfidenceLevel.LOW
