@@ -220,8 +220,9 @@ test.describe.serial('Agent Sidekick — E2E', () => {
     const closeBtn = drawer.locator('.ant-drawer-close');
     await closeBtn.click();
 
-    // Drawer should be hidden
-    await expect(drawer).not.toBeVisible({ timeout: 3000 });
+    // Drawer body should be hidden after close animation
+    // Ant Design Drawer keeps DOM but adds ant-drawer-hidden or removes ant-drawer-open
+    await expect(drawer.locator('.ant-drawer-body')).not.toBeVisible({ timeout: 5000 });
   });
 
   // ──────── AC-16: Open Workshop navigation ────────

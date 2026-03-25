@@ -1,0 +1,167 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - img "deployment-unit" [ref=e7]:
+          - img [ref=e8]
+        - strong [ref=e11]: Ontology Management
+      - generic [ref=e13]:
+        - img "search" [ref=e15]:
+          - img [ref=e16]
+        - textbox "Search by name, RID, aliases..." [ref=e18]
+        - generic [ref=e20]: ⌘K
+      - generic [ref=e21]:
+        - button "plus New" [ref=e22] [cursor=pointer]:
+          - img "plus" [ref=e24]:
+            - img [ref=e25]
+          - generic [ref=e28]: New
+        - button "AI Assistant" [ref=e29] [cursor=pointer]:
+          - img "thunderbolt" [ref=e31]:
+            - img [ref=e32]
+        - generic [ref=e34] [cursor=pointer]:
+          - img "global" [ref=e35]:
+            - img [ref=e36]
+          - text: English
+    - generic [ref=e38]:
+      - complementary [ref=e39]:
+        - complementary [ref=e40]:
+          - navigation [ref=e42]:
+            - link "arrow-left Back home" [ref=e44] [cursor=pointer]:
+              - /url: /object-types
+              - img "arrow-left" [ref=e45]:
+                - img [ref=e46]
+              - text: Back home
+            - generic [ref=e49]:
+              - img "appstore" [ref=e50]:
+                - img [ref=e51]
+              - strong [ref=e53]: E2E Sidekick Customer
+              - generic [ref=e54]: Experimental
+              - generic [ref=e55]: New
+              - button "more" [ref=e56] [cursor=pointer]:
+                - img "more" [ref=e58]:
+                  - img [ref=e59]
+            - menu [ref=e61]:
+              - menuitem "file-text Overview" [ref=e62] [cursor=pointer]:
+                - img "file-text" [ref=e63]:
+                  - img [ref=e64]
+                - generic [ref=e67]: Overview
+              - menuitem "unordered-list Properties" [ref=e68] [cursor=pointer]:
+                - img "unordered-list" [ref=e69]:
+                  - img [ref=e70]
+                - generic [ref=e73]: Properties
+              - menuitem "database Datasources" [ref=e74] [cursor=pointer]:
+                - img "database" [ref=e75]:
+                  - img [ref=e76]
+                - generic [ref=e79]: Datasources
+              - menuitem "table Instances" [ref=e80] [cursor=pointer]:
+                - img "table" [ref=e81]:
+                  - img [ref=e82]
+                - generic [ref=e85]: Instances
+              - menuitem "history History" [ref=e86] [cursor=pointer]:
+                - img "history" [ref=e87]:
+                  - img [ref=e88]
+                - generic [ref=e91]: History
+      - main [ref=e92]:
+        - main [ref=e93]:
+          - generic [ref=e94]:
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - generic [ref=e97]:
+                  - generic [ref=e98]:
+                    - button "appstore" [ref=e99] [cursor=pointer]:
+                      - img "appstore" [ref=e100]:
+                        - img [ref=e101]
+                    - generic [ref=e104] [cursor=pointer]: E2E Sidekick Customer
+                    - generic [ref=e105]:
+                      - text: Plural Name
+                      - generic [ref=e106] [cursor=pointer]: Plural Name
+                  - generic [ref=e107] [cursor=pointer]: Type here...
+                - generic [ref=e108]:
+                  - generic [ref=e109]:
+                    - text: Status
+                    - generic [ref=e110] [cursor=pointer]:
+                      - generic [ref=e112]:
+                        - combobox [ref=e114]
+                        - generic "Experimental" [ref=e115]
+                      - generic:
+                        - img:
+                          - img
+                  - generic [ref=e116]:
+                    - text: Visibility
+                    - generic [ref=e117] [cursor=pointer]:
+                      - generic [ref=e119]:
+                        - combobox [ref=e121]
+                        - generic "Normal" [ref=e122]
+                      - generic:
+                        - img:
+                          - img
+              - generic [ref=e123]:
+                - generic [ref=e124]:
+                  - text: ID
+                  - generic [ref=e126]:
+                    - text: e2e-sidekick-customer
+                    - button "Copy" [ref=e127] [cursor=pointer]:
+                      - img "copy" [ref=e128]:
+                        - img [ref=e129]
+                - generic [ref=e131]:
+                  - text: API Name
+                  - generic [ref=e132] [cursor=pointer]: E2esidekickcustomer
+                - generic [ref=e133]:
+                  - text: RID
+                  - generic [ref=e135]:
+                    - text: ri.ontology.object-type.837550fc3188
+                    - button "Copy" [ref=e136] [cursor=pointer]:
+                      - img "copy" [ref=e137]:
+                        - img [ref=e138]
+            - generic [ref=e140]:
+              - generic [ref=e141]:
+                - generic [ref=e143]:
+                  - generic [ref=e144]:
+                    - heading "Properties (2)" [level=5] [ref=e145]:
+                      - text: Properties
+                      - generic [ref=e146]: (2)
+                    - button "plus Add Property" [ref=e147] [cursor=pointer]:
+                      - img "plus" [ref=e149]:
+                        - img [ref=e150]
+                      - generic [ref=e153]: Add Property
+                  - list [ref=e157]:
+                    - listitem [ref=e158]:
+                      - generic [ref=e159]:
+                        - img "font-size" [ref=e160]:
+                          - img [ref=e161]
+                        - generic [ref=e163]: E2e-sidekick-email
+                    - listitem [ref=e164]:
+                      - generic [ref=e165]:
+                        - img "number" [ref=e166]:
+                          - img [ref=e167]
+                        - generic [ref=e169]: E2e-sidekick-age
+                - generic [ref=e171]:
+                  - heading "Action Types (0)" [level=5] [ref=e173]:
+                    - text: Action Types
+                    - generic [ref=e174]: (0)
+                  - generic [ref=e175]:
+                    - img "No data" [ref=e177]
+                    - generic [ref=e183]: No action types defined yet
+              - generic [ref=e185]:
+                - generic [ref=e186]:
+                  - heading "Link Types" [level=5] [ref=e187]
+                  - button "plus New link type" [ref=e188] [cursor=pointer]:
+                    - img "plus" [ref=e190]:
+                      - img [ref=e191]
+                    - generic [ref=e194]: New link type
+                - generic [ref=e195]:
+                  - img "No data" [ref=e197]
+                  - generic [ref=e203]: No link types defined yet
+              - generic [ref=e206]:
+                - heading "Backing Datasource" [level=5] [ref=e208]
+                - generic [ref=e209]:
+                  - generic [ref=e210]: No datasource linked
+                  - button "plus Add Backing Datasource" [ref=e211] [cursor=pointer]:
+                    - img "plus" [ref=e213]:
+                      - img [ref=e214]
+                    - generic [ref=e217]: Add Backing Datasource
+  - tooltip "AI Assistant" [ref=e220]
+```
