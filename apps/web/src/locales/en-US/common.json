@@ -746,6 +746,7 @@
     "backToManager": "Back",
     "guidance": {
       "title": "Start Building Ontology",
+      "subtitle": "AI-assisted business domain analysis and semantic data modeling",
       "domain": "Business Domain (optional)",
       "goal": "Modeling Goal (optional)",
       "scope": "Concept Scope (optional)",
