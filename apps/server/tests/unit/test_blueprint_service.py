@@ -1568,9 +1568,7 @@ class TestRetryItem:
             mock_item_storage.update_created_entity_rid = AsyncMock()
             mock_item_storage.update_decision = AsyncMock()
 
-            with patch(
-                "app.services.blueprint_service.ObjectTypeService", create=True
-            ) as mock_ot_svc_cls:
+            with patch("app.services.object_type_service.ObjectTypeService") as mock_ot_svc_cls:
                 mock_ot_svc = MagicMock()
                 mock_ot_svc.create = AsyncMock(return_value=mock_created_ot)
                 mock_ot_svc_cls.return_value = mock_ot_svc
@@ -1606,9 +1604,7 @@ class TestRetryItem:
             mock_item_storage.update_created_entity_rid = AsyncMock()
             mock_item_storage.update_decision = AsyncMock()
 
-            with patch(
-                "app.services.blueprint_service.ObjectTypeService", create=True
-            ) as mock_ot_svc_cls:
+            with patch("app.services.object_type_service.ObjectTypeService") as mock_ot_svc_cls:
                 mock_ot_svc = MagicMock()
                 mock_ot_svc.create = AsyncMock(return_value=mock_created_ot)
                 mock_ot_svc_cls.return_value = mock_ot_svc
