@@ -42,7 +42,7 @@ export default function SuggestionCard({
         </Space>
         <ConfidenceIndicator
           confidence={suggestion.confidence}
-          confidenceLevel={suggestion.confidenceLevel}
+          confidenceLevel={suggestion.confidenceLevel as 'high' | 'medium' | 'low'}
         />
       </Flex>
 
