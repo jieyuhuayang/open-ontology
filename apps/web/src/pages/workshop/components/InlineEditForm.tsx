@@ -105,7 +105,7 @@ export default function InlineEditForm({
             <Form.Item label={t('common.displayName', 'Display Name')} name="displayName">
               <Input />
             </Form.Item>
-            <Form.Item label="Side A">
+            <Form.Item label={t('common.sideA', 'Side A')}>
               <Input
                 value={
                   (
