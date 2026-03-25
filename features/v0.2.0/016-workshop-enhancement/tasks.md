@@ -221,7 +221,7 @@
   **覆盖 AC**: AC-13, AC-14, AC-15
   **依赖**: T002
 
-- [ ] **T014**: MessageBubble 实体锚点 + MessageList 高亮
+- [x] **T014**: MessageBubble 实体锚点 + MessageList 高亮
   **文件**: `apps/web/src/pages/workshop/components/MessageBubble.tsx`（修改）, `MessageList.tsx`（修改）
   **逻辑**:
   - **MessageBubble 修改**:
