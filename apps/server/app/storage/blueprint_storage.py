@@ -202,6 +202,13 @@ class BlueprintItemStorage:
         return (await session.execute(stmt)).scalar_one()
 
     @staticmethod
+    async def get_for_update(session: AsyncSession, rid: str) -> BlueprintItemModel | None:
+        """Get a blueprint item with row-level lock (SELECT ... FOR UPDATE)."""
+        stmt = select(BlueprintItemModel).where(BlueprintItemModel.rid == rid).with_for_update()
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    @staticmethod
     async def batch_get(session: AsyncSession, rids: list[str]) -> list[BlueprintItemModel]:
         """Get multiple blueprint items by RID list."""
         if not rids:
