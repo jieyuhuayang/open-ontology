@@ -350,7 +350,7 @@ stateDiagram-v2
 |------|------|------|
 | `itemRid` | string | 蓝图项唯一标识 |
 | `type` | enum | `object_type` / `property` / `link_type` |
-| `suggestion` | object | 建议内容（对象类型/属性/链接的完整定义） |
+| `suggestion` | object | 实体定义内容（对象类型/属性/链接的完整定义） |
 | `confidence` | float | 置信度分值（0.0–1.0） |
 | `confidenceLevel` | enum | `high`（≥0.8）/ `medium`（0.5–0.8）/ `low`（<0.5） |
 | `reasoning` | string | 推理说明 |
