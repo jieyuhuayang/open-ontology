@@ -62,14 +62,14 @@ class SidekickService:
             return await self._apply_description(request)
         elif request.suggestion_type == SuggestionType.MISSING_TITLE_KEY:
             await self._apply_title_key(request.entity_rid, request.action_payload)
-            return SuggestionApplyResponse(success=True, message="标题键已更新")
+            return SuggestionApplyResponse(success=True, message="Title key updated")
         elif request.suggestion_type == SuggestionType.MISSING_PRIMARY_KEY:
             await self._apply_primary_key(request.entity_rid, request.action_payload)
-            return SuggestionApplyResponse(success=True, message="主键已更新")
+            return SuggestionApplyResponse(success=True, message="Primary key updated")
         else:
             return SuggestionApplyResponse(
                 success=True,
-                message="建议已记录，该类型暂不支持自动应用",
+                message="Suggestion noted; auto-apply not supported for this type",
             )
 
     async def generate_content(self, request: GenerateContentRequest) -> GenerateContentResponse:
