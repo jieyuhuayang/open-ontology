@@ -49,7 +49,7 @@ export default function StarCollapseEffect({
     return { directions, speeds, positions, colors, baseColor, redColor };
   }, [collapse.color]);
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock, invalidate }) => {
     const elapsed = clock.elapsedTime - collapse.startTime;
     const progress = Math.min(elapsed / DURATION, 1.0);
 
