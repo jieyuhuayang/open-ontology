@@ -935,6 +935,17 @@
       "pattern_matching": "Pattern matching",
       "semantic_inference": "Semantic inference",
       "best_practices": "Best practices"
+    },
+    "type": {
+      "missing_description": "Missing description",
+      "missing_title_key": "Missing title key",
+      "missing_primary_key": "Missing primary key",
+      "orphan_link": "Orphan link",
+      "duplicate_property_name": "Duplicate property name",
+      "suggest_link": "Suggest link",
+      "cardinality_review": "Cardinality review",
+      "naming_improvement": "Naming improvement",
+      "description_enhancement": "Description enhancement"
     }
   }
 }
