@@ -319,7 +319,7 @@
   **覆盖 AC**: AC-22
   **依赖**: T002
 
-- [ ] **T020**: DataProbeButton 占位组件
+- [x] **T020**: DataProbeButton 占位组件
   **文件**: `apps/web/src/pages/workshop/components/DataProbeButton.tsx`（新建）
   **逻辑**:
   - 接收 `disabled: boolean`（F016 中始终为 true）、`tooltip: string` props
