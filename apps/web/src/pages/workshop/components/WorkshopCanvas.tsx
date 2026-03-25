@@ -236,10 +236,11 @@ function CameraAnimator({
   targetRef: React.RefObject<THREE.Vector3 | null>;
   controlsRef: React.RefObject<OrbitControlsRef | null>;
 }) {
-  useFrame(({ camera }) => {
+  useFrame(({ camera, invalidate }) => {
     if (!targetRef.current || !controlsRef.current) return;
     camera.position.lerp(targetRef.current, 0.06);
     controlsRef.current.update();
+    invalidate();
     if (camera.position.distanceTo(targetRef.current) < 0.1) {
       (targetRef as React.MutableRefObject<THREE.Vector3 | null>).current = null;
     }
