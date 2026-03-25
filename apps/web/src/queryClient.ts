@@ -38,7 +38,10 @@ function handleMutationError(
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
-    onError: handleGlobalError,
+    onError: (error, query) => {
+      if (query.meta?.skipGlobalError) return;
+      handleGlobalError(error);
+    },
   }),
   mutationCache: new MutationCache({
     onError: handleMutationError,
