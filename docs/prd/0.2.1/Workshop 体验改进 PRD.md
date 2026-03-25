@@ -315,3 +315,17 @@ v0.2.0 的 Workshop（本体工坊）已完成 F012-F017 的实现，但实际�
 7. **附录 DDL 注释**：blueprint_items 表注释（已在检查 #1 修复）、status 注释补充 ready 映射说明、suggestion 列注释更新
 
 **结论**：蓝图语义重塑已全面落实到数据模型说明、视觉规范、DDL 注释各层面。
+
+### 检查 #3 — 主题：Phase 1 Agent 自主构建 + F018 砍掉清理（改进二、五）（2026-03-26）
+
+**检查范围**：Phase 1 自主构建流程的完整性、F018 残留彻底性、suggest-improvements skill 补充、Phase 1 UI 组件规范
+
+**发现并修复的问题**：
+
+1. **§3.6 Skills 体系**：L3 编排级 Skill 列表缺少 `suggest-improvements`（从 F018 迁移的新 skill）→ 已补充到 L3 列表
+2. **§A4a 主动澄清机制**：原文说"出现在对话面板中"——但 Phase 1 无对话面板 → 已修正为"Phase 1 以画布浮层呈现，Phase 2 以 Chat 消息卡片呈现"
+3. **§3.1 Phase 1 布局**：浮动进度条和澄清浮层缺少 UI 规范（尺寸、位置、交互细节）→ 已在 Phase 1 布局图后补充 BuildProgressBar / ClarificationOverlay / 返回按钮的具体规范
+
+**F018 清理确认**：所有 Sidekick 引用（共 11 处）均已标记为"已取消"或包含迁移说明，无遗漏。
+
+**结论**：Phase 1 自主构建和 F018 清理已完整到位。三次检查全部完成。
