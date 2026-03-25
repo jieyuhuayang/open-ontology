@@ -796,13 +796,40 @@
       "properties": "Properties",
       "relationships": "Relationships",
       "reasoning": "Reasoning",
-      "viewDetail": "View Full Detail"
+      "viewDetail": "View Full Detail",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this entity?",
+      "deleteImpact": "{{count}} related link(s) will also be removed: {{names}}",
+      "cannotDeleteConfirmed": "Confirmed entities are managed in Ontology Manager"
     },
     "toolbar": {
       "fit": "Fit",
       "reset": "Reset",
       "zoomIn": "Zoom In",
-      "zoomOut": "Zoom Out"
+      "zoomOut": "Zoom Out",
+      "view3D": "3D",
+      "view2D": "2D"
+    },
+    "autoDegrade": {
+      "suggestion": "Over 200 entities detected. Switch to 2D view for better performance.",
+      "switchTo2D": "Switch to 2D"
+    },
+    "focusLock": {
+      "locked": "Focus: {{name}}",
+      "unlock": "Unlock focus"
+    },
+    "promptBubbles": {
+      "checkOrphanKeys": "Check for orphan foreign keys",
+      "deriveStats": "Derive statistical properties",
+      "splitSensitive": "Split sensitive fields",
+      "suggestRelated": "Suggest related object types",
+      "checkNaming": "Check field naming conventions",
+      "addMissingProps": "Add missing properties",
+      "verifyCardinality": "Verify cardinality",
+      "checkReverse": "Check reverse link"
+    },
+    "dataProbe": {
+      "comingSoon": "Data preview probe — coming soon"
     },
     "domains": {
       "ecommerce": "E-Commerce",
