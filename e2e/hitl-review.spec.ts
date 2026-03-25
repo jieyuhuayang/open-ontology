@@ -44,6 +44,17 @@ test.describe.serial('F017 HITL Review — E2E', () => {
   // ──────── Setup: Create blueprint with items via API ────────
 
   test('setup: create session + blueprint + items', async ({ request }) => {
+    // Clean up any existing active sessions (INV-12: single active session)
+    const sessResp = await request.get(`${API}/agent/sessions`);
+    if (sessResp.ok()) {
+      const sessData = await sessResp.json();
+      for (const s of sessData.items ?? []) {
+        if (s.status === 'active') {
+          await request.delete(`${API}/agent/sessions/${s.rid}`);
+        }
+      }
+    }
+
     // Create agent session
     sessionRid = await createAgentSession(request, {
       domain: 'e2e-test',
