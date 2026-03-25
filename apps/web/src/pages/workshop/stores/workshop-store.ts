@@ -168,5 +168,9 @@ export const useWorkshopStore = create<WorkshopStore>((set) => ({
       activeCollapses: s.activeCollapses.filter((c) => c.id !== id),
     })),
 
+  // F017: Sidekick tabs + editing
+  setSidekickActiveTab: (sidekickActiveTab) => set({ sidekickActiveTab }),
+  setEditingItemRid: (editingItemRid) => set({ editingItemRid }),
+
   reset: () => set(initialState),
 }));
