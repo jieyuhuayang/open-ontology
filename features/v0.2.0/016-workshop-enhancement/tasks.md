@@ -27,7 +27,7 @@
 
 ### Phase 0: 基础设施（Types + Store + i18n）
 
-- [ ] **T001**: 前端类型定义扩展
+- [x] **T001**: 前端类型定义扩展
   **文件**: `apps/web/src/pages/workshop/types.ts`
   **逻辑**:
   - 新增 `ViewMode = '3d' | '2d'` 类型
