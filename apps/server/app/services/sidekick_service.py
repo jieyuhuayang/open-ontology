@@ -61,11 +61,19 @@ class SidekickService:
         if request.suggestion_type == SuggestionType.MISSING_DESCRIPTION:
             return await self._apply_description(request)
         elif request.suggestion_type == SuggestionType.MISSING_TITLE_KEY:
-            await self._apply_title_key(request.entity_rid, request.action_payload)
-            return SuggestionApplyResponse(success=True, message="Title key updated")
+            applied = await self._apply_title_key(request.entity_rid, request.action_payload)
+            if applied:
+                return SuggestionApplyResponse(success=True, message="Title key updated")
+            return SuggestionApplyResponse(
+                success=False, message="No suitable property found for title key"
+            )
         elif request.suggestion_type == SuggestionType.MISSING_PRIMARY_KEY:
-            await self._apply_primary_key(request.entity_rid, request.action_payload)
-            return SuggestionApplyResponse(success=True, message="Primary key updated")
+            applied = await self._apply_primary_key(request.entity_rid, request.action_payload)
+            if applied:
+                return SuggestionApplyResponse(success=True, message="Primary key updated")
+            return SuggestionApplyResponse(
+                success=False, message="No suitable property found for primary key"
+            )
         else:
             return SuggestionApplyResponse(
                 success=True,
