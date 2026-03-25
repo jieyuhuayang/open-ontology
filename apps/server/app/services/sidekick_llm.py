@@ -87,9 +87,10 @@ class SidekickLlmEngine:
 
     async def _call_llm(self, system: str, user_message: str):
         """Call Anthropic API. Separated for easy mocking."""
-        import anthropic
+        if not hasattr(self, "_client"):
+            import anthropic
 
-        client = anthropic.AsyncAnthropic()
+            self._client = anthropic.AsyncAnthropic()
         model = os.environ.get("LLM_MODEL", "claude-sonnet-4-20250514")
         return await client.messages.create(
             model=model,
