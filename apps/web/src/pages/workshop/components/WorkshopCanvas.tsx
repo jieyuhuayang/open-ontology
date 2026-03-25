@@ -27,6 +27,7 @@ interface WorkshopCanvasProps {
   edges: WorkshopEdge[];
   onNodeClick?: (nodeId: string) => void;
   onNodeDoubleClick?: (nodeId: string) => void;
+  onLinkCreate?: (sourceId: string, targetId: string) => void;
 }
 
 function SceneContent({
