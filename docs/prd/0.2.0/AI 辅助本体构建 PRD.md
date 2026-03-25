@@ -971,9 +971,9 @@ Agent 发送 blueprint-item 事件（type: link_type）
 
 ```
 用户在 3D 中点击星体
-  → 右侧显示实体详情（Tier 2 面板）
+  → EntityDrawer 弹出显示实体详情（Tier 2）
   → 可直接编辑属性/描述
-  → Sidekick 显示针对该实体的优化建议
+  → Chat 面板中 Agent 可针对该实体提出优化建议
 
 用户在 3D 中拖拽连线
   → 触发链接创建（复用已有 DragLinkLine 组件）
