@@ -43,6 +43,7 @@ class SidekickService:
         rule_suggestions = await self._rules_engine.analyze(context)
 
         # Get LLM suggestions (never raises, returns [] on failure)
+        llm_available = self._llm_engine._is_available()
         entity_data = await self._get_entity_data_for_llm(context)
         ontology_summary = await self._get_ontology_summary()
         llm_suggestions = await self._llm_engine.analyze(context, entity_data, ontology_summary)
@@ -53,7 +54,8 @@ class SidekickService:
 
         return SuggestionsResponse(
             suggestions=all_suggestions,
-            has_llm_suggestions=len(llm_suggestions) > 0,
+            # True when LLM is available (even if it returned 0 suggestions)
+            has_llm_suggestions=llm_available,
         )
 
     async def apply_suggestion(self, request: SuggestionApplyRequest) -> SuggestionApplyResponse:
