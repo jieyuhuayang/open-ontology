@@ -41,13 +41,10 @@ class SidekickService:
         """Get suggestions for the given page context."""
         llm_available = self._llm_engine.is_available()
 
-        # Run rules analysis and LLM data prep concurrently
-        rule_suggestions, entity_data, ontology_summary = await asyncio.gather(
-            self._rules_engine.analyze(context),
-            self._get_entity_data_for_llm(context),
-            self._get_ontology_summary(),
-        )
-
+        # Sequential: all operations share the same AsyncSession (no concurrent DB ops)
+        rule_suggestions = await self._rules_engine.analyze(context)
+        entity_data = await self._get_entity_data_for_llm(context)
+        ontology_summary = await self._get_ontology_summary()
         llm_suggestions = await self._llm_engine.analyze(context, entity_data, ontology_summary)
 
         all_suggestions = rule_suggestions + llm_suggestions
