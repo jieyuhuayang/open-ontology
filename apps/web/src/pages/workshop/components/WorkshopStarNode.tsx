@@ -152,23 +152,53 @@ export default function WorkshopStarNode({
     [onClick],
   );
 
-  // Animate low-confidence nodes with flickering
+  const { gl } = useThree();
+  const supportsWebGL2 = gl.capabilities.isWebGL2;
+
+  const shaderUniforms = useMemo(
+    () => ({
+      time: { value: 0 },
+      color: { value: new THREE.Color(node.color) },
+      opacity: { value: getOpacity(node) },
+      emissiveColor: { value: new THREE.Color(node.color) },
+      emissiveIntensity: { value: getEmissiveIntensity(node) },
+      fresnelPower: { value: 2.0 },
+      fresnelIntensity: { value: 0.8 },
+    }),
+    // Only recreate on node identity change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [node.id],
+  );
+
+  // Animate
   useFrame(({ clock }) => {
-    if (!meshRef.current) return;
-    const mat = meshRef.current.material as THREE.MeshStandardMaterial;
+    // Update shader time
+    if (shaderUniforms.time) {
+      shaderUniforms.time.value = clock.elapsedTime;
+    }
+
+    // Update opacity for low-confidence flicker
     if (node.status === 'pending' && node.confidenceLevel === 'low') {
       const flicker =
         0.3 + 0.15 * Math.sin(clock.elapsedTime * 3 + node.id.length);
-      mat.opacity = flicker;
+      shaderUniforms.opacity.value = flicker;
+    } else {
+      shaderUniforms.opacity.value = getOpacity(node);
     }
+
+    // Update emissive
+    shaderUniforms.emissiveIntensity.value = getEmissiveIntensity(node);
+    shaderUniforms.color.value.set(node.color);
+    shaderUniforms.emissiveColor.value.set(node.color);
+
     // Glow pulse for selected/hovered/highlighted
     if (glowRef.current) {
       if (isHighlighted) {
         const pulse = 2.2 + 0.15 * Math.sin(clock.elapsedTime * 5);
         glowRef.current.scale.setScalar(pulse);
       } else {
-        const scale = isSelected || isHovered ? 1.8 : 1.4;
-        const pulse = scale + 0.1 * Math.sin(clock.elapsedTime * 2);
+        const baseScale = isSelected || isHovered ? 1.8 : 1.4;
+        const pulse = baseScale + 0.1 * Math.sin(clock.elapsedTime * 2);
         glowRef.current.scale.setScalar(pulse);
       }
     }
