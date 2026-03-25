@@ -93,6 +93,16 @@ async def list_blueprint_items(
     return await service.list_items(rid)
 
 
+@router.patch("/{rid}/items/batch-decision", response_model=list[BlueprintItem])
+async def batch_update_decisions(
+    rid: str,
+    body: BlueprintItemBatchUpdate,
+    service: BlueprintService = Depends(_get_service),
+):
+    validate_rid(rid)
+    return await service.batch_update_decisions(rid, body)
+
+
 @router.patch("/{rid}/items/{item_rid}", response_model=BlueprintItem)
 async def update_blueprint_item_decision(
     rid: str,
@@ -103,6 +113,27 @@ async def update_blueprint_item_decision(
     validate_rid(rid)
     validate_rid(item_rid)
     return await service.update_item_decision(rid, item_rid, body)
+
+
+@router.post("/{rid}/items/{item_rid}/retry", response_model=BlueprintItemRetryResult)
+async def retry_blueprint_item(
+    rid: str,
+    item_rid: str,
+    body: BlueprintItemRetryRequest,
+    service: BlueprintService = Depends(_get_service),
+):
+    validate_rid(rid)
+    validate_rid(item_rid)
+    return await service.retry_item(rid, item_rid, body.user_edits)
+
+
+@router.post("/{rid}/pre-apply-check", response_model=BlueprintPreApplyCheck)
+async def pre_apply_check(
+    rid: str,
+    service: BlueprintService = Depends(_get_service),
+):
+    validate_rid(rid)
+    return await service.pre_apply_check(rid)
 
 
 @router.post("/{rid}/apply", response_model=BlueprintApplyResult)
