@@ -223,7 +223,6 @@ export default function BlueprintReviewTable({
             </Tooltip>
             <RejectionReasonPopover
               item={record}
-              blueprintRid={blueprintRid}
               disabled={decided}
               onConfirm={(reason) => handleRejectConfirm(record, reason)}
             />
