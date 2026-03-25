@@ -82,7 +82,7 @@
   **覆盖 AC**: AC-14, AC-15
   **依赖**: T001, T002
 
-- [x] **T00- [ ] **T006**: `pre_apply_check` 实现
+- [x] **T006**: `pre_apply_check` 实现
   **文件**: `apps/server/app/services/blueprint_service.py`
   **逻辑**: 新增方法 `async def pre_apply_check(self, rid: str) -> BlueprintPreApplyCheck`：
   1. 验证蓝图存在且状态为 `pending_review`
