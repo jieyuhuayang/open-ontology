@@ -205,7 +205,7 @@
   **覆盖 AC**: AC-09, AC-12
   **依赖**: T002
 
-- [ ] **T013**: use-entity-highlights Hook + 测试
+- [x] **T013**: use-entity-highlights Hook + 测试
   **文件**: `apps/web/src/pages/workshop/hooks/use-entity-highlights.ts`（新建）, `hooks/__tests__/use-entity-highlights.test.ts`（新建）
   **逻辑**:
   - `useEntityHighlights(nodes: WorkshopNode[])` 返回：
