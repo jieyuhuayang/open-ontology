@@ -95,7 +95,7 @@
   **覆盖 AC**: AC-14, AC-15
   **依赖**: T005
 
-- [x] **T00- [ ] **T007**: `retry_item` 单元测试
+- [x] **T007**: `retry_item` 单元测试
   **文件**: `apps/server/tests/unit/test_blueprint_service.py`
   **逻辑**: 测试 `BlueprintService.retry_item()`：
   - `test_retry_success_ot`: applied 蓝图 + accepted OT 项 + `created_entity_rid=None`（失败项）→ 重新创建成功 → 返回 `status="success"` + `createdEntityRid`
