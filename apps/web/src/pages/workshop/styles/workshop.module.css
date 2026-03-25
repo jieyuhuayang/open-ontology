@@ -192,11 +192,14 @@
   text-transform: uppercase;
 }
 
+.guidanceSection {
+  margin-bottom: 28px;
+}
+
 .guidancePillGrid {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 28px;
 }
 
 .guidancePill {
