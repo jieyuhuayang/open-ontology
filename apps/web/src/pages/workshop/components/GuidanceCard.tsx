@@ -49,7 +49,7 @@ interface GuidanceCardProps {
 const stagger = (i: number) => ({
   initial: { opacity: 0, y: 18 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.45, delay: 0.1 + i * 0.08, ease: [0.16, 1, 0.3, 1] },
+  transition: { duration: 0.45, delay: 0.1 + i * 0.08, ease: [0.16, 1, 0.3, 1] as const },
 });
 
 export default function GuidanceCard({ ontologyRid }: GuidanceCardProps) {
