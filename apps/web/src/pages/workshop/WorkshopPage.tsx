@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useObjectTypes } from '@/api/object-types';
+import { useBlueprints } from '@/api/blueprints';
 import { useWorkshopStore } from './stores/workshop-store';
 import { useAgentChat } from './hooks/use-agent-chat';
 import { useWorkshopGraph } from './hooks/use-workshop-graph';
