@@ -185,7 +185,7 @@
   **覆盖 AC**: AC-09, AC-11
   **依赖**: T003
 
-- [ ] **T011**: ChatPanel 集成焦点锁定
+- [x] **T011**: ChatPanel 集成焦点锁定
   **文件**: `apps/web/src/pages/workshop/components/ChatPanel.tsx`（修改）
   **逻辑**:
   - 接收 `nodes: WorkshopNode[]` prop（由 WorkshopPage 传入）
