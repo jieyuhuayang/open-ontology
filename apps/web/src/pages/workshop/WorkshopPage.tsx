@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
@@ -25,6 +25,9 @@ export function Component() {
   const pageState = useWorkshopStore((s) => s.pageState);
   const setPageState = useWorkshopStore((s) => s.setPageState);
   const currentSessionRid = useWorkshopStore((s) => s.currentSessionRid);
+  const addCollapse = useWorkshopStore((s) => s.addCollapse);
+  const setSelectedEntityRid = useWorkshopStore((s) => s.setSelectedEntityRid);
+  const clearFocusLock = useWorkshopStore((s) => s.clearFocusLock);
 
   // Determine initial page state based on existing ObjectTypes
   const { data: otData } = useObjectTypes(1, 1);
@@ -50,6 +53,43 @@ export function Component() {
     };
   }, []);
 
+  // F016: Drag-to-create-link → Agent chat
+  const handleLinkCreate = useCallback(
+    (sourceId: string, targetId: string) => {
+      const sourceNode = nodes.find((n) => n.id === sourceId);
+      const targetNode = nodes.find((n) => n.id === targetId);
+      if (!sourceNode || !targetNode) return;
+      agentChat.send(
+        `请建议从 ${sourceNode.displayName} 到 ${targetNode.displayName} 的链接类型，包括基数关系和关系名称`,
+      );
+    },
+    [nodes, agentChat],
+  );
+
+  // F016: Delete star entity
+  const handleDeleteNode = useCallback(
+    (nodeId: string) => {
+      const node = nodes.find((n) => n.id === nodeId);
+      if (!node) return;
+
+      // Trigger collapse animation
+      addCollapse({
+        id: `collapse-${nodeId}-${Date.now()}`,
+        position: { ...node.position },
+        color: node.color,
+        startTime: performance.now() / 1000,
+      });
+
+      // Clear selection and focus if this node was focused
+      setSelectedEntityRid(null);
+      clearFocusLock();
+
+      // Note: actual removal from data layer (TanStack Query cache / blueprint API)
+      // will be handled in F017 when backend integration is available
+    },
+    [nodes, addCollapse, setSelectedEntityRid, clearFocusLock],
+  );
+
   return (
     <div className={styles.workshopPage}>
       <Link to="/" className={styles.backButton} data-testid="back-button">
@@ -65,6 +105,7 @@ export function Component() {
           <ChatPanel
             ontologyRid={DEFAULT_ONTOLOGY_RID}
             agentChat={agentChat}
+            nodes={nodes}
           />
         )}
         <div
@@ -77,7 +118,11 @@ export function Component() {
       </div>
 
       <div className={styles.canvasArea} data-testid="canvas-area">
-        <StarfieldWorkbench nodes={nodes} edges={edges} />
+        <StarfieldWorkbench
+          nodes={nodes}
+          edges={edges}
+          onLinkCreate={handleLinkCreate}
+        />
         <EntityPopover nodes={nodes} />
         <ConnectionBanner onReconnect={agentChat.reconnect} />
       </div>
@@ -110,7 +155,11 @@ export function Component() {
         </div>
       )}
 
-      <EntityDrawer nodes={nodes} edges={edges} />
+      <EntityDrawer
+        nodes={nodes}
+        edges={edges}
+        onDeleteNode={handleDeleteNode}
+      />
     </div>
   );
 }
