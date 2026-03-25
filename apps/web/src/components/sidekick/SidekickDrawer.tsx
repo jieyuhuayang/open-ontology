@@ -127,7 +127,7 @@ export default function SidekickDrawer() {
       ) : (
         <>
           {visibleSuggestions.map((suggestion) => (
-            <div key={suggestion.id}>
+            <Fragment key={suggestion.id}>
               <SuggestionCard
                 suggestion={suggestion}
                 llmAvailable={llmAvailable || !suggestion.requiresLlm}
@@ -142,7 +142,7 @@ export default function SidekickDrawer() {
                   onCancel={() => setEditingSuggestionId(null)}
                 />
               )}
-            </div>
+            </Fragment>
           ))}
 
           {!data?.hasLlmSuggestions && (
