@@ -241,8 +241,8 @@ class TestApplySuggestion:
             ),
         ):
             with pytest.raises(AppError) as exc_info:
-                    await service.apply_suggestion(request)
-                assert exc_info.value.code == "ENTITY_NOT_FOUND"
+                await service.apply_suggestion(request)
+            assert exc_info.value.code == "ENTITY_NOT_FOUND"
 
 
 class TestGenerateContent:
