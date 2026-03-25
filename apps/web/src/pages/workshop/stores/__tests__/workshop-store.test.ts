@@ -154,6 +154,125 @@ describe('workshop-store', () => {
     });
   });
 
+  describe('viewMode (F016)', () => {
+    it('starts with 3d', () => {
+      expect(useWorkshopStore.getState().viewMode).toBe('3d');
+    });
+
+    it('switches to 2d', () => {
+      useWorkshopStore.getState().setViewMode('2d');
+      expect(useWorkshopStore.getState().viewMode).toBe('2d');
+    });
+
+    it('switches back to 3d', () => {
+      useWorkshopStore.getState().setViewMode('2d');
+      useWorkshopStore.getState().setViewMode('3d');
+      expect(useWorkshopStore.getState().viewMode).toBe('3d');
+    });
+  });
+
+  describe('focusLock (F016)', () => {
+    it('starts with null', () => {
+      expect(useWorkshopStore.getState().focusedEntityRid).toBeNull();
+    });
+
+    it('sets focused entity', () => {
+      useWorkshopStore.getState().setFocusedEntityRid('ri.test.entity1');
+      expect(useWorkshopStore.getState().focusedEntityRid).toBe('ri.test.entity1');
+    });
+
+    it('clears focus lock', () => {
+      useWorkshopStore.getState().setFocusedEntityRid('ri.test.entity1');
+      useWorkshopStore.getState().clearFocusLock();
+      expect(useWorkshopStore.getState().focusedEntityRid).toBeNull();
+    });
+  });
+
+  describe('highlightedEntityRids (F016)', () => {
+    it('starts empty', () => {
+      expect(useWorkshopStore.getState().highlightedEntityRids).toEqual([]);
+    });
+
+    it('sets highlighted entities', () => {
+      useWorkshopStore.getState().setHighlightedEntityRids(['a', 'b']);
+      expect(useWorkshopStore.getState().highlightedEntityRids).toEqual(['a', 'b']);
+    });
+
+    it('clears highlights', () => {
+      useWorkshopStore.getState().setHighlightedEntityRids(['a']);
+      useWorkshopStore.getState().clearHighlights();
+      expect(useWorkshopStore.getState().highlightedEntityRids).toEqual([]);
+    });
+  });
+
+  describe('dragLinkState (F016)', () => {
+    const mockDragState = {
+      sourceNodeId: 'node1',
+      sourcePosition: { x: 0, y: 0, z: 0 },
+      currentPointerPosition: { x: 1, y: 1, z: 1 },
+      hoveredTargetId: null,
+    };
+
+    it('starts null', () => {
+      expect(useWorkshopStore.getState().dragLinkState).toBeNull();
+    });
+
+    it('sets drag link state', () => {
+      useWorkshopStore.getState().setDragLinkState(mockDragState);
+      expect(useWorkshopStore.getState().dragLinkState).toEqual(mockDragState);
+    });
+
+    it('clears drag link', () => {
+      useWorkshopStore.getState().setDragLinkState(mockDragState);
+      useWorkshopStore.getState().clearDragLink();
+      expect(useWorkshopStore.getState().dragLinkState).toBeNull();
+    });
+  });
+
+  describe('activeShockwaves (F016)', () => {
+    const mockShockwave = { id: 'sw1', position: { x: 0, y: 0, z: 0 }, startTime: 100 };
+
+    it('starts empty', () => {
+      expect(useWorkshopStore.getState().activeShockwaves).toEqual([]);
+    });
+
+    it('adds shockwave', () => {
+      useWorkshopStore.getState().addShockwave(mockShockwave);
+      expect(useWorkshopStore.getState().activeShockwaves).toHaveLength(1);
+      expect(useWorkshopStore.getState().activeShockwaves[0]?.id).toBe('sw1');
+    });
+
+    it('removes shockwave by id', () => {
+      useWorkshopStore.getState().addShockwave(mockShockwave);
+      useWorkshopStore.getState().addShockwave({ ...mockShockwave, id: 'sw2' });
+      useWorkshopStore.getState().removeShockwave('sw1');
+      expect(useWorkshopStore.getState().activeShockwaves).toHaveLength(1);
+      expect(useWorkshopStore.getState().activeShockwaves[0]?.id).toBe('sw2');
+    });
+  });
+
+  describe('activeCollapses (F016)', () => {
+    const mockCollapse = { id: 'c1', position: { x: 0, y: 0, z: 0 }, color: '#ff0000', startTime: 200 };
+
+    it('starts empty', () => {
+      expect(useWorkshopStore.getState().activeCollapses).toEqual([]);
+    });
+
+    it('adds collapse', () => {
+      useWorkshopStore.getState().addCollapse(mockCollapse);
+      expect(useWorkshopStore.getState().activeCollapses).toHaveLength(1);
+      expect(useWorkshopStore.getState().activeCollapses[0]?.id).toBe('c1');
+    });
+
+    it('removes collapse by id', () => {
+      useWorkshopStore.getState().addCollapse(mockCollapse);
+      useWorkshopStore.getState().addCollapse({ ...mockCollapse, id: 'c2' });
+      useWorkshopStore.getState().removeCollapse('c1');
+      expect(useWorkshopStore.getState().activeCollapses).toHaveLength(1);
+      expect(useWorkshopStore.getState().activeCollapses[0]?.id).toBe('c2');
+    });
+  });
+
   describe('reset', () => {
     it('resets all state to initial values', () => {
       const store = useWorkshopStore.getState();
@@ -170,6 +289,18 @@ describe('workshop-store', () => {
         confidence: 0.5,
         confidenceLevel: 'medium',
       });
+      // F016 fields
+      store.setViewMode('2d');
+      store.setFocusedEntityRid('ri.test.focus');
+      store.setHighlightedEntityRids(['a', 'b']);
+      store.setDragLinkState({
+        sourceNodeId: 'n1',
+        sourcePosition: { x: 0, y: 0, z: 0 },
+        currentPointerPosition: { x: 1, y: 1, z: 1 },
+        hoveredTargetId: null,
+      });
+      store.addShockwave({ id: 'sw', position: { x: 0, y: 0, z: 0 }, startTime: 0 });
+      store.addCollapse({ id: 'c', position: { x: 0, y: 0, z: 0 }, color: '#f00', startTime: 0 });
 
       store.reset();
 
@@ -181,6 +312,13 @@ describe('workshop-store', () => {
       expect(s.isChatPanelExpanded).toBe(true);
       expect(s.planSteps).toHaveLength(0);
       expect(s.pendingCrystallizations).toHaveLength(0);
+      // F016 fields
+      expect(s.viewMode).toBe('3d');
+      expect(s.focusedEntityRid).toBeNull();
+      expect(s.highlightedEntityRids).toEqual([]);
+      expect(s.dragLinkState).toBeNull();
+      expect(s.activeShockwaves).toEqual([]);
+      expect(s.activeCollapses).toEqual([]);
     });
   });
 });
