@@ -1707,7 +1707,7 @@ CREATE TABLE blueprint_items (
     rid TEXT PRIMARY KEY,                    -- ri.ontology.blueprint-item.<uuid>
     blueprint_rid TEXT NOT NULL REFERENCES blueprints(rid) ON DELETE CASCADE,
     item_type TEXT NOT NULL,                -- object_type | property | link_type
-    suggestion JSONB NOT NULL,              -- 建议内容（对象类型/属性/链接的完整定义）
+    suggestion JSONB NOT NULL,              -- 实体定义内容（对象类型/属性/链接的完整定义）
     confidence REAL NOT NULL,               -- 0.0 - 1.0
     confidence_level TEXT NOT NULL,         -- high | medium | low
     reasoning TEXT,                          -- 推理说明
