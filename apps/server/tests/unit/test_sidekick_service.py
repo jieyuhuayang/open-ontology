@@ -135,6 +135,10 @@ class TestGetSuggestions:
                 service._rules_engine, "analyze", new_callable=AsyncMock, return_value=sugs
             ),
             patch.object(service._llm_engine, "analyze", new_callable=AsyncMock, return_value=[]),
+            patch.object(
+                service, "_get_entity_data_for_llm", new_callable=AsyncMock, return_value={}
+            ),
+            patch.object(service, "_get_ontology_summary", new_callable=AsyncMock, return_value={}),
         ):
             result = await service.get_suggestions(_make_context())
 
