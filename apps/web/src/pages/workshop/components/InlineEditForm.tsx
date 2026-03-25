@@ -116,7 +116,7 @@ export default function InlineEditForm({
                 disabled
               />
             </Form.Item>
-            <Form.Item label="Side B">
+            <Form.Item label={t('common.sideB', 'Side B')}>
               <Input
                 value={
                   (
