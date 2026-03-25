@@ -87,93 +87,63 @@ class SidekickService:
         content = await self._llm_engine.generate_content(request)
         return GenerateContentResponse(content=content)
 
-    # --- Private helpers ---
-
     async def _apply_description(self, request: SuggestionApplyRequest) -> SuggestionApplyResponse:
-        """Apply missing_description suggestion."""
         if request.action_payload and request.action_payload.get("description"):
-            # User edited: use provided description directly
             description = request.action_payload["description"]
         else:
-            # Auto-generate via LLM
             ot = await self._ot_service.get_by_rid(request.entity_rid)
             gen_request = GenerateContentRequest(
                 content_type="description",
                 entity_rid=request.entity_rid,
-                context={
-                    "displayName": ot.display_name,
-                    "apiName": ot.api_name,
-                },
+                context={"displayName": ot.display_name, "apiName": ot.api_name},
             )
             description = await self._llm_engine.generate_content(gen_request)
 
-        await self._update_ot_description(request.entity_rid, description)
-        return SuggestionApplyResponse(success=True, message="Description updated")
-
-    async def _update_ot_description(self, entity_rid: str, description: str) -> None:
-        """Update OT description via ObjectTypeService."""
         from app.domain.object_type import ObjectTypeUpdateRequest
 
-        req = ObjectTypeUpdateRequest(description=description)
-        await self._ot_service.update(entity_rid, req)
+        await self._ot_service.update(
+            request.entity_rid, ObjectTypeUpdateRequest(description=description)
+        )
+        return SuggestionApplyResponse(success=True, message="Description updated")
 
-    async def _apply_title_key(self, entity_rid: str, action_payload: dict | None) -> bool:
-        """Set title key property for an OT. Returns True if applied."""
-        if action_payload and action_payload.get("propertyId"):
-            property_id = action_payload["propertyId"]
-        else:
-            property_id = await self._find_best_property(entity_rid, _TITLE_KEY_CANDIDATES)
-
-        if property_id:
-            from app.domain.property import PropertyUpdateRequest
-
-            prop_list = await self._prop_service.list(entity_rid)
-            for prop in prop_list.items:
-                if prop.id == property_id:
-                    req = PropertyUpdateRequest(is_title_key=True)
-                    await self._prop_service.update(entity_rid, prop.rid, req)
-                    return True
-        return False
-
-    async def _apply_primary_key(self, entity_rid: str, action_payload: dict | None) -> bool:
-        """Set primary key property for an OT. Returns True if applied."""
-        if action_payload and action_payload.get("propertyId"):
-            property_id = action_payload["propertyId"]
-        else:
-            property_id = await self._find_best_property(entity_rid, _PRIMARY_KEY_CANDIDATES)
-
-        if property_id:
-            from app.domain.property import PropertyUpdateRequest
-
-            prop_list = await self._prop_service.list(entity_rid)
-            for prop in prop_list.items:
-                if prop.id == property_id:
-                    req = PropertyUpdateRequest(is_primary_key=True)
-                    await self._prop_service.update(entity_rid, prop.rid, req)
-                    return True
-        return False
-
-    async def _find_best_property(self, entity_rid: str, candidates: set[str]) -> str | None:
-        """Find the best matching property by name."""
+    async def _apply_key_property(
+        self,
+        entity_rid: str,
+        action_payload: dict | None,
+        candidates: set[str],
+        update_field: str,
+    ) -> bool:
+        """Set a key property (title or primary) for an OT. Single fetch."""
         prop_list = await self._prop_service.list(entity_rid)
-        for prop in prop_list.items:
-            if prop.display_name.lower() in candidates:
-                return prop.id
-        # Fallback: first property
-        if prop_list.items:
-            return prop_list.items[0].id
-        return None
+
+        # Determine target property id
+        if action_payload and action_payload.get("propertyId"):
+            target_id = action_payload["propertyId"]
+        else:
+            # Pick best candidate by name, fallback to first property
+            target_id = None
+            for prop in prop_list.items:
+                if prop.display_name.lower() in candidates:
+                    target_id = prop.id
+                    break
+            if not target_id and prop_list.items:
+                target_id = prop_list.items[0].id
+
+        if target_id:
+            for prop in prop_list.items:
+                if prop.id == target_id:
+                    req = PropertyUpdateRequest(**{update_field: True})
+                    await self._prop_service.update(entity_rid, prop.rid, req)
+                    return True
+        return False
 
     async def _get_entity_data_for_llm(self, context: SidekickContext) -> dict:
-        """Get entity data for LLM context. Never raises."""
         try:
-            data = await self._rules_engine._get_entity_data(context)
-            return data
+            return await self._rules_engine.get_entity_data(context)
         except AppError:
             return {}
 
     async def _get_ontology_summary(self) -> dict:
-        """Get a brief ontology summary for LLM context."""
         try:
             ot_list = await self._ot_service.list(page=1, page_size=100)
             return {
