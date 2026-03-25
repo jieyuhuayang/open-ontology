@@ -187,6 +187,7 @@ class GenerateContentResponse(DomainModel):
       "confidenceLevel": "high",
       "source": "completeness_check",
       "reasoning": "completeness_check 规则检测到 description 字段为空",
+      "requiresLlm": true,
       "actionPayload": null
     },
     {
@@ -198,6 +199,7 @@ class GenerateContentResponse(DomainModel):
       "confidenceLevel": "medium",
       "source": "semantic_inference",
       "reasoning": "Customer 和 Order 在业务领域中通常存在关联关系，建议添加链接类型",
+      "requiresLlm": false,
       "actionPayload": {
         "targetObjectTypeRid": "ri.ontology.object-type.def456",
         "suggestedCardinality": "one-to-many"
