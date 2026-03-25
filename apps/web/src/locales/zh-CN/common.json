@@ -797,13 +797,40 @@
       "properties": "属性",
       "relationships": "关系",
       "reasoning": "推理来源",
-      "viewDetail": "查看完整详情"
+      "viewDetail": "查看完整详情",
+      "delete": "删除",
+      "deleteConfirm": "确认删除此实体？",
+      "deleteImpact": "{{count}} 个关联链接将同步移除：{{names}}",
+      "cannotDeleteConfirmed": "已确认的实体通过 Ontology Manager 管理"
     },
     "toolbar": {
       "fit": "适配",
       "reset": "重置",
       "zoomIn": "放大",
-      "zoomOut": "缩小"
+      "zoomOut": "缩小",
+      "view3D": "3D",
+      "view2D": "2D"
+    },
+    "autoDegrade": {
+      "suggestion": "检测到超过 200 个实体，建议切换到 2D 视图以保持流畅。",
+      "switchTo2D": "切换到 2D"
+    },
+    "focusLock": {
+      "locked": "焦点：{{name}}",
+      "unlock": "取消焦点锁定"
+    },
+    "promptBubbles": {
+      "checkOrphanKeys": "检查孤立外键",
+      "deriveStats": "推导统计属性",
+      "splitSensitive": "拆分敏感字段",
+      "suggestRelated": "推导关联对象类型",
+      "checkNaming": "检查字段命名规范",
+      "addMissingProps": "补充缺失属性",
+      "verifyCardinality": "验证基数关系",
+      "checkReverse": "检查反向链接"
+    },
+    "dataProbe": {
+      "comingSoon": "数据预览探针 — 即将推出"
     },
     "domains": {
       "ecommerce": "电商零售",
