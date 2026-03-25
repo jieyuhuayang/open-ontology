@@ -1712,5 +1712,5 @@ class TestRetryItem:
 
                 result = await service.retry_item(bp_orm.rid, lt_item.rid)
 
-        assert result.status == "success"
+        assert result.status == "success", f"Expected success, got error: {result.error}"
         assert result.created_entity_rid == "ri.ontology.link-type.new-lt1"
