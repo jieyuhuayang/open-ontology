@@ -689,16 +689,20 @@ Agent 还需理解当前本体的已有状态。通过 `03-agent-context-archite
 Agent 与前端通过 SSE 流式通信，事件类型如下：
 
 ```
-event: plan-step         # Agent 规划步骤（data: { step, index, total }）
-event: text-delta        # 文本增量（data: { text }）
-event: skill-call        # Skill 调用通知（data: { skillName, params, status }）
-event: blueprint-item    # 蓝图项建议（data: { item: BlueprintItem }）
-event: subgraph-update   # 3D 星空子图更新（data: { nodes, edges, action }）
-event: confidence-update # 置信度更新（data: { itemRid, confidence, reasoning }）
-event: clarification-req # 澄清请求（data: { questionId, question, options[], context }）
-event: done              # 流结束（data: { blueprintRid, summary }）
-event: error             # 错误（data: { code, message }）
+event: plan-step           # Agent 规划步骤（data: { step, index, total }）
+event: text-delta          # 文本增量（data: { text }）
+event: skill-call          # Skill 调用通知（data: { skillName, params, status }）
+event: blueprint-item      # 蓝图项（data: { item: BlueprintItem }）
+event: subgraph-update     # 3D 星空子图更新（data: { nodes, edges, action }）
+event: confidence-update   # 置信度更新（data: { itemRid, confidence, reasoning }）
+event: clarification-req   # 澄清请求（data: { questionId, question, options[], context }）
+event: blueprint-complete  # 蓝图构建完成（data: { blueprintRid, name, status, itemCount }）
+event: suggestion          # Agent 建议（v0.2.1 新增，data: { id, action, summary, details, confidence, source }）
+event: done                # 流结束（data: { blueprintRid, summary }）
+event: error               # 错误（data: { code, message }）
 ```
+
+> **v0.2.1 新增**：`suggestion` 事件用于 Phase 2 中 Agent 通过工具调用输出结构化建议，前端在 Chat 消息流中渲染为可交互建议卡片（Accept/Edit/Reject）。
 
 ### SSE 连接恢复策略
 
