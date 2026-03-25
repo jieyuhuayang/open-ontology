@@ -369,7 +369,7 @@
   **覆盖 AC**: AC-24
   **依赖**: T007
 
-- [ ] **T023**: ShockwaveEffect 冲击波动画
+- [x] **T023**: ShockwaveEffect 冲击波动画
   **文件**: `apps/web/src/pages/workshop/components/ShockwaveEffect.tsx`（新建）
   **逻辑**:
   - R3F 组件，接收 `shockwave: ShockwaveInstance` prop
