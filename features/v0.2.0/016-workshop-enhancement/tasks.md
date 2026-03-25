@@ -94,7 +94,7 @@
   **覆盖 AC**: AC-01, AC-02, AC-03, AC-04
   **依赖**: T001, T002
 
-- [ ] **T005**: WorkshopToolbar 视图切换按钮 + Auto-degrade
+- [x] **T005**: WorkshopToolbar 视图切换按钮 + Auto-degrade
   **文件**: `apps/web/src/pages/workshop/components/WorkshopToolbar.tsx`（修改）
   **逻辑**:
   - 在工具栏右侧新增 3D/2D 切换按钮组（自定义 toggle，使用 `AppstoreOutlined`/`NodeIndexOutlined` 图标）
