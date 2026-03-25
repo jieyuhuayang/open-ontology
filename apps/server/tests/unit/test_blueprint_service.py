@@ -1636,7 +1636,9 @@ class TestRetryItem:
             patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
         ):
             mock_bp_storage.get = AsyncMock(return_value=bp_orm)
-            mock_item_storage.get = AsyncMock(return_value=item_orm)
+            mock_result = MagicMock()
+            mock_result.scalar_one_or_none.return_value = item_orm
+            db_session_mock.execute = AsyncMock(return_value=mock_result)
 
             with pytest.raises(AppError, match="not retryable"):
                 await service.retry_item(bp_orm.rid, item_orm.rid)
@@ -1656,7 +1658,9 @@ class TestRetryItem:
             patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
         ):
             mock_bp_storage.get = AsyncMock(return_value=bp_orm)
-            mock_item_storage.get = AsyncMock(return_value=item_orm)
+            mock_result = MagicMock()
+            mock_result.scalar_one_or_none.return_value = item_orm
+            db_session_mock.execute = AsyncMock(return_value=mock_result)
 
             with pytest.raises(AppError, match="not retryable"):
                 await service.retry_item(bp_orm.rid, item_orm.rid)
