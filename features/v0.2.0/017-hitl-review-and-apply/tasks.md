@@ -123,7 +123,7 @@
 
 ### Phase 3: 后端 API 层（Test-First）
 
-- [x] **T00- [ ] **T009**: 3 个新端点集成测试
+- [x] **T009**: 3 个新端点集成测试
   **文件**: `apps/server/tests/integration/test_blueprint_api.py`
   **逻辑**: 使用 `seeded_client` 测试 3 个新端点：
   - **batch-decision**:
