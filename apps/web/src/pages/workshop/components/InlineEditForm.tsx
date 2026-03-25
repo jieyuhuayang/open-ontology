@@ -53,7 +53,7 @@ export default function InlineEditForm({
             <Form.Item label={t('common.apiName', 'API Name')} name="apiName">
               <Input />
             </Form.Item>
-            <Form.Item label="Description" name="description">
+            <Form.Item label={t('common.description', 'Description')} name="description">
               <Input.TextArea rows={2} />
             </Form.Item>
             <Form.Item label="Icon" name="icon">
