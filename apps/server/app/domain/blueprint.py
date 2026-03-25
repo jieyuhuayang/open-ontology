@@ -187,6 +187,6 @@ class BlueprintItemRetryResult(DomainModel):
     """Single item retry result."""
 
     item_rid: str
-    status: str  # "success" | "failed"
+    status: RetryStatus
     created_entity_rid: str | None = None
     error: str | None = None
