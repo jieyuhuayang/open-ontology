@@ -61,11 +61,7 @@ export function useApplySuggestion() {
 
 export function useGenerateContent() {
   return useMutation({
-    mutationFn: async (req: {
-      contentType: string;
-      entityRid: string;
-      context?: Record<string, unknown>;
-    }) => {
+    mutationFn: async (req: GenerateContentRequest) => {
       const { data } = await apiClient.post<GenerateContentResponse>(
         '/sidekick/generate-content',
         req,
