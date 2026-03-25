@@ -229,6 +229,38 @@ export default function EntityDrawer({ nodes, edges, onDeleteNode }: EntityDrawe
           {t('workshop.entity.viewDetail')}
         </Button>
       )}
+
+      {/* Delete button (pending only) */}
+      {node.status === 'pending' && onDeleteNode && (
+        <div style={{ marginTop: 16, borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 16 }}>
+          <Popconfirm
+            title={t('workshop.entity.deleteConfirm')}
+            description={
+              relatedEdges.length > 0
+                ? t('workshop.entity.deleteImpact', {
+                    count: relatedEdges.length,
+                    names: relatedEdges.map((e) => e.label).join(', '),
+                  })
+                : undefined
+            }
+            onConfirm={() => {
+              onDeleteNode(node.id);
+              setSelectedEntityRid(null);
+            }}
+            okText={t('workshop.entity.delete')}
+            okButtonProps={{ danger: true }}
+          >
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              block
+              data-testid="entity-delete-button"
+            >
+              {t('workshop.entity.delete')}
+            </Button>
+          </Popconfirm>
+        </div>
+      )}
     </Drawer>
   );
 }
