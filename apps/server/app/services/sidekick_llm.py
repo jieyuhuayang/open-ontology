@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import uuid
 
+from app.config import settings
 from app.domain.sidekick import (
     GenerateContentRequest,
     SidekickContext,
