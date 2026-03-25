@@ -125,13 +125,24 @@
 /* ─── Guidance Overlay (initial empty state) ─── */
 
 .guidanceOverlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 50;
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
+  background: rgba(0, 0, 0, 0.3);
+  animation: guidanceFadeIn 0.4s ease both;
+}
+
+@keyframes guidanceFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes guidanceSlideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .guidanceGlass {
@@ -140,7 +151,7 @@
   max-height: 85vh;
   overflow-y: auto;
   padding: 48px 56px;
-  background: rgba(12, 12, 28, 0.78);
+  background: rgba(12, 12, 28, 0.82);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
   border: 1px solid rgba(255, 255, 255, 0.09);
@@ -149,7 +160,7 @@
     0 0 80px rgba(79, 142, 255, 0.06),
     0 32px 64px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  pointer-events: auto;
+  animation: guidanceSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
 }
 
 .guidanceTitle {
