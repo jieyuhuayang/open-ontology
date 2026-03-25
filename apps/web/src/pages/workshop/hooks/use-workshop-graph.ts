@@ -119,7 +119,7 @@ export function useWorkshopGraph(
   ontologyRid: string,
   blueprintRid: string | null,
 ): UseWorkshopGraphReturn {
-  const { data: otData, isLoading: otLoading } = useObjectTypes(1, 200);
+  const { data: otData, isLoading: otLoading } = useObjectTypes(1, 100);
   const { data: bpData, isLoading: bpLoading } =
     useBlueprintDetail(blueprintRid);
 
