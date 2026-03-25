@@ -286,7 +286,7 @@
 
 ### Phase 5: 删除星体 + 数据探针占位
 
-- [ ] **T018**: EntityDrawer 删除按钮 + 影响展示
+- [x] **T018**: EntityDrawer 删除按钮 + 影响展示
   **文件**: `apps/web/src/pages/workshop/components/EntityDrawer.tsx`（修改）
   **逻辑**:
   - 接收 `onDeleteNode?: (nodeId: string) => void` prop
