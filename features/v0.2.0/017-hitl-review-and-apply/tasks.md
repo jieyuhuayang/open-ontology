@@ -60,7 +60,7 @@
   **覆盖 AC**: AC-11, AC-22
   **依赖**: T001, T002
 
-- [x] **T00- [ ] **T004**: `batch_update_decisions` 实现
+- [x] **T004**: `batch_update_decisions` 实现
   **文件**: `apps/server/app/services/blueprint_service.py`
   **逻辑**: 新增方法 `async def batch_update_decisions(self, blueprint_rid: str, req: BlueprintItemBatchUpdate) -> list[BlueprintItem]`：
   1. 验证蓝图存在且状态为 `pending_review`（否则抛 `BLUEPRINT_INVALID_STATUS_TRANSITION`）
