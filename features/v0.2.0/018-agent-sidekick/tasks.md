@@ -30,7 +30,7 @@
 
 ### Phase 1: 后端 Domain 模型
 
-- [ ] **T001**: Sidekick Domain 模型
+- [x] **T001**: Sidekick Domain 模型
   **文件**: `apps/server/app/domain/sidekick.py`
   **逻辑**: 定义所有 Sidekick 相关的 Pydantic 模型，继承 `DomainModel`（`alias_generator=to_camel, populate_by_name=True`）：
   - `SidekickPageType(str, Enum)`: `object_type_detail`, `property_list`, `link_type_detail`
