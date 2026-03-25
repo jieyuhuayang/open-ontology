@@ -41,6 +41,12 @@ export function Component() {
     }
   }, [otData, currentSessionRid, pageState, setPageState]);
 
+  // Fetch blueprints for the current session
+  const { data: blueprintData } = useBlueprints({
+    sessionRid: currentSessionRid ?? undefined,
+  });
+  const latestBlueprint = blueprintData?.items?.[0] ?? null;
+
   // Single instance of useAgentChat — shared by ChatPanel and ConnectionBanner
   const agentChat = useAgentChat(currentSessionRid);
 
