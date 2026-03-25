@@ -32,7 +32,7 @@ class SidekickRulesEngine:
 
     async def analyze(self, context: SidekickContext) -> list[Suggestion]:
         """Analyze current entity and return rule-based suggestions."""
-        entity_data = await self._get_entity_data(context)
+        entity_data = await self.get_entity_data(context)
 
         if context.page_type == SidekickPageType.OBJECT_TYPE_DETAIL:
             return self._analyze_object_type(entity_data)
