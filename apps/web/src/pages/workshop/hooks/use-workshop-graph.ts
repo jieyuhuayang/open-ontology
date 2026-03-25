@@ -116,11 +116,23 @@ interface UseWorkshopGraphReturn {
   isLoading: boolean;
 }
 
+export function linkTypeToEdge(lt: LinkType): WorkshopEdge {
+  return {
+    id: lt.rid,
+    sourceNodeId: lt.sideA.objectTypeRid,
+    targetNodeId: lt.sideB.objectTypeRid,
+    label: lt.sideA.displayName,
+    cardinality: lt.cardinality,
+    status: 'confirmed',
+  };
+}
+
 export function useWorkshopGraph(
   ontologyRid: string,
   blueprintRid: string | null,
 ): UseWorkshopGraphReturn {
   const { data: otData, isLoading: otLoading } = useObjectTypes(1, 100);
+  const { data: ltData, isLoading: ltLoading } = useLinkTypes(1, 100);
   const { data: bpData, isLoading: bpLoading } =
     useBlueprintDetail(blueprintRid);
 
@@ -132,6 +144,12 @@ export function useWorkshopGraph(
     const objectTypes = (otData?.items ?? []) as ObjectType[];
     objectTypes.forEach((ot, i) => {
       rawNodes.push(objectTypeToNode(ot, i));
+    });
+
+    // Existing LinkTypes → confirmed edges
+    const linkTypes = (ltData?.items ?? []) as LinkType[];
+    linkTypes.forEach((lt) => {
+      edges.push(linkTypeToEdge(lt));
     });
 
     // Blueprint items
@@ -154,11 +172,11 @@ export function useWorkshopGraph(
     }));
 
     return { nodes, edges };
-  }, [otData, bpData]);
+  }, [otData, ltData, bpData]);
 
   return {
     nodes: result.nodes,
     edges: result.edges,
-    isLoading: otLoading || bpLoading,
+    isLoading: otLoading || ltLoading || bpLoading,
   };
 }
