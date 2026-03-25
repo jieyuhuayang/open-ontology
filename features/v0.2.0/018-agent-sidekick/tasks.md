@@ -11,7 +11,7 @@
 |------|------|------|
 | spec.md | ✅ 已评审 | Spec Discovery + SDD Review 完成 |
 | tasks.md | ✅ 已拆解 | SDD Review LGTM |
-| 实现 | 🔲 未开始 | 0 / 18 完成 |
+| 实现 | 🔄 进行中 | 16 / 18 完成（T010/T017 openapi 重生成 + T018 E2E 待做） |
 
 ---
 
