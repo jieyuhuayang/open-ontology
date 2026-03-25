@@ -480,30 +480,31 @@ class BlueprintService:
                 from app.services.link_type_service import LinkTypeService
 
                 lt_service = LinkTypeService(self._session)
-                side_a = suggestion.get("sideA", {})
-                side_b = suggestion.get("sideB", {})
+                # Resolve placeholder RIDs — support both nested and flat formats
+                side_a_placeholder = suggestion.get("sideAPlaceholderRid", "")
+                side_b_placeholder = suggestion.get("sideBPlaceholderRid", "")
+                if not side_a_placeholder:
+                    side_a_placeholder = (suggestion.get("sideA") or {}).get("objectTypeRid", "")
+                if not side_b_placeholder:
+                    side_b_placeholder = (suggestion.get("sideB") or {}).get("objectTypeRid", "")
+
                 side_a_ot = ot_rid_map.get(
-                    side_a.get("objectTypeRid", ""), side_a.get("objectTypeRid", "")
+                    side_a_placeholder, suggestion.get("sideAObjectTypeRid", side_a_placeholder)
                 )
                 side_b_ot = ot_rid_map.get(
-                    side_b.get("objectTypeRid", ""), side_b.get("objectTypeRid", "")
+                    side_b_placeholder, suggestion.get("sideBObjectTypeRid", side_b_placeholder)
                 )
 
-                from app.domain.link_type import LinkSideCreateInput, LinkTypeCreateRequest
+                from app.domain.link_type import LinkTypeCreateRequest
 
                 created = await lt_service.create(
                     LinkTypeCreateRequest(
                         display_name=suggestion.get("displayName", ""),
-                        api_name=suggestion.get("apiName"),
-                        side_a=LinkSideCreateInput(
-                            object_type_rid=side_a_ot,
-                            api_name=side_a.get("apiName", "sideA"),
-                        ),
-                        side_b=LinkSideCreateInput(
-                            object_type_rid=side_b_ot,
-                            api_name=side_b.get("apiName", "sideB"),
-                        ),
-                        cardinality=suggestion.get("cardinality", "one-to-many"),
+                        id=suggestion.get("id"),
+                        description=suggestion.get("description", ""),
+                        side_a_object_type_rid=side_a_ot,
+                        side_b_object_type_rid=side_b_ot,
+                        cardinality=suggestion.get("cardinality", "many-to-many"),
                     )
                 )
                 await BlueprintItemStorage.update_created_entity_rid(
