@@ -907,33 +907,46 @@ Agent 与画布通过 SSE 事件流实现实时联动，核心消息流如下：
 ```mermaid
 sequenceDiagram
     participant U as 用户
-    participant Chat as 对话面板
+    participant Guide as 引导组件
     participant Agent as Agent 后端
     participant SSE as SSE 事件流
     participant Canvas as 3D 星空画布
-    participant Side as Sidekick
+    participant Chat as Chat 面板
 
-    U->>Chat: 上传文件 + "开始分析"
-    Chat->>Agent: POST /agent/chat
+    Note over U,Chat: Phase 0 — 全屏引导
+    U->>Guide: 填写领域/目标 + 上传文件
+    U->>Guide: 点击"开始构建"
+    Guide->>Agent: POST /agent/sessions（创建会话）
+    Guide->>Agent: POST /agent/materials/upload（批量上传）
+    Guide->>Agent: POST /agent/chat（初始消息触发构建）
+
+    Note over U,Chat: Phase 1 — Agent 自主构建（全屏画布）
     Agent-->>SSE: plan-step（规划步骤）
-    SSE-->>Side: 展示规划进度树
+    SSE-->>Canvas: 浮动进度条更新
 
     loop 逐文件分析
         Agent-->>SSE: skill-call（解析文件）
         Agent-->>SSE: blueprint-item（识别实体）
-        SSE-->>Canvas: subgraph-update → 结晶新星体
-        SSE-->>Side: 建议卡片
+        SSE-->>Canvas: 结晶新星体（动画）
     end
 
     opt 遇到歧义
         Agent-->>SSE: clarification-req
-        SSE-->>Chat: 展示澄清选择题
-        U->>Chat: 选择选项
-        Chat->>Agent: POST /agent/chat/clarify
+        SSE-->>Canvas: 弹出澄清选择题浮层
+        U->>Canvas: 选择选项
+        Canvas->>Agent: POST /agent/chat（用户回答）
     end
 
-    Agent-->>SSE: done（蓝图完成）
+    Agent-->>SSE: blueprint-complete（蓝图构建完成）
     SSE-->>Canvas: 全部星体就位
+
+    Note over U,Chat: Phase 2 — 蓝图调优（两面板）
+    Canvas-->>Chat: Chat 面板滑入（历史记录 + 对话）
+    U->>Chat: 自然语言指令（调优蓝图）
+    Chat->>Agent: POST /agent/chat
+    Agent-->>SSE: text-delta + suggestion（建议卡片）
+    SSE-->>Chat: 渲染建议卡片（Accept/Edit/Reject）
+    SSE-->>Canvas: 星体实时更新
 ```
 
 #### 实时结晶动画
