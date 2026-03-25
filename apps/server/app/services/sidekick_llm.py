@@ -55,7 +55,7 @@ class SidekickLlmEngine:
         ontology_summary: dict,
     ) -> list[Suggestion]:
         """Generate semantic-level suggestions via LLM."""
-        if not self._is_available():
+        if not self.is_available():
             return []
 
         try:
@@ -71,7 +71,7 @@ class SidekickLlmEngine:
 
     async def generate_content(self, request: GenerateContentRequest) -> str:
         """Generate content (e.g., description) via LLM."""
-        if not self._is_available():
+        if not self.is_available():
             raise AppError(
                 code="SIDEKICK_LLM_UNAVAILABLE",
                 message="LLM service is not configured. Set ANTHROPIC_API_KEY to enable AI suggestions.",
