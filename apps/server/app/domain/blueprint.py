@@ -136,3 +136,47 @@ class BlueprintApplyResult(DomainModel):
     failed: int
     skipped: int
     results: list[ApplyItemResult]
+
+
+# --- F017: HITL Review & Apply models ---
+
+
+class BlueprintItemBatchUpdate(DomainModel):
+    """Batch decision update request."""
+
+    item_rids: list[str]
+    user_decision: UserDecision
+    rejection_reason: str | None = None
+
+
+class ConflictCheckResult(DomainModel):
+    """Single conflict check result."""
+
+    item_rid: str
+    conflict_type: str  # "api_name_collision" | "dependency_missing"
+    message: str
+    conflicting_entity_rid: str | None = None
+
+
+class BlueprintPreApplyCheck(DomainModel):
+    """Pre-apply check response."""
+
+    can_apply: bool
+    conflicts: list[ConflictCheckResult]
+    actionable_count: int
+    undecided_count: int
+
+
+class BlueprintItemRetryRequest(DomainModel):
+    """Single item retry request."""
+
+    user_edits: dict | None = None
+
+
+class BlueprintItemRetryResult(DomainModel):
+    """Single item retry result."""
+
+    item_rid: str
+    status: str  # "success" | "failed"
+    created_entity_rid: str | None = None
+    error: str | None = None
