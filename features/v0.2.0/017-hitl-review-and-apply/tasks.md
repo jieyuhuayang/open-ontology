@@ -107,7 +107,7 @@
   **覆盖 AC**: AC-19
   **依赖**: T001, T002
 
-- [x] **T00- [ ] **T008**: `retry_item` 实现
+- [x] **T008**: `retry_item` 实现
   **文件**: `apps/server/app/services/blueprint_service.py`
   **逻辑**: 新增方法 `async def retry_item(self, blueprint_rid: str, item_rid: str, user_edits: dict | None = None) -> BlueprintItemRetryResult`：
   1. 验证蓝图存在且状态为 `applied`
