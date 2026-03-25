@@ -1,8 +1,65 @@
-import { useRef, useCallback } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useRef, useCallback, useMemo } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import type { WorkshopNode } from '../types';
+
+// Fresnel + vertex noise shader
+const fresnelVertexShader = /* glsl */ `
+  uniform float time;
+  varying vec3 vNormal;
+  varying vec3 vViewDir;
+  varying vec2 vUv;
+
+  // Simplex-like hash noise
+  vec3 hash3(vec3 p) {
+    p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
+             dot(p, vec3(269.5, 183.3, 246.1)),
+             dot(p, vec3(113.5, 271.9, 124.6)));
+    return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+  }
+  float noise3D(vec3 p) {
+    vec3 i = floor(p);
+    vec3 f = fract(p);
+    vec3 u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(mix(dot(hash3(i), f),
+                       dot(hash3(i + vec3(1,0,0)), f - vec3(1,0,0)), u.x),
+                   mix(dot(hash3(i + vec3(0,1,0)), f - vec3(0,1,0)),
+                       dot(hash3(i + vec3(1,1,0)), f - vec3(1,1,0)), u.x), u.y),
+               mix(mix(dot(hash3(i + vec3(0,0,1)), f - vec3(0,0,1)),
+                       dot(hash3(i + vec3(1,0,1)), f - vec3(1,0,1)), u.x),
+                   mix(dot(hash3(i + vec3(0,1,1)), f - vec3(0,1,1)),
+                       dot(hash3(i + vec3(1,1,1)), f - vec3(1,1,1)), u.x), u.y), u.z);
+  }
+
+  void main() {
+    vUv = uv;
+    // Vertex noise displacement
+    vec3 displaced = position + normal * noise3D(position * 2.0 + time * 0.3) * 0.05;
+    vec4 worldPos = modelMatrix * vec4(displaced, 1.0);
+    vNormal = normalize(normalMatrix * normal);
+    vViewDir = normalize(cameraPosition - worldPos.xyz);
+    gl_Position = projectionMatrix * viewMatrix * worldPos;
+  }
+`;
+
+const fresnelFragmentShader = /* glsl */ `
+  uniform vec3 color;
+  uniform float opacity;
+  uniform vec3 emissiveColor;
+  uniform float emissiveIntensity;
+  uniform float fresnelPower;
+  uniform float fresnelIntensity;
+  varying vec3 vNormal;
+  varying vec3 vViewDir;
+
+  void main() {
+    float fresnel = pow(1.0 - max(dot(vViewDir, vNormal), 0.0), fresnelPower);
+    vec3 base = color * 0.6 + emissiveColor * emissiveIntensity;
+    vec3 fresnelContrib = vec3(1.0) * fresnel * fresnelIntensity;
+    gl_FragColor = vec4(base + fresnelContrib, opacity);
+  }
+`;
 
 interface WorkshopStarNodeProps {
   node: WorkshopNode;
