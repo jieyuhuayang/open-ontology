@@ -1595,33 +1595,31 @@ apps/server/
 
 ### 新增前端代码结构
 
+> **v0.2.1 改进**：去掉 Sidekick 面板和独立审查栏组件，建议交互整合到 Chat 面板。
+
 ```
 apps/web/src/
 ├── pages/
 │   └── workshop/                       # 本体工坊页面（v0.2.0 新增）
-│       ├── WorkshopPage.tsx            # 主页面（全屏三面板布局）
+│       ├── WorkshopPage.tsx            # 主页面（Phase 状态机控制三阶段渲染）
 │       ├── components/
-│       │   ├── ChatPanel.tsx           # 左侧对话面板
+│       │   ├── GuidanceCard.tsx        # Phase 0 全屏引导组件（含文件上传区）
+│       │   ├── ChatPanel.tsx           # Phase 2 左侧对话面板（历史+建议卡片）
 │       │   ├── StarfieldWorkbench.tsx  # 中央 3D 星空工作台（复用升级 Demo）
-│       │   ├── AgentSidekick.tsx       # 右侧建议面板（升级 Demo 版本）
-│       │   ├── BlueprintReviewBar.tsx  # 底部蓝图审查栏
-│       │   ├── BlueprintItemRow.tsx    # 蓝图项行组件
-│       │   ├── InlineEditor.tsx        # 蓝图项内联编辑器
+│       │   ├── BuildProgressBar.tsx    # Phase 1 浮动进度条
+│       │   ├── ClarificationOverlay.tsx# Phase 1 澄清选择题浮层
+│       │   ├── SuggestionCard.tsx      # Chat 中的建议卡片（Accept/Edit/Reject）
+│       │   ├── InlineEditForm.tsx      # 建议卡片内联编辑器
 │       │   ├── ConfidenceIndicator.tsx # 置信度指示器
-│       │   ├── ReasoningPanel.tsx      # 推理来源展开面板
 │       │   ├── FileUploadArea.tsx      # 文件上传区域
-│       │   └── EntityAnchor.tsx        # 对话中的实体锚点
+│       │   ├── EntityAnchor.tsx        # 对话中的实体锚点
+│       │   └── ApplyProgressModal.tsx  # 应用到本体进度弹窗
 │       ├── hooks/
 │       │   ├── use-agent-chat.ts       # SSE 流式对话 hook
-│       │   ├── use-blueprint.ts        # 蓝图状态管理
-│       │   └── use-starfield-sync.ts   # 3D 星空与 Agent 联动
+│       │   ├── use-workshop-graph.ts   # 图模型合并
+│       │   └── use-sse-parser.ts       # SSE 事件解析
 │       └── stores/
-│           ├── workshop-store.ts       # 工坊 UI 状态
-│           └── blueprint-store.ts      # 蓝图审查状态
-├── components/
-│   └── sidekick/                       # Sidekick 组件（P1，可复用）
-│       ├── SidekickPanel.tsx
-│       └── SuggestionCard.tsx
+│           └── workshop-store.ts       # 工坊 UI 状态（Phase 状态机）
 ```
 
 ## 6.2 新增 API 端点
