@@ -88,6 +88,12 @@ const initialState = {
   isSidekickOpen: true,
   planSteps: [] as PlanStep[],
   pendingCrystallizations: [] as SSEBlueprintItemData[],
+  viewMode: '3d' as ViewMode,
+  focusedEntityRid: null as string | null,
+  highlightedEntityRids: [] as string[],
+  dragLinkState: null as DragLinkState | null,
+  activeShockwaves: [] as ShockwaveInstance[],
+  activeCollapses: [] as CollapseInstance[],
 };
 
 export const useWorkshopStore = create<WorkshopStore>((set) => ({
