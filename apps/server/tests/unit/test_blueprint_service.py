@@ -1563,7 +1563,10 @@ class TestRetryItem:
             patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
         ):
             mock_bp_storage.get = AsyncMock(return_value=bp_orm)
-            mock_item_storage.get = AsyncMock(return_value=item_orm)
+            # retry_item uses session.execute() with FOR UPDATE instead of ItemStorage.get
+            mock_result = MagicMock()
+            mock_result.scalar_one_or_none.return_value = item_orm
+            db_session_mock.execute = AsyncMock(return_value=mock_result)
             mock_item_storage.get_succeeded_items = AsyncMock(return_value=[])
             mock_item_storage.update_created_entity_rid = AsyncMock()
             mock_item_storage.update_decision = AsyncMock()
@@ -1599,7 +1602,10 @@ class TestRetryItem:
             patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
         ):
             mock_bp_storage.get = AsyncMock(return_value=bp_orm)
-            mock_item_storage.get = AsyncMock(return_value=item_orm)
+            # retry_item uses session.execute() with FOR UPDATE instead of ItemStorage.get
+            mock_result = MagicMock()
+            mock_result.scalar_one_or_none.return_value = item_orm
+            db_session_mock.execute = AsyncMock(return_value=mock_result)
             mock_item_storage.get_succeeded_items = AsyncMock(return_value=[])
             mock_item_storage.update_created_entity_rid = AsyncMock()
             mock_item_storage.update_decision = AsyncMock()
