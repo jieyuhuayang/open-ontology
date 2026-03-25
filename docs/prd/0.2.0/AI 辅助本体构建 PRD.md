@@ -171,7 +171,7 @@ v0.2.0 标志着本体管理系统从"底层数据治理工具"跃升为"企业�
 <td>P1</td>
 <td>
 <ol>
-<li><b>Agent Sidekick 面板</b> — Ontology Manager 各页面的常驻 AI 助手侧栏</li>
+<li><s>Agent Sidekick 面板</s> — <b>已取消</b>（v0.2.1 决策：能力合并到 Workshop Chat 面板，详见 <code>docs/prd/0.2.1/</code>）</li>
 <li><b>本体导入导出（JSON）</b>（v0.1.0 延后）</li>
 <li><b>Agent 反馈学习</b> — 记录用户对建议的接受/拒绝行为，用于优化后续推荐</li>
 </ol>
