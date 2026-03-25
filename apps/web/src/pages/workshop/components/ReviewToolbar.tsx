@@ -6,6 +6,7 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import apiClient from '@/api/client';
 import { useBatchUpdateDecisions } from '@/api/blueprints';
 import type { BlueprintItem } from '@/api/types';
 import { useWorkshopStore } from '../stores/workshop-store';
