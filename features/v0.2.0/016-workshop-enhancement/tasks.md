@@ -402,7 +402,7 @@
 
 ### Phase 7: 集成与测试
 
-- [ ] **T025**: WorkshopPage 全局集成
+- [x] **T025**: WorkshopPage 全局集成
   **文件**: `apps/web/src/pages/workshop/WorkshopPage.tsx`（修改）
   **逻辑**:
   - 传递 `nodes` 给 `ChatPanel`（用于 focus lock displayName 查找和 entity anchors）
