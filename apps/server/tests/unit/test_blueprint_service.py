@@ -7,6 +7,7 @@ import pytest
 
 from app.domain.blueprint import (
     BlueprintCreate,
+    BlueprintItemBatchUpdate,
     BlueprintItemCreate,
     BlueprintItemType,
     BlueprintItemUpdate,
