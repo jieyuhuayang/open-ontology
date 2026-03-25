@@ -154,11 +154,11 @@ test.describe.serial('Workshop Enhancement — E2E', () => {
       page.locator('[data-testid="workshop-toolbar"]'),
     ).toBeVisible({ timeout: 10000 });
 
-    // Zoom buttons
-    await expect(page.locator('[aria-label="zoom-in"]')).toBeVisible();
-    await expect(page.locator('[aria-label="zoom-out"]')).toBeVisible();
-    await expect(page.locator('[aria-label="fit-view"]')).toBeVisible();
-    await expect(page.locator('[aria-label="reset-camera"]')).toBeVisible();
+    // Zoom buttons (use button element to avoid strict mode with nested icon)
+    await expect(page.locator('button[aria-label="zoom-in"]')).toBeVisible();
+    await expect(page.locator('button[aria-label="zoom-out"]')).toBeVisible();
+    await expect(page.locator('button[aria-label="fit-view"]')).toBeVisible();
+    await expect(page.locator('button[aria-label="reset-camera"]')).toBeVisible();
 
     // View toggle buttons (F016)
     await expect(page.locator('[data-testid="view-3d-btn"]')).toBeVisible();
