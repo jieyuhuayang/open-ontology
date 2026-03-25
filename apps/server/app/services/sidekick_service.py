@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,12 +11,12 @@ from app.domain.sidekick import (
     GenerateContentRequest,
     GenerateContentResponse,
     SidekickContext,
-    Suggestion,
     SuggestionApplyRequest,
     SuggestionApplyResponse,
     SuggestionsResponse,
     SuggestionType,
 )
+from app.domain.property import PropertyUpdateRequest
 from app.exceptions import AppError
 from app.services.object_type_service import ObjectTypeService
 from app.services.property_service import PropertyService
@@ -24,7 +25,6 @@ from app.services.sidekick_rules import SidekickRulesEngine
 
 logger = logging.getLogger(__name__)
 
-# Property names that are good candidates for title key
 _TITLE_KEY_CANDIDATES = {"name", "title", "displayName", "display_name", "label", "email"}
 _PRIMARY_KEY_CANDIDATES = {"id", "uid", "uuid", "key", "code"}
 
