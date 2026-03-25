@@ -71,7 +71,7 @@
   **覆盖 AC**: AC-11, AC-22
   **依赖**: T003
 
-- [x] **T00- [ ] **T005**: `pre_apply_check` 单元测试
+- [x] **T005**: `pre_apply_check` 单元测试
   **文件**: `apps/server/tests/unit/test_blueprint_service.py`
   **逻辑**: 测试 `BlueprintService.pre_apply_check()`：
   - `test_precheck_no_conflicts`: 3 个 accepted OT 项 + 1 个 LT 项（依赖 OT 均 accepted）→ `canApply=true, conflicts=[]`
