@@ -4,7 +4,6 @@ import { useAgentSessions } from '@/api/agent';
 import { useMaterials } from '@/api/materials';
 import { useWorkshopStore } from '../stores/workshop-store';
 import { useFocusLock } from '../hooks/use-focus-lock';
-import GuidanceCard from './GuidanceCard';
 import FileUploadArea from './FileUploadArea';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
