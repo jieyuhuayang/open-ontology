@@ -59,7 +59,7 @@
   **覆盖 AC**: AC-01, AC-06, AC-09, AC-23, AC-25
   **依赖**: T001
 
-- [ ] **T003**: i18n 键值扩展
+- [x] **T003**: i18n 键值扩展
   **文件**: `apps/web/src/locales/en-US/common.json`, `apps/web/src/locales/zh-CN/common.json`
   **逻辑**: 在 `workshop` 命名空间下新增：
   - `workshop.toolbar.view3D` / `workshop.toolbar.view2D`
