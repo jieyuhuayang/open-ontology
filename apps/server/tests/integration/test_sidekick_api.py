@@ -14,11 +14,6 @@ class TestSuggestionsEndpoint:
     @pytest.mark.asyncio
     async def test_suggestions_success(self, seeded_client: AsyncClient):
         """AC-18: Valid context returns 200 with suggestions list."""
-        # First create an OT to have a valid entity
-        from app.domain.object_type import ObjectTypeCreateRequest
-        from app.services.object_type_service import ObjectTypeService
-        from tests.conftest import _override_session
-
         resp = await seeded_client.post(
             "/api/v1/sidekick/suggestions",
             json={
