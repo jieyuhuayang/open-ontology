@@ -28,7 +28,9 @@ class AgentEngine:
         Returns:
             A compiled LangGraph StateGraph ready for astream().
         """
-        if not self._settings.ANTHROPIC_API_KEY.get_secret_value():
+        has_anthropic = self._settings.ANTHROPIC_API_KEY.get_secret_value()
+        has_openai = self._settings.OPENAI_API_KEY.get_secret_value()
+        if not has_anthropic and not has_openai:
             raise AppError(
                 code="LLM_NOT_CONFIGURED",
                 message="LLM API key not configured",
@@ -38,8 +40,16 @@ class AgentEngine:
         base_prompt = (_PROMPTS_DIR / "ontology_builder.md").read_text()
         full_prompt = f"{system_prompt}\n\n{base_prompt}" if system_prompt else base_prompt
 
+        model_spec = self._settings.LLM_MODEL
+        # For OpenAI-compatible providers (e.g. OneRouter), disable Responses API
+        # as most proxies only support /v1/chat/completions.
+        if model_spec.startswith("openai:"):
+            model = init_chat_model(model_spec, use_responses_api=False)
+        else:
+            model = model_spec
+
         agent = create_deep_agent(
-            model=self._settings.LLM_MODEL,
+            model=model,
             system_prompt=full_prompt,
             skills=[_SKILLS_DIR],
             checkpointer=self._get_checkpointer(),
