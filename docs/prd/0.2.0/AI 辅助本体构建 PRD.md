@@ -621,7 +621,7 @@ deepagents 的 Skill 系统采用**两层加载**机制：
 - "把 Shipping 对象类型的名称改成 Delivery"
 - "这个蓝图里缺少了退货相关的对象类型，请补充"
 
-Agent 的回复以 **SSE 流式** 方式逐步输出，同时通过事件触发 3D 星空和 Sidekick 面板的联动更新。
+Agent 的回复以 **SSE 流式** 方式逐步输出，同时通过事件触发 3D 星空画布的联动更新。在 Phase 2 中，建议事件同步渲染为 Chat 面板中的可交互卡片。
 
 #### A4a. 主动澄清机制（Proactive Clarification）
 
