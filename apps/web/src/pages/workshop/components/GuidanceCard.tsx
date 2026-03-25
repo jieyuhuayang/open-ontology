@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tag, Input, Button, Space, message } from 'antd';
+import { Input, Button, message } from 'antd';
+import { motion } from 'framer-motion';
 import { useCreateAgentSession } from '@/api/agent';
 import { useWorkshopStore } from '../stores/workshop-store';
+import styles from '../styles/workshop.module.css';
 
 const { TextArea } = Input;
-const { CheckableTag } = Tag;
 
 const DOMAINS = [
   'ecommerce',
@@ -16,6 +17,15 @@ const DOMAINS = [
   'hr',
 ] as const;
 
+const DOMAIN_ICONS: Record<string, string> = {
+  ecommerce: '🛒',
+  finance: '🏦',
+  supplyChain: '📦',
+  healthcare: '🏥',
+  manufacturing: '🏭',
+  hr: '👥',
+};
+
 const GOALS = [
   'dataIntegration',
   'analytics',
@@ -24,17 +34,23 @@ const GOALS = [
   'dataGovernance',
 ] as const;
 
+const GOAL_ICONS: Record<string, string> = {
+  dataIntegration: '🔗',
+  analytics: '📊',
+  knowledgeGraph: '🧠',
+  aiFoundation: '⚡',
+  dataGovernance: '🛡️',
+};
+
 interface GuidanceCardProps {
   ontologyRid: string;
 }
 
-const cardStyle: React.CSSProperties = {
-  margin: '24px 16px',
-  padding: 24,
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.1)',
-  borderRadius: 12,
-};
+const stagger = (i: number) => ({
+  initial: { opacity: 0, y: 18 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.45, delay: 0.1 + i * 0.08, ease: [0.16, 1, 0.3, 1] },
+});
 
 export default function GuidanceCard({ ontologyRid }: GuidanceCardProps) {
   const { t } = useTranslation();
@@ -77,112 +93,121 @@ export default function GuidanceCard({ ontologyRid }: GuidanceCardProps) {
     }
   };
 
+  const toggleDomain = (d: string) =>
+    setSelectedDomain((prev) => (prev === d ? null : d));
+
+  const toggleGoal = (g: string) =>
+    setSelectedGoal((prev) => (prev === g ? null : g));
+
   return (
-    <div style={cardStyle} data-testid="guidance-card">
-      <h3 style={{ color: 'rgba(255,255,255,0.9)', marginBottom: 20 }}>
-        {t('workshop.guidance.title')}
-      </h3>
+    <motion.div
+      className={styles.guidanceOverlay}
+      data-testid="guidance-card"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.35 }}
+    >
+      <motion.div
+        className={styles.guidanceGlass}
+        initial={{ opacity: 0, y: 28, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {/* Title */}
+        <motion.h1 className={styles.guidanceTitle} {...stagger(0)}>
+          {t('workshop.guidance.title')}
+        </motion.h1>
+        <motion.p className={styles.guidanceSubtitle} {...stagger(1)}>
+          {t('workshop.guidance.subtitle')}
+        </motion.p>
 
-      {/* Domain */}
-      <div style={{ marginBottom: 16 }}>
-        <div
-          style={{
-            color: 'rgba(255,255,255,0.6)',
-            fontSize: 13,
-            marginBottom: 8,
-          }}
-        >
-          {t('workshop.guidance.domain')}
-        </div>
-        <Space size={[8, 8]} wrap>
-          {DOMAINS.map((d) => (
-            <CheckableTag
-              key={d}
-              checked={selectedDomain === d}
-              onChange={(checked) => setSelectedDomain(checked ? d : null)}
+        {/* Domain */}
+        <motion.div {...stagger(2)}>
+          <div className={styles.guidanceSectionLabel}>
+            {t('workshop.guidance.domain')}
+          </div>
+          <div className={styles.guidancePillGrid}>
+            {DOMAINS.map((d) => (
+              <div
+                key={d}
+                className={`${styles.guidancePill} ${selectedDomain === d ? styles.guidancePillSelected : ''}`}
+                onClick={() => toggleDomain(d)}
+              >
+                <span>{DOMAIN_ICONS[d]}</span>
+                <span>{t(`workshop.domains.${d}`)}</span>
+              </div>
+            ))}
+            <div
+              className={`${styles.guidancePill} ${selectedDomain === 'custom' ? styles.guidancePillSelected : ''}`}
+              onClick={() => toggleDomain('custom')}
             >
-              {t(`workshop.domains.${d}`)}
-            </CheckableTag>
-          ))}
-          <CheckableTag
-            checked={selectedDomain === 'custom'}
-            onChange={(checked) => setSelectedDomain(checked ? 'custom' : null)}
-          >
-            {t('common.other', 'Other')}
-          </CheckableTag>
-        </Space>
-        {selectedDomain === 'custom' && (
-          <Input
-            size="small"
-            style={{ marginTop: 8, maxWidth: 200 }}
-            value={customDomain}
-            onChange={(e) => setCustomDomain(e.target.value)}
+              <span>✦</span>
+              <span>{t('common.other', 'Other')}</span>
+            </div>
+          </div>
+          {selectedDomain === 'custom' && (
+            <div className={styles.guidanceCustomInput} style={{ marginTop: -16, marginBottom: 28 }}>
+              <Input
+                size="small"
+                style={{ maxWidth: 220 }}
+                value={customDomain}
+                onChange={(e) => setCustomDomain(e.target.value)}
+              />
+            </div>
+          )}
+        </motion.div>
+
+        {/* Goal */}
+        <motion.div {...stagger(3)}>
+          <div className={styles.guidanceSectionLabel}>
+            {t('workshop.guidance.goal')}
+          </div>
+          <div className={styles.guidancePillGrid}>
+            {GOALS.map((g) => (
+              <div
+                key={g}
+                className={`${styles.guidancePill} ${selectedGoal === g ? styles.guidancePillSelected : ''}`}
+                onClick={() => toggleGoal(g)}
+              >
+                <span>{GOAL_ICONS[g]}</span>
+                <span>{t(`workshop.goals.${g}`)}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Scope */}
+        <motion.div className={styles.guidanceScopeWrapper} {...stagger(4)}>
+          <div className={styles.guidanceSectionLabel}>
+            {t('workshop.guidance.scope')}
+          </div>
+          <TextArea
+            rows={3}
+            value={scopeHint}
+            onChange={(e) => setScopeHint(e.target.value)}
+            placeholder={t('workshop.guidance.scopePlaceholder')}
           />
-        )}
-      </div>
+        </motion.div>
 
-      {/* Goal */}
-      <div style={{ marginBottom: 16 }}>
-        <div
-          style={{
-            color: 'rgba(255,255,255,0.6)',
-            fontSize: 13,
-            marginBottom: 8,
-          }}
-        >
-          {t('workshop.guidance.goal')}
-        </div>
-        <Space size={[8, 8]} wrap>
-          {GOALS.map((g) => (
-            <CheckableTag
-              key={g}
-              checked={selectedGoal === g}
-              onChange={(checked) => setSelectedGoal(checked ? g : null)}
-            >
-              {t(`workshop.goals.${g}`)}
-            </CheckableTag>
-          ))}
-        </Space>
-      </div>
-
-      {/* Scope */}
-      <div style={{ marginBottom: 20 }}>
-        <div
-          style={{
-            color: 'rgba(255,255,255,0.6)',
-            fontSize: 13,
-            marginBottom: 8,
-          }}
-        >
-          {t('workshop.guidance.scope')}
-        </div>
-        <TextArea
-          rows={2}
-          value={scopeHint}
-          onChange={(e) => setScopeHint(e.target.value)}
-          placeholder={t('workshop.guidance.scopePlaceholder')}
-          style={{ background: 'rgba(255,255,255,0.06)', color: '#fff' }}
-        />
-      </div>
-
-      {/* Actions */}
-      <Space>
-        <Button
-          type="primary"
-          onClick={() => handleSubmit(false)}
-          loading={createSession.isPending}
-          data-testid="guidance-confirm"
-        >
-          {t('workshop.guidance.confirm')}
-        </Button>
-        <Button
-          onClick={() => handleSubmit(true)}
-          loading={createSession.isPending}
-          data-testid="guidance-skip"
-        >
-          {t('workshop.guidance.skip')}
-        </Button>
-      </Space>
-    </div>
+        {/* Actions */}
+        <motion.div className={styles.guidanceActions} {...stagger(5)}>
+          <Button
+            type="primary"
+            onClick={() => handleSubmit(false)}
+            loading={createSession.isPending}
+            data-testid="guidance-confirm"
+          >
+            {t('workshop.guidance.confirm')}
+          </Button>
+          <Button
+            onClick={() => handleSubmit(true)}
+            loading={createSession.isPending}
+            data-testid="guidance-skip"
+          >
+            {t('workshop.guidance.skip')}
+          </Button>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 }
