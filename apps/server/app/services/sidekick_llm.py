@@ -90,12 +90,14 @@ class SidekickLlmEngine:
         if not hasattr(self, "_client"):
             import anthropic
 
-            self._client = anthropic.AsyncAnthropic()
-        model = os.environ.get("LLM_MODEL", "claude-sonnet-4-20250514")
+            self._client = anthropic.AsyncAnthropic(
+                api_key=settings.ANTHROPIC_API_KEY.get_secret_value(),
+            )
+        model = settings.SIDEKICK_MODEL or settings.LLM_MODEL
         return await self._client.messages.create(
             model=model,
             max_tokens=1024,
-            temperature=0.3,
+            temperature=settings.LLM_TEMPERATURE,
             system=system,
             messages=[{"role": "user", "content": user_message}],
         )
