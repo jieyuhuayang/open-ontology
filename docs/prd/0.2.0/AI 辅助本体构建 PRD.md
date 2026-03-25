@@ -1842,7 +1842,7 @@ class Settings(BaseSettings):
 | 本体工坊 | Ontology Workshop | ✅ | 3D 星空升级后的正式产品名称 |
 | 本体构建 Agent | Ontology Builder Agent | ✅ | deepagents 驱动的通用 Agent |
 | 本体蓝图 | Ontology Blueprint | ✅ | Agent 生成的本体初稿 |
-| 蓝图项 | Blueprint Item | ✅ | 蓝图中的单个建议（对象类型/属性/链接） |
+| 蓝图项 | Blueprint Item | ✅ | 蓝图初稿中的单个实体/属性/链接定义 |
 | 置信度 | Confidence | ✅ | Agent 对建议准确性的评估 |
 | 推理来源 | Reasoning Source | ✅ | 建议的依据（字段分析/模式匹配/语义推断/最佳实践） |
 | 资料 | Material | ✅ | 用户上传的分析素材（文件/文本） |
