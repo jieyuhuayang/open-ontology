@@ -7,6 +7,7 @@ import pytest
 
 from app.domain.blueprint import (
     BlueprintCreate,
+    BlueprintItemBatchUpdate,
     BlueprintItemCreate,
     BlueprintItemType,
     BlueprintItemUpdate,
@@ -1230,3 +1231,486 @@ class TestComputeConfidenceLevel:
         assert _compute_confidence_level(0.0) == ConfidenceLevel.LOW
         assert _compute_confidence_level(0.3) == ConfidenceLevel.LOW
         assert _compute_confidence_level(0.49) == ConfidenceLevel.LOW
+
+
+# ---------------------------------------------------------------------------
+# F017: Batch Update Decisions
+# ---------------------------------------------------------------------------
+
+
+class TestBatchUpdateDecisions:
+    """Tests for BlueprintService.batch_update_decisions()."""
+
+    @pytest.mark.asyncio
+    async def test_batch_accept_all_undecided(self, service, db_session_mock):
+        """3 undecided items → all accepted, returns 3."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
+        items = [
+            _make_item_orm(rid=f"ri.ontology.blueprint-item.item{i}", user_decision=None)
+            for i in range(3)
+        ]
+        # After update_decision, items get the new decision
+        updated_items = [
+            _make_item_orm(
+                rid=f"ri.ontology.blueprint-item.item{i}", user_decision=UserDecision.ACCEPTED.value
+            )
+            for i in range(3)
+        ]
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.batch_get = AsyncMock(return_value=items)
+            mock_item_storage.update_decision = AsyncMock(side_effect=updated_items)
+
+            req = BlueprintItemBatchUpdate(
+                item_rids=[f"ri.ontology.blueprint-item.item{i}" for i in range(3)],
+                user_decision=UserDecision.ACCEPTED,
+            )
+            result = await service.batch_update_decisions(bp_orm.rid, req)
+
+        assert len(result) == 3
+        assert all(item.user_decision == UserDecision.ACCEPTED for item in result)
+
+    @pytest.mark.asyncio
+    async def test_batch_skips_already_decided(self, service, db_session_mock):
+        """2 already decided + 1 undecided → returns only 1 updated."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
+        items = [
+            _make_item_orm(
+                rid="ri.ontology.blueprint-item.d1", user_decision=UserDecision.ACCEPTED.value
+            ),
+            _make_item_orm(
+                rid="ri.ontology.blueprint-item.d2", user_decision=UserDecision.REJECTED.value
+            ),
+            _make_item_orm(rid="ri.ontology.blueprint-item.u1", user_decision=None),
+        ]
+        updated = _make_item_orm(
+            rid="ri.ontology.blueprint-item.u1",
+            user_decision=UserDecision.ACCEPTED.value,
+        )
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.batch_get = AsyncMock(return_value=items)
+            mock_item_storage.update_decision = AsyncMock(return_value=updated)
+
+            req = BlueprintItemBatchUpdate(
+                item_rids=[i.rid for i in items],
+                user_decision=UserDecision.ACCEPTED,
+            )
+            result = await service.batch_update_decisions(bp_orm.rid, req)
+
+        assert len(result) == 1
+        assert result[0].rid == "ri.ontology.blueprint-item.u1"
+
+    @pytest.mark.asyncio
+    async def test_batch_reject_with_reason(self, service, db_session_mock):
+        """Batch reject with rejection reason → each item has the reason."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
+        items = [
+            _make_item_orm(rid="ri.ontology.blueprint-item.r1", user_decision=None),
+        ]
+        updated = _make_item_orm(
+            rid="ri.ontology.blueprint-item.r1",
+            user_decision=UserDecision.REJECTED.value,
+            rejection_reason="与业务不相关",
+        )
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.batch_get = AsyncMock(return_value=items)
+            mock_item_storage.update_decision = AsyncMock(return_value=updated)
+
+            req = BlueprintItemBatchUpdate(
+                item_rids=["ri.ontology.blueprint-item.r1"],
+                user_decision=UserDecision.REJECTED,
+                rejection_reason="与业务不相关",
+            )
+            result = await service.batch_update_decisions(bp_orm.rid, req)
+
+        assert len(result) == 1
+        assert result[0].rejection_reason == "与业务不相关"
+
+    @pytest.mark.asyncio
+    async def test_batch_requires_pending_review(self, service, db_session_mock):
+        """Blueprint in draft → raises BLUEPRINT_INVALID_STATUS_TRANSITION."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.DRAFT.value)
+
+        with patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage:
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+
+            req = BlueprintItemBatchUpdate(
+                item_rids=["ri.ontology.blueprint-item.x"],
+                user_decision=UserDecision.ACCEPTED,
+            )
+            with pytest.raises(AppError, match="pending_review"):
+                await service.batch_update_decisions(bp_orm.rid, req)
+
+    @pytest.mark.asyncio
+    async def test_batch_empty_rids(self, service, db_session_mock):
+        """Empty item_rids → returns empty list."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.batch_get = AsyncMock(return_value=[])
+
+            req = BlueprintItemBatchUpdate(
+                item_rids=[],
+                user_decision=UserDecision.ACCEPTED,
+            )
+            result = await service.batch_update_decisions(bp_orm.rid, req)
+
+        assert result == []
+
+
+# ---------------------------------------------------------------------------
+# F017: Pre-Apply Check
+# ---------------------------------------------------------------------------
+
+
+class TestPreApplyCheck:
+    """Tests for BlueprintService.pre_apply_check()."""
+
+    @pytest.mark.asyncio
+    async def test_precheck_no_conflicts(self, service, db_session_mock):
+        """Accepted OTs + LT with valid deps → canApply=true, no conflicts."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
+        ot_item = _make_item_orm(
+            rid="ri.ontology.blueprint-item.ot1",
+            item_type=BlueprintItemType.OBJECT_TYPE.value,
+            suggestion={"displayName": "Order", "apiName": "Order", "placeholderRid": "ph-ot1"},
+            user_decision=UserDecision.ACCEPTED.value,
+        )
+        lt_item = _make_item_orm(
+            rid="ri.ontology.blueprint-item.lt1",
+            item_type=BlueprintItemType.LINK_TYPE.value,
+            suggestion={
+                "displayName": "Contains",
+                "sideA": {"objectTypeRid": "ph-ot1"},
+                "sideB": {"objectTypeRid": "ph-ot1"},
+            },
+            user_decision=UserDecision.ACCEPTED.value,
+        )
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.list_by_blueprint = AsyncMock(return_value=[ot_item, lt_item])
+
+            # Mock ObjectTypeStorage to return no existing OT with same apiName
+            with patch("app.storage.object_type_storage.ObjectTypeStorage") as mock_ot_storage:
+                mock_ot_storage.get_by_api_name = AsyncMock(return_value=None)
+                result = await service.pre_apply_check(bp_orm.rid)
+
+        assert result.can_apply is True
+        assert result.conflicts == []
+        assert result.actionable_count == 2
+        assert result.undecided_count == 0
+
+    @pytest.mark.asyncio
+    async def test_precheck_apiname_collision(self, service, db_session_mock):
+        """OT apiName conflicts with existing → conflict reported."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
+        ot_item = _make_item_orm(
+            rid="ri.ontology.blueprint-item.ot1",
+            item_type=BlueprintItemType.OBJECT_TYPE.value,
+            suggestion={"displayName": "Order", "apiName": "Order", "placeholderRid": "ph-ot1"},
+            user_decision=UserDecision.ACCEPTED.value,
+        )
+        existing_ot = MagicMock()
+        existing_ot.rid = "ri.ontology.object-type.existing"
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.list_by_blueprint = AsyncMock(return_value=[ot_item])
+
+            with patch("app.storage.object_type_storage.ObjectTypeStorage") as mock_ot_storage:
+                mock_ot_storage.get_by_api_name = AsyncMock(return_value=existing_ot)
+                result = await service.pre_apply_check(bp_orm.rid)
+
+        assert len(result.conflicts) == 1
+        assert result.conflicts[0].conflict_type == "api_name_collision"
+        assert result.conflicts[0].conflicting_entity_rid == "ri.ontology.object-type.existing"
+
+    @pytest.mark.asyncio
+    async def test_precheck_dependency_missing(self, service, db_session_mock):
+        """LT references rejected OT placeholder → dependency_missing conflict."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
+        ot_item = _make_item_orm(
+            rid="ri.ontology.blueprint-item.ot1",
+            item_type=BlueprintItemType.OBJECT_TYPE.value,
+            suggestion={"displayName": "Order", "apiName": "Order", "placeholderRid": "ph-ot1"},
+            user_decision=UserDecision.REJECTED.value,
+        )
+        lt_item = _make_item_orm(
+            rid="ri.ontology.blueprint-item.lt1",
+            item_type=BlueprintItemType.LINK_TYPE.value,
+            suggestion={
+                "displayName": "HasOrder",
+                "sideA": {"objectTypeRid": "ph-ot1"},
+                "sideB": {"objectTypeRid": "ph-ot1"},
+            },
+            user_decision=UserDecision.ACCEPTED.value,
+        )
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.list_by_blueprint = AsyncMock(return_value=[ot_item, lt_item])
+
+            result = await service.pre_apply_check(bp_orm.rid)
+
+        assert result.can_apply is False
+        dep_conflicts = [c for c in result.conflicts if c.conflict_type == "dependency_missing"]
+        assert len(dep_conflicts) >= 1
+
+    @pytest.mark.asyncio
+    async def test_precheck_counts_undecided(self, service, db_session_mock):
+        """2 accepted + 1 undecided → correct counts."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
+        items = [
+            _make_item_orm(
+                rid="ri.ontology.blueprint-item.a1",
+                user_decision=UserDecision.ACCEPTED.value,
+                item_type=BlueprintItemType.OBJECT_TYPE.value,
+                suggestion={"displayName": "A", "apiName": "A", "placeholderRid": "ph-a1"},
+            ),
+            _make_item_orm(
+                rid="ri.ontology.blueprint-item.a2",
+                user_decision=UserDecision.ACCEPTED.value,
+                item_type=BlueprintItemType.OBJECT_TYPE.value,
+                suggestion={"displayName": "B", "apiName": "B", "placeholderRid": "ph-a2"},
+            ),
+            _make_item_orm(
+                rid="ri.ontology.blueprint-item.u1",
+                user_decision=None,
+                item_type=BlueprintItemType.OBJECT_TYPE.value,
+                suggestion={"displayName": "C", "apiName": "C", "placeholderRid": "ph-u1"},
+            ),
+        ]
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.list_by_blueprint = AsyncMock(return_value=items)
+
+            with patch("app.storage.object_type_storage.ObjectTypeStorage") as mock_ot_storage:
+                mock_ot_storage.get_by_api_name = AsyncMock(return_value=None)
+                result = await service.pre_apply_check(bp_orm.rid)
+
+        assert result.actionable_count == 2
+        assert result.undecided_count == 1
+
+    @pytest.mark.asyncio
+    async def test_precheck_requires_pending_review(self, service, db_session_mock):
+        """Blueprint not in pending_review → raises error."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.APPLIED.value)
+
+        with patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage:
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+
+            with pytest.raises(AppError, match="pending_review"):
+                await service.pre_apply_check(bp_orm.rid)
+
+
+# ---------------------------------------------------------------------------
+# F017: Retry Item
+# ---------------------------------------------------------------------------
+
+
+class TestRetryItem:
+    """Tests for BlueprintService.retry_item()."""
+
+    @pytest.mark.asyncio
+    async def test_retry_success_ot(self, service, db_session_mock):
+        """Applied blueprint + accepted OT with no created_entity_rid → retry succeeds."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.APPLIED.value)
+        item_orm = _make_item_orm(
+            rid="ri.ontology.blueprint-item.fail1",
+            item_type=BlueprintItemType.OBJECT_TYPE.value,
+            suggestion={"displayName": "Order", "apiName": "Order", "placeholderRid": "ph1"},
+            user_decision=UserDecision.ACCEPTED.value,
+            created_entity_rid=None,
+        )
+
+        mock_created_ot = MagicMock()
+        mock_created_ot.rid = "ri.ontology.object-type.new1"
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.get_for_update = AsyncMock(return_value=item_orm)
+            mock_item_storage.get_succeeded_items = AsyncMock(return_value=[])
+            mock_item_storage.update_created_entity_rid = AsyncMock()
+            mock_item_storage.update_decision = AsyncMock()
+
+            with patch("app.services.object_type_service.ObjectTypeService") as mock_ot_svc_cls:
+                mock_ot_svc = MagicMock()
+                mock_ot_svc.create = AsyncMock(return_value=mock_created_ot)
+                mock_ot_svc_cls.return_value = mock_ot_svc
+
+                result = await service.retry_item(bp_orm.rid, item_orm.rid)
+
+        assert result.status == "success"
+        assert result.created_entity_rid == "ri.ontology.object-type.new1"
+
+    @pytest.mark.asyncio
+    async def test_retry_with_user_edits(self, service, db_session_mock):
+        """Retry with user_edits merges edits before creating."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.APPLIED.value)
+        item_orm = _make_item_orm(
+            rid="ri.ontology.blueprint-item.fail2",
+            item_type=BlueprintItemType.OBJECT_TYPE.value,
+            suggestion={"displayName": "Order", "apiName": "Order", "placeholderRid": "ph2"},
+            user_decision=UserDecision.ACCEPTED.value,
+            created_entity_rid=None,
+            user_edits=None,
+        )
+
+        mock_created_ot = MagicMock()
+        mock_created_ot.rid = "ri.ontology.object-type.new2"
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.get_for_update = AsyncMock(return_value=item_orm)
+            mock_item_storage.get_succeeded_items = AsyncMock(return_value=[])
+            mock_item_storage.update_created_entity_rid = AsyncMock()
+            mock_item_storage.update_decision = AsyncMock()
+
+            with patch("app.services.object_type_service.ObjectTypeService") as mock_ot_svc_cls:
+                mock_ot_svc = MagicMock()
+                mock_ot_svc.create = AsyncMock(return_value=mock_created_ot)
+                mock_ot_svc_cls.return_value = mock_ot_svc
+
+                result = await service.retry_item(
+                    bp_orm.rid, item_orm.rid, user_edits={"apiName": "CustomerOrder"}
+                )
+
+        assert result.status == "success"
+
+    @pytest.mark.asyncio
+    async def test_retry_not_retryable_already_created(self, service, db_session_mock):
+        """Item with created_entity_rid → not retryable."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.APPLIED.value)
+        item_orm = _make_item_orm(
+            rid="ri.ontology.blueprint-item.ok1",
+            user_decision=UserDecision.ACCEPTED.value,
+            created_entity_rid="ri.ontology.object-type.exists",
+        )
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.get_for_update = AsyncMock(return_value=item_orm)
+
+            with pytest.raises(AppError, match="not retryable"):
+                await service.retry_item(bp_orm.rid, item_orm.rid)
+
+    @pytest.mark.asyncio
+    async def test_retry_not_retryable_rejected(self, service, db_session_mock):
+        """Rejected item → not retryable."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.APPLIED.value)
+        item_orm = _make_item_orm(
+            rid="ri.ontology.blueprint-item.rej1",
+            user_decision=UserDecision.REJECTED.value,
+            created_entity_rid=None,
+        )
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.get_for_update = AsyncMock(return_value=item_orm)
+
+            with pytest.raises(AppError, match="not retryable"):
+                await service.retry_item(bp_orm.rid, item_orm.rid)
+
+    @pytest.mark.asyncio
+    async def test_retry_requires_applied_status(self, service, db_session_mock):
+        """Blueprint not in applied → raises error."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
+
+        with patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage:
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+
+            with pytest.raises(AppError, match="applied"):
+                await service.retry_item(bp_orm.rid, "ri.ontology.blueprint-item.x")
+
+    @pytest.mark.asyncio
+    async def test_retry_builds_rid_map_from_succeeded(self, service, db_session_mock):
+        """LT retry resolves placeholder OT RID from succeeded items."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.APPLIED.value)
+        # A succeeded OT item
+        succeeded_ot = _make_item_orm(
+            rid="ri.ontology.blueprint-item.ot-ok",
+            item_type=BlueprintItemType.OBJECT_TYPE.value,
+            suggestion={"displayName": "Order", "apiName": "Order", "placeholderRid": "ph-ot1"},
+            user_decision=UserDecision.ACCEPTED.value,
+            created_entity_rid="ri.ontology.object-type.real-ot1",
+        )
+        # A failed LT item referencing the succeeded OT
+        lt_item = _make_item_orm(
+            rid="ri.ontology.blueprint-item.lt-fail",
+            item_type=BlueprintItemType.LINK_TYPE.value,
+            suggestion={
+                "displayName": "HasOrder",
+                "apiName": "hasOrder",
+                "sideA": {"objectTypeRid": "ph-ot1"},
+                "sideB": {"objectTypeRid": "ph-ot1"},
+                "cardinality": "one-to-many",
+            },
+            user_decision=UserDecision.ACCEPTED.value,
+            created_entity_rid=None,
+        )
+
+        mock_created_lt = MagicMock()
+        mock_created_lt.rid = "ri.ontology.link-type.new-lt1"
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.get_for_update = AsyncMock(return_value=lt_item)
+            mock_item_storage.get_succeeded_items = AsyncMock(return_value=[succeeded_ot])
+            mock_item_storage.update_created_entity_rid = AsyncMock()
+
+            with patch("app.services.link_type_service.LinkTypeService") as mock_lt_svc_cls:
+                mock_lt_svc = MagicMock()
+                mock_lt_svc.create = AsyncMock(return_value=mock_created_lt)
+                mock_lt_svc_cls.return_value = mock_lt_svc
+
+                result = await service.retry_item(bp_orm.rid, lt_item.rid)
+
+        assert result.status == "success", f"Expected success, got error: {result.error}"
+        assert result.created_entity_rid == "ri.ontology.link-type.new-lt1"

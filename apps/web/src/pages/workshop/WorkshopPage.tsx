@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useObjectTypes } from '@/api/object-types';
+import { useBlueprints } from '@/api/blueprints';
 import { useWorkshopStore } from './stores/workshop-store';
 import { useAgentChat } from './hooks/use-agent-chat';
 import { useWorkshopGraph } from './hooks/use-workshop-graph';
@@ -40,11 +41,17 @@ export function Component() {
     }
   }, [otData, currentSessionRid, pageState, setPageState]);
 
+  // Fetch blueprints for the current session
+  const { data: blueprintData } = useBlueprints({
+    sessionRid: currentSessionRid ?? undefined,
+  });
+  const latestBlueprint = blueprintData?.items?.[0] ?? null;
+
   // Single instance of useAgentChat — shared by ChatPanel and ConnectionBanner
   const agentChat = useAgentChat(currentSessionRid);
 
   // Single instance of useWorkshopGraph — shared by StarfieldWorkbench, EntityPopover, EntityDrawer
-  const { nodes, edges } = useWorkshopGraph(DEFAULT_ONTOLOGY_RID, null);
+  const { nodes, edges } = useWorkshopGraph(DEFAULT_ONTOLOGY_RID, latestBlueprint?.rid ?? null);
 
   // Reset store on unmount
   useEffect(() => {
@@ -140,7 +147,12 @@ export function Component() {
             >
               <RightOutlined />
             </div>
-            <SidekickPanel />
+            <SidekickPanel
+              blueprintRid={latestBlueprint?.rid ?? null}
+              blueprintStatus={latestBlueprint?.status ?? null}
+              blueprintName={latestBlueprint?.name}
+              blueprintItemCount={undefined}
+            />
           </>
         )}
       </div>

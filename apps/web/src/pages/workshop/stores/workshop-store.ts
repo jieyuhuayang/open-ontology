@@ -74,6 +74,14 @@ export interface WorkshopStore {
   addCollapse: (instance: CollapseInstance) => void;
   removeCollapse: (id: string) => void;
 
+  // F017: Sidekick active tab
+  sidekickActiveTab: 'assistant' | 'review';
+  setSidekickActiveTab: (tab: 'assistant' | 'review') => void;
+
+  // F017: Editing item (for cross-component highlight)
+  editingItemRid: string | null;
+  setEditingItemRid: (rid: string | null) => void;
+
   // Reset
   reset: () => void;
 }
@@ -94,6 +102,8 @@ const initialState = {
   dragLinkState: null as DragLinkState | null,
   activeShockwaves: [] as ShockwaveInstance[],
   activeCollapses: [] as CollapseInstance[],
+  sidekickActiveTab: 'assistant' as const,
+  editingItemRid: null as string | null,
 };
 
 export const useWorkshopStore = create<WorkshopStore>((set) => ({
@@ -157,6 +167,10 @@ export const useWorkshopStore = create<WorkshopStore>((set) => ({
     set((s) => ({
       activeCollapses: s.activeCollapses.filter((c) => c.id !== id),
     })),
+
+  // F017: Sidekick tabs + editing
+  setSidekickActiveTab: (sidekickActiveTab) => set({ sidekickActiveTab }),
+  setEditingItemRid: (editingItemRid) => set({ editingItemRid }),
 
   reset: () => set(initialState),
 }));

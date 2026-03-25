@@ -11,7 +11,7 @@
 |------|------|------|
 | spec.md | ✅ 已评审 | 22 条 AC，用户确认通过 |
 | tasks.md | ✅ 已拆解 | 22 个任务，LGTM |
-| 实现 | 🔲 未开始 | 0 / 22 完成 |
+| 实现 | ✅ 完成 | 22 / 22 完成 |
 
 ---
 
@@ -30,7 +30,7 @@
 
 ### Phase 1: 后端基础设施
 
-- [ ] **T001**: Domain 模型扩展
+- [x] **T001**: Domain 模型扩展
   **文件**: `apps/server/app/domain/blueprint.py`
   **逻辑**: 新增 5 个 Pydantic 模型（继承 `DomainModel`）：
   - `BlueprintItemBatchUpdate`: `item_rids: list[str]`, `user_decision: UserDecision`, `rejection_reason: str | None = None`
@@ -40,7 +40,7 @@
   - `BlueprintItemRetryResult`: `item_rid: str`, `status: str`, `created_entity_rid: str | None = None`, `error: str | None = None`
   **依赖**: 无
 
-- [ ] **T002**: Storage 层扩展
+- [x] **T002**: Storage 层扩展
   **文件**: `apps/server/app/storage/blueprint_storage.py`
   **逻辑**: 在 `BlueprintItemStorage` 中新增 2 个静态方法：
   - `batch_get(session, rids: list[str]) -> list[BlueprintItemModel]`: 按 RID 列表批量查询蓝图项
@@ -49,7 +49,7 @@
 
 ### Phase 2: 后端服务层（Test-First）
 
-- [ ] **T003**: `batch_update_decisions` 单元测试
+- [x] **T003**: `batch_update_decisions` 单元测试
   **文件**: `apps/server/tests/unit/test_blueprint_service.py`
   **逻辑**: 使用 `mock_db_session` 测试 `BlueprintService.batch_update_decisions()`：
   - `test_batch_accept_all_undecided`: 3 个未决策项全部 accept → 返回 3 项，均 `userDecision=accepted`
@@ -60,7 +60,7 @@
   **覆盖 AC**: AC-11, AC-22
   **依赖**: T001, T002
 
-- [ ] **T004**: `batch_update_decisions` 实现
+- [x] **T004**: `batch_update_decisions` 实现
   **文件**: `apps/server/app/services/blueprint_service.py`
   **逻辑**: 新增方法 `async def batch_update_decisions(self, blueprint_rid: str, req: BlueprintItemBatchUpdate) -> list[BlueprintItem]`：
   1. 验证蓝图存在且状态为 `pending_review`（否则抛 `BLUEPRINT_INVALID_STATUS_TRANSITION`）
@@ -71,7 +71,7 @@
   **覆盖 AC**: AC-11, AC-22
   **依赖**: T003
 
-- [ ] **T005**: `pre_apply_check` 单元测试
+- [x] **T005**: `pre_apply_check` 单元测试
   **文件**: `apps/server/tests/unit/test_blueprint_service.py`
   **逻辑**: 测试 `BlueprintService.pre_apply_check()`：
   - `test_precheck_no_conflicts`: 3 个 accepted OT 项 + 1 个 LT 项（依赖 OT 均 accepted）→ `canApply=true, conflicts=[]`
@@ -82,7 +82,7 @@
   **覆盖 AC**: AC-14, AC-15
   **依赖**: T001, T002
 
-- [ ] **T006**: `pre_apply_check` 实现
+- [x] **T006**: `pre_apply_check` 实现
   **文件**: `apps/server/app/services/blueprint_service.py`
   **逻辑**: 新增方法 `async def pre_apply_check(self, rid: str) -> BlueprintPreApplyCheck`：
   1. 验证蓝图存在且状态为 `pending_review`
@@ -95,7 +95,7 @@
   **覆盖 AC**: AC-14, AC-15
   **依赖**: T005
 
-- [ ] **T007**: `retry_item` 单元测试
+- [x] **T007**: `retry_item` 单元测试
   **文件**: `apps/server/tests/unit/test_blueprint_service.py`
   **逻辑**: 测试 `BlueprintService.retry_item()`：
   - `test_retry_success_ot`: applied 蓝图 + accepted OT 项 + `created_entity_rid=None`（失败项）→ 重新创建成功 → 返回 `status="success"` + `createdEntityRid`
@@ -107,7 +107,7 @@
   **覆盖 AC**: AC-19
   **依赖**: T001, T002
 
-- [ ] **T008**: `retry_item` 实现
+- [x] **T008**: `retry_item` 实现
   **文件**: `apps/server/app/services/blueprint_service.py`
   **逻辑**: 新增方法 `async def retry_item(self, blueprint_rid: str, item_rid: str, user_edits: dict | None = None) -> BlueprintItemRetryResult`：
   1. 验证蓝图存在且状态为 `applied`
@@ -123,7 +123,7 @@
 
 ### Phase 3: 后端 API 层（Test-First）
 
-- [ ] **T009**: 3 个新端点集成测试
+- [x] **T009**: 3 个新端点集成测试
   **文件**: `apps/server/tests/integration/test_blueprint_api.py`
   **逻辑**: 使用 `seeded_client` 测试 3 个新端点：
   - **batch-decision**:
@@ -138,7 +138,7 @@
   **覆盖 AC**: AC-11, AC-14, AC-15, AC-19, AC-22
   **依赖**: T004, T006, T008
 
-- [ ] **T010**: 3 个新端点 Router 实现
+- [x] **T010**: 3 个新端点 Router 实现
   **文件**: `apps/server/app/routers/blueprints.py`
   **逻辑**: 在现有 router 中新增 3 个端点（薄壳，委托给 service）：
   - `@router.patch("/{rid}/items/batch-decision")`: 接收 `BlueprintItemBatchUpdate` body → `service.batch_update_decisions(rid, body)` → 返回 `list[BlueprintItem]`

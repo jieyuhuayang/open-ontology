@@ -767,6 +767,62 @@
         }
       }
     },
+    "/api/v1/blueprints/{rid}/items/batch-decision": {
+      "patch": {
+        "tags": [
+          "blueprints"
+        ],
+        "summary": "Batch Update Decisions",
+        "operationId": "batch_update_decisions_api_v1_blueprints__rid__items_batch_decision_patch",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlueprintItemBatchUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BlueprintItem"
+                  },
+                  "title": "Response Batch Update Decisions Api V1 Blueprints  Rid  Items Batch Decision Patch"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/blueprints/{rid}/items/{item_rid}": {
       "patch": {
         "tags": [
@@ -811,6 +867,109 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BlueprintItem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/blueprints/{rid}/items/{item_rid}/retry": {
+      "post": {
+        "tags": [
+          "blueprints"
+        ],
+        "summary": "Retry Blueprint Item",
+        "operationId": "retry_blueprint_item_api_v1_blueprints__rid__items__item_rid__retry_post",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          },
+          {
+            "name": "item_rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Item Rid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlueprintItemRetryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlueprintItemRetryResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/blueprints/{rid}/pre-apply-check": {
+      "post": {
+        "tags": [
+          "blueprints"
+        ],
+        "summary": "Pre Apply Check",
+        "operationId": "pre_apply_check_api_v1_blueprints__rid__pre_apply_check_post",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlueprintPreApplyCheck"
                 }
               }
             }
@@ -3108,10 +3267,6 @@
             "type": "integer",
             "title": "Filesize"
           },
-          "storagePath": {
-            "type": "string",
-            "title": "Storagepath"
-          },
           "analysisStatus": {
             "$ref": "#/components/schemas/AnalysisStatus",
             "default": "pending"
@@ -3152,7 +3307,6 @@
           "fileName",
           "fileType",
           "fileSize",
-          "storagePath",
           "createdAt"
         ],
         "title": "AgentMaterial"
@@ -3744,6 +3898,38 @@
         ],
         "title": "BlueprintItem"
       },
+      "BlueprintItemBatchUpdate": {
+        "properties": {
+          "itemRids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Itemrids"
+          },
+          "userDecision": {
+            "$ref": "#/components/schemas/UserDecision"
+          },
+          "rejectionReason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejectionreason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "itemRids",
+          "userDecision"
+        ],
+        "title": "BlueprintItemBatchUpdate",
+        "description": "Batch decision update request."
+      },
       "BlueprintItemCreate": {
         "properties": {
           "itemType": {
@@ -3788,6 +3974,66 @@
           "source"
         ],
         "title": "BlueprintItemCreate"
+      },
+      "BlueprintItemRetryRequest": {
+        "properties": {
+          "userEdits": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Useredits"
+          }
+        },
+        "type": "object",
+        "title": "BlueprintItemRetryRequest",
+        "description": "Single item retry request."
+      },
+      "BlueprintItemRetryResult": {
+        "properties": {
+          "itemRid": {
+            "type": "string",
+            "title": "Itemrid"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "createdEntityRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Createdentityrid"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "itemRid",
+          "status"
+        ],
+        "title": "BlueprintItemRetryResult",
+        "description": "Single item retry result."
       },
       "BlueprintItemType": {
         "type": "string",
@@ -3863,6 +4109,38 @@
           "pageSize"
         ],
         "title": "BlueprintList"
+      },
+      "BlueprintPreApplyCheck": {
+        "properties": {
+          "canApply": {
+            "type": "boolean",
+            "title": "Canapply"
+          },
+          "conflicts": {
+            "items": {
+              "$ref": "#/components/schemas/ConflictCheckResult"
+            },
+            "type": "array",
+            "title": "Conflicts"
+          },
+          "actionableCount": {
+            "type": "integer",
+            "title": "Actionablecount"
+          },
+          "undecidedCount": {
+            "type": "integer",
+            "title": "Undecidedcount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "canApply",
+          "conflicts",
+          "actionableCount",
+          "undecidedCount"
+        ],
+        "title": "BlueprintPreApplyCheck",
+        "description": "Pre-apply check response."
       },
       "BlueprintStatus": {
         "type": "string",
@@ -4111,6 +4389,41 @@
           "low"
         ],
         "title": "ConfidenceLevel"
+      },
+      "ConflictCheckResult": {
+        "properties": {
+          "itemRid": {
+            "type": "string",
+            "title": "Itemrid"
+          },
+          "conflictType": {
+            "type": "string",
+            "title": "Conflicttype"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "conflictingEntityRid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conflictingentityrid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "itemRid",
+          "conflictType",
+          "message"
+        ],
+        "title": "ConflictCheckResult",
+        "description": "Single conflict check result."
       },
       "ConnectionTestResponse": {
         "properties": {

@@ -200,3 +200,35 @@ class BlueprintItemStorage:
             )
         )
         return (await session.execute(stmt)).scalar_one()
+
+    @staticmethod
+    async def get_for_update(session: AsyncSession, rid: str) -> BlueprintItemModel | None:
+        """Get a blueprint item with row-level lock (SELECT ... FOR UPDATE)."""
+        stmt = select(BlueprintItemModel).where(BlueprintItemModel.rid == rid).with_for_update()
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    @staticmethod
+    async def batch_get(session: AsyncSession, rids: list[str]) -> list[BlueprintItemModel]:
+        """Get multiple blueprint items by RID list."""
+        if not rids:
+            return []
+        stmt = select(BlueprintItemModel).where(BlueprintItemModel.rid.in_(rids))
+        result = await session.execute(stmt)
+        return list(result.scalars().all())
+
+    @staticmethod
+    async def get_succeeded_items(
+        session: AsyncSession, blueprint_rid: str
+    ) -> list[BlueprintItemModel]:
+        """Get items that were successfully created (created_entity_rid IS NOT NULL)."""
+        stmt = (
+            select(BlueprintItemModel)
+            .where(
+                BlueprintItemModel.blueprint_rid == blueprint_rid,
+                BlueprintItemModel.created_entity_rid.is_not(None),
+            )
+            .order_by(BlueprintItemModel.sort_order.asc())
+        )
+        result = await session.execute(stmt)
+        return list(result.scalars().all())

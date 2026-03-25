@@ -17,7 +17,7 @@ export interface WorkshopNode {
   color: string;
   properties?: WorkshopProperty[];
   position: { x: number; y: number; z: number };
-  status: 'confirmed' | 'pending';
+  status: 'confirmed' | 'pending' | 'accepted' | 'rejected' | 'failed';
   confidence?: number;
   confidenceLevel?: 'high' | 'medium' | 'low';
   reasoning?: string;
@@ -42,7 +42,7 @@ export interface WorkshopEdge {
   targetNodeId: string;
   label: string;
   cardinality?: string;
-  status: 'confirmed' | 'pending';
+  status: 'confirmed' | 'pending' | 'accepted' | 'rejected' | 'failed';
   confidence?: number;
   confidenceLevel?: 'high' | 'medium' | 'low';
   blueprintItemRid?: string;
@@ -107,7 +107,7 @@ export interface PromptBubble {
   label: string;
   template: string;
   entityTypes?: ('object_type' | 'link_type')[];
-  entityStatuses?: ('confirmed' | 'pending')[];
+  entityStatuses?: WorkshopNode['status'][];
   minProperties?: number;
 }
 

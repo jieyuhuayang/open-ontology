@@ -1,6 +1,15 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 import apiClient from '@/api/client';
-import type { BlueprintList, BlueprintDetail } from '@/api/types';
+import type {
+  BlueprintApplyResult,
+  BlueprintDetail,
+  BlueprintItem,
+  BlueprintItemBatchUpdate,
+  BlueprintItemRetryResult,
+  BlueprintList,
+  BlueprintPreApplyCheck,
+} from '@/api/types';
 
 export const blueprintKeys = {
   all: ['blueprints'] as const,
@@ -47,5 +56,102 @@ export function useBlueprintDetail(rid: string | null) {
       return data;
     },
     enabled: !!rid,
+  });
+}
+
+// --- F017: Mutation hooks ---
+
+function invalidateBlueprintCache(
+  queryClient: QueryClient,
+  blueprintRid: string,
+) {
+  void queryClient.invalidateQueries({
+    queryKey: blueprintKeys.detail(blueprintRid),
+  });
+  void queryClient.invalidateQueries({
+    queryKey: blueprintKeys.lists(),
+  });
+}
+
+export function useUpdateItemDecision(blueprintRid: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      itemRid,
+      userDecision,
+      userEdits,
+      rejectionReason,
+    }: {
+      itemRid: string;
+      userDecision: string;
+      userEdits?: Record<string, unknown>;
+      rejectionReason?: string;
+    }) => {
+      const { data } = await apiClient.patch<BlueprintItem>(
+        `/blueprints/${blueprintRid}/items/${itemRid}`,
+        { userDecision, userEdits, rejectionReason },
+      );
+      return data;
+    },
+    onSuccess: () => invalidateBlueprintCache(queryClient, blueprintRid),
+  });
+}
+
+export function useBatchUpdateDecisions(blueprintRid: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: BlueprintItemBatchUpdate) => {
+      const { data } = await apiClient.patch<BlueprintItem[]>(
+        `/blueprints/${blueprintRid}/items/batch-decision`,
+        body,
+      );
+      return data;
+    },
+    onSuccess: () => invalidateBlueprintCache(queryClient, blueprintRid),
+  });
+}
+
+export function usePreApplyCheck(blueprintRid: string) {
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiClient.post<BlueprintPreApplyCheck>(
+        `/blueprints/${blueprintRid}/pre-apply-check`,
+      );
+      return data;
+    },
+    // Read-only operation — no cache invalidation needed
+  });
+}
+
+export function useApplyBlueprint(blueprintRid: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiClient.post<BlueprintApplyResult>(
+        `/blueprints/${blueprintRid}/apply`,
+      );
+      return data;
+    },
+    onSuccess: () => invalidateBlueprintCache(queryClient, blueprintRid),
+  });
+}
+
+export function useRetryItem(blueprintRid: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      itemRid,
+      userEdits,
+    }: {
+      itemRid: string;
+      userEdits?: Record<string, unknown>;
+    }) => {
+      const { data } = await apiClient.post<BlueprintItemRetryResult>(
+        `/blueprints/${blueprintRid}/items/${itemRid}/retry`,
+        { userEdits },
+      );
+      return data;
+    },
+    onSuccess: () => invalidateBlueprintCache(queryClient, blueprintRid),
   });
 }
