@@ -205,7 +205,7 @@ class TestApplySuggestion:
         )
 
         with patch.object(service, "_apply_title_key", new_callable=AsyncMock) as mock_apply:
-            mock_apply.return_value = None
+            mock_apply.return_value = True
             result = await service.apply_suggestion(request)
 
         assert result.success is True
