@@ -403,7 +403,18 @@ class BlueprintService:
                 status_code=422,
             )
 
-        item_orm = await BlueprintItemStorage.get(self._session, item_rid)
+        # Use FOR UPDATE lock to prevent concurrent retries on the same item
+        from sqlalchemy import select as sa_select
+        from app.storage.models import BlueprintItemModel
+
+        stmt = (
+            sa_select(BlueprintItemModel)
+            .where(BlueprintItemModel.rid == item_rid)
+            .with_for_update()
+        )
+        result = await self._session.execute(stmt)
+        item_orm = result.scalar_one_or_none()
+
         if item_orm is None or item_orm.blueprint_rid != blueprint_rid:
             raise AppError(
                 code="BLUEPRINT_ITEM_NOT_FOUND",
