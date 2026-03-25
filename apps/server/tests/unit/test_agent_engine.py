@@ -58,7 +58,7 @@ class TestAgentEngine:
     async def test_create_agent_no_api_key(self):
         from app.agent.engine import AgentEngine
 
-        settings = self._make_settings(ANTHROPIC_API_KEY="")
+        settings = self._make_settings(ANTHROPIC_API_KEY="", OPENAI_API_KEY="")
         engine = AgentEngine(settings)
 
         with pytest.raises(AppError) as exc_info:
