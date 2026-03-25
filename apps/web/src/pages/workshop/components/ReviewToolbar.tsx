@@ -62,7 +62,6 @@ export default function ReviewToolbar({
       content: t('workshop.review.discardConfirmContent'),
       okButtonProps: { danger: true },
       onOk: async () => {
-        const apiClient = (await import('@/api/client')).default;
         await apiClient.patch(`/blueprints/${blueprintRid}`, {
           status: 'discarded',
         });
