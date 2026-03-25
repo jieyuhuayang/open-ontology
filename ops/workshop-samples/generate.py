@@ -263,14 +263,8 @@ def generate_weather_data(schema_text: str) -> None:
     if precip_file.exists():
         precip_col_map = {c: i for i, c in enumerate(precip_cols)}
         precip_rows = parse_insert_values(precip_file)
-        # 只取 GRAND TOTAL 行
-        grand_total_rows = [
-            r
-            for r in precip_rows
-            if len(r) > precip_col_map.get("state", 999)
-            and r[precip_col_map["state"]] == "GRAND TOTAL"
-        ]
-        for row in grand_total_rows[:10]:
+        # 取前 10 行（含不同州，让 Agent 识别州维度）
+        for row in precip_rows[:10]:
             all_rows.append(
                 [
                     "precipitation",
