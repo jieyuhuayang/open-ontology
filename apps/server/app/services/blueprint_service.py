@@ -553,8 +553,12 @@ class BlueprintService:
                     error=f"Unknown item type: {item_orm.item_type}",
                 )
 
-        except Exception as e:
-            return BlueprintItemRetryResult(item_rid=item_rid, status="failed", error=str(e))
+        except AppError as e:
+            return BlueprintItemRetryResult(item_rid=item_rid, status="failed", error=e.message)
+        except Exception:
+            return BlueprintItemRetryResult(
+                item_rid=item_rid, status="failed", error="Entity creation failed"
+            )
 
     # --- Apply ---
 
