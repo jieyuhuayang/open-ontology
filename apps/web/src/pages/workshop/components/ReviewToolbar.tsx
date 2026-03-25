@@ -13,6 +13,7 @@ import {
 } from '@/api/blueprints';
 import type { BlueprintItem } from '@/api/types';
 import { useWorkshopStore } from '../stores/workshop-store';
+import ApplyProgressModal from './ApplyProgressModal';
 import { useState } from 'react';
 
 interface ReviewToolbarProps {
