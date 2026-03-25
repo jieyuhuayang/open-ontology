@@ -42,7 +42,7 @@ class SidekickRulesEngine:
             return await self._analyze_property_list(context, entity_data)
         return []
 
-    async def _get_entity_data(self, context: SidekickContext) -> dict:
+    async def get_entity_data(self, context: SidekickContext) -> dict:
         """Fetch entity data based on page type."""
         try:
             if context.page_type == SidekickPageType.OBJECT_TYPE_DETAIL:
