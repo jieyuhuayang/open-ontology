@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Flex, Input, Select, Space } from 'antd';
+import { Button, Flex, Input, Select } from 'antd';
 import { useTranslation } from 'react-i18next';
 import type { Suggestion } from '@/api/sidekick';
 
