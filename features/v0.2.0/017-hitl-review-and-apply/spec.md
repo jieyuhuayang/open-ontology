@@ -265,12 +265,13 @@ SidekickPanel (修改)
 │       └── BlueprintReviewPanel (新增)
 │           ├── ReviewToolbar
 │           │   ├── "全部接受" Button
+│           │   ├── "批量拒绝" Button (danger, 仅当有勾选行时启用)
 │           │   ├── 类型筛选 Select (OT/Property/LT)
 │           │   ├── 置信度筛选 Select (高/中/低)
 │           │   ├── "放弃蓝图" Button (danger)
 │           │   └── "应用蓝图" Button (primary, 禁用态由 AC-16 控制)
-│           ├── BlueprintReviewTable (Ant Table)
-│           │   ├── Columns: 类型图标 | 名称 | 详情 | 置信度 | 来源 | 操作
+│           ├── BlueprintReviewTable (Ant Table, rowSelection 启用行勾选)
+│           │   ├── Columns: 勾选框 | 类型图标 | 名称 | 详情 | 置信度 | 来源 | 操作
 │           │   ├── expandedRowRender → InlineEditForm
 │           │   └── 行样式: pending(默认) / accepted(绿) / edited(蓝) / rejected(红线) / failed(红底)
 │           ├── RejectionReasonPopover
