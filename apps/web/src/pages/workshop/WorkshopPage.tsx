@@ -147,7 +147,12 @@ export function Component() {
             >
               <RightOutlined />
             </div>
-            <SidekickPanel />
+            <SidekickPanel
+              blueprintRid={latestBlueprint?.rid ?? null}
+              blueprintStatus={latestBlueprint?.status ?? null}
+              blueprintName={latestBlueprint?.name}
+              blueprintItemCount={undefined}
+            />
           </>
         )}
       </div>
