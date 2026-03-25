@@ -107,8 +107,8 @@ class SidekickService:
         req = ObjectTypeUpdateRequest(description=description)
         await self._ot_service.update(entity_rid, req)
 
-    async def _apply_title_key(self, entity_rid: str, action_payload: dict | None) -> None:
-        """Set title key property for an OT."""
+    async def _apply_title_key(self, entity_rid: str, action_payload: dict | None) -> bool:
+        """Set title key property for an OT. Returns True if applied."""
         if action_payload and action_payload.get("propertyId"):
             property_id = action_payload["propertyId"]
         else:
@@ -119,17 +119,14 @@ class SidekickService:
 
             prop_list = await self._prop_service.list(entity_rid)
             for prop in prop_list.items:
-                if prop.id == property_id or prop.display_name.lower() in _TITLE_KEY_CANDIDATES:
-                    if prop.id == property_id or (
-                        not action_payload and prop.display_name.lower() in _TITLE_KEY_CANDIDATES
-                    ):
-                        target_rid = prop.rid
-                        req = PropertyUpdateRequest(is_title_key=True)
-                        await self._prop_service.update(entity_rid, target_rid, req)
-                        return
+                if prop.id == property_id:
+                    req = PropertyUpdateRequest(is_title_key=True)
+                    await self._prop_service.update(entity_rid, prop.rid, req)
+                    return True
+        return False
 
-    async def _apply_primary_key(self, entity_rid: str, action_payload: dict | None) -> None:
-        """Set primary key property for an OT."""
+    async def _apply_primary_key(self, entity_rid: str, action_payload: dict | None) -> bool:
+        """Set primary key property for an OT. Returns True if applied."""
         if action_payload and action_payload.get("propertyId"):
             property_id = action_payload["propertyId"]
         else:
@@ -143,7 +140,8 @@ class SidekickService:
                 if prop.id == property_id:
                     req = PropertyUpdateRequest(is_primary_key=True)
                     await self._prop_service.update(entity_rid, prop.rid, req)
-                    return
+                    return True
+        return False
 
     async def _find_best_property(self, entity_rid: str, candidates: set[str]) -> str | None:
         """Find the best matching property by name."""
