@@ -107,7 +107,7 @@ export interface PromptBubble {
   label: string;
   template: string;
   entityTypes?: ('object_type' | 'link_type')[];
-  entityStatuses?: ('confirmed' | 'pending')[];
+  entityStatuses?: WorkshopNode['status'][];
   minProperties?: number;
 }
 
