@@ -37,6 +37,6 @@ settings = Settings()
 import os as _os
 
 if settings.OPENAI_API_KEY.get_secret_value():
-    _os.environ.setdefault("OPENAI_API_KEY", settings.OPENAI_API_KEY.get_secret_value())
+    _os.environ["OPENAI_API_KEY"] = settings.OPENAI_API_KEY.get_secret_value()
 if settings.OPENAI_API_BASE:
-    _os.environ.setdefault("OPENAI_API_BASE", settings.OPENAI_API_BASE)
+    _os.environ["OPENAI_API_BASE"] = settings.OPENAI_API_BASE
