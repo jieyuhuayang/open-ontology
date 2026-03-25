@@ -303,7 +303,7 @@
   **覆盖 AC**: AC-19, AC-20, AC-21
   **依赖**: T003
 
-- [ ] **T019**: StarCollapseEffect 碎裂消散动画
+- [x] **T019**: StarCollapseEffect 碎裂消散动画
   **文件**: `apps/web/src/pages/workshop/components/StarCollapseEffect.tsx`（新建）
   **逻辑**:
   - R3F 组件，接收 `collapse: CollapseInstance` prop
