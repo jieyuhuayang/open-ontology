@@ -254,7 +254,7 @@
 
 ### Phase 4: 引导性提示气泡
 
-- [ ] **T016**: PromptBubbles 组件 + 测试
+- [x] **T016**: PromptBubbles 组件 + 测试
   **文件**: `apps/web/src/pages/workshop/components/PromptBubbles.tsx`（新建）
   **逻辑**:
   - 接收 `selectedNode: WorkshopNode | null`、`onSend: (message: string) => void` props
