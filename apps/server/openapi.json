@@ -3242,6 +3242,129 @@
           }
         }
       }
+    },
+    "/api/v1/sidekick/suggestions": {
+      "post": {
+        "tags": [
+          "sidekick"
+        ],
+        "summary": "Get Suggestions",
+        "operationId": "get_suggestions_api_v1_sidekick_suggestions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SidekickContext"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestionsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sidekick/apply": {
+      "post": {
+        "tags": [
+          "sidekick"
+        ],
+        "summary": "Apply Suggestion",
+        "operationId": "apply_suggestion_api_v1_sidekick_apply_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuggestionApplyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestionApplyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sidekick/generate-content": {
+      "post": {
+        "tags": [
+          "sidekick"
+        ],
+        "summary": "Generate Content",
+        "operationId": "generate_content_api_v1_sidekick_generate_content_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateContentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenerateContentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4001,8 +4124,7 @@
             "title": "Itemrid"
           },
           "status": {
-            "type": "string",
-            "title": "Status"
+            "$ref": "#/components/schemas/RetryStatus"
           },
           "createdEntityRid": {
             "anyOf": [
@@ -4397,8 +4519,7 @@
             "title": "Itemrid"
           },
           "conflictType": {
-            "type": "string",
-            "title": "Conflicttype"
+            "$ref": "#/components/schemas/ConflictType"
           },
           "message": {
             "type": "string",
@@ -4424,6 +4545,14 @@
         ],
         "title": "ConflictCheckResult",
         "description": "Single conflict check result."
+      },
+      "ConflictType": {
+        "type": "string",
+        "enum": [
+          "api_name_collision",
+          "dependency_missing"
+        ],
+        "title": "ConflictType"
       },
       "ConnectionTestResponse": {
         "properties": {
@@ -4825,6 +4954,49 @@
           "preview"
         ],
         "title": "FileUploadPreviewResponse"
+      },
+      "GenerateContentRequest": {
+        "properties": {
+          "contentType": {
+            "type": "string",
+            "title": "Contenttype"
+          },
+          "entityRid": {
+            "type": "string",
+            "title": "Entityrid"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "contentType",
+          "entityRid"
+        ],
+        "title": "GenerateContentRequest"
+      },
+      "GenerateContentResponse": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "title": "GenerateContentResponse"
       },
       "HTTPValidationError": {
         "properties": {
@@ -6959,6 +7131,14 @@
         ],
         "title": "ResourceType"
       },
+      "RetryStatus": {
+        "type": "string",
+        "enum": [
+          "success",
+          "failed"
+        ],
+        "title": "RetryStatus"
+      },
       "SearchResourceType": {
         "type": "string",
         "enum": [
@@ -7143,6 +7323,37 @@
         ],
         "title": "SessionStatus"
       },
+      "SidekickContext": {
+        "properties": {
+          "pageType": {
+            "$ref": "#/components/schemas/SidekickPageType"
+          },
+          "entityRid": {
+            "type": "string",
+            "title": "Entityrid"
+          },
+          "ontologyRid": {
+            "type": "string",
+            "title": "Ontologyrid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pageType",
+          "entityRid",
+          "ontologyRid"
+        ],
+        "title": "SidekickContext"
+      },
+      "SidekickPageType": {
+        "type": "string",
+        "enum": [
+          "object_type_detail",
+          "property_list",
+          "link_type_detail"
+        ],
+        "title": "SidekickPageType"
+      },
       "StructField": {
         "properties": {
           "name": {
@@ -7160,6 +7371,165 @@
           "type"
         ],
         "title": "StructField"
+      },
+      "Suggestion": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "suggestionType": {
+            "$ref": "#/components/schemas/SuggestionType"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence"
+          },
+          "confidenceLevel": {
+            "type": "string",
+            "title": "Confidencelevel"
+          },
+          "source": {
+            "$ref": "#/components/schemas/SuggestionSource"
+          },
+          "reasoning": {
+            "type": "string",
+            "title": "Reasoning"
+          },
+          "requiresLlm": {
+            "type": "boolean",
+            "title": "Requiresllm",
+            "default": false
+          },
+          "actionPayload": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actionpayload"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "suggestionType",
+          "title",
+          "description",
+          "confidence",
+          "confidenceLevel",
+          "source",
+          "reasoning"
+        ],
+        "title": "Suggestion"
+      },
+      "SuggestionApplyRequest": {
+        "properties": {
+          "suggestionType": {
+            "$ref": "#/components/schemas/SuggestionType"
+          },
+          "entityRid": {
+            "type": "string",
+            "title": "Entityrid"
+          },
+          "actionPayload": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actionpayload"
+          }
+        },
+        "type": "object",
+        "required": [
+          "suggestionType",
+          "entityRid"
+        ],
+        "title": "SuggestionApplyRequest"
+      },
+      "SuggestionApplyResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "message"
+        ],
+        "title": "SuggestionApplyResponse"
+      },
+      "SuggestionSource": {
+        "type": "string",
+        "enum": [
+          "completeness_check",
+          "consistency_check",
+          "pattern_matching",
+          "semantic_inference",
+          "best_practices"
+        ],
+        "title": "SuggestionSource"
+      },
+      "SuggestionType": {
+        "type": "string",
+        "enum": [
+          "missing_description",
+          "missing_title_key",
+          "missing_primary_key",
+          "orphan_link",
+          "duplicate_property_name",
+          "suggest_link",
+          "cardinality_review",
+          "naming_improvement",
+          "description_enhancement"
+        ],
+        "title": "SuggestionType"
+      },
+      "SuggestionsResponse": {
+        "properties": {
+          "suggestions": {
+            "items": {
+              "$ref": "#/components/schemas/Suggestion"
+            },
+            "type": "array",
+            "title": "Suggestions"
+          },
+          "hasLlmSuggestions": {
+            "type": "boolean",
+            "title": "Hasllmsuggestions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "suggestions",
+          "hasLlmSuggestions"
+        ],
+        "title": "SuggestionsResponse"
       },
       "SyncJob": {
         "properties": {

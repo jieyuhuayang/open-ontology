@@ -3,47 +3,17 @@ import apiClient from '@/api/client';
 import { objectTypeKeys } from '@/api/object-types';
 import { propertyKeys } from '@/api/properties';
 import { linkTypeKeys } from '@/api/link-types';
+import type { components } from '@/generated/api';
 
-// --- Types (hand-written until openapi-typescript regeneration) ---
+// --- Types (from openapi-typescript) ---
 
-export interface SidekickContext {
-  pageType: string;
-  entityRid: string;
-  ontologyRid: string;
-}
-
-export interface Suggestion {
-  id: string;
-  suggestionType: string;
-  title: string;
-  description: string;
-  confidence: number;
-  confidenceLevel: 'high' | 'medium' | 'low';
-  source: string;
-  reasoning: string;
-  requiresLlm: boolean;
-  actionPayload: Record<string, unknown> | null;
-}
-
-export interface SuggestionsResponse {
-  suggestions: Suggestion[];
-  hasLlmSuggestions: boolean;
-}
-
-export interface SuggestionApplyRequest {
-  suggestionType: string;
-  entityRid: string;
-  actionPayload?: Record<string, unknown> | null;
-}
-
-export interface SuggestionApplyResponse {
-  success: boolean;
-  message: string;
-}
-
-export interface GenerateContentResponse {
-  content: string;
-}
+export type SidekickContext = components['schemas']['SidekickContext'];
+export type Suggestion = components['schemas']['Suggestion'];
+export type SuggestionsResponse = components['schemas']['SuggestionsResponse'];
+export type SuggestionApplyRequest = components['schemas']['SuggestionApplyRequest'];
+export type SuggestionApplyResponse = components['schemas']['SuggestionApplyResponse'];
+export type GenerateContentRequest = components['schemas']['GenerateContentRequest'];
+export type GenerateContentResponse = components['schemas']['GenerateContentResponse'];
 
 // --- Query keys ---
 
