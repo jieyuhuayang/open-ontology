@@ -123,7 +123,7 @@
 
 ### Phase 2: 拖拽连线创建链接（3D only）
 
-- [ ] **T007**: DragLinkLine 组件
+- [x] **T007**: DragLinkLine 组件
   **文件**: `apps/web/src/pages/workshop/components/DragLinkLine.tsx`（新建）
   **逻辑**:
   - 基于 Demo `DragLinkLine.tsx` 适配到 Workshop
