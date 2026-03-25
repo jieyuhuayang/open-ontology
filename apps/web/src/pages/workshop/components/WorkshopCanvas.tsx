@@ -304,6 +304,7 @@ const WorkshopCanvas = forwardRef<WorkshopCanvasHandle, WorkshopCanvasProps>(
           onNodeDoubleClick={onNodeDoubleClick}
           onLinkCreate={onLinkCreate}
         />
+        <CameraAnimator targetRef={cameraTargetRef} controlsRef={controlsRef} />
       </Canvas>
     );
   },
