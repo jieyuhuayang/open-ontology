@@ -1,10 +1,6 @@
 import { useState } from 'react';
 import { Table, Button, Tag, Tooltip, Space } from 'antd';
-import {
-  CheckOutlined,
-  EditOutlined,
-  CloseOutlined,
-} from '@ant-design/icons';
+import { CheckOutlined, EditOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import { useUpdateItemDecision } from '@/api/blueprints';
