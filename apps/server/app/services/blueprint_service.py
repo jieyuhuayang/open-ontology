@@ -495,15 +495,21 @@ class BlueprintService:
                     side_b_placeholder, suggestion.get("sideBObjectTypeRid", side_b_placeholder)
                 )
 
-                from app.domain.link_type import LinkTypeCreateRequest
+                from app.domain.link_type import LinkSideCreateInput, LinkTypeCreateRequest
 
                 created = await lt_service.create(
                     LinkTypeCreateRequest(
-                        display_name=suggestion.get("displayName", ""),
-                        id=suggestion.get("id"),
-                        description=suggestion.get("description", ""),
-                        side_a_object_type_rid=side_a_ot,
-                        side_b_object_type_rid=side_b_ot,
+                        id=suggestion.get("id", suggestion.get("apiName", "")),
+                        side_a=LinkSideCreateInput(
+                            object_type_rid=side_a_ot,
+                            display_name=suggestion.get("displayName", ""),
+                            api_name=(suggestion.get("sideA") or {}).get("apiName", "sideA"),
+                        ),
+                        side_b=LinkSideCreateInput(
+                            object_type_rid=side_b_ot,
+                            display_name=suggestion.get("displayName", ""),
+                            api_name=(suggestion.get("sideB") or {}).get("apiName", "sideB"),
+                        ),
                         cardinality=suggestion.get("cardinality", "many-to-many"),
                     )
                 )
