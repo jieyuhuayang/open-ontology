@@ -6,11 +6,7 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import {
-  useBatchUpdateDecisions,
-  useApplyBlueprint,
-  usePreApplyCheck,
-} from '@/api/blueprints';
+import { useBatchUpdateDecisions } from '@/api/blueprints';
 import type { BlueprintItem } from '@/api/types';
 import { useWorkshopStore } from '../stores/workshop-store';
 import ApplyProgressModal from './ApplyProgressModal';
