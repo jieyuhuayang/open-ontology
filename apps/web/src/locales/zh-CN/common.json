@@ -827,7 +827,17 @@
       "checkNaming": "检查字段命名规范",
       "addMissingProps": "补充缺失属性",
       "verifyCardinality": "验证基数关系",
-      "checkReverse": "检查反向链接"
+      "checkReverse": "检查反向链接",
+      "templates": {
+        "checkOrphanKeys": "检查是否存在孤立的外键",
+        "deriveStats": "根据现有字段推导统计属性",
+        "splitSensitive": "拆分敏感字段以提高安全性",
+        "suggestRelated": "推导关联对象类型",
+        "checkNaming": "检查字段命名规范",
+        "addMissingProps": "补充缺失属性",
+        "verifyCardinality": "验证基数关系是否正确",
+        "checkReverse": "检查是否需要反向链接"
+      }
     },
     "dataProbe": {
       "comingSoon": "数据预览探针 — 即将推出"
