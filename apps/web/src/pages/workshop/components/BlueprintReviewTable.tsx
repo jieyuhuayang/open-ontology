@@ -23,6 +23,13 @@ const TYPE_ICONS: Record<string, string> = {
   link_type: '🔗',
 };
 
+const ROW_STYLES = `
+  .review-row-accepted { background: rgba(82, 196, 26, 0.08) !important; }
+  .review-row-edited { background: rgba(22, 119, 255, 0.08) !important; }
+  .review-row-rejected { background: rgba(255, 77, 79, 0.04) !important; text-decoration: line-through; opacity: 0.6; }
+  .review-row-accepted td, .review-row-edited td, .review-row-rejected td { background: transparent !important; }
+`;
+
 const CONFIDENCE_COLORS: Record<string, string> = {
   high: 'green',
   medium: 'gold',
