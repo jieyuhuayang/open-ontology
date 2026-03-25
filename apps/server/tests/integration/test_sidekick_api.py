@@ -73,7 +73,7 @@ class TestGenerateContentEndpoint:
     @pytest.mark.asyncio
     async def test_generate_content_no_api_key(self, seeded_client: AsyncClient):
         """AC-20: No API Key returns 503 SIDEKICK_LLM_UNAVAILABLE."""
-        with patch.object(SidekickLlmEngine, "_is_available", return_value=False):
+        with patch.object(SidekickLlmEngine, "is_available", return_value=False):
             resp = await seeded_client.post(
                 "/api/v1/sidekick/generate-content",
                 json={
