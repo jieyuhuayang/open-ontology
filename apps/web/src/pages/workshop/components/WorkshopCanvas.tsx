@@ -221,6 +221,7 @@ function SceneContent({
           luminanceThreshold={0.2}
           luminanceSmoothing={0.9}
           intensity={0.8}
+          resolutionScale={0.5}
         />
       </EffectComposer>
     </>
