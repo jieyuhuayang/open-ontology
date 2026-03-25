@@ -547,7 +547,7 @@ class BlueprintService:
                 )
 
         except AppError as e:
-            return BlueprintItemRetryResult(item_rid=item_rid, status="failed", error=e.message)
+            return BlueprintItemRetryResult(item_rid=item_rid, status=RetryStatus.FAILED, error=e.message)
         except Exception:
             return BlueprintItemRetryResult(
                 item_rid=item_rid, status="failed", error="Entity creation failed"

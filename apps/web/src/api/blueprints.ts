@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 import apiClient from '@/api/client';
 import type {
   BlueprintApplyResult,
@@ -60,6 +61,18 @@ export function useBlueprintDetail(rid: string | null) {
 
 // --- F017: Mutation hooks ---
 
+function invalidateBlueprintCache(
+  queryClient: QueryClient,
+  blueprintRid: string,
+) {
+  void queryClient.invalidateQueries({
+    queryKey: blueprintKeys.detail(blueprintRid),
+  });
+  void queryClient.invalidateQueries({
+    queryKey: blueprintKeys.lists(),
+  });
+}
+
 export function useUpdateItemDecision(blueprintRid: string) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -80,14 +93,7 @@ export function useUpdateItemDecision(blueprintRid: string) {
       );
       return data;
     },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: blueprintKeys.detail(blueprintRid),
-      });
-      void queryClient.invalidateQueries({
-        queryKey: blueprintKeys.lists(),
-      });
-    },
+    onSuccess: () => invalidateBlueprintCache(queryClient, blueprintRid),
   });
 }
 
@@ -101,19 +107,11 @@ export function useBatchUpdateDecisions(blueprintRid: string) {
       );
       return data;
     },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: blueprintKeys.detail(blueprintRid),
-      });
-      void queryClient.invalidateQueries({
-        queryKey: blueprintKeys.lists(),
-      });
-    },
+    onSuccess: () => invalidateBlueprintCache(queryClient, blueprintRid),
   });
 }
 
 export function usePreApplyCheck(blueprintRid: string) {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
       const { data } = await apiClient.post<BlueprintPreApplyCheck>(
@@ -121,14 +119,7 @@ export function usePreApplyCheck(blueprintRid: string) {
       );
       return data;
     },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: blueprintKeys.detail(blueprintRid),
-      });
-      void queryClient.invalidateQueries({
-        queryKey: blueprintKeys.lists(),
-      });
-    },
+    // Read-only operation — no cache invalidation needed
   });
 }
 
@@ -141,14 +132,7 @@ export function useApplyBlueprint(blueprintRid: string) {
       );
       return data;
     },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: blueprintKeys.detail(blueprintRid),
-      });
-      void queryClient.invalidateQueries({
-        queryKey: blueprintKeys.lists(),
-      });
-    },
+    onSuccess: () => invalidateBlueprintCache(queryClient, blueprintRid),
   });
 }
 
@@ -168,13 +152,6 @@ export function useRetryItem(blueprintRid: string) {
       );
       return data;
     },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: blueprintKeys.detail(blueprintRid),
-      });
-      void queryClient.invalidateQueries({
-        queryKey: blueprintKeys.lists(),
-      });
-    },
+    onSuccess: () => invalidateBlueprintCache(queryClient, blueprintRid),
   });
 }
