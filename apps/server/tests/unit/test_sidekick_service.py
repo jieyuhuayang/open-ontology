@@ -95,7 +95,7 @@ class TestGetSuggestions:
             patch.object(
                 service._llm_engine, "analyze", new_callable=AsyncMock, return_value=llm_sugs
             ),
-            patch.object(service._llm_engine, "_is_available", return_value=True),
+            patch.object(service._llm_engine, "is_available", return_value=True),
             patch.object(
                 service, "_get_entity_data_for_llm", new_callable=AsyncMock, return_value={}
             ),
