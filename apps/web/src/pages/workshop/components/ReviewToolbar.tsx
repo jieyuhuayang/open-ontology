@@ -156,7 +156,7 @@ export default function ReviewToolbar({
         </Button>
       </Space>
       {applyModalOpen && (
-        <ApplyProgressModalLazy
+        <ApplyProgressModal
           blueprintRid={blueprintRid}
           open={applyModalOpen}
           onClose={() => setApplyModalOpen(false)}
@@ -164,16 +164,4 @@ export default function ReviewToolbar({
       )}
     </div>
   );
-}
-
-// Lazy import to avoid circular deps
-function ApplyProgressModalLazy(props: {
-  blueprintRid: string;
-  open: boolean;
-  onClose: () => void;
-}) {
-  // Dynamic import handled by Vite's code splitting
-  const ApplyProgressModal =
-    require('./ApplyProgressModal').default as React.FC<typeof props>;
-  return <ApplyProgressModal {...props} />;
 }
