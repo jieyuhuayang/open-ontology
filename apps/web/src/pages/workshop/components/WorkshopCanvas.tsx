@@ -227,41 +227,68 @@ function SceneContent({
   );
 }
 
+/** Camera lerp animation component — renders inside Canvas */
+function CameraAnimator({
+  targetRef,
+  controlsRef,
+}: {
+  targetRef: React.RefObject<THREE.Vector3 | null>;
+  controlsRef: React.RefObject<OrbitControlsRef | null>;
+}) {
+  useFrame(({ camera }) => {
+    if (!targetRef.current || !controlsRef.current) return;
+    camera.position.lerp(targetRef.current, 0.06);
+    controlsRef.current.update();
+    if (camera.position.distanceTo(targetRef.current) < 0.1) {
+      (targetRef as React.MutableRefObject<THREE.Vector3 | null>).current = null;
+    }
+  });
+  return null;
+}
+
 const WorkshopCanvas = forwardRef<WorkshopCanvasHandle, WorkshopCanvasProps>(
   function WorkshopCanvas({ nodes, edges, onNodeClick, onNodeDoubleClick, onLinkCreate }, ref) {
     const controlsRef = useRef<OrbitControlsRef>(null);
+    const cameraTargetRef = useRef<THREE.Vector3 | null>(null);
 
     const fitView = useCallback(() => {
-      if (!controlsRef.current) return;
-      const cam = controlsRef.current.object as THREE.PerspectiveCamera;
-      cam.position.set(0, 0, 20);
-      controlsRef.current.target.set(0, 0, 0);
-      controlsRef.current.update();
+      cameraTargetRef.current = new THREE.Vector3(0, 0, 20);
     }, []);
 
     const resetCamera = useCallback(() => {
-      if (!controlsRef.current) return;
-      const cam = controlsRef.current.object as THREE.PerspectiveCamera;
-      cam.position.set(0, 5, 15);
-      controlsRef.current.target.set(0, 0, 0);
-      controlsRef.current.update();
+      cameraTargetRef.current = new THREE.Vector3(0, 5, 15);
     }, []);
 
     const zoomIn = useCallback(() => {
       if (!controlsRef.current) return;
       const cam = controlsRef.current.object as THREE.PerspectiveCamera;
-      cam.position.multiplyScalar(0.8);
-      controlsRef.current.update();
+      cameraTargetRef.current = cam.position.clone().multiplyScalar(0.8);
     }, []);
 
     const zoomOut = useCallback(() => {
       if (!controlsRef.current) return;
       const cam = controlsRef.current.object as THREE.PerspectiveCamera;
-      cam.position.multiplyScalar(1.25);
-      controlsRef.current.update();
+      cameraTargetRef.current = cam.position.clone().multiplyScalar(1.25);
     }, []);
 
-    useImperativeHandle(ref, () => ({ fitView, resetCamera, zoomIn, zoomOut }));
+    const focusOnEntity = useCallback(
+      (position: { x: number; y: number; z: number }) => {
+        cameraTargetRef.current = new THREE.Vector3(
+          position.x,
+          position.y + 2,
+          position.z + 5,
+        );
+      },
+      [],
+    );
+
+    useImperativeHandle(ref, () => ({
+      fitView,
+      resetCamera,
+      zoomIn,
+      zoomOut,
+      focusOnEntity,
+    }));
 
     return (
       <Canvas
