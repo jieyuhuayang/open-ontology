@@ -1696,7 +1696,7 @@ CREATE TABLE blueprints (
     session_rid TEXT NOT NULL REFERENCES agent_sessions(rid) ON DELETE CASCADE,
     ontology_rid TEXT NOT NULL REFERENCES ontologies(rid),
     name TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'draft',   -- draft | pending_review | applied | discarded
+    status TEXT NOT NULL DEFAULT 'draft',   -- draft | pending_review(前端映射为ready) | applied | discarded
     source_summary TEXT,                    -- 来源摘要
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
