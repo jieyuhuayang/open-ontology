@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from deepagents import create_deep_agent
+from langchain.chat_models import init_chat_model
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
 from app.config import Settings
