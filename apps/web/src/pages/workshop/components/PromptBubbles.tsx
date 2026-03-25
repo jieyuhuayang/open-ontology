@@ -7,63 +7,42 @@ interface PromptBubblesProps {
   onSend: (message: string) => void;
 }
 
+/** Template keys match i18n keys under workshop.promptBubbles.templates.* */
+const TEMPLATE_KEYS = [
+  'checkOrphanKeys',
+  'deriveStats',
+  'splitSensitive',
+  'suggestRelated',
+  'checkNaming',
+  'addMissingProps',
+  'verifyCardinality',
+  'checkReverse',
+] as const;
+
+interface TemplateConfig {
+  entityTypes?: ('object_type' | 'link_type')[];
+  entityStatuses?: ('confirmed' | 'pending')[];
+  minProperties?: number;
+}
+
+const TEMPLATE_CONFIGS: Record<string, TemplateConfig> = {
+  checkOrphanKeys: { entityTypes: ['object_type'], entityStatuses: ['confirmed', 'pending'] },
+  deriveStats: { entityTypes: ['object_type'], entityStatuses: ['confirmed'] },
+  splitSensitive: { entityTypes: ['object_type'], minProperties: 8 },
+  suggestRelated: { entityTypes: ['object_type'], entityStatuses: ['pending'] },
+  checkNaming: { entityTypes: ['object_type'], entityStatuses: ['pending'] },
+  addMissingProps: { entityTypes: ['object_type'], entityStatuses: ['pending'] },
+  verifyCardinality: { entityTypes: ['link_type'] },
+  checkReverse: { entityTypes: ['link_type'] },
+};
+
 function getPromptTemplates(t: (key: string) => string): PromptBubble[] {
-  return [
-    {
-      id: 'checkOrphanKeys',
-      label: t('workshop.promptBubbles.checkOrphanKeys'),
-      template: '检查是否存在孤立的外键',
-      entityTypes: ['object_type'],
-      entityStatuses: ['confirmed', 'pending'],
-    },
-    {
-      id: 'deriveStats',
-      label: t('workshop.promptBubbles.deriveStats'),
-      template: '根据现有字段推导统计属性',
-      entityTypes: ['object_type'],
-      entityStatuses: ['confirmed'],
-    },
-    {
-      id: 'splitSensitive',
-      label: t('workshop.promptBubbles.splitSensitive'),
-      template: '拆分敏感字段以提高安全性',
-      entityTypes: ['object_type'],
-      minProperties: 8,
-    },
-    {
-      id: 'suggestRelated',
-      label: t('workshop.promptBubbles.suggestRelated'),
-      template: '推导关联对象类型',
-      entityTypes: ['object_type'],
-      entityStatuses: ['pending'],
-    },
-    {
-      id: 'checkNaming',
-      label: t('workshop.promptBubbles.checkNaming'),
-      template: '检查字段命名规范',
-      entityTypes: ['object_type'],
-      entityStatuses: ['pending'],
-    },
-    {
-      id: 'addMissingProps',
-      label: t('workshop.promptBubbles.addMissingProps'),
-      template: '补充缺失属性',
-      entityTypes: ['object_type'],
-      entityStatuses: ['pending'],
-    },
-    {
-      id: 'verifyCardinality',
-      label: t('workshop.promptBubbles.verifyCardinality'),
-      template: '验证基数关系是否正确',
-      entityTypes: ['link_type'],
-    },
-    {
-      id: 'checkReverse',
-      label: t('workshop.promptBubbles.checkReverse'),
-      template: '检查是否需要反向链接',
-      entityTypes: ['link_type'],
-    },
-  ];
+  return TEMPLATE_KEYS.map((key) => ({
+    id: key,
+    label: t(`workshop.promptBubbles.${key}`),
+    template: t(`workshop.promptBubbles.templates.${key}`),
+    ...TEMPLATE_CONFIGS[key],
+  }));
 }
 
 function filterBubbles(
