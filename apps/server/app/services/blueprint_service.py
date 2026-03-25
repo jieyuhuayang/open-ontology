@@ -472,7 +472,9 @@ class BlueprintService:
                 from app.services.property_service import PropertyService
 
                 prop_service = PropertyService(self._session)
-                owner_placeholder = suggestion.get("objectTypeRid", "")
+                owner_placeholder = suggestion.get("objectTypePlaceholderRid") or suggestion.get(
+                    "objectTypeRid", ""
+                )
                 owner_rid = ot_rid_map.get(owner_placeholder, owner_placeholder)
                 created = await prop_service.create(
                     owner_rid,
