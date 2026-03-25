@@ -50,7 +50,7 @@ export default function InlineEditForm({
             <Form.Item label={t('common.displayName', 'Display Name')} name="displayName">
               <Input />
             </Form.Item>
-            <Form.Item label="API Name" name="apiName">
+            <Form.Item label={t('common.apiName', 'API Name')} name="apiName">
               <Input />
             </Form.Item>
             <Form.Item label="Description" name="description">
@@ -66,7 +66,7 @@ export default function InlineEditForm({
             <Form.Item label={t('common.displayName', 'Display Name')} name="displayName">
               <Input />
             </Form.Item>
-            <Form.Item label="API Name" name="apiName">
+            <Form.Item label={t('common.apiName', 'API Name')} name="apiName">
               <Input />
             </Form.Item>
             <Form.Item label="Base Type" name="baseType">
