@@ -355,7 +355,7 @@ stateDiagram-v2
 | `confidenceLevel` | enum | `high`（≥0.8）/ `medium`（0.5–0.8）/ `low`（<0.5） |
 | `reasoning` | string | 推理说明 |
 | `source` | enum | `field_analysis` / `pattern_matching` / `semantic_inference` / `best_practices` |
-| `userDecision` | enum? | `null`（未审查）/ `accepted` / `edited` / `rejected` |
+| `userDecision` | enum? | `null`（未决策）/ `accepted` / `edited` / `rejected` |
 
 **示例**（对象类型蓝图项）：
 
