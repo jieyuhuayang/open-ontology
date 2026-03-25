@@ -20,6 +20,8 @@ from app.domain.blueprint import (
     BlueprintUpdate,
     ConfidenceLevel,
     ConflictCheckResult,
+    ConflictType,
+    RetryStatus,
     UserDecision,
 )
 from app.domain.common import generate_rid
