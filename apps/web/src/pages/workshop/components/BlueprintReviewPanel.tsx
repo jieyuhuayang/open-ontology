@@ -20,33 +20,10 @@ export default function BlueprintReviewPanel({
     confidenceLevel?: string;
   }>({});
 
-  if (!blueprintRid) {
-    return (
-      <Empty
-        description={t('workshop.review.empty')}
-        style={{ padding: 32, color: 'rgba(255,255,255,0.45)' }}
-      />
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          padding: 48,
-        }}
-      >
-        <Spin tip={t('workshop.review.analyzing')} />
-      </div>
-    );
-  }
-
   const blueprint = detail?.blueprint;
   const items = detail?.items ?? [];
 
-  if (!blueprint) {
+  if (!blueprintRid || (!isLoading && !blueprint)) {
     return (
       <Empty
         description={t('workshop.review.empty')}
@@ -55,7 +32,7 @@ export default function BlueprintReviewPanel({
     );
   }
 
-  if (blueprint.status === 'draft') {
+  if (isLoading || blueprint?.status === 'draft') {
     return (
       <div
         style={{
