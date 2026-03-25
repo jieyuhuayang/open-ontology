@@ -60,7 +60,7 @@ class TestAnalyze:
             new_callable=AsyncMock,
             return_value=_mock_llm_response(mock_suggestions),
         ):
-            with patch.object(engine, "_is_available", return_value=True):
+            with patch.object(engine, "is_available", return_value=True):
                 suggestions = await engine.analyze(context, entity_data, ontology_summary)
 
         assert len(suggestions) == 1
@@ -74,7 +74,7 @@ class TestAnalyze:
         engine = SidekickLlmEngine()
         context = _make_context()
 
-        with patch.object(engine, "_is_available", return_value=False):
+        with patch.object(engine, "is_available", return_value=False):
             suggestions = await engine.analyze(context, {}, {})
 
         assert suggestions == []
@@ -85,7 +85,7 @@ class TestAnalyze:
         engine = SidekickLlmEngine()
         context = _make_context()
 
-        with patch.object(engine, "_is_available", return_value=True):
+        with patch.object(engine, "is_available", return_value=True):
             with patch.object(
                 engine,
                 "_call_llm",
@@ -113,7 +113,7 @@ class TestAnalyze:
             }
         ]
 
-        with patch.object(engine, "_is_available", return_value=True):
+        with patch.object(engine, "is_available", return_value=True):
             with patch.object(
                 engine,
                 "_call_llm",
@@ -144,7 +144,7 @@ class TestGenerateContent:
         content_block.text = "Customer 表示系统中的客户实体"
         mock_response.content = [content_block]
 
-        with patch.object(engine, "_is_available", return_value=True):
+        with patch.object(engine, "is_available", return_value=True):
             with patch.object(
                 engine,
                 "_call_llm",
@@ -164,7 +164,7 @@ class TestGenerateContent:
             entity_rid="ri.ontology.object-type.test1",
         )
 
-        with patch.object(engine, "_is_available", return_value=False):
+        with patch.object(engine, "is_available", return_value=False):
             with pytest.raises(AppError) as exc_info:
                 await engine.generate_content(request)
 
