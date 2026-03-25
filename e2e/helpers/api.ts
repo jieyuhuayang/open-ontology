@@ -159,3 +159,110 @@ export async function publishChanges(request: APIRequestContext): Promise<void> 
 export async function discardAll(request: APIRequestContext): Promise<void> {
   await request.delete(`${API}/ontologies/${ONTOLOGY_RID}/working-state`);
 }
+
+// --- Blueprint helpers (F017) ---
+
+/**
+ * Create an agent session via API. Returns session RID.
+ */
+export async function createAgentSession(
+  request: APIRequestContext,
+  opts: { domain?: string; goal?: string } = {},
+): Promise<string> {
+  const resp = await request.post(`${API}/agent/sessions`, {
+    data: {
+      ontologyRid: ONTOLOGY_RID,
+      domain: opts.domain ?? 'e2e-test',
+      goal: opts.goal ?? 'E2E test session',
+    },
+  });
+  expect(resp.ok(), `Failed to create session: ${resp.status()}`).toBeTruthy();
+  const data = await resp.json();
+  return data.rid;
+}
+
+/**
+ * Create a blueprint via API. Returns blueprint RID.
+ */
+export async function createBlueprint(
+  request: APIRequestContext,
+  sessionRid: string,
+  name: string,
+): Promise<string> {
+  const resp = await request.post(`${API}/blueprints`, {
+    data: {
+      sessionRid,
+      ontologyRid: ONTOLOGY_RID,
+      name,
+    },
+  });
+  expect(resp.ok(), `Failed to create blueprint: ${resp.status()}`).toBeTruthy();
+  const data = await resp.json();
+  return data.rid;
+}
+
+/**
+ * Create blueprint items in batch. Returns item RIDs.
+ */
+export async function createBlueprintItems(
+  request: APIRequestContext,
+  blueprintRid: string,
+  items: Array<{
+    itemType: string;
+    suggestion: Record<string, unknown>;
+    confidence: number;
+    source?: string;
+    sortOrder?: number;
+  }>,
+): Promise<string[]> {
+  const body = items.map((item, idx) => ({
+    itemType: item.itemType,
+    suggestion: item.suggestion,
+    confidence: item.confidence,
+    source: item.source ?? 'field_analysis',
+    sortOrder: item.sortOrder ?? idx,
+  }));
+  const resp = await request.post(`${API}/blueprints/${blueprintRid}/items`, {
+    data: body,
+  });
+  expect(resp.ok(), `Failed to create blueprint items: ${resp.status()}`).toBeTruthy();
+  const data = await resp.json();
+  return (data as Array<{ rid: string }>).map((d) => d.rid);
+}
+
+/**
+ * Update blueprint status.
+ */
+export async function updateBlueprintStatus(
+  request: APIRequestContext,
+  blueprintRid: string,
+  status: string,
+): Promise<void> {
+  const resp = await request.patch(`${API}/blueprints/${blueprintRid}`, {
+    data: { status },
+  });
+  expect(resp.ok(), `Failed to update blueprint status: ${resp.status()}`).toBeTruthy();
+}
+
+/**
+ * Delete a blueprint (cleanup).
+ */
+export async function deleteBlueprint(
+  request: APIRequestContext,
+  blueprintRid: string,
+): Promise<void> {
+  // First discard if in pending_review
+  await request.patch(`${API}/blueprints/${blueprintRid}`, {
+    data: { status: 'discarded' },
+  });
+}
+
+/**
+ * Delete an agent session (cleanup).
+ */
+export async function deleteAgentSession(
+  request: APIRequestContext,
+  sessionRid: string,
+): Promise<void> {
+  await request.delete(`${API}/agent/sessions/${sessionRid}`);
+}
