@@ -161,7 +161,7 @@ function SceneContent({
       <Stars
         radius={100}
         depth={80}
-        count={3000}
+        count={1500}
         factor={4}
         saturation={0}
         fade
