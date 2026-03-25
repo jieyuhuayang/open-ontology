@@ -35,6 +35,7 @@ export default function TopBar() {
         <div id="branch-selector-slot" />
         <div id="change-status-slot" />
         <CreateMenu />
+        <SidekickTrigger />
         <LanguageSwitcher />
       </Flex>
     </Header>
