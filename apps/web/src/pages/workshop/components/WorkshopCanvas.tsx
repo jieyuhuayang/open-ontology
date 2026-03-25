@@ -293,6 +293,7 @@ const WorkshopCanvas = forwardRef<WorkshopCanvasHandle, WorkshopCanvasProps>(
 
     return (
       <Canvas
+        frameloop="demand"
         camera={{ position: [0, 5, 15], fov: 60, near: 0.1, far: 2000 }}
         style={{ background: '#0a0a1a' }}
         data-testid="workshop-canvas"
