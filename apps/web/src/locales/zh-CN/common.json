@@ -936,6 +936,17 @@
       "pattern_matching": "模式匹配",
       "semantic_inference": "语义推断",
       "best_practices": "最佳实践"
+    },
+    "type": {
+      "missing_description": "缺少描述",
+      "missing_title_key": "缺少标题键",
+      "missing_primary_key": "缺少主键",
+      "orphan_link": "孤立链接",
+      "duplicate_property_name": "重复属性名",
+      "suggest_link": "建议链接",
+      "cardinality_review": "基数审查",
+      "naming_improvement": "命名优化",
+      "description_enhancement": "描述增强"
     }
   }
 }
