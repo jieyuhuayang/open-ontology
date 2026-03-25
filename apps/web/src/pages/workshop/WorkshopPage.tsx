@@ -8,6 +8,7 @@ import { useWorkshopStore } from './stores/workshop-store';
 import { useAgentChat } from './hooks/use-agent-chat';
 import { useWorkshopGraph } from './hooks/use-workshop-graph';
 import ChatPanel from './components/ChatPanel';
+import GuidanceCard from './components/GuidanceCard';
 import StarfieldWorkbench from './components/StarfieldWorkbench';
 import SidekickPanel from './components/SidekickPanel';
 import EntityPopover from './components/EntityPopover';
