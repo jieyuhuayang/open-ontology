@@ -345,7 +345,7 @@ class BlueprintService:
                 conflicts.append(
                     ConflictCheckResult(
                         item_rid=item.rid,
-                        conflict_type="api_name_collision",
+                        conflict_type=ConflictType.API_NAME_COLLISION,
                         message=f"apiName '{api_name}' conflicts with existing ObjectType '{existing.rid}'",
                         conflicting_entity_rid=existing.rid,
                     )
