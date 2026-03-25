@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useObjectTypes } from '@/api/object-types';
+import { useLinkTypes } from '@/api/link-types';
 import { useBlueprintDetail } from '@/api/blueprints';
 import type { ObjectType, LinkType, BlueprintItem } from '@/api/types';
 import type { WorkshopNode, WorkshopEdge } from '../types';
