@@ -1,6 +1,6 @@
 import { useRef, useCallback, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
+import { Billboard, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import type { WorkshopNode } from '../types';
 
