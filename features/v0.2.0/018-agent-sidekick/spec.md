@@ -131,6 +131,7 @@ class Suggestion(DomainModel):
     confidence_level: str            # high / medium / low
     source: SuggestionSource
     reasoning: str                   # 推理依据（展开后显示）
+    requires_llm: bool = False       # Accept 是否依赖 LLM（前端据此在降级模式下隐藏 Accept）
     action_payload: dict | None = None  # 可选：Apply 时需要的数据
 
 class SuggestionsResponse(DomainModel):
