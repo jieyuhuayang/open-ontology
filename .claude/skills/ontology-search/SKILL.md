@@ -3,6 +3,8 @@ name: ontology-search
 description: 搜索本体资源（对象类型、属性、链接类型）。TRIGGER when: 用户要求搜索本体，或使用 /ontology-search 命令。
 ---
 
+> 完整参数与约束定义：`apps/server/app/agent/skills/search-ontology/SKILL.md`
+
 使用 `oo search` 命令进行全文搜索。
 
 ```bash
