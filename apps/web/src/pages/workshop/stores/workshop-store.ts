@@ -3,6 +3,10 @@ import type {
   WorkshopPageState,
   PlanStep,
   SSEBlueprintItemData,
+  ViewMode,
+  DragLinkState,
+  ShockwaveInstance,
+  CollapseInstance,
 } from '../types';
 
 export interface WorkshopStore {
