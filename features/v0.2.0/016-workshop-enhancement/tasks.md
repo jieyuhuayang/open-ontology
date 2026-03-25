@@ -274,7 +274,7 @@
   **覆盖 AC**: AC-16, AC-17, AC-18
   **依赖**: T003
 
-- [ ] **T017**: ChatPanel 集成 PromptBubbles
+- [x] **T017**: ChatPanel 集成 PromptBubbles
   **文件**: `apps/web/src/pages/workshop/components/ChatPanel.tsx`（修改）
   **逻辑**:
   - 从 `selectedEntityRid` + `nodes` 派生 `selectedNode`
