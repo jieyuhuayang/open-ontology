@@ -1352,7 +1352,7 @@ class TestBatchUpdateDecisions:
                 item_rids=["ri.ontology.blueprint-item.x"],
                 user_decision=UserDecision.ACCEPTED,
             )
-            with pytest.raises(AppError, match="BLUEPRINT_INVALID_STATUS_TRANSITION"):
+            with pytest.raises(AppError, match="pending_review"):
                 await service.batch_update_decisions(bp_orm.rid, req)
 
     @pytest.mark.asyncio
