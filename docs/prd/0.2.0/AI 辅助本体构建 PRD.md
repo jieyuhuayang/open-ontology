@@ -340,7 +340,7 @@ stateDiagram-v2
 |------|------|------|
 | `blueprintRid` | string | 蓝图唯一标识（`ri.ontology.blueprint.<uuid>`） |
 | `name` | string | 蓝图名称（如"电商平台本体蓝图"） |
-| `status` | enum | `draft` / `pending_review` / `applied` / `discarded` |
+| `status` | enum | `draft` / `pending_review`（前端语义重映射为 `ready`） / `applied` / `discarded` |
 | `sourceFiles` | string[] | 来源文件列表 |
 | `items` | BlueprintItem[] | 蓝图项列表 |
 
