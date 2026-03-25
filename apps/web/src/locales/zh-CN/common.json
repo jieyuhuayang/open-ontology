@@ -747,6 +747,7 @@
     "backToManager": "返回",
     "guidance": {
       "title": "开始构建本体",
+      "subtitle": "AI 辅助分析业务领域，构建语义数据模型",
       "domain": "业务领域（可选）",
       "goal": "建模目标（可选）",
       "scope": "概念范围（可选）",
