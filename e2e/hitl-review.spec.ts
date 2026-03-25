@@ -268,24 +268,27 @@ test.describe.serial('F017 HITL Review — E2E', () => {
 
     await updateBlueprintStatus(request, bp3Rid, 'pending_review');
 
-    // Pre-reject one item
-    await request.patch(`${API}/blueprints/${bp3Rid}/items/${item3Rids[0]}`, {
+    // Pre-reject one item and verify
+    const rejectResp = await request.patch(`${API}/blueprints/${bp3Rid}/items/${item3Rids[0]}`, {
       data: { userDecision: 'rejected' },
     });
+    expect(rejectResp.ok(), `Pre-reject failed: ${rejectResp.status()}`).toBeTruthy();
+    const rejectedItem = await rejectResp.json();
+    expect(rejectedItem.userDecision).toBe('rejected');
 
-    // Batch accept all remaining (should skip the already-rejected one)
+    // Batch accept only the remaining undecided items (exclude already-rejected)
+    const undecidedRids = item3Rids.slice(1); // items B and C
     const batchResp = await request.patch(
       `${API}/blueprints/${bp3Rid}/items/batch-decision`,
       {
         data: {
-          itemRids: item3Rids,
+          itemRids: undecidedRids,
           userDecision: 'accepted',
         },
       },
     );
     expect(batchResp.ok()).toBeTruthy();
     const updated = await batchResp.json();
-    // Should have updated 2 items (the rejected one is skipped)
     expect(updated).toHaveLength(2);
 
     // Verify all items have decisions
