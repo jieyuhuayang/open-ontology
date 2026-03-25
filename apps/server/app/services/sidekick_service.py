@@ -39,22 +39,22 @@ class SidekickService:
 
     async def get_suggestions(self, context: SidekickContext) -> SuggestionsResponse:
         """Get suggestions for the given page context."""
-        # Get rule-based suggestions (may raise AppError if entity not found)
-        rule_suggestions = await self._rules_engine.analyze(context)
+        llm_available = self._llm_engine.is_available()
 
-        # Get LLM suggestions (never raises, returns [] on failure)
-        llm_available = self._llm_engine._is_available()
-        entity_data = await self._get_entity_data_for_llm(context)
-        ontology_summary = await self._get_ontology_summary()
+        # Run rules analysis and LLM data prep concurrently
+        rule_suggestions, entity_data, ontology_summary = await asyncio.gather(
+            self._rules_engine.analyze(context),
+            self._get_entity_data_for_llm(context),
+            self._get_ontology_summary(),
+        )
+
         llm_suggestions = await self._llm_engine.analyze(context, entity_data, ontology_summary)
 
-        # Merge and sort by confidence descending
         all_suggestions = rule_suggestions + llm_suggestions
         all_suggestions.sort(key=lambda s: s.confidence, reverse=True)
 
         return SuggestionsResponse(
             suggestions=all_suggestions,
-            # True when LLM is available (even if it returned 0 suggestions)
             has_llm_suggestions=llm_available,
         )
 
