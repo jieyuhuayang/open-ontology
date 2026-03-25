@@ -15,7 +15,7 @@ import EntityDrawer from './components/EntityDrawer';
 import ConnectionBanner from './components/ConnectionBanner';
 import styles from './styles/workshop.module.css';
 
-const DEFAULT_ONTOLOGY_RID = 'ri.ontology.main.default';
+import { DEFAULT_ONTOLOGY_RID } from '@/api/working-state';
 
 export function Component() {
   const { t } = useTranslation();
