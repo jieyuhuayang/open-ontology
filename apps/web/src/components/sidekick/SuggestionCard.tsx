@@ -38,7 +38,7 @@ export default function SuggestionCard({
       <Flex justify="space-between" align="center" style={{ marginBottom: 8 }}>
         <Space size={4}>
           <StarFilled style={{ color: '#722ed1', fontSize: 12 }} />
-          <Tag style={{ fontSize: 11 }}>{suggestion.suggestionType}</Tag>
+          <Tag style={{ fontSize: 11 }}>{t(`sidekick.type.${suggestion.suggestionType}`, suggestion.suggestionType)}</Tag>
         </Space>
         <ConfidenceIndicator
           confidence={suggestion.confidence}
