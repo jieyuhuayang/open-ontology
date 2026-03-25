@@ -354,13 +354,23 @@ class BlueprintService:
             if item.item_type != BlueprintItemType.LINK_TYPE.value:
                 continue
             suggestion = item.user_edits or item.suggestion
-            side_a_rid = (suggestion.get("sideA") or {}).get("objectTypeRid", "")
-            side_b_rid = (suggestion.get("sideB") or {}).get("objectTypeRid", "")
+            # Support both nested and flat formats
+            side_a_rid = suggestion.get("sideAPlaceholderRid") or (
+                suggestion.get("sideA") or {}
+            ).get("objectTypeRid", "")
+            side_b_rid = suggestion.get("sideBPlaceholderRid") or (
+                suggestion.get("sideB") or {}
+            ).get("objectTypeRid", "")
             missing_sides = []
-            if side_a_rid and side_a_rid not in ot_placeholders:
-                missing_sides.append(f"sideA ({side_a_rid})")
-            if side_b_rid and side_b_rid not in ot_placeholders:
-                missing_sides.append(f"sideB ({side_b_rid})")
+            for side_label, side_rid in [("sideA", side_a_rid), ("sideB", side_b_rid)]:
+                if not side_rid:
+                    continue
+                # Skip if it's a real OT RID (already exists in ontology)
+                if side_rid.startswith("ri.ontology."):
+                    continue
+                # Check if it's a placeholder that maps to an accepted/edited OT
+                if side_rid not in ot_placeholders:
+                    missing_sides.append(f"{side_label} ({side_rid})")
             if missing_sides:
                 has_blocking_conflict = True
                 conflicts.append(
