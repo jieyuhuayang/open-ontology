@@ -160,19 +160,6 @@ export default function SidekickDrawer() {
           )}
         </>
       )}
-
-      <div style={{ marginTop: 24, textAlign: 'center' }}>
-        <Button
-          type="link"
-          icon={<RocketOutlined />}
-          onClick={() => {
-            close();
-            navigate('/workshop');
-          }}
-        >
-          {t('sidekick.openWorkshop')}
-        </Button>
-      </div>
     </Drawer>
   );
 }
