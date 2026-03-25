@@ -3,6 +3,8 @@ name: ontology-optimize
 description: 优化现有本体（命名一致性、缺失关系、质量改进建议）。TRIGGER when: 用户要求优化本体，或使用 /ontology-optimize 命令。
 ---
 
+> 完整参数与约束定义：`apps/server/app/agent/skills/optimize-ontology/SKILL.md`
+
 通过验证和分析现有本体提出优化建议：
 
 ```bash

@@ -3,7 +3,9 @@ name: ontology-create
 description: 在本体中创建对象类型、属性或链接类型。TRIGGER when: 用户要求创建本体资源（对象类型、属性、链接类型），或使用 /ontology-create 命令。DO NOT TRIGGER when: 用户要求搜索、验证或管理蓝图。
 ---
 
-使用 `oo` CLI 命令创建本体资源。参数约束详见 deepagents Skill 定义（`apps/server/app/agent/skills/`）。
+> 完整参数与约束定义：`apps/server/app/agent/skills/create-object-type/SKILL.md`、`create-property/SKILL.md`、`create-link-type/SKILL.md`
+
+使用 `oo` CLI 命令创建本体资源。
 
 ## 创建对象类型
 
