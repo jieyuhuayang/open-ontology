@@ -280,6 +280,9 @@ class BlueprintService:
         items = await BlueprintItemStorage.batch_get(self._session, req.item_rids)
         updated: list[BlueprintItem] = []
         for item_orm in items:
+            # Verify item belongs to this blueprint (prevent IDOR)
+            if item_orm.blueprint_rid != blueprint_rid:
+                continue
             if item_orm.user_decision is not None:
                 continue
             orm = await BlueprintItemStorage.update_decision(
