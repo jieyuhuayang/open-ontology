@@ -102,6 +102,8 @@ const initialState = {
   dragLinkState: null as DragLinkState | null,
   activeShockwaves: [] as ShockwaveInstance[],
   activeCollapses: [] as CollapseInstance[],
+  sidekickActiveTab: 'assistant' as const,
+  editingItemRid: null as string | null,
 };
 
 export const useWorkshopStore = create<WorkshopStore>((set) => ({
