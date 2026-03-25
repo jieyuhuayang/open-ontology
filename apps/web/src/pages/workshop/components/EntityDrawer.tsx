@@ -1,7 +1,10 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Drawer, Table, Tag, Button, Typography } from 'antd';
+import { Drawer, Table, Tag, Button, Popconfirm, Typography } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import { useWorkshopStore } from '../stores/workshop-store';
 import ConfidenceIndicator from './ConfidenceIndicator';
+import DataProbeButton from './DataProbeButton';
 import type { WorkshopNode, WorkshopEdge } from '../types';
 
 const { Text, Paragraph } = Typography;
@@ -9,6 +12,7 @@ const { Text, Paragraph } = Typography;
 interface EntityDrawerProps {
   nodes: WorkshopNode[];
   edges: WorkshopEdge[];
+  onDeleteNode?: (nodeId: string) => void;
 }
 
 const SOURCE_LABELS: Record<string, string> = {
