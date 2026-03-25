@@ -47,7 +47,7 @@ class TestMissingDescription:
         }
         context = _make_context()
 
-        with patch.object(engine, "_get_entity_data", new_callable=AsyncMock, return_value=ot_data):
+        with patch.object(engine, "get_entity_data", new_callable=AsyncMock, return_value=ot_data):
             suggestions = await engine.analyze(context)
 
         desc_suggestions = [
@@ -71,7 +71,7 @@ class TestMissingDescription:
         }
         context = _make_context()
 
-        with patch.object(engine, "_get_entity_data", new_callable=AsyncMock, return_value=ot_data):
+        with patch.object(engine, "get_entity_data", new_callable=AsyncMock, return_value=ot_data):
             suggestions = await engine.analyze(context)
 
         desc_suggestions = [
@@ -93,7 +93,7 @@ class TestMissingTitleKey:
         }
         context = _make_context()
 
-        with patch.object(engine, "_get_entity_data", new_callable=AsyncMock, return_value=ot_data):
+        with patch.object(engine, "get_entity_data", new_callable=AsyncMock, return_value=ot_data):
             suggestions = await engine.analyze(context)
 
         tk_suggestions = [
@@ -117,7 +117,7 @@ class TestMissingPrimaryKey:
         }
         context = _make_context()
 
-        with patch.object(engine, "_get_entity_data", new_callable=AsyncMock, return_value=ot_data):
+        with patch.object(engine, "get_entity_data", new_callable=AsyncMock, return_value=ot_data):
             suggestions = await engine.analyze(context)
 
         pk_suggestions = [
@@ -149,7 +149,7 @@ class TestOrphanLink:
         )
 
         with (
-            patch.object(engine, "_get_entity_data", new_callable=AsyncMock, return_value=lt_data),
+            patch.object(engine, "get_entity_data", new_callable=AsyncMock, return_value=lt_data),
             patch.object(
                 engine,
                 "_check_ot_exists",
@@ -188,7 +188,7 @@ class TestDuplicatePropertyName:
         )
 
         with (
-            patch.object(engine, "_get_entity_data", new_callable=AsyncMock, return_value=ot_data),
+            patch.object(engine, "get_entity_data", new_callable=AsyncMock, return_value=ot_data),
             patch.object(
                 engine,
                 "_find_duplicate_property_names",
@@ -217,7 +217,7 @@ class TestNoIssues:
         }
         context = _make_context()
 
-        with patch.object(engine, "_get_entity_data", new_callable=AsyncMock, return_value=ot_data):
+        with patch.object(engine, "get_entity_data", new_callable=AsyncMock, return_value=ot_data):
             suggestions = await engine.analyze(context)
 
         assert len(suggestions) == 0
@@ -236,7 +236,7 @@ class TestPageTypeFiltering:
         }
         context = _make_context(page_type=SidekickPageType.OBJECT_TYPE_DETAIL)
 
-        with patch.object(engine, "_get_entity_data", new_callable=AsyncMock, return_value=ot_data):
+        with patch.object(engine, "get_entity_data", new_callable=AsyncMock, return_value=ot_data):
             suggestions = await engine.analyze(context)
 
         for s in suggestions:
@@ -267,7 +267,7 @@ class TestPageTypeFiltering:
         )
 
         with (
-            patch.object(engine, "_get_entity_data", new_callable=AsyncMock, return_value=lt_data),
+            patch.object(engine, "get_entity_data", new_callable=AsyncMock, return_value=lt_data),
             patch.object(
                 engine,
                 "_check_ot_exists",
