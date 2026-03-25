@@ -51,7 +51,7 @@ export function Component() {
   const agentChat = useAgentChat(currentSessionRid);
 
   // Single instance of useWorkshopGraph — shared by StarfieldWorkbench, EntityPopover, EntityDrawer
-  const { nodes, edges } = useWorkshopGraph(DEFAULT_ONTOLOGY_RID, null);
+  const { nodes, edges } = useWorkshopGraph(DEFAULT_ONTOLOGY_RID, latestBlueprint?.rid ?? null);
 
   // Reset store on unmount
   useEffect(() => {
