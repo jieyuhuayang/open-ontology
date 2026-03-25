@@ -1705,9 +1705,7 @@ class TestRetryItem:
             mock_item_storage.get_succeeded_items = AsyncMock(return_value=[succeeded_ot])
             mock_item_storage.update_created_entity_rid = AsyncMock()
 
-            with patch(
-                "app.services.blueprint_service.LinkTypeService", create=True
-            ) as mock_lt_svc_cls:
+            with patch("app.services.link_type_service.LinkTypeService") as mock_lt_svc_cls:
                 mock_lt_svc = MagicMock()
                 mock_lt_svc.create = AsyncMock(return_value=mock_created_lt)
                 mock_lt_svc_cls.return_value = mock_lt_svc
