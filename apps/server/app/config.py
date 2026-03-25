@@ -1,3 +1,4 @@
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings
 
 
@@ -11,9 +12,10 @@ class Settings(BaseSettings):
     UPLOAD_TOKEN_TTL_MINUTES: int = 30
 
     # Agent LLM configuration (v0.2.0)
-    ANTHROPIC_API_KEY: str = ""
-    OPENAI_API_KEY: str = ""
+    ANTHROPIC_API_KEY: SecretStr = SecretStr("")
+    OPENAI_API_KEY: SecretStr = SecretStr("")
     LLM_MODEL: str = "claude-sonnet-4-6"
+    SIDEKICK_MODEL: str = ""  # Empty = inherit LLM_MODEL
     LLM_MAX_TOKENS: int = 4096
     LLM_TEMPERATURE: float = 0.3
     LLM_TOKEN_BUDGET: int = 100000  # per-session token budget
