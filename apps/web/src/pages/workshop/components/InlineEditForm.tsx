@@ -84,7 +84,7 @@ export default function InlineEditForm({
             </Form.Item>
             <Space>
               <Form.Item
-                label="Required"
+                label={t('common.required', 'Required')}
                 name="required"
                 valuePropName="checked"
               >
