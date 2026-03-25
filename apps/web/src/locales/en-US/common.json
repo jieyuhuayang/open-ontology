@@ -826,7 +826,17 @@
       "checkNaming": "Check field naming conventions",
       "addMissingProps": "Add missing properties",
       "verifyCardinality": "Verify cardinality",
-      "checkReverse": "Check reverse link"
+      "checkReverse": "Check reverse link",
+      "templates": {
+        "checkOrphanKeys": "Check for orphan foreign keys",
+        "deriveStats": "Derive statistical properties from existing fields",
+        "splitSensitive": "Split sensitive fields to improve security",
+        "suggestRelated": "Suggest related object types",
+        "checkNaming": "Check field naming conventions",
+        "addMissingProps": "Add missing properties",
+        "verifyCardinality": "Verify cardinality relationship is correct",
+        "checkReverse": "Check if reverse link is needed"
+      }
     },
     "dataProbe": {
       "comingSoon": "Data preview probe — coming soon"
