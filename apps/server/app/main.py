@@ -23,6 +23,7 @@ from app.routers import (
     ontology,
     properties,
     search,
+    sidekick,
 )
 
 
