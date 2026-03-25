@@ -15,7 +15,7 @@ export default function ShockwaveEffect({ shockwave }: ShockwaveEffectProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const removeShockwave = useWorkshopStore((s) => s.removeShockwave);
 
-  useFrame(({ clock, camera }) => {
+  useFrame(({ clock, camera, invalidate }) => {
     if (!meshRef.current) return;
 
     const elapsed = clock.elapsedTime - shockwave.startTime;
