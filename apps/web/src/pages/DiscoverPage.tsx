@@ -24,6 +24,7 @@ export default function DiscoverPage() {
         return data;
       },
       retry: false,
+      meta: { skipGlobalError: true },
     })),
   });
 
