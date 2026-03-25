@@ -56,7 +56,7 @@ export default function InlineEditForm({
             <Form.Item label={t('common.description', 'Description')} name="description">
               <Input.TextArea rows={2} />
             </Form.Item>
-            <Form.Item label="Icon" name="icon">
+            <Form.Item label={t('common.icon', 'Icon')} name="icon">
               <Input />
             </Form.Item>
           </>
