@@ -162,7 +162,7 @@ v0.2.0 标志着本体管理系统从"底层数据治理工具"跃升为"企业�
 <li><b>本体构建 Agent 引擎</b> — 基于 deepagents 的通用 Agent，具备自主规划、Skill 调用、子 Agent 派生能力</li>
 <li><b>资料分析与本体蓝图生成</b> — 支持上传结构化/非结构化资料，Agent 自动分析并生成本体蓝图</li>
 <li><b>3D 本体工坊</b> — 将 3D 星空 Demo 升级为正式的本体可视化工作台，与 Agent 深度联动</li>
-<li><b>HITL 蓝图审查与微调</b> — 三级操作（接受/编辑/拒绝），流式可视化审查流程</li>
+<li><b>HITL 蓝图调优与应用</b> — Chat 面板中的建议卡片交互（接受/编辑/拒绝）+ 蓝图应用流程</li>
 <li><b>CLI 工具与 Skills 体系</b> — 将原子操作包装为 CLI 命令和 Claude Code Skills，Agent 和开发者共用</li>
 </ol>
 </td>
