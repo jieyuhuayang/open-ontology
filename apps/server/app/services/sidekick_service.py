@@ -98,7 +98,7 @@ class SidekickService:
             description = await self._llm_engine.generate_content(gen_request)
 
         await self._update_ot_description(request.entity_rid, description)
-        return SuggestionApplyResponse(success=True, message="描述已更新")
+        return SuggestionApplyResponse(success=True, message="Description updated")
 
     async def _update_ot_description(self, entity_rid: str, description: str) -> None:
         """Update OT description via ObjectTypeService."""
