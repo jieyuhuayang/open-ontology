@@ -91,7 +91,7 @@ export default function InlineEditForm({
                 <Switch />
               </Form.Item>
               <Form.Item
-                label="Primary Key"
+                label={t('common.primaryKey', 'Primary Key')}
                 name="primaryKey"
                 valuePropName="checked"
               >
