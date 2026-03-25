@@ -1370,37 +1370,47 @@ description: 在本体中创建对象类型或链接类型
 
 ## 5.2 端到端流程走查
 
+> **v0.2.1 改进**：流程重构为三阶段体验。
+
 ```mermaid
 flowchart TD
-    Start([用户进入本体工坊]) --> Phase0{领域/目标引导}
-    Phase0 -->|填写领域+目标+范围| P0Done[注入 Agent 上下文]
-    Phase0 -->|跳过| P0Done
-    P0Done --> Phase1[拖入/上传资料文件]
-    Phase1 --> Phase1b{继续上传?}
-    Phase1b -->|是| Phase1
-    Phase1b -->|否| Trigger[点击发送 / 输入'开始分析']
+    Start([用户进入本体工坊]) --> Phase0
 
-    Trigger --> Phase2[Agent 流式分析]
-    Phase2 --> Parse[逐文件解析 + 实体结晶]
-    Parse --> Ambiguity{遇到歧义?}
-    Ambiguity -->|是| Clarify[发送澄清请求]
-    Clarify --> UserReply[用户选择/跳过]
-    UserReply --> Parse
-    Ambiguity -->|否| NextFile{还有文件?}
-    NextFile -->|是| Parse
-    NextFile -->|否| Phase3[合并去重 + 自我审查 → 生成蓝图]
+    subgraph Phase0[Phase 0 — 全屏引导]
+        Guide[填写领域/目标/范围]
+        Upload[上传业务资料文件]
+        Guide --> Upload
+        Upload --> Submit[点击'开始构建']
+    end
 
-    Phase3 --> Phase4[HITL 审查]
-    Phase4 --> Review{逐项审查}
-    Review -->|高置信度| Accept[接受 → 星体结晶]
-    Review -->|需调整| Edit[编辑后确认]
-    Review -->|不相关| Reject[拒绝 → 星体消散]
-    Review -->|缺失项| Dialog[对话补充 → Agent 新增]
-    Dialog --> Review
+    Submit --> CreateSession[创建 Session + 上传文件 + 触发 Agent]
 
-    Accept & Edit & Reject --> AllDone{全部审查完?}
-    AllDone -->|否| Review
-    AllDone -->|是| Apply[点击'应用蓝图']
+    subgraph Phase1[Phase 1 — Agent 自主构建 全屏画布]
+        Build[Agent 自主分析 + 结晶动画]
+        Build --> Ambiguity{遇到歧义?}
+        Ambiguity -->|是| Clarify[弹出澄清选择题]
+        Clarify --> UserReply[用户选择/跳过]
+        UserReply --> Build
+        Ambiguity -->|否| NextStep{构建完成?}
+        NextStep -->|否| Build
+        NextStep -->|是| Complete[blueprint-complete 事件]
+    end
+
+    CreateSession --> Build
+    Complete --> Transition[进度条淡出 · Chat 面板滑入]
+
+    subgraph Phase2[Phase 2 — 蓝图调优 两面板]
+        Chat[用户通过 Chat 与 Agent 对话]
+        Suggest[Agent 主动提建议卡片]
+        Chat --> Suggest
+        Suggest --> Accept[Accept → 修改蓝图]
+        Suggest --> Edit[Edit → 内联编辑后修改]
+        Suggest --> Reject[Reject → 忽略建议]
+        Accept & Edit --> Chat
+        Chat --> Apply{满意? 点击'应用到本体'}
+    end
+
+    Transition --> Chat
     Apply --> Create[批量创建到 WorkingState]
     Create --> Fail{有失败项?}
     Fail -->|是| Retry[编辑后重试 / 跳过]
@@ -1411,14 +1421,13 @@ flowchart TD
 
 **各阶段要点**：
 
-| 阶段 | 核心动作 | 画布状态 | 对话面板状态 |
-|------|----------|----------|-------------|
-| 1. 进入工坊 | 浏览现有本体 + 领域引导 | 渲染已有星体（或空白引导） | 领域/目标引导卡片 |
-| 2. 资料上传 | 拖入文件 + 补充说明 | 不变 | 文件缩略图 + 发送按钮 |
-| 3. 流式分析 | 观看实时进度，回答澄清 | 星体逐个结晶（半透明） | SSE 流式输出 + 进度步骤 |
-| 4. HITL 审查 | 接受/编辑/拒绝 + 对话补充 | 星体状态随操作变化 | 审查引导 + Agent 建议 |
-| 5. 应用蓝图 | 批量创建 + 处理失败项 | 半透明→实体 / 红色闪烁 | 进度条 + 错误汇报 |
-| 6. 发布 | Save 确认 | 所有星体明亮稳定 | 变更摘要 |
+| 阶段 | 界面形态 | 核心动作 | 画布状态 |
+|------|---------|----------|----------|
+| Phase 0 引导 | 全屏星空 + 居中引导 | 填写领域/目标 + 上传文件 | 装饰性星空（无交互节点） |
+| Phase 1 构建 | 全屏画布 + 浮动进度条 | 观看 Agent 自主构建 + 回答澄清 | 星体逐步结晶（实时动画） |
+| Phase 2 调优 | 两面板（Chat + Canvas） | 自然语言调优 + Accept/Edit/Reject 建议 | 蓝图初稿星体（可交互） |
+| 应用 | ApplyProgressModal | 批量创建 + 处理失败项 | 初稿星体 → 确认星体 |
+| 发布 | Ontology Manager | Save 确认 | 所有星体明亮稳定 |
 
 ## 5.3 HITL 交互规范
 
