@@ -44,7 +44,7 @@ def _confidence_level(confidence: float) -> str:
 
 
 class SidekickLlmEngine:
-    def _is_available(self) -> bool:
+    def is_available(self) -> bool:
         """Check if Anthropic API key is configured."""
         return bool(os.environ.get("ANTHROPIC_API_KEY"))
 
