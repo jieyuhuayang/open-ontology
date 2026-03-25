@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Input, Button, message } from 'antd';
-import { motion } from 'framer-motion';
 import { useCreateAgentSession } from '@/api/agent';
 import { useWorkshopStore } from '../stores/workshop-store';
 import styles from '../styles/workshop.module.css';
@@ -45,12 +44,6 @@ const GOAL_ICONS: Record<string, string> = {
 interface GuidanceCardProps {
   ontologyRid: string;
 }
-
-const stagger = (i: number) => ({
-  initial: { opacity: 0, y: 18 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.45, delay: 0.1 + i * 0.08, ease: [0.16, 1, 0.3, 1] as const },
-});
 
 export default function GuidanceCard({ ontologyRid }: GuidanceCardProps) {
   const { t } = useTranslation();
@@ -100,29 +93,18 @@ export default function GuidanceCard({ ontologyRid }: GuidanceCardProps) {
     setSelectedGoal((prev) => (prev === g ? null : g));
 
   return (
-    <motion.div
-      className={styles.guidanceOverlay}
-      data-testid="guidance-card"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.35 }}
-    >
-      <motion.div
-        className={styles.guidanceGlass}
-        initial={{ opacity: 0, y: 28, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-      >
+    <div className={styles.guidanceOverlay} data-testid="guidance-card">
+      <div className={styles.guidanceGlass}>
         {/* Title */}
-        <motion.h1 className={styles.guidanceTitle} {...stagger(0)}>
+        <h1 className={styles.guidanceTitle}>
           {t('workshop.guidance.title')}
-        </motion.h1>
-        <motion.p className={styles.guidanceSubtitle} {...stagger(1)}>
+        </h1>
+        <p className={styles.guidanceSubtitle}>
           {t('workshop.guidance.subtitle')}
-        </motion.p>
+        </p>
 
         {/* Domain */}
-        <motion.div {...stagger(2)}>
+        <div className={styles.guidanceSection}>
           <div className={styles.guidanceSectionLabel}>
             {t('workshop.guidance.domain')}
           </div>
@@ -146,7 +128,7 @@ export default function GuidanceCard({ ontologyRid }: GuidanceCardProps) {
             </div>
           </div>
           {selectedDomain === 'custom' && (
-            <div className={styles.guidanceCustomInput} style={{ marginTop: -16, marginBottom: 28 }}>
+            <div className={styles.guidanceCustomInput}>
               <Input
                 size="small"
                 style={{ maxWidth: 220 }}
@@ -155,10 +137,10 @@ export default function GuidanceCard({ ontologyRid }: GuidanceCardProps) {
               />
             </div>
           )}
-        </motion.div>
+        </div>
 
         {/* Goal */}
-        <motion.div {...stagger(3)}>
+        <div className={styles.guidanceSection}>
           <div className={styles.guidanceSectionLabel}>
             {t('workshop.guidance.goal')}
           </div>
@@ -174,10 +156,10 @@ export default function GuidanceCard({ ontologyRid }: GuidanceCardProps) {
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* Scope */}
-        <motion.div className={styles.guidanceScopeWrapper} {...stagger(4)}>
+        <div className={styles.guidanceScopeWrapper}>
           <div className={styles.guidanceSectionLabel}>
             {t('workshop.guidance.scope')}
           </div>
@@ -187,10 +169,10 @@ export default function GuidanceCard({ ontologyRid }: GuidanceCardProps) {
             onChange={(e) => setScopeHint(e.target.value)}
             placeholder={t('workshop.guidance.scopePlaceholder')}
           />
-        </motion.div>
+        </div>
 
         {/* Actions */}
-        <motion.div className={styles.guidanceActions} {...stagger(5)}>
+        <div className={styles.guidanceActions}>
           <Button
             type="primary"
             onClick={() => handleSubmit(false)}
@@ -206,8 +188,8 @@ export default function GuidanceCard({ ontologyRid }: GuidanceCardProps) {
           >
             {t('workshop.guidance.skip')}
           </Button>
-        </motion.div>
-      </motion.div>
-    </motion.div>
+        </div>
+      </div>
+    </div>
   );
 }
