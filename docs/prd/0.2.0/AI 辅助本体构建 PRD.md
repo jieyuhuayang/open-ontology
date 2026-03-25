@@ -963,7 +963,7 @@ Agent 发送 blueprint-item 事件（type: object_type）
   → 漩涡中凝聚出新星体（birth animation）
   → 星体半透明状态（pending review）
   → 属性以光圈形式环绕星体
-  → Sidekick 面板同步显示建议卡片
+  → Phase 2 中 Chat 面板同步显示建议卡片
 
 Agent 发送 blueprint-item 事件（type: link_type）
   → 两个相关星体之间出现虚线（pending review）
