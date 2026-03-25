@@ -29,7 +29,6 @@ const headerStyle: React.CSSProperties = {
 export default function ChatPanel({ ontologyRid, agentChat, nodes = [] }: ChatPanelProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const pageState = useWorkshopStore((s) => s.pageState);
   const currentSessionRid = useWorkshopStore((s) => s.currentSessionRid);
   const setCurrentSessionRid = useWorkshopStore(
     (s) => s.setCurrentSessionRid,
