@@ -205,7 +205,7 @@ class TestApplySuggestion:
             entity_rid="ri.ontology.object-type.test1",
         )
 
-        with patch.object(service, "_apply_title_key", new_callable=AsyncMock) as mock_apply:
+        with patch.object(service, "_apply_key_property", new_callable=AsyncMock) as mock_apply:
             mock_apply.return_value = True
             result = await service.apply_suggestion(request)
 
