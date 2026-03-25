@@ -489,17 +489,17 @@ class BlueprintService:
                     side_b.get("objectTypeRid", ""), side_b.get("objectTypeRid", "")
                 )
 
-                from app.domain.link_type import LinkTypeCreateRequest, LinkTypeSideInput
+                from app.domain.link_type import LinkSideCreateInput, LinkTypeCreateRequest
 
                 created = await lt_service.create(
                     LinkTypeCreateRequest(
                         display_name=suggestion.get("displayName", ""),
                         api_name=suggestion.get("apiName"),
-                        side_a=LinkTypeSideInput(
+                        side_a=LinkSideCreateInput(
                             object_type_rid=side_a_ot,
                             api_name=side_a.get("apiName", "sideA"),
                         ),
-                        side_b=LinkTypeSideInput(
+                        side_b=LinkSideCreateInput(
                             object_type_rid=side_b_ot,
                             api_name=side_b.get("apiName", "sideB"),
                         ),
