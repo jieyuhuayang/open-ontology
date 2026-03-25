@@ -558,7 +558,7 @@ Skills 体系严格分为**能力层**和**知识层**，确保所有调用者�
                                          ▼
                                 WorkingState（草稿）→ Save 发布
 
-                    F. Sidekick (P1) — Ontology Manager 各页面的轻量级 AI 助手
+                    F. Sidekick — 已取消（能力合并到 Workshop Chat 面板）
 ```
 
 ## 4.1 模块 A：本体构建 Agent 引擎（P0）
