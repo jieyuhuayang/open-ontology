@@ -1701,9 +1701,7 @@ class TestRetryItem:
             patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
         ):
             mock_bp_storage.get = AsyncMock(return_value=bp_orm)
-            mock_result = MagicMock()
-            mock_result.scalar_one_or_none.return_value = lt_item
-            db_session_mock.execute = AsyncMock(return_value=mock_result)
+            mock_item_storage.get_for_update = AsyncMock(return_value=lt_item)
             mock_item_storage.get_succeeded_items = AsyncMock(return_value=[succeeded_ot])
             mock_item_storage.update_created_entity_rid = AsyncMock()
 
