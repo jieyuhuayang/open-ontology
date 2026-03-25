@@ -47,7 +47,7 @@ export default function InlineEditForm({
       >
         {item.itemType === 'object_type' && (
           <>
-            <Form.Item label="Display Name" name="displayName">
+            <Form.Item label={t('common.displayName', 'Display Name')} name="displayName">
               <Input />
             </Form.Item>
             <Form.Item label="API Name" name="apiName">
@@ -63,7 +63,7 @@ export default function InlineEditForm({
         )}
         {item.itemType === 'property' && (
           <>
-            <Form.Item label="Display Name" name="displayName">
+            <Form.Item label={t('common.displayName', 'Display Name')} name="displayName">
               <Input />
             </Form.Item>
             <Form.Item label="API Name" name="apiName">
@@ -102,7 +102,7 @@ export default function InlineEditForm({
         )}
         {item.itemType === 'link_type' && (
           <>
-            <Form.Item label="Display Name" name="displayName">
+            <Form.Item label={t('common.displayName', 'Display Name')} name="displayName">
               <Input />
             </Form.Item>
             <Form.Item label="Side A">
