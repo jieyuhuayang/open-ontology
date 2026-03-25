@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     # Agent LLM configuration (v0.2.0)
     ANTHROPIC_API_KEY: SecretStr = SecretStr("")
     OPENAI_API_KEY: SecretStr = SecretStr("")
+    OPENAI_API_BASE: str = ""  # Custom endpoint for OpenAI-compatible providers (e.g. OneRouter)
     LLM_MODEL: str = "claude-sonnet-4-6"
     SIDEKICK_MODEL: str = ""  # Empty = inherit LLM_MODEL
     LLM_MAX_TOKENS: int = 4096
