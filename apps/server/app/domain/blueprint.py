@@ -141,6 +141,16 @@ class BlueprintApplyResult(DomainModel):
 # --- F017: HITL Review & Apply models ---
 
 
+class ConflictType(str, enum.Enum):
+    API_NAME_COLLISION = "api_name_collision"
+    DEPENDENCY_MISSING = "dependency_missing"
+
+
+class RetryStatus(str, enum.Enum):
+    SUCCESS = "success"
+    FAILED = "failed"
+
+
 class BlueprintItemBatchUpdate(DomainModel):
     """Batch decision update request."""
 
@@ -153,7 +163,7 @@ class ConflictCheckResult(DomainModel):
     """Single conflict check result."""
 
     item_rid: str
-    conflict_type: str  # "api_name_collision" | "dependency_missing"
+    conflict_type: ConflictType
     message: str
     conflicting_entity_rid: str | None = None
 
