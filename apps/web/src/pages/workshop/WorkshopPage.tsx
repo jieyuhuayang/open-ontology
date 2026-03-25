@@ -168,6 +168,10 @@ export function Component() {
         </div>
       )}
 
+      {pageState === 'empty' && !currentSessionRid && (
+        <GuidanceCard ontologyRid={DEFAULT_ONTOLOGY_RID} />
+      )}
+
       <EntityDrawer
         nodes={nodes}
         edges={edges}
