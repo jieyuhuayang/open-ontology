@@ -56,11 +56,11 @@ export default function SuggestionInlineEditor({
           onChange={setSelectValue}
           style={{ width: '100%', marginBottom: 8 }}
           options={[
-            { label: 'One to One', value: 'one-to-one' },
-            { label: 'One to Many', value: 'one-to-many' },
-            { label: 'Many to Many', value: 'many-to-many' },
+            { label: t('linkType.cardinality.oneToOne', 'One to One'), value: 'one-to-one' },
+            { label: t('linkType.cardinality.oneToMany', 'One to Many'), value: 'one-to-many' },
+            { label: t('linkType.cardinality.manyToMany', 'Many to Many'), value: 'many-to-many' },
           ]}
-          placeholder="Select cardinality"
+          placeholder={t('sidekick.selectCardinality', 'Select cardinality')}
         />
       )}
 
