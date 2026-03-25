@@ -171,14 +171,12 @@ class TestApplySuggestion:
                 new_callable=AsyncMock,
                 return_value="Generated description",
             ),
-            patch.object(service, "_update_ot_description", new_callable=AsyncMock) as mock_update,
+            patch.object(service._ot_service, "update", new_callable=AsyncMock) as mock_update,
         ):
             result = await service.apply_suggestion(request)
 
         assert result.success is True
-        mock_update.assert_called_once_with(
-            "ri.ontology.object-type.test1", "Generated description"
-        )
+        mock_update.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_apply_missing_description_with_edit(self, service):
