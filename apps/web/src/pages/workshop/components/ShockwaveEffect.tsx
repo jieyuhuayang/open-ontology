@@ -36,6 +36,7 @@ export default function ShockwaveEffect({ shockwave }: ShockwaveEffectProps) {
 
     // Face camera
     meshRef.current.quaternion.copy(camera.quaternion);
+    invalidate();
   });
 
   return (
