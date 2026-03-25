@@ -22,7 +22,7 @@ const SOURCE_LABELS: Record<string, string> = {
   best_practices: 'source.best_practices',
 };
 
-export default function EntityDrawer({ nodes, edges }: EntityDrawerProps) {
+export default function EntityDrawer({ nodes, edges, onDeleteNode }: EntityDrawerProps) {
   const { t } = useTranslation();
   const selectedEntityRid = useWorkshopStore((s) => s.selectedEntityRid);
   const setSelectedEntityRid = useWorkshopStore(
