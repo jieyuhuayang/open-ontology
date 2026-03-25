@@ -49,7 +49,7 @@
 
 ### Phase 2: 后端服务层（Test-First）
 
-- [x] **T00- [ ] **T003**: `batch_update_decisions` 单元测试
+- [x] **T003**: `batch_update_decisions` 单元测试
   **文件**: `apps/server/tests/unit/test_blueprint_service.py`
   **逻辑**: 使用 `mock_db_session` 测试 `BlueprintService.batch_update_decisions()`：
   - `test_batch_accept_all_undecided`: 3 个未决策项全部 accept → 返回 3 项，均 `userDecision=accepted`
