@@ -136,7 +136,7 @@
   **覆盖 AC**: AC-06
   **依赖**: T001
 
-- [ ] **T008**: WorkshopCanvas 拖拽交互逻辑
+- [x] **T008**: WorkshopCanvas 拖拽交互逻辑
   **文件**: `apps/web/src/pages/workshop/components/WorkshopCanvas.tsx`（修改）, `WorkshopStarNode.tsx`（修改）
   **逻辑**:
   - **WorkshopStarNode 修改**:
