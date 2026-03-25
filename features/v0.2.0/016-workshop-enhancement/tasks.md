@@ -73,7 +73,7 @@
 
 ### Phase 1: 3D/2D 视图切换
 
-- [ ] **T004**: Workshop2DView 组件
+- [x] **T004**: Workshop2DView 组件
   **文件**: `apps/web/src/pages/workshop/components/Workshop2DView.tsx`（新建）
   **逻辑**:
   - 接收 `nodes: WorkshopNode[]`、`edges: WorkshopEdge[]` props
