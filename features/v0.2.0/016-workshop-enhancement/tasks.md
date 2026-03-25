@@ -107,7 +107,7 @@
   **覆盖 AC**: AC-01, AC-05
   **依赖**: T002, T003
 
-- [ ] **T006**: StarfieldWorkbench 3D/2D 视图路由
+- [x] **T006**: StarfieldWorkbench 3D/2D 视图路由
   **文件**: `apps/web/src/pages/workshop/components/StarfieldWorkbench.tsx`（修改）
   **逻辑**:
   - 新增 `Workshop2DView` 和 `useRef<Workshop2DViewHandle>` 用于 2D 视图控制
