@@ -311,20 +311,26 @@ v0.2.0 标志着本体管理系统从"底层数据治理工具"跃升为"企业�
 
 ## 3.3 本体蓝图（Ontology Blueprint）
 
-Agent 分析资料后生成的本体初稿，是用户审查和微调的中间产物。蓝图不是正式本体——它是一组"建议"，需要经过用户 HITL 审查后才转化为 WorkingState 中的草稿。
+> **v0.2.1 改进**：蓝图从"一组建议"重新定义为**本体初稿（Draft Schema）**——语义上等同于 Ontology Manager 中尚未保存的本体状态，处于建 Schema 的阶段。
+
+Agent 分析资料后生成的本体初稿，是用户通过自然语言对话进行调优的中间产物。蓝图不是正式本体——它是一份**可编辑的 Schema 草稿**，需要经过用户在 Chat 面板中与 Agent 协作调优后，才转化为 WorkingState 中的正式草稿。
+
+蓝图项（BlueprintItem）不再被称为"建议"，而是初稿中的实体、属性、链接。用户不需要逐项审查，而是通过自然语言与 Agent 交互来调整初稿内容。Agent 在交互过程中可能主动提出"建议"（如"补充描述"、"创建链接"等），此时建议以可交互卡片形式出现在 Chat 消息流中，用户可 Accept/Edit/Reject。
 
 ### 蓝图生命周期
 
 ```mermaid
 stateDiagram-v2
-    [*] --> draft : Agent 开始分析
-    draft --> pending_review : Agent 完成蓝图生成（done 事件）
-    pending_review --> pending_review : 用户逐项审查（接受/编辑/拒绝）
-    pending_review --> applied : 用户点击"应用蓝图"→ 批量创建到 WorkingState
-    pending_review --> discarded : 用户放弃蓝图
+    [*] --> draft : Agent 开始构建（Phase 1）
+    draft --> ready : Agent 完成蓝图构建（blueprint-complete 事件）
+    ready --> ready : 用户通过 Chat 与 Agent 协作调优
+    ready --> applied : 用户点击"应用到本体"→ 批量创建到 WorkingState
+    ready --> discarded : 用户放弃蓝图
     applied --> [*]
     discarded --> [*]
 ```
+
+> 注：数据库中 `ready` 状态对应 `pending_review` 枚举值（保持后向兼容），仅前端文案和语义重映射。
 
 ### 蓝图数据结构
 
