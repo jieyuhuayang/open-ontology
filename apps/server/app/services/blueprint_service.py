@@ -266,7 +266,7 @@ class BlueprintService:
         return self._to_item(orm)
 
     async def batch_update_decisions(
-        self, blueprint_rid: str, req: "BlueprintItemBatchUpdate"
+        self, blueprint_rid: str, req: BlueprintItemBatchUpdate
     ) -> list[BlueprintItem]:
         """Batch update decisions for multiple items, skipping already-decided ones."""
         bp_orm = await self._get_blueprint_or_404(blueprint_rid)
