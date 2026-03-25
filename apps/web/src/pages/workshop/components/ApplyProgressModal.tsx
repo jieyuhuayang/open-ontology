@@ -65,10 +65,14 @@ export default function ApplyProgressModal({
     });
   };
 
-  // Run pre-check on first open
-  if (open && stage === 'precheck' && !preCheckMutation.isPending && !preCheckMutation.data) {
-    runPreCheck();
-  }
+  // Run pre-check on first open (in useEffect to avoid render-time side effects)
+  const hasStarted = useRef(false);
+  useEffect(() => {
+    if (open && stage === 'precheck' && !hasStarted.current) {
+      hasStarted.current = true;
+      runPreCheck();
+    }
+  }, [open, stage]);
 
   const handleRetry = (itemRid: string) => {
     retryMutation.mutate(
