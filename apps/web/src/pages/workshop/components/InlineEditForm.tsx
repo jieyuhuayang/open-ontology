@@ -127,7 +127,7 @@ export default function InlineEditForm({
                 disabled
               />
             </Form.Item>
-            <Form.Item label="Cardinality" name="cardinality">
+            <Form.Item label={t('common.cardinality', 'Cardinality')} name="cardinality">
               <Select
                 options={[
                   { label: 'One to One', value: 'one-to-one' },
