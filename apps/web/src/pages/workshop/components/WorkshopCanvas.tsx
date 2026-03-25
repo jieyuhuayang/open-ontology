@@ -156,6 +156,7 @@ function SceneContent({
         enableZoom
         dampingFactor={0.1}
         enableDamping
+        makeDefault
       />
 
       <Stars
