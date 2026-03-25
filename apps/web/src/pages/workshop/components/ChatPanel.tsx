@@ -85,10 +85,6 @@ export default function ChatPanel({ ontologyRid, agentChat, nodes = [] }: ChatPa
       {/* Focus lock tag */}
       <FocusLockTag entity={focusedEntity} onUnlock={unlockEntity} />
 
-      {pageState === 'empty' && !currentSessionRid && (
-        <GuidanceCard ontologyRid={ontologyRid} />
-      )}
-
       {currentSessionRid && (
         <>
           <FileUploadArea
