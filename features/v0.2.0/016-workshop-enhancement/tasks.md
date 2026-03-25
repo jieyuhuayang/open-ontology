@@ -333,7 +333,7 @@
 
 ### Phase 6: 视觉效果升级
 
-- [ ] **T021**: Fresnel 边缘光 + 顶点噪声 Shader
+- [x] **T021**: Fresnel 边缘光 + 顶点噪声 Shader
   **文件**: `apps/web/src/pages/workshop/components/WorkshopStarNode.tsx`（修改）
   **逻辑**:
   - 将 `meshStandardMaterial` 替换为自定义 `shaderMaterial`
