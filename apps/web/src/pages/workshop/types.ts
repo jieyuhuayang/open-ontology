@@ -95,3 +95,33 @@ export interface PlanStep {
   index: number;
   total: number;
 }
+
+// ─── F016: Workshop Enhancement types ───
+
+/** Canvas view mode */
+export type ViewMode = '3d' | '2d';
+
+/** Suggested prompt bubble template */
+export interface PromptBubble {
+  id: string;
+  label: string;
+  template: string;
+  entityTypes?: ('object_type' | 'link_type')[];
+  entityStatuses?: ('confirmed' | 'pending')[];
+  minProperties?: number;
+}
+
+/** Shockwave animation instance (link confirmation effect) */
+export interface ShockwaveInstance {
+  id: string;
+  position: { x: number; y: number; z: number };
+  startTime: number;
+}
+
+/** Star collapse animation instance (delete effect) */
+export interface CollapseInstance {
+  id: string;
+  position: { x: number; y: number; z: number };
+  color: string;
+  startTime: number;
+}
