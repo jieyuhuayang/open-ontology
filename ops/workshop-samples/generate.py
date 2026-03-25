@@ -289,13 +289,8 @@ def generate_weather_data(schema_text: str) -> None:
     if temp_file.exists():
         temp_col_map = {c: i for i, c in enumerate(temp_cols)}
         temp_rows = parse_insert_values(temp_file)
-        grand_total_rows = [
-            r
-            for r in temp_rows
-            if len(r) > temp_col_map.get("state", 999)
-            and r[temp_col_map["state"]] == "GRAND TOTAL"
-        ]
-        for row in grand_total_rows[:10]:
+        # 取前 10 行
+        for row in temp_rows[:10]:
             all_rows.append(
                 [
                     "temperature",
