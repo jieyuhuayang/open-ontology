@@ -69,7 +69,7 @@ export default function InlineEditForm({
             <Form.Item label={t('common.apiName', 'API Name')} name="apiName">
               <Input />
             </Form.Item>
-            <Form.Item label="Base Type" name="baseType">
+            <Form.Item label={t('common.baseType', 'Base Type')} name="baseType">
               <Select
                 options={[
                   { label: 'String', value: 'string' },
