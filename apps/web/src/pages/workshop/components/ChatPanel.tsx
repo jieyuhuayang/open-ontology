@@ -1,17 +1,22 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAgentSessions } from '@/api/agent';
 import { useMaterials } from '@/api/materials';
 import { useWorkshopStore } from '../stores/workshop-store';
+import { useFocusLock } from '../hooks/use-focus-lock';
 import GuidanceCard from './GuidanceCard';
 import FileUploadArea from './FileUploadArea';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
+import FocusLockTag from './FocusLockTag';
+import PromptBubbles from './PromptBubbles';
 import type { UseAgentChatReturn } from '../hooks/use-agent-chat';
+import type { WorkshopNode } from '../types';
 
 interface ChatPanelProps {
   ontologyRid: string;
   agentChat: UseAgentChatReturn;
+  nodes?: WorkshopNode[];
 }
 
 const headerStyle: React.CSSProperties = {
@@ -22,7 +27,7 @@ const headerStyle: React.CSSProperties = {
   color: 'rgba(255,255,255,0.8)',
 };
 
-export default function ChatPanel({ ontologyRid, agentChat }: ChatPanelProps) {
+export default function ChatPanel({ ontologyRid, agentChat, nodes = [] }: ChatPanelProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pageState = useWorkshopStore((s) => s.pageState);
@@ -31,6 +36,7 @@ export default function ChatPanel({ ontologyRid, agentChat }: ChatPanelProps) {
     (s) => s.setCurrentSessionRid,
   );
   const setPageState = useWorkshopStore((s) => s.setPageState);
+  const selectedEntityRid = useWorkshopStore((s) => s.selectedEntityRid);
 
   const { data: sessionsData } = useAgentSessions(ontologyRid, 1, 1);
 
@@ -42,7 +48,7 @@ export default function ChatPanel({ ontologyRid, agentChat }: ChatPanelProps) {
     );
   }, [currentSessionRid, sessionsData]);
 
-  // Restore active session (moved out of render body into useEffect)
+  // Restore active session
   useEffect(() => {
     if (activeSession && !currentSessionRid) {
       setCurrentSessionRid(activeSession.rid);
@@ -51,8 +57,24 @@ export default function ChatPanel({ ontologyRid, agentChat }: ChatPanelProps) {
   }, [activeSession, currentSessionRid, setCurrentSessionRid, setPageState]);
 
   const { messages, streamingText, isStreaming, send } = agentChat;
-
   const { data: materials } = useMaterials(currentSessionRid ?? '');
+
+  // Focus lock
+  const { focusedEntity, unlockEntity, prefixMessage } = useFocusLock(nodes);
+
+  // Selected node for prompt bubbles
+  const selectedNode = useMemo(
+    () => nodes.find((n) => n.id === selectedEntityRid) ?? null,
+    [nodes, selectedEntityRid],
+  );
+
+  // Wrap send with focus lock prefix
+  const handleSend = useCallback(
+    (content: string) => {
+      send(prefixMessage(content));
+    },
+    [send, prefixMessage],
+  );
 
   return (
     <div
@@ -60,6 +82,9 @@ export default function ChatPanel({ ontologyRid, agentChat }: ChatPanelProps) {
       data-testid="chat-panel-content"
     >
       <div style={headerStyle}>{t('workshop.title')}</div>
+
+      {/* Focus lock tag */}
+      <FocusLockTag entity={focusedEntity} onUnlock={unlockEntity} />
 
       {pageState === 'empty' && !currentSessionRid && (
         <GuidanceCard ontologyRid={ontologyRid} />
@@ -72,8 +97,9 @@ export default function ChatPanel({ ontologyRid, agentChat }: ChatPanelProps) {
             materials={materials ?? []}
           />
           <MessageList messages={messages} streamingText={streamingText} />
+          <PromptBubbles selectedNode={selectedNode} onSend={handleSend} />
           <ChatInput
-            onSend={send}
+            onSend={handleSend}
             onUploadClick={() => fileInputRef.current?.click()}
             disabled={isStreaming}
           />
