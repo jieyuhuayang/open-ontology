@@ -239,7 +239,7 @@
   **覆盖 AC**: AC-13, AC-14, AC-15
   **依赖**: T013
 
-- [ ] **T015**: WorkshopStarNode 高亮响应
+- [x] **T015**: WorkshopStarNode 高亮响应
   **文件**: `apps/web/src/pages/workshop/components/WorkshopStarNode.tsx`（修改）
   **逻辑**:
   - 新增 `isHighlighted: boolean` prop（由父组件从 `highlightedEntityRids.includes(id)` 派生）
