@@ -96,6 +96,7 @@ export default function StarCollapseEffect({
       const mat = sphereRef.current.material as THREE.MeshBasicMaterial;
       mat.opacity = s * 0.6;
     }
+    invalidate();
   });
 
   return (
