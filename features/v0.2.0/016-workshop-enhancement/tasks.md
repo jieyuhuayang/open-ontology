@@ -173,7 +173,7 @@
   **覆盖 AC**: AC-09, AC-10, AC-11, AC-12
   **依赖**: T002
 
-- [ ] **T010**: FocusLockTag 组件
+- [x] **T010**: FocusLockTag 组件
   **文件**: `apps/web/src/pages/workshop/components/FocusLockTag.tsx`（新建）
   **逻辑**:
   - 接收 `entity: WorkshopNode | null`、`onUnlock: () => void` props
