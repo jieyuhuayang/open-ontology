@@ -35,7 +35,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
     await ensure_seed_data(engine)
 
     # Initialize LangGraph checkpoint tables (v0.2.0 Agent)
-    if settings.ANTHROPIC_API_KEY:
+    if settings.ANTHROPIC_API_KEY.get_secret_value():
         from app.agent.engine import AgentEngine
 
         agent_engine = AgentEngine(settings)
