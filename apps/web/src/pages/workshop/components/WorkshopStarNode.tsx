@@ -257,43 +257,31 @@ export default function WorkshopStarNode({
       </mesh>
 
       {/* Label */}
-      <Html
-        position={[0, 0.9, 0]}
-        center
-        style={{ pointerEvents: 'none' }}
-      >
-        <div
-          style={{
-            color: 'rgba(255,255,255,0.85)',
-            fontSize: 11,
-            fontWeight: 500,
-            whiteSpace: 'nowrap',
-            textShadow: '0 0 8px rgba(0,0,0,0.8)',
-            userSelect: 'none',
-          }}
+      <Billboard position={[0, 0.9, 0]}>
+        <Text
+          fontSize={0.28}
+          color="rgba(255,255,255,0.85)"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.02}
+          outlineColor="#000000"
         >
           {node.displayName}
-        </div>
-      </Html>
+        </Text>
+      </Billboard>
 
       {/* AI badge for pending items */}
       {node.status === 'pending' && (
-        <Html
-          position={[0, -0.8, 0]}
-          center
-          style={{ pointerEvents: 'none' }}
-        >
-          <div
-            style={{
-              fontSize: 10,
-              color: '#ffc53d',
-              textShadow: '0 0 6px rgba(255,197,61,0.5)',
-              userSelect: 'none',
-            }}
+        <Billboard position={[0, -0.8, 0]}>
+          <Text
+            fontSize={0.22}
+            color="#ffc53d"
+            anchorX="center"
+            anchorY="middle"
           >
-            ✦ AI
-          </div>
-        </Html>
+            AI
+          </Text>
+        </Billboard>
       )}
     </group>
   );
