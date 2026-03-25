@@ -27,7 +27,7 @@ class AgentEngine:
         Returns:
             A compiled LangGraph StateGraph ready for astream().
         """
-        if not self._settings.ANTHROPIC_API_KEY:
+        if not self._settings.ANTHROPIC_API_KEY.get_secret_value():
             raise AppError(
                 code="LLM_NOT_CONFIGURED",
                 message="LLM API key not configured",
