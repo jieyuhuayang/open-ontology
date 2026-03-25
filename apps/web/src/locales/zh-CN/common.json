@@ -907,5 +907,46 @@
       "aiFoundation": "AI 应用基座",
       "dataGovernance": "数据治理合规"
     }
+  },
+  "sidekick": {
+    "title": "AI 助手",
+    "refresh": "刷新建议",
+    "accept": "接受",
+    "edit": "编辑",
+    "ignore": "忽略",
+    "confirm": "确认",
+    "cancel": "取消",
+    "openWorkshop": "打开本体工坊",
+    "emptyState": "本体为空，建议使用本体工坊开始构建",
+    "noSuggestions": "本体状态良好，暂无改进建议",
+    "llmUnavailable": "配置 API Key 以获取更多 AI 建议",
+    "llmLoading": "正在加载 AI 建议...",
+    "llmError": "AI 建议暂时不可用",
+    "applySuccess": "建议已应用",
+    "applyError": "应用失败，请重试",
+    "reasoning": "推理来源",
+    "confidence": {
+      "high": "高置信度",
+      "medium": "中置信度",
+      "low": "低置信度"
+    },
+    "source": {
+      "completeness_check": "完整性检查",
+      "consistency_check": "一致性检查",
+      "pattern_matching": "模式匹配",
+      "semantic_inference": "语义推断",
+      "best_practices": "最佳实践"
+    },
+    "type": {
+      "missing_description": "缺少描述",
+      "missing_title_key": "缺少标题键",
+      "missing_primary_key": "缺少主键",
+      "orphan_link": "孤立链接",
+      "duplicate_property_name": "重复属性名",
+      "suggest_link": "建议链接",
+      "cardinality_review": "基数审查",
+      "naming_improvement": "命名优化",
+      "description_enhancement": "描述增强"
+    }
   }
 }

@@ -906,5 +906,46 @@
       "aiFoundation": "AI Foundation",
       "dataGovernance": "Data Governance"
     }
+  },
+  "sidekick": {
+    "title": "AI Assistant",
+    "refresh": "Refresh",
+    "accept": "Accept",
+    "edit": "Edit",
+    "ignore": "Ignore",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "openWorkshop": "Open Workshop",
+    "emptyState": "Ontology is empty. Use the Workshop to start building.",
+    "noSuggestions": "Ontology looks good. No suggestions at this time.",
+    "llmUnavailable": "Configure API Key for more AI suggestions",
+    "llmLoading": "Loading AI suggestions...",
+    "llmError": "AI suggestions temporarily unavailable",
+    "applySuccess": "Suggestion applied",
+    "applyError": "Failed to apply. Please retry.",
+    "reasoning": "Reasoning",
+    "confidence": {
+      "high": "High confidence",
+      "medium": "Medium confidence",
+      "low": "Low confidence"
+    },
+    "source": {
+      "completeness_check": "Completeness check",
+      "consistency_check": "Consistency check",
+      "pattern_matching": "Pattern matching",
+      "semantic_inference": "Semantic inference",
+      "best_practices": "Best practices"
+    },
+    "type": {
+      "missing_description": "Missing description",
+      "missing_title_key": "Missing title key",
+      "missing_primary_key": "Missing primary key",
+      "orphan_link": "Orphan link",
+      "duplicate_property_name": "Duplicate property name",
+      "suggest_link": "Suggest link",
+      "cardinality_review": "Cardinality review",
+      "naming_improvement": "Naming improvement",
+      "description_enhancement": "Description enhancement"
+    }
   }
 }

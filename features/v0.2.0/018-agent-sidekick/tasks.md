@@ -11,7 +11,7 @@
 |------|------|------|
 | spec.md | ✅ 已评审 | Spec Discovery + SDD Review 完成 |
 | tasks.md | ✅ 已拆解 | SDD Review LGTM |
-| 实现 | 🔲 未开始 | 0 / 18 完成 |
+| 实现 | 🔄 进行中 | 16 / 18 完成（T010/T017 openapi 重生成 + T018 E2E 待做） |
 
 ---
 
@@ -30,7 +30,7 @@
 
 ### Phase 1: 后端 Domain 模型
 
-- [ ] **T001**: Sidekick Domain 模型
+- [x] **T001**: Sidekick Domain 模型
   **文件**: `apps/server/app/domain/sidekick.py`
   **逻辑**: 定义所有 Sidekick 相关的 Pydantic 模型，继承 `DomainModel`（`alias_generator=to_camel, populate_by_name=True`）：
   - `SidekickPageType(str, Enum)`: `object_type_detail`, `property_list`, `link_type_detail`
@@ -47,7 +47,7 @@
 
 ### Phase 2: 后端规则引擎（Test-First）
 
-- [ ] **T002**: 规则引擎单元测试
+- [x] **T000: 规则引擎单元测试
   **文件**: `apps/server/tests/unit/test_sidekick_rules.py`
   **逻辑**: 使用 `mock_db_session` mock 数据库，测试 `SidekickRulesEngine` 的每条规则：
   - `test_missing_description_detected` — OT 无 description → 返回 missing_description 建议，confidence=1.0, source=completeness_check, requires_llm=True → AC-03
@@ -62,7 +62,7 @@
   **覆盖 AC**: AC-03, AC-04, AC-05
   **依赖**: T001
 
-- [ ] **T003**: 规则引擎实现
+- [x] **T000: 规则引擎实现
   **文件**: `apps/server/app/services/sidekick_rules.py`
   **逻辑**: `SidekickRulesEngine` 类，接收 `AsyncSession`：
   - `async analyze(context: SidekickContext) -> list[Suggestion]`：根据 pageType 调用对应规则集
@@ -78,7 +78,7 @@
 
 ### Phase 3: 后端 LLM 引擎（Test-First）
 
-- [ ] **T004**: LLM 引擎单元测试
+- [x] **T000: LLM 引擎单元测试
   **文件**: `apps/server/tests/unit/test_sidekick_llm.py`
   **逻辑**: mock Anthropic SDK 调用，测试 `SidekickLlmEngine`：
   - `test_analyze_returns_suggestions` — mock LLM 返回 JSON → 解析为 Suggestion 列表，confidence 在 0.5-0.9 范围 → AC-06
@@ -90,7 +90,7 @@
   **覆盖 AC**: AC-06, AC-12, AC-14, AC-20
   **依赖**: T001
 
-- [ ] **T005**: LLM 引擎实现
+- [x] **T000: LLM 引擎实现
   **文件**: `apps/server/app/services/sidekick_llm.py`
   **逻辑**: `SidekickLlmEngine` 类：
   - `_is_available() -> bool`：检查 `ANTHROPIC_API_KEY` 环境变量
@@ -110,7 +110,7 @@
 
 ### Phase 4: 后端编排服务（Test-First）
 
-- [ ] **T006**: SidekickService 单元测试
+- [x] **T000: SidekickService 单元测试
   **文件**: `apps/server/tests/unit/test_sidekick_service.py`
   **逻辑**: mock `SidekickRulesEngine` 和 `SidekickLlmEngine`，测试 `SidekickService`：
   - `test_get_suggestions_rules_only` — LLM 不可用 → 仅返回规则建议, has_llm_suggestions=False → AC-12
@@ -125,7 +125,7 @@
   **覆盖 AC**: AC-06, AC-07, AC-08, AC-09, AC-12, AC-18, AC-19, AC-20
   **依赖**: T003, T005
 
-- [ ] **T007**: SidekickService 实现
+- [x] **T000: SidekickService 实现
   **文件**: `apps/server/app/services/sidekick_service.py`
   **逻辑**: `SidekickService` 类，接收 `AsyncSession`：
   - `async get_suggestions(context: SidekickContext) -> SuggestionsResponse`：
@@ -146,7 +146,7 @@
 
 ### Phase 5: 后端 API 层（Test-First）
 
-- [ ] **T008**: API 路由集成测试
+- [x] **T000: API 路由集成测试
   **文件**: `apps/server/tests/integration/test_sidekick_api.py`
   **逻辑**: 使用 `seeded_client` fixture，测试 3 个 HTTP 端点：
   - `test_suggestions_success` — POST /api/v1/sidekick/suggestions，有效 context → 200 + suggestions 列表 → AC-18
@@ -159,7 +159,7 @@
   **覆盖 AC**: AC-18, AC-19, AC-20
   **依赖**: T007
 
-- [ ] **T009**: API 路由实现 + Router 注册
+- [x] **T000: API 路由实现 + Router 注册
   **文件**: `apps/server/app/routers/sidekick.py`, `apps/server/app/main.py`
   **逻辑**:
   - `sidekick.py`：定义 `router = APIRouter(prefix="/api/v1/sidekick", tags=["sidekick"])`

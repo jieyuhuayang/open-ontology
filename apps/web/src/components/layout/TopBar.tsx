@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import SearchBar from './SearchBar';
 import CreateMenu from './CreateMenu';
 import LanguageSwitcher from './LanguageSwitcher';
+import SidekickTrigger from '@/components/sidekick/SidekickTrigger';
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -34,6 +35,7 @@ export default function TopBar() {
         <div id="branch-selector-slot" />
         <div id="change-status-slot" />
         <CreateMenu />
+        <SidekickTrigger />
         <LanguageSwitcher />
       </Flex>
     </Header>
