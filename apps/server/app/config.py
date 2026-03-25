@@ -31,3 +31,12 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# Propagate LLM config to environment variables for LangChain auto-discovery.
+# LangChain's ChatOpenAI reads OPENAI_API_KEY and OPENAI_API_BASE from env.
+import os as _os
+
+if settings.OPENAI_API_KEY.get_secret_value():
+    _os.environ.setdefault("OPENAI_API_KEY", settings.OPENAI_API_KEY.get_secret_value())
+if settings.OPENAI_API_BASE:
+    _os.environ.setdefault("OPENAI_API_BASE", settings.OPENAI_API_BASE)
