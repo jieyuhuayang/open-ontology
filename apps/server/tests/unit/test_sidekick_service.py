@@ -219,19 +219,28 @@ class TestApplySuggestion:
             entity_rid="ri.ontology.object-type.nonexistent",
         )
 
-        with patch.object(
-            service,
-            "_update_ot_description",
-            new_callable=AsyncMock,
-            side_effect=AppError(code="ENTITY_NOT_FOUND", message="Not found", status_code=404),
-        ):
-            with patch.object(
+        mock_ot = MagicMock()
+        mock_ot.display_name = "Test"
+        mock_ot.api_name = "test"
+
+        with (
+            patch.object(
+                service._ot_service, "get_by_rid", new_callable=AsyncMock, return_value=mock_ot
+            ),
+            patch.object(
                 service._llm_engine,
                 "generate_content",
                 new_callable=AsyncMock,
                 return_value="desc",
-            ):
-                with pytest.raises(AppError) as exc_info:
+            ),
+            patch.object(
+                service,
+                "_update_ot_description",
+                new_callable=AsyncMock,
+                side_effect=AppError(code="ENTITY_NOT_FOUND", message="Not found", status_code=404),
+            ),
+        ):
+            with pytest.raises(AppError) as exc_info:
                     await service.apply_suggestion(request)
                 assert exc_info.value.code == "ENTITY_NOT_FOUND"
 
