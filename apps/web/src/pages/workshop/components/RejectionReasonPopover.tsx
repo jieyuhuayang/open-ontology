@@ -6,7 +6,6 @@ import type { BlueprintItem } from '@/api/types';
 
 interface RejectionReasonPopoverProps {
   item: BlueprintItem;
-  blueprintRid: string;
   disabled: boolean;
   onConfirm: (reason: string) => void;
 }
