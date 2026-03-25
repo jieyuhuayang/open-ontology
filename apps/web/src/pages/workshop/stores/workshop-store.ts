@@ -46,6 +46,34 @@ export interface WorkshopStore {
   addPendingCrystallization: (item: SSEBlueprintItemData) => void;
   consumeCrystallization: (rid: string) => void;
 
+  // F016: View mode
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
+
+  // F016: Focus lock
+  focusedEntityRid: string | null;
+  setFocusedEntityRid: (rid: string | null) => void;
+  clearFocusLock: () => void;
+
+  // F016: Bidirectional highlighting
+  highlightedEntityRids: string[];
+  setHighlightedEntityRids: (rids: string[]) => void;
+  clearHighlights: () => void;
+
+  // F016: Drag link
+  dragLinkState: DragLinkState | null;
+  setDragLinkState: (state: DragLinkState | null) => void;
+  clearDragLink: () => void;
+
+  // F016: Visual effects
+  activeShockwaves: ShockwaveInstance[];
+  addShockwave: (instance: ShockwaveInstance) => void;
+  removeShockwave: (id: string) => void;
+
+  activeCollapses: CollapseInstance[];
+  addCollapse: (instance: CollapseInstance) => void;
+  removeCollapse: (id: string) => void;
+
   // Reset
   reset: () => void;
 }
