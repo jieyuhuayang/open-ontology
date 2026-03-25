@@ -10,7 +10,7 @@
 | 步骤 | 状态 | 备注 |
 |------|------|------|
 | spec.md | ✅ 已评审 | Spec Discovery + SDD Review 完成 |
-| tasks.md | 🔲 草稿 | |
+| tasks.md | ✅ 已拆解 | SDD Review LGTM |
 | 实现 | 🔲 未开始 | 0 / 18 完成 |
 
 ---
