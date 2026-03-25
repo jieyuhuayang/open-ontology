@@ -385,7 +385,7 @@
   **覆盖 AC**: AC-25
   **依赖**: T002
 
-- [ ] **T024**: Cinematic Camera 平滑过渡
+- [x] **T024**: Cinematic Camera 平滑过渡
   **文件**: `apps/web/src/pages/workshop/components/WorkshopCanvas.tsx`（修改）
   **逻辑**:
   - 新增 `cameraTarget` state（`useRef<{position: Vector3, lookAt: Vector3} | null>`）
