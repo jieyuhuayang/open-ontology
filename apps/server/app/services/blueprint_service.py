@@ -261,6 +261,32 @@ class BlueprintService:
         )
         return self._to_item(orm)
 
+    async def batch_update_decisions(
+        self, blueprint_rid: str, req: "BlueprintItemBatchUpdate"
+    ) -> list[BlueprintItem]:
+        """Batch update decisions for multiple items, skipping already-decided ones."""
+        bp_orm = await self._get_blueprint_or_404(blueprint_rid)
+        if bp_orm.status != BlueprintStatus.PENDING_REVIEW.value:
+            raise AppError(
+                code="BLUEPRINT_INVALID_STATUS_TRANSITION",
+                message=f"Blueprint must be in 'pending_review' to update item decisions (current: '{bp_orm.status}')",
+                status_code=422,
+            )
+
+        items = await BlueprintItemStorage.batch_get(self._session, req.item_rids)
+        updated: list[BlueprintItem] = []
+        for item_orm in items:
+            if item_orm.user_decision is not None:
+                continue
+            orm = await BlueprintItemStorage.update_decision(
+                self._session,
+                item_orm.rid,
+                decision=req.user_decision.value,
+                rejection_reason=req.rejection_reason,
+            )
+            updated.append(self._to_item(orm))
+        return updated
+
     # --- Apply ---
 
     async def apply(self, rid: str) -> BlueprintApplyResult:
