@@ -352,7 +352,7 @@
   **覆盖 AC**: AC-23
   **依赖**: T002
 
-- [ ] **T022**: DragLinkLine 发光升级 + 能量粒子
+- [x] **T022**: DragLinkLine 发光升级 + 能量粒子
   **文件**: `apps/web/src/pages/workshop/components/DragLinkLine.tsx`（修改）
   **逻辑**:
   - 将 dashed `Line` 替换为 tube geometry（`TubeGeometry` with `CatmullRomCurve3`）+ emissive MeshBasicMaterial
