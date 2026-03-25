@@ -59,7 +59,8 @@ F017 依赖 F014（蓝图数据模型）、F015（工坊布局）、F013（CLI �
 | AC-10 | 用户 | 选择拒绝原因后点击"确认拒绝" | 调用 `PATCH /items/{item_rid}` 设置 `userDecision=rejected` + `rejectionReason`。行样式变为红色删除线态。3D 画布中对应星体播放 collapse 消散动画（复用 `addCollapse`） |
 | **批量操作** | | | |
 | AC-11 | 用户 | 点击"全部接受"按钮 | 调用 `PATCH /items/batch-decision` 将所有未决策项（`userDecision=null`）批量设为 `accepted`。已决策项被跳过而非报错。表格更新所有行样式。3D 画布批量播放 crystallize 动画 |
-| AC-12 | 用户 | 使用筛选器按置信度（高/中/低）或类型（OT/Property/LT）筛选 | 表格仅显示匹配项。批量操作（全部接受）作用于当前筛选结果 |
+| AC-12 | 用户 | 使用筛选器按置信度（高/中/低）或类型（OT/Property/LT）筛选 | 表格仅显示匹配项。批量操作（全部接受/批量拒绝）作用于当前筛选结果 |
+| AC-22 | 用户 | 勾选多个未决策项后点击"批量拒绝" | 弹出拒绝原因 Popover（与单项拒绝相同），确认后调用 `PATCH /items/batch-decision` 设置 `userDecision=rejected` + `rejectionReason`。所有勾选项标记为 rejected。3D 画布批量播放 collapse 动画 |
 | **应用蓝图** | | | |
 | AC-13 | 用户 | 所有项已决策后点击"应用蓝图" | 先调用 `POST /pre-apply-check` 执行预检。无冲突时弹出进度 Modal，调用 `POST /apply`。Modal 显示逐项创建进度（成功 ✓ / 失败 ✗ / 跳过 ⊘）和汇总统计 |
 | AC-14 | 用户 | 预检发现 apiName 冲突 | 显示冲突警告 Alert（列出冲突项 + 冲突的现有实体名称）。用户可选择"返回修改"或"忽略冲突继续应用" |
