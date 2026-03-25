@@ -1702,7 +1702,7 @@ CREATE TABLE blueprints (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 蓝图项（每个建议）
+-- 蓝图项（初稿中的每个实体/属性/链接定义）
 CREATE TABLE blueprint_items (
     rid TEXT PRIMARY KEY,                    -- ri.ontology.blueprint-item.<uuid>
     blueprint_rid TEXT NOT NULL REFERENCES blueprints(rid) ON DELETE CASCADE,
