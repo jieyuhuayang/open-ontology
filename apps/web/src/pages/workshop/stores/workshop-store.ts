@@ -96,7 +96,7 @@ const initialState = {
   isSidekickOpen: true,
   planSteps: [] as PlanStep[],
   pendingCrystallizations: [] as SSEBlueprintItemData[],
-  viewMode: '3d' as ViewMode,
+  viewMode: '2d' as ViewMode,
   focusedEntityRid: null as string | null,
   highlightedEntityRids: [] as string[],
   dragLinkState: null as DragLinkState | null,
