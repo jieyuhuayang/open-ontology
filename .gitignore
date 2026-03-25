@@ -51,6 +51,10 @@ ops/mysql-sample/.env.mysql-sample.local
 pgdata/
 ops/mysql-sample/runtime/
 
+# Workshop samples (generated output, keep generate.py and README.md)
+ops/workshop-samples/*.csv
+ops/workshop-samples/*.sql
+
 # Generated (DO NOT EDIT manually)
 apps/web/src/generated/*.ts
 
