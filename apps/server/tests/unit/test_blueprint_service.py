@@ -1413,9 +1413,7 @@ class TestPreApplyCheck:
             mock_item_storage.list_by_blueprint = AsyncMock(return_value=[ot_item, lt_item])
 
             # Mock ObjectTypeStorage to return no existing OT with same apiName
-            with patch(
-                "app.services.blueprint_service.ObjectTypeStorage", create=True
-            ) as mock_ot_storage:
+            with patch("app.storage.object_type_storage.ObjectTypeStorage") as mock_ot_storage:
                 mock_ot_storage.get_by_api_name = AsyncMock(return_value=None)
                 result = await service.pre_apply_check(bp_orm.rid)
 
@@ -1444,9 +1442,7 @@ class TestPreApplyCheck:
             mock_bp_storage.get = AsyncMock(return_value=bp_orm)
             mock_item_storage.list_by_blueprint = AsyncMock(return_value=[ot_item])
 
-            with patch(
-                "app.services.blueprint_service.ObjectTypeStorage", create=True
-            ) as mock_ot_storage:
+            with patch("app.storage.object_type_storage.ObjectTypeStorage") as mock_ot_storage:
                 mock_ot_storage.get_by_api_name = AsyncMock(return_value=existing_ot)
                 result = await service.pre_apply_check(bp_orm.rid)
 
@@ -1520,9 +1516,7 @@ class TestPreApplyCheck:
             mock_bp_storage.get = AsyncMock(return_value=bp_orm)
             mock_item_storage.list_by_blueprint = AsyncMock(return_value=items)
 
-            with patch(
-                "app.services.blueprint_service.ObjectTypeStorage", create=True
-            ) as mock_ot_storage:
+            with patch("app.storage.object_type_storage.ObjectTypeStorage") as mock_ot_storage:
                 mock_ot_storage.get_by_api_name = AsyncMock(return_value=None)
                 result = await service.pre_apply_check(bp_orm.rid)
 
