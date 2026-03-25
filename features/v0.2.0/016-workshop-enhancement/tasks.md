@@ -38,7 +38,7 @@
   **测试**: 纯类型定义，无运行时测试
   **依赖**: 无
 
-- [ ] **T002**: Zustand Store 扩展 + 测试
+- [x] **T002**: Zustand Store 扩展 + 测试
   **文件**: `apps/web/src/pages/workshop/stores/workshop-store.ts`, `stores/__tests__/workshop-store.test.ts`
   **逻辑**:
   - 新增 `viewMode: ViewMode`（默认 `'3d'`）+ `setViewMode(mode)`
