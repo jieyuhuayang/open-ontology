@@ -1231,3 +1231,146 @@ class TestComputeConfidenceLevel:
         assert _compute_confidence_level(0.0) == ConfidenceLevel.LOW
         assert _compute_confidence_level(0.3) == ConfidenceLevel.LOW
         assert _compute_confidence_level(0.49) == ConfidenceLevel.LOW
+
+
+# ---------------------------------------------------------------------------
+# F017: Batch Update Decisions
+# ---------------------------------------------------------------------------
+
+
+class TestBatchUpdateDecisions:
+    """Tests for BlueprintService.batch_update_decisions()."""
+
+    @pytest.mark.asyncio
+    async def test_batch_accept_all_undecided(self, service, db_session_mock):
+        """3 undecided items → all accepted, returns 3."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
+        items = [
+            _make_item_orm(rid=f"ri.ontology.blueprint-item.item{i}", user_decision=None)
+            for i in range(3)
+        ]
+        # After update_decision, items get the new decision
+        updated_items = [
+            _make_item_orm(
+                rid=f"ri.ontology.blueprint-item.item{i}", user_decision=UserDecision.ACCEPTED.value
+            )
+            for i in range(3)
+        ]
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.batch_get = AsyncMock(return_value=items)
+            mock_item_storage.update_decision = AsyncMock(side_effect=updated_items)
+
+            req = BlueprintItemBatchUpdate(
+                item_rids=[f"ri.ontology.blueprint-item.item{i}" for i in range(3)],
+                user_decision=UserDecision.ACCEPTED,
+            )
+            result = await service.batch_update_decisions(bp_orm.rid, req)
+
+        assert len(result) == 3
+        assert all(item.user_decision == UserDecision.ACCEPTED for item in result)
+
+    @pytest.mark.asyncio
+    async def test_batch_skips_already_decided(self, service, db_session_mock):
+        """2 already decided + 1 undecided → returns only 1 updated."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
+        items = [
+            _make_item_orm(
+                rid="ri.ontology.blueprint-item.d1", user_decision=UserDecision.ACCEPTED.value
+            ),
+            _make_item_orm(
+                rid="ri.ontology.blueprint-item.d2", user_decision=UserDecision.REJECTED.value
+            ),
+            _make_item_orm(rid="ri.ontology.blueprint-item.u1", user_decision=None),
+        ]
+        updated = _make_item_orm(
+            rid="ri.ontology.blueprint-item.u1",
+            user_decision=UserDecision.ACCEPTED.value,
+        )
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.batch_get = AsyncMock(return_value=items)
+            mock_item_storage.update_decision = AsyncMock(return_value=updated)
+
+            req = BlueprintItemBatchUpdate(
+                item_rids=[i.rid for i in items],
+                user_decision=UserDecision.ACCEPTED,
+            )
+            result = await service.batch_update_decisions(bp_orm.rid, req)
+
+        assert len(result) == 1
+        assert result[0].rid == "ri.ontology.blueprint-item.u1"
+
+    @pytest.mark.asyncio
+    async def test_batch_reject_with_reason(self, service, db_session_mock):
+        """Batch reject with rejection reason → each item has the reason."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
+        items = [
+            _make_item_orm(rid="ri.ontology.blueprint-item.r1", user_decision=None),
+        ]
+        updated = _make_item_orm(
+            rid="ri.ontology.blueprint-item.r1",
+            user_decision=UserDecision.REJECTED.value,
+            rejection_reason="与业务不相关",
+        )
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.batch_get = AsyncMock(return_value=items)
+            mock_item_storage.update_decision = AsyncMock(return_value=updated)
+
+            req = BlueprintItemBatchUpdate(
+                item_rids=["ri.ontology.blueprint-item.r1"],
+                user_decision=UserDecision.REJECTED,
+                rejection_reason="与业务不相关",
+            )
+            result = await service.batch_update_decisions(bp_orm.rid, req)
+
+        assert len(result) == 1
+        assert result[0].rejection_reason == "与业务不相关"
+
+    @pytest.mark.asyncio
+    async def test_batch_requires_pending_review(self, service, db_session_mock):
+        """Blueprint in draft → raises BLUEPRINT_INVALID_STATUS_TRANSITION."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.DRAFT.value)
+
+        with patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage:
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+
+            req = BlueprintItemBatchUpdate(
+                item_rids=["ri.ontology.blueprint-item.x"],
+                user_decision=UserDecision.ACCEPTED,
+            )
+            with pytest.raises(AppError, match="BLUEPRINT_INVALID_STATUS_TRANSITION"):
+                await service.batch_update_decisions(bp_orm.rid, req)
+
+    @pytest.mark.asyncio
+    async def test_batch_empty_rids(self, service, db_session_mock):
+        """Empty item_rids → returns empty list."""
+        bp_orm = _make_blueprint_orm(status=BlueprintStatus.PENDING_REVIEW.value)
+
+        with (
+            patch("app.services.blueprint_service.BlueprintStorage") as mock_bp_storage,
+            patch("app.services.blueprint_service.BlueprintItemStorage") as mock_item_storage,
+        ):
+            mock_bp_storage.get = AsyncMock(return_value=bp_orm)
+            mock_item_storage.batch_get = AsyncMock(return_value=[])
+
+            req = BlueprintItemBatchUpdate(
+                item_rids=[],
+                user_decision=UserDecision.ACCEPTED,
+            )
+            result = await service.batch_update_decisions(bp_orm.rid, req)
+
+        assert result == []
