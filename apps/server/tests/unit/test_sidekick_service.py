@@ -231,8 +231,8 @@ class TestApplySuggestion:
                 return_value="desc",
             ),
             patch.object(
-                service,
-                "_update_ot_description",
+                service._ot_service,
+                "update",
                 new_callable=AsyncMock,
                 side_effect=AppError(code="ENTITY_NOT_FOUND", message="Not found", status_code=404),
             ),
