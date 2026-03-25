@@ -62,3 +62,25 @@ export type SearchResponse = components['schemas']['SearchResponse'];
 export type SearchResultItem = components['schemas']['SearchResultItem'];
 export type SearchTypeResult = components['schemas']['SearchTypeResult'];
 export type SearchResourceType = components['schemas']['SearchResourceType'];
+
+// Agent (v0.2.0)
+export type AgentSession = components['schemas']['AgentSession'];
+export type AgentSessionCreate = components['schemas']['AgentSessionCreate'];
+export type AgentSessionList = components['schemas']['AgentSessionList'];
+export type AgentSessionDetail = components['schemas']['AgentSessionDetail'];
+export type AgentMessage = components['schemas']['AgentMessage'];
+export type ChatRequest = components['schemas']['ChatRequest'];
+
+// Material (v0.2.0)
+export type AgentMaterial = components['schemas']['AgentMaterial'];
+
+// Blueprint (v0.2.0)
+export type Blueprint = components['schemas']['Blueprint'];
+export type BlueprintCreate = components['schemas']['BlueprintCreate'];
+export type BlueprintUpdate = components['schemas']['BlueprintUpdate'];
+export type BlueprintItem = components['schemas']['BlueprintItem'];
+export type BlueprintItemCreate = components['schemas']['BlueprintItemCreate'];
+export type BlueprintItemUpdate = components['schemas']['BlueprintItemUpdate'];
+export type BlueprintDetail = components['schemas']['BlueprintDetail'];
+export type BlueprintList = components['schemas']['BlueprintList'];
+export type BlueprintApplyResult = components['schemas']['BlueprintApplyResult'];

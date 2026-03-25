@@ -37,6 +37,10 @@ export const routeConfig: RouteObject[] = [
     lazy: () => import('@/pages/demo/DemoCanvasPage'),
   },
   {
+    path: '/workshop',
+    lazy: () => import('@/pages/workshop/WorkshopPage'),
+  },
+  {
     path: '/',
     element: <AppShell />,
     errorElement: <ErrorBoundary />,

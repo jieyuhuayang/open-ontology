@@ -740,5 +740,121 @@
     "pendingChanges": "Pending changes",
     "missingDisplayName": "{{type}}: missing display name",
     "editsCount": "{{count}} edits"
+  },
+  "workshop": {
+    "title": "Ontology Workshop",
+    "backToManager": "Back",
+    "guidance": {
+      "title": "Start Building Ontology",
+      "domain": "Business Domain (optional)",
+      "goal": "Modeling Goal (optional)",
+      "scope": "Concept Scope (optional)",
+      "scopePlaceholder": "e.g. Focus on order fulfillment, exclude financial reconciliation",
+      "confirm": "Confirm & Continue",
+      "skip": "Skip",
+      "createFailed": "Failed to create session"
+    },
+    "chat": {
+      "placeholder": "Ask Agent...",
+      "thinking": "Agent is thinking...",
+      "send": "Send"
+    },
+    "upload": {
+      "dropHint": "Release to upload files",
+      "invalidType": "Unsupported file type. Supported: CSV, Excel, SQL, PDF, Markdown, Word, Text",
+      "tooLarge": "File exceeds 10MB limit",
+      "failed": "Upload failed: {{name}}",
+      "uploaded": "Uploaded"
+    },
+    "sidekick": {
+      "title": "AI Suggestions",
+      "planSteps": "Plan",
+      "blueprintComplete": "Blueprint complete"
+    },
+    "confidence": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "source": {
+      "field_analysis": "Field Analysis",
+      "pattern_matching": "Pattern Matching",
+      "semantic_inference": "Semantic Inference",
+      "best_practices": "Best Practices"
+    },
+    "connection": {
+      "reconnecting": "Reconnecting...",
+      "disconnected": "Connection lost",
+      "reconnect": "Reconnect"
+    },
+    "state": {
+      "uploadGuide": "Upload materials to expand ontology"
+    },
+    "entity": {
+      "objectType": "Object Type",
+      "linkType": "Link Type",
+      "properties": "Properties",
+      "relationships": "Relationships",
+      "reasoning": "Reasoning",
+      "viewDetail": "View Full Detail",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this entity?",
+      "deleteImpact": "{{count}} related link(s) will also be removed: {{names}}",
+      "cannotDeleteConfirmed": "Confirmed entities are managed in Ontology Manager"
+    },
+    "toolbar": {
+      "fit": "Fit",
+      "reset": "Reset",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
+      "view3D": "3D",
+      "view2D": "2D"
+    },
+    "autoDegrade": {
+      "suggestion": "Over 200 entities detected. Switch to 2D view for better performance.",
+      "switchTo2D": "Switch to 2D"
+    },
+    "focusLock": {
+      "locked": "Focus: {{name}}",
+      "unlock": "Unlock focus"
+    },
+    "promptBubbles": {
+      "checkOrphanKeys": "Check for orphan foreign keys",
+      "deriveStats": "Derive statistical properties",
+      "splitSensitive": "Split sensitive fields",
+      "suggestRelated": "Suggest related object types",
+      "checkNaming": "Check field naming conventions",
+      "addMissingProps": "Add missing properties",
+      "verifyCardinality": "Verify cardinality",
+      "checkReverse": "Check reverse link",
+      "templates": {
+        "checkOrphanKeys": "Check for orphan foreign keys",
+        "deriveStats": "Derive statistical properties from existing fields",
+        "splitSensitive": "Split sensitive fields to improve security",
+        "suggestRelated": "Suggest related object types",
+        "checkNaming": "Check field naming conventions",
+        "addMissingProps": "Add missing properties",
+        "verifyCardinality": "Verify cardinality relationship is correct",
+        "checkReverse": "Check if reverse link is needed"
+      }
+    },
+    "dataProbe": {
+      "comingSoon": "Data preview probe — coming soon"
+    },
+    "domains": {
+      "ecommerce": "E-Commerce",
+      "finance": "Finance & Banking",
+      "supplyChain": "Supply Chain",
+      "healthcare": "Healthcare",
+      "manufacturing": "Manufacturing",
+      "hr": "Human Resources"
+    },
+    "goals": {
+      "dataIntegration": "Data Integration & Search",
+      "analytics": "Analytics & Reports",
+      "knowledgeGraph": "Knowledge Graph",
+      "aiFoundation": "AI Foundation",
+      "dataGovernance": "Data Governance"
+    }
   }
 }
