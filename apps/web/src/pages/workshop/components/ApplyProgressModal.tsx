@@ -72,6 +72,9 @@ export default function ApplyProgressModal({
       hasStarted.current = true;
       runPreCheck();
     }
+    if (!open) {
+      hasStarted.current = false;
+    }
   }, [open, stage]);
 
   const handleRetry = (itemRid: string) => {
