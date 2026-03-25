@@ -30,7 +30,7 @@
 
 ### Phase 1: 后端基础设施
 
-- [ ] **T001**: Domain 模型扩展
+- [x] **T001**: Domain 模型扩展
   **文件**: `apps/server/app/domain/blueprint.py`
   **逻辑**: 新增 5 个 Pydantic 模型（继承 `DomainModel`）：
   - `BlueprintItemBatchUpdate`: `item_rids: list[str]`, `user_decision: UserDecision`, `rejection_reason: str | None = None`
