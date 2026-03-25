@@ -156,7 +156,14 @@ class TestApplySuggestion:
             action_payload=None,
         )
 
+        mock_ot = MagicMock()
+        mock_ot.display_name = "Customer"
+        mock_ot.api_name = "customer"
+
         with (
+            patch.object(
+                service._ot_service, "get_by_rid", new_callable=AsyncMock, return_value=mock_ot
+            ),
             patch.object(
                 service._llm_engine,
                 "generate_content",
