@@ -291,6 +291,238 @@ class BlueprintService:
             updated.append(self._to_item(orm))
         return updated
 
+    # --- Pre-Apply Check ---
+
+    async def pre_apply_check(self, rid: str) -> BlueprintPreApplyCheck:
+        """Check for conflicts before applying a blueprint."""
+        bp_orm = await self._get_blueprint_or_404(rid)
+        if bp_orm.status != BlueprintStatus.PENDING_REVIEW.value:
+            raise AppError(
+                code="BLUEPRINT_INVALID_STATUS_TRANSITION",
+                message=f"Blueprint must be in 'pending_review' for pre-apply check (current: '{bp_orm.status}')",
+                status_code=422,
+            )
+
+        items = await BlueprintItemStorage.list_by_blueprint(self._session, rid)
+        actionable = [
+            i
+            for i in items
+            if i.user_decision in (UserDecision.ACCEPTED.value, UserDecision.EDITED.value)
+        ]
+        undecided = [i for i in items if i.user_decision is None]
+
+        conflicts: list[ConflictCheckResult] = []
+        has_blocking_conflict = False
+
+        # Build placeholder set from accepted/edited OT items
+        ot_placeholders: set[str] = set()
+        for item in actionable:
+            if item.item_type == BlueprintItemType.OBJECT_TYPE.value:
+                suggestion = item.user_edits or item.suggestion
+                placeholder = suggestion.get("placeholderRid", "")
+                if placeholder:
+                    ot_placeholders.add(placeholder)
+
+        # Phase 1: apiName collision check for OT items
+        from app.storage.object_type_storage import ObjectTypeStorage
+
+        for item in actionable:
+            if item.item_type != BlueprintItemType.OBJECT_TYPE.value:
+                continue
+            suggestion = item.user_edits or item.suggestion
+            api_name = suggestion.get("apiName")
+            if not api_name:
+                continue
+            existing = await ObjectTypeStorage.get_by_api_name(
+                self._session, bp_orm.ontology_rid, api_name
+            )
+            if existing:
+                conflicts.append(
+                    ConflictCheckResult(
+                        item_rid=item.rid,
+                        conflict_type="api_name_collision",
+                        message=f"apiName '{api_name}' conflicts with existing ObjectType '{existing.rid}'",
+                        conflicting_entity_rid=existing.rid,
+                    )
+                )
+
+        # Phase 2: dependency check for LT items
+        for item in actionable:
+            if item.item_type != BlueprintItemType.LINK_TYPE.value:
+                continue
+            suggestion = item.user_edits or item.suggestion
+            side_a_rid = (suggestion.get("sideA") or {}).get("objectTypeRid", "")
+            side_b_rid = (suggestion.get("sideB") or {}).get("objectTypeRid", "")
+            missing_sides = []
+            if side_a_rid and side_a_rid not in ot_placeholders:
+                missing_sides.append(f"sideA ({side_a_rid})")
+            if side_b_rid and side_b_rid not in ot_placeholders:
+                missing_sides.append(f"sideB ({side_b_rid})")
+            if missing_sides:
+                has_blocking_conflict = True
+                conflicts.append(
+                    ConflictCheckResult(
+                        item_rid=item.rid,
+                        conflict_type="dependency_missing",
+                        message=f"LinkType '{suggestion.get('displayName', '')}' references missing OT: {', '.join(missing_sides)}",
+                    )
+                )
+
+        can_apply = not has_blocking_conflict
+        return BlueprintPreApplyCheck(
+            can_apply=can_apply,
+            conflicts=conflicts,
+            actionable_count=len(actionable),
+            undecided_count=len(undecided),
+        )
+
+    # --- Retry Item ---
+
+    async def retry_item(
+        self, blueprint_rid: str, item_rid: str, user_edits: dict | None = None
+    ) -> BlueprintItemRetryResult:
+        """Retry creating a single failed item from an applied blueprint."""
+        bp_orm = await self._get_blueprint_or_404(blueprint_rid)
+        if bp_orm.status != BlueprintStatus.APPLIED.value:
+            raise AppError(
+                code="BLUEPRINT_INVALID_STATUS_FOR_APPLY",
+                message=f"Blueprint must be in 'applied' to retry items (current: '{bp_orm.status}')",
+                status_code=422,
+            )
+
+        item_orm = await BlueprintItemStorage.get(self._session, item_rid)
+        if item_orm is None or item_orm.blueprint_rid != blueprint_rid:
+            raise AppError(
+                code="BLUEPRINT_ITEM_NOT_FOUND",
+                message=f"Blueprint item '{item_rid}' not found",
+                status_code=404,
+            )
+
+        if item_orm.user_decision not in (UserDecision.ACCEPTED.value, UserDecision.EDITED.value):
+            raise AppError(
+                code="BLUEPRINT_ITEM_NOT_RETRYABLE",
+                message=f"Item is not retryable (decision: '{item_orm.user_decision}')",
+                status_code=422,
+            )
+
+        if item_orm.created_entity_rid is not None:
+            raise AppError(
+                code="BLUEPRINT_ITEM_NOT_RETRYABLE",
+                message=f"Item already created (rid: '{item_orm.created_entity_rid}'), not retryable",
+                status_code=422,
+            )
+
+        # Merge user_edits if provided
+        suggestion = dict(item_orm.user_edits or item_orm.suggestion)
+        if user_edits:
+            suggestion.update(user_edits)
+            await BlueprintItemStorage.update_decision(
+                self._session,
+                item_rid,
+                decision=item_orm.user_decision,
+                edits=suggestion,
+            )
+
+        # Build OT RID map from succeeded items
+        succeeded = await BlueprintItemStorage.get_succeeded_items(self._session, blueprint_rid)
+        ot_rid_map: dict[str, str] = {}
+        for s_item in succeeded:
+            if s_item.item_type == BlueprintItemType.OBJECT_TYPE.value:
+                s_suggestion = s_item.user_edits or s_item.suggestion
+                placeholder = s_suggestion.get("placeholderRid", "")
+                if placeholder and s_item.created_entity_rid:
+                    ot_rid_map[placeholder] = s_item.created_entity_rid
+
+        try:
+            if item_orm.item_type == BlueprintItemType.OBJECT_TYPE.value:
+                from app.domain.object_type import ObjectTypeCreateRequest
+                from app.services.object_type_service import ObjectTypeService
+
+                ot_service = ObjectTypeService(self._session)
+                created = await ot_service.create(
+                    ObjectTypeCreateRequest(
+                        display_name=suggestion.get("displayName", ""),
+                        api_name=suggestion.get("apiName"),
+                        id=suggestion.get("id"),
+                        description=suggestion.get("description", ""),
+                    )
+                )
+                await BlueprintItemStorage.update_created_entity_rid(
+                    self._session, item_rid, created.rid
+                )
+                return BlueprintItemRetryResult(
+                    item_rid=item_rid, status="success", created_entity_rid=created.rid
+                )
+
+            elif item_orm.item_type == BlueprintItemType.PROPERTY.value:
+                from app.domain.property import PropertyCreateRequest
+                from app.services.property_service import PropertyService
+
+                prop_service = PropertyService(self._session)
+                owner_placeholder = suggestion.get("objectTypeRid", "")
+                owner_rid = ot_rid_map.get(owner_placeholder, owner_placeholder)
+                created = await prop_service.create(
+                    owner_rid,
+                    PropertyCreateRequest(
+                        display_name=suggestion.get("displayName", ""),
+                        api_name=suggestion.get("apiName"),
+                        base_type=suggestion.get("baseType", "string"),
+                    ),
+                )
+                await BlueprintItemStorage.update_created_entity_rid(
+                    self._session, item_rid, created.rid
+                )
+                return BlueprintItemRetryResult(
+                    item_rid=item_rid, status="success", created_entity_rid=created.rid
+                )
+
+            elif item_orm.item_type == BlueprintItemType.LINK_TYPE.value:
+                from app.services.link_type_service import LinkTypeService
+
+                lt_service = LinkTypeService(self._session)
+                side_a = suggestion.get("sideA", {})
+                side_b = suggestion.get("sideB", {})
+                side_a_ot = ot_rid_map.get(
+                    side_a.get("objectTypeRid", ""), side_a.get("objectTypeRid", "")
+                )
+                side_b_ot = ot_rid_map.get(
+                    side_b.get("objectTypeRid", ""), side_b.get("objectTypeRid", "")
+                )
+
+                from app.domain.link_type import LinkTypeCreateRequest, LinkTypeSideInput
+
+                created = await lt_service.create(
+                    LinkTypeCreateRequest(
+                        display_name=suggestion.get("displayName", ""),
+                        api_name=suggestion.get("apiName"),
+                        side_a=LinkTypeSideInput(
+                            object_type_rid=side_a_ot,
+                            api_name=side_a.get("apiName", "sideA"),
+                        ),
+                        side_b=LinkTypeSideInput(
+                            object_type_rid=side_b_ot,
+                            api_name=side_b.get("apiName", "sideB"),
+                        ),
+                        cardinality=suggestion.get("cardinality", "one-to-many"),
+                    )
+                )
+                await BlueprintItemStorage.update_created_entity_rid(
+                    self._session, item_rid, created.rid
+                )
+                return BlueprintItemRetryResult(
+                    item_rid=item_rid, status="success", created_entity_rid=created.rid
+                )
+
+            else:
+                return BlueprintItemRetryResult(
+                    item_rid=item_rid,
+                    status="failed",
+                    error=f"Unknown item type: {item_orm.item_type}",
+                )
+
+        except Exception as e:
+            return BlueprintItemRetryResult(item_rid=item_rid, status="failed", error=str(e))
+
     # --- Apply ---
 
     async def apply(self, rid: str) -> BlueprintApplyResult:
