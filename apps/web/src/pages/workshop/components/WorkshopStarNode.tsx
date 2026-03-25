@@ -232,13 +232,22 @@ export default function WorkshopStarNode({
         }}
       >
         <sphereGeometry args={[0.5, 32, 32]} />
-        <meshStandardMaterial
-          color={node.color}
-          emissive={node.color}
-          emissiveIntensity={emissiveIntensity}
-          transparent
-          opacity={opacity}
-        />
+        {supportsWebGL2 ? (
+          <shaderMaterial
+            vertexShader={fresnelVertexShader}
+            fragmentShader={fresnelFragmentShader}
+            uniforms={shaderUniforms}
+            transparent
+          />
+        ) : (
+          <meshStandardMaterial
+            color={node.color}
+            emissive={node.color}
+            emissiveIntensity={emissiveIntensity}
+            transparent
+            opacity={opacity}
+          />
+        )}
       </mesh>
 
       {/* Glow sphere */}
