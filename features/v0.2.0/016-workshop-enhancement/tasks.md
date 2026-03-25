@@ -156,7 +156,7 @@
 
 ### Phase 3: 焦点锁定 + 双向高亮
 
-- [ ] **T009**: use-focus-lock Hook + 测试
+- [x] **T009**: use-focus-lock Hook + 测试
   **文件**: `apps/web/src/pages/workshop/hooks/use-focus-lock.ts`（新建）, `hooks/__tests__/use-focus-lock.test.ts`（新建）
   **逻辑**:
   - `useFocusLock(nodes: WorkshopNode[])` 返回：
