@@ -305,7 +305,7 @@ class TestChat:
             ),
             patch("app.services.agent_service.settings") as mock_settings,
         ):
-            mock_settings.ANTHROPIC_API_KEY = ""
+            mock_settings.ANTHROPIC_API_KEY = SecretStr("")
             mock_settings.LLM_MODEL = "test"
             mock_settings.LLM_MAX_STEPS = 50
             mock_settings.LLM_TOKEN_BUDGET = 100000
