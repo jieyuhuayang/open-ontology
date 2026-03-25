@@ -92,7 +92,7 @@ class SidekickLlmEngine:
 
             self._client = anthropic.AsyncAnthropic()
         model = os.environ.get("LLM_MODEL", "claude-sonnet-4-20250514")
-        return await client.messages.create(
+        return await self._client.messages.create(
             model=model,
             max_tokens=1024,
             temperature=0.3,
