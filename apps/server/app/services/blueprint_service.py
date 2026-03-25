@@ -378,7 +378,7 @@ class BlueprintService:
                 conflicts.append(
                     ConflictCheckResult(
                         item_rid=item.rid,
-                        conflict_type="dependency_missing",
+                        conflict_type=ConflictType.DEPENDENCY_MISSING,
                         message=f"LinkType '{suggestion.get('displayName', '')}' references missing OT: {', '.join(missing_sides)}",
                     )
                 )
