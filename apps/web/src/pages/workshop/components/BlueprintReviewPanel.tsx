@@ -75,8 +75,8 @@ export default function BlueprintReviewPanel({
     ).length;
     const failed = items.filter(
       (i) =>
-        i.userDecision === 'accepted' ||
-        (i.userDecision === 'edited' && i.createdEntityRid == null),
+        (i.userDecision === 'accepted' || i.userDecision === 'edited') &&
+        i.createdEntityRid == null,
     ).length;
     const rejected = items.filter(
       (i) => i.userDecision === 'rejected',
