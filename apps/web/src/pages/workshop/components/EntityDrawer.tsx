@@ -167,20 +167,26 @@ export default function EntityDrawer({ nodes, edges, onDeleteNode }: EntityDrawe
                   background: 'rgba(255,255,255,0.04)',
                   borderRadius: 6,
                   fontSize: 13,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
                 }}
               >
-                <span style={{ color: 'rgba(255,255,255,0.75)' }}>
-                  {edge.label}
-                </span>
-                <span style={{ color: 'rgba(255,255,255,0.4)', margin: '0 6px' }}>
-                  →
-                </span>
-                <span style={{ color: '#4f8eff' }}>
-                  {otherNode?.displayName ?? otherNodeId}
-                </span>
-                {edge.cardinality && (
-                  <Tag style={{ marginLeft: 8 }}>{edge.cardinality}</Tag>
-                )}
+                <div>
+                  <span style={{ color: 'rgba(255,255,255,0.75)' }}>
+                    {edge.label}
+                  </span>
+                  <span style={{ color: 'rgba(255,255,255,0.4)', margin: '0 6px' }}>
+                    →
+                  </span>
+                  <span style={{ color: '#4f8eff' }}>
+                    {otherNode?.displayName ?? otherNodeId}
+                  </span>
+                  {edge.cardinality && (
+                    <Tag style={{ marginLeft: 8 }}>{edge.cardinality}</Tag>
+                  )}
+                </div>
+                <DataProbeButton disabled />
               </div>
             );
           })}
