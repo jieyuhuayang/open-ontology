@@ -196,7 +196,7 @@
   **覆盖 AC**: AC-09, AC-10, AC-11
   **依赖**: T009, T010
 
-- [ ] **T012**: WorkshopCanvas 集成焦点锁定
+- [x] **T012**: WorkshopCanvas 集成焦点锁定
   **文件**: `apps/web/src/pages/workshop/components/WorkshopCanvas.tsx`（修改）
   **逻辑**:
   - 星体点击时（`onNodeClick`），除了现有 `setSelectedEntityRid`，同时调用 `setFocusedEntityRid(nodeId)`
