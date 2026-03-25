@@ -124,5 +124,39 @@ export const useWorkshopStore = create<WorkshopStore>((set) => ({
       ),
     })),
 
+  // F016: View mode
+  setViewMode: (viewMode) => set({ viewMode }),
+
+  // F016: Focus lock
+  setFocusedEntityRid: (focusedEntityRid) => set({ focusedEntityRid }),
+  clearFocusLock: () => set({ focusedEntityRid: null }),
+
+  // F016: Bidirectional highlighting
+  setHighlightedEntityRids: (highlightedEntityRids) =>
+    set({ highlightedEntityRids }),
+  clearHighlights: () => set({ highlightedEntityRids: [] }),
+
+  // F016: Drag link
+  setDragLinkState: (dragLinkState) => set({ dragLinkState }),
+  clearDragLink: () => set({ dragLinkState: null }),
+
+  // F016: Visual effects
+  addShockwave: (instance) =>
+    set((s) => ({
+      activeShockwaves: [...s.activeShockwaves, instance],
+    })),
+  removeShockwave: (id) =>
+    set((s) => ({
+      activeShockwaves: s.activeShockwaves.filter((sw) => sw.id !== id),
+    })),
+  addCollapse: (instance) =>
+    set((s) => ({
+      activeCollapses: [...s.activeCollapses, instance],
+    })),
+  removeCollapse: (id) =>
+    set((s) => ({
+      activeCollapses: s.activeCollapses.filter((c) => c.id !== id),
+    })),
+
   reset: () => set(initialState),
 }));
