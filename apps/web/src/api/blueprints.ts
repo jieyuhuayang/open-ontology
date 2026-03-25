@@ -84,6 +84,9 @@ export function useUpdateItemDecision(blueprintRid: string) {
       void queryClient.invalidateQueries({
         queryKey: blueprintKeys.detail(blueprintRid),
       });
+      void queryClient.invalidateQueries({
+        queryKey: blueprintKeys.lists(),
+      });
     },
   });
 }
@@ -102,6 +105,9 @@ export function useBatchUpdateDecisions(blueprintRid: string) {
       void queryClient.invalidateQueries({
         queryKey: blueprintKeys.detail(blueprintRid),
       });
+      void queryClient.invalidateQueries({
+        queryKey: blueprintKeys.lists(),
+      });
     },
   });
 }
@@ -119,6 +125,9 @@ export function usePreApplyCheck(blueprintRid: string) {
       void queryClient.invalidateQueries({
         queryKey: blueprintKeys.detail(blueprintRid),
       });
+      void queryClient.invalidateQueries({
+        queryKey: blueprintKeys.lists(),
+      });
     },
   });
 }
@@ -135,6 +144,9 @@ export function useApplyBlueprint(blueprintRid: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: blueprintKeys.detail(blueprintRid),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: blueprintKeys.lists(),
       });
     },
   });
@@ -159,6 +171,9 @@ export function useRetryItem(blueprintRid: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: blueprintKeys.detail(blueprintRid),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: blueprintKeys.lists(),
       });
     },
   });
