@@ -170,29 +170,24 @@ export default function WorkshopStarNode({
     [node.id],
   );
 
-  // Animate
-  useFrame(({ clock }) => {
-    // Update shader time
-    if (shaderUniforms.time) {
-      shaderUniforms.time.value = clock.elapsedTime;
-    }
+  const needsAnimation = node.status === 'pending' && node.confidenceLevel === 'low';
+  const needsGlowPulse = isSelected || isHovered || isHighlighted;
+
+  // Animate — only request frames when animation is active
+  useFrame(({ clock, invalidate }) => {
+    // Update shader time (drives vertex noise displacement)
+    shaderUniforms.time.value = clock.elapsedTime;
 
     // Update opacity for low-confidence flicker
-    if (node.status === 'pending' && node.confidenceLevel === 'low') {
+    if (needsAnimation) {
       const flicker =
         0.3 + 0.15 * Math.sin(clock.elapsedTime * 3 + node.id.length);
       shaderUniforms.opacity.value = flicker;
-    } else {
-      shaderUniforms.opacity.value = getOpacity(node);
+      invalidate();
     }
 
-    // Update emissive
-    shaderUniforms.emissiveIntensity.value = getEmissiveIntensity(node);
-    shaderUniforms.color.value.set(node.color);
-    shaderUniforms.emissiveColor.value.set(node.color);
-
-    // Glow pulse for selected/hovered/highlighted
-    if (glowRef.current) {
+    // Glow pulse only when interactive state is active
+    if (glowRef.current && needsGlowPulse) {
       if (isHighlighted) {
         const pulse = 2.2 + 0.15 * Math.sin(clock.elapsedTime * 5);
         glowRef.current.scale.setScalar(pulse);
@@ -201,6 +196,7 @@ export default function WorkshopStarNode({
         const pulse = baseScale + 0.1 * Math.sin(clock.elapsedTime * 2);
         glowRef.current.scale.setScalar(pulse);
       }
+      invalidate();
     }
   });
 
