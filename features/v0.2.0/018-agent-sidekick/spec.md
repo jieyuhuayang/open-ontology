@@ -1,11 +1,15 @@
 # Feature: F018 Agent Sidekick — AI 助手侧栏
 
-> **前置步骤**：Spec Discovery 已完成，7 个不确定性问题已与用户对齐。
-> 本文档合并需求规范与技术设计。需求部分描述业务能力，设计部分只写契约和决策（Why + What），不写实现步骤（How）。
+> **[已取消]** v0.2.1 决策：F018 整体功能取消，能力合并到 Workshop Chat 面板的 Agent 建议交互机制。
+> 规则建议逻辑迁移为 Agent skill `suggest-improvements`，由 Agent 在 Workshop Phase 2 对话中主动调用。
+> 详见 `docs/prd/0.2.1/Workshop 体验改进 PRD.md` §2.5。
+
+> ~~**前置步骤**：Spec Discovery 已完成，7 个不确定性问题已与用户对齐。~~
+> ~~本文档合并需求规范与技术设计。需求部分描述业务能力，设计部分只写契约和决策（Why + What），不写实现步骤（How）。~~
 
 **关联 PRD**: [docs/prd/0.2.0/AI 辅助本体构建 PRD.md §4.6 模块 F + §5.1 US-5 + §3.5 置信度与 AI 提示模式 + §3.8 引导性提示]
 **架构参考**: [docs/architecture/01-system-architecture.md]
-**优先级**: P1
+**优先级**: ~~P1~~ **已取消**
 **所属版本**: v0.2.0
 
 ---
