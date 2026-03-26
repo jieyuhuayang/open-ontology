@@ -98,7 +98,7 @@ Feature spec 只能引用不变量 ID，不能重新定义或覆盖。
 | 015-workshop-foundation | 012-agent-foundation, 014-material-and-blueprint | 需要 Agent SSE 端点和会话数据 + Material/Blueprint API |
 | 016-workshop-enhancement | 015-workshop-foundation | 需要工坊基础布局和画布组件 |
 | 017-hitl-review-and-apply | 014-material-and-blueprint, 015-workshop-foundation, 013-cli-and-skills | 需要蓝图 API + 工坊布局 + CLI apply 命令 |
-| 018-agent-sidekick | 012-agent-foundation | 需要 Agent Engine（P1，可延后） |
+| ~~018-agent-sidekick~~ | ~~012-agent-foundation~~ | **已取消**（v0.2.1 决策：能力合并到 Workshop Chat 面板，详见 `docs/prd/0.2.1/`） |
 | 019-ontology-import-export | 013-cli-and-skills | 需要 CLI 框架（P1，可延后） |
 
 ### 并行开发说明
