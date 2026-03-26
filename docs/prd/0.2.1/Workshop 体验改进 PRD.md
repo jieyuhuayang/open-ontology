@@ -146,10 +146,10 @@ v0.2.0 的 Workshop（本体工坊）已完成 F012-F017 的实现，但实际�
 | 审查入口 | Sidekick Review Tab + 底部审查栏 | Chat 面板中的建议卡片 |
 | 完成标志 | 所有项审查完毕 | 用户满意后点击"应用到本体" |
 
-**数据模型不变**：BlueprintItem 的 confidence/source/reasoning 等字段保留，用于：
-- 画布上的视觉区分（高/中/低置信度的星体亮度和样式）
-- EntityPopover 和 EntityDrawer 中展示推理来源信息
-- Agent 内部决策参考
+**数据模型不变**：BlueprintItem 的 confidence/source/reasoning 等字段保留，但 UI 展示策略调整：
+- **confidence**：保留画布视觉展示（高/中/低置信度的星体亮度和连线样式），对用户有直觉意义
+- **source**：从 UI 中移除（4 个枚举值是技术术语，目标用户看不懂），仅作为 Agent 内部元数据，供 `suggest-improvements` 等 skill 分析时参考
+- **reasoning**：从 UI 中移除（不在 EntityDrawer 中主动展示），但 Agent 可在 Chat 对话中按需引用（如用户问"这个实体是怎么来的"时自然语言回答）
 
 **状态机调整**：
 - `draft` = Agent 正在构建（Phase 1）
