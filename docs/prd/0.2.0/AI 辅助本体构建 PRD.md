@@ -1850,7 +1850,7 @@ class Settings(BaseSettings):
 | 本体蓝图 | Ontology Blueprint | ✅ | Agent 生成的本体初稿 |
 | 蓝图项 | Blueprint Item | ✅ | 蓝图初稿中的单个实体/属性/链接定义 |
 | 置信度 | Confidence | ✅ | Agent 对建议准确性的评估 |
-| 推理来源 | Reasoning Source | ✅ | 建议的依据（字段分析/模式匹配/语义推断/最佳实践） |
+| 推理来源 | Reasoning Source | ✅ | Agent 内部元数据，记录蓝图项的生成依据（字段分析/模式匹配/语义推断/最佳实践），不在 UI 中展示 |
 | 资料 | Material | ✅ | 用户上传的分析素材（文件/文本） |
 | 本体 | Ontology | | 组织的完整语义模型 |
 | 对象类型 | Object Type | | 对现实实体或事件的抽象 |
