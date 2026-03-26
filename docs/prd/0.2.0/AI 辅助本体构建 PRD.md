@@ -358,8 +358,8 @@ stateDiagram-v2
 | `suggestion` | object | 实体定义内容（对象类型/属性/链接的完整定义） |
 | `confidence` | float | 置信度分值（0.0–1.0） |
 | `confidenceLevel` | enum | `high`（≥0.8）/ `medium`（0.5–0.8）/ `low`（<0.5） |
-| `reasoning` | string | 推理说明 |
-| `source` | enum | `field_analysis` / `pattern_matching` / `semantic_inference` / `best_practices` |
+| `reasoning` | string | 推理说明（Agent 内部元数据，不在 UI 中直接展示） |
+| `source` | enum | `field_analysis` / `pattern_matching` / `semantic_inference` / `best_practices`（Agent 内部元数据，不在 UI 中直接展示） |
 | `userDecision` | enum? | `null`（未决策）/ `accepted` / `edited` / `rejected` |
 
 **示例**（对象类型蓝图项）：
