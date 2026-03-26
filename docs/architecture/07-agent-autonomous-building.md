@@ -1,8 +1,8 @@
 # 07 - Agent 自主构建本体 / Autonomous Ontology Building
 
-> **版本**: v0.2.1
-> **日期**: 2026-03-26
-> **前置文档**: [03-agent-context-architecture.md](./03-agent-context-architecture.md), [v0.2.1 Workshop 体验改进 PRD](../prd/0.2.1/Workshop%20体验改进%20PRD.md)
+> **版本**: v0.2.1  
+> **日期**: 2026-03-26  
+> **前置文档**: [03-agent-context-architecture.md](./03-agent-context-architecture.md), [v0.2.1 Workshop 体验改进 PRD](../prd/0.2.1/Workshop%20体验改进%20PRD.md)  
 > **关联 Feature**: F012 Agent Foundation, F013 CLI & Skills, F014 Material & Blueprint, F015 Workshop Foundation
 
 ---
