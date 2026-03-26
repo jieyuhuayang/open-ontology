@@ -113,7 +113,8 @@ UI 框架、Object Type CRUD、Link Type CRUD、属性管理、本体搜索、�
 
 ### v0.2.0（AI-Assisted Ontology Building）— 进行中
 - **已完成**：F012 Agent Foundation（deepagents 引擎 + SSE 流式通信 + 会话管理）、F013 CLI & Skills（`oo` 统一能力层 + 16 个 Agent Skills）
-- **计划中**：F014 素材与蓝图、F015-016 Workshop、F017 人机审查与应用、F018 Agent Sidekick、F019 本体导入导出
+- **计划中**：F014 素材与蓝图、F015-016 Workshop、F017 人机审查与应用、F019 本体导入导出
+- **已取消**：~~F018 Agent Sidekick~~（v0.2.1 决策：能力合并到 Workshop Chat 面板）
 
 ### 延后
 Discover 页定制、对象类型分组、共享属性、Action Type CRUD、对象类型复制
