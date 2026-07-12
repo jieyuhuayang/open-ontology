@@ -17,7 +17,8 @@
 8. [测试要求](#8-测试要求)
 9. [范围变更传播](#9-范围变更传播)
 10. [自动化基础设施](#10-自动化基础设施)
-11. [适配指南](#11-适配指南)
+11. [开发工作空间：分支与 Worktree](#11-开发工作空间分支与-worktree)
+12. [适配指南](#12-适配指南)
 
 ---
 
@@ -37,16 +38,6 @@ SDD（Spec-Driven Development）是一套**分层规范驱动**的开发方法�
 | **Test-First** | 后端先写测试再写实现，测试驱动开发 |
 | **范围严格管制** | release-contract.md 管理跨 Feature 的领域归属和不变量 |
 | **递进式审查** | L0 实时守卫 → L1 任务审查 → L2 特性审查，逐层加深 |
-
-### 为什么适合 AI 辅助开发
-
-SDD 的设计特别适合人机协作和 AI 编程场景：
-
-1. **上下文可控**：每个任务限定在 1-2 个文件，AI 单次会话即可完成
-2. **验收明确**：AC 表格提供精确的测试目标，AI 不会偏离需求
-3. **知识蒸馏**：spec + tasks 充当"知识蒸馏层"，AI 无需理解完整项目即可执行单个任务
-4. **质量可验证**：三层审查体系自动检测违规，不依赖人工逐行 review
-5. **范围防漂移**：release-contract 防止 AI 在实现时引入超出范围的变更
 
 ---
 
@@ -192,7 +183,7 @@ features/
 
 调用 `/sdd-review <feature_dir> tasks`，自动检查 4 组 17 条规则（无需用户确认，有问题自动修复后重审，最多 2 轮）。
 
-#### 步骤 6：创建 Feature 分支
+#### 步骤 6：创建 Feature 分支或 Worktree
 
 ```bash
 git checkout -b feat/<version>/<feature-id>-<short-name>
@@ -200,6 +191,8 @@ git checkout -b feat/<version>/<feature-id>-<short-name>
 ```
 
 **规则**：步骤 1-5 的文档工作在 main 上完成；步骤 7 的代码实现在 Feature 分支上。
+
+**并发场景**：如果你同时推进多个 Feature、有 AI Agent 并行协作、或主开发线需要与紧急 hotfix 共存，推荐使用 `git worktree` 而非纯分支切换。完整说明见 [§11 开发工作空间：分支与 Worktree](#11-开发工作空间分支与-worktree)。
 
 #### 步骤 7：逐任务执行
 
@@ -220,15 +213,23 @@ git checkout -b feat/<version>/<feature-id>-<short-name>
 
 #### 步骤 8：代码审查
 
-调用 `/code-review --base main`，自动运行多维度深度审查：
+调用 `/code-review`（Claude Code 内置 Skill，审查当前 diff），自动运行多维度深度审查：
 - PASS / PASS_WITH_WARNINGS → 可合并
 - NEEDS_FIX → 修复 HIGH 问题后重审（最多 2 轮）
+
+**常用参数**：
+- `--effort low|medium|high|max`：控制审查深度（低 = 高置信度少量发现；高 = 广覆盖含不确定发现）
+- `--comment`：将发现项作为 inline 评论推到 PR
+
+未使用 Claude Code 的项目可参照 [§7.3 L2 审查框架](#l2特性级代码审查code-review)自行实现等效审查工具。
 
 #### 步骤 9：合并
 
 ```bash
 git checkout main && git merge --no-ff feat/<version>/<branch> && git branch -d feat/<version>/<branch>
 ```
+
+**Worktree 场景**：若 Feature 使用 worktree 开发，合并前需先回到主工作区（`cd` 回主仓库目录），合并后用 `git worktree remove <path>` 清理工作目录、再 `git branch -d` 删除分支，避免 stale worktree 残留。
 
 ### 核心约束
 
@@ -650,7 +651,11 @@ L2 ─── Feature 全部完成 ──→ 多维度深度审查（全面、6 �
 
 **触发时机**：Feature 全部任务完成后。
 
-**调用方式**：`/code-review --base main`
+**调用方式**：`/code-review`（Claude Code 内置 Skill，默认审查当前 diff）
+- `--effort low|medium|high|max`：控制审查深度
+- `--comment`：发现项作为 inline 评论推到 PR
+
+> **实现说明**：Claude Code 用户直接使用内置 Skill，无需自定义实现。其他环境可参照下方 **6 维度审查框架** 自行实现等效工具（如 CI 中跑 SAST + LLM-based review）。维度本身是方法论规范，与具体工具无关。
 
 **6 维度审查框架**：
 
@@ -773,6 +778,8 @@ L2 ─── Feature 全部完成 ──→ 多维度深度审查（全面、6 �
 
 每次文件变更后，同步执行 `arch-guard.sh`，在 AI 下次操作前就输出违规警告。
 
+> **多 Worktree 注意**：Hook 命令和 arch-guard 脚本路径建议使用 `$CLAUDE_PROJECT_DIR` 或相对路径，以便在任意 worktree 根目录下独立加载正确的脚本，避免绝对路径跨 worktree 失效（详见 [§11.6 常见坑](#116-常见坑与规避)）。
+
 ### 配置示例
 
 ```json
@@ -808,6 +815,7 @@ L2 ─── Feature 全部完成 ──→ 多维度深度审查（全面、6 �
 # arch-guard.sh — 架构守卫脚本
 # 触发时机：Claude Code 使用 Write/Edit 工具后立即执行（同步）
 # 无违规时完全静默，不产生噪音
+# 注意：脚本应能在任意 worktree 根目录下独立运行，不假设绝对路径
 
 FILE="$1"
 [ -z "$FILE" ] && exit 0
@@ -849,20 +857,123 @@ exit 0
 
 ### Skill 定义
 
-SDD 的审查能力通过 Claude Code Skill 实现。以下是需要定义的 Skill：
+SDD 的审查能力通过 Claude Code Skill 实现。以下是需要的 Skill：
 
-| Skill | 触发方式 | 功能 |
-|-------|---------|------|
-| `sdd-review` | `/sdd-review <dir> spec/tasks` | 审查 spec.md 或 tasks.md |
-| `task-review` | `/task-review <dir> <task_id>` | L1 任务级约定合规审查 |
-| `code-review` | `/code-review --base main` | L2 多维度代码审查 |
-| `e2e-test` | `/e2e-test <dir>` | 生成并运行 E2E 测试 |
+| Skill | 触发方式 | 功能 | 实现来源 |
+|-------|---------|------|---------|
+| `sdd-review` | `/sdd-review <dir> spec/tasks` | 审查 spec.md 或 tasks.md | **项目自定义** |
+| `task-review` | `/task-review <dir> <task_id>` | L1 任务级约定合规审查 | **项目自定义** |
+| `code-review` | `/code-review` | L2 多维度代码审查（审当前 diff） | **Claude Code 内置**，无需自定义 |
+| `e2e-test` | `/e2e-test <dir>` | 生成并运行 E2E 测试 | **项目自定义** |
 
 每个 Skill 的详细定义参见 `.claude/skills/<skill-name>/SKILL.md`。
 
 ---
 
-## 11. 适配指南
+## 11. 开发工作空间：分支与 Worktree
+
+> SDD 工作流的步骤 6-9 涉及"在隔离的工作空间里实现 Feature"。本章节给出两种工作空间方案的选型依据、与九步法的嵌合方式、以及多 worktree 并发的实操要点。
+
+### 11.1 为什么需要 Worktree
+
+**痛点驱动**：
+- AI Agent 并发开发——多个 Claude 实例同时推进不同 Feature，分支切换会互相打断
+- 长跑测试 / E2E / 数据迁移占用工作区时，紧急 bugfix 必须切分支但不能丢失现场
+- 大型 monorepo 切分支成本高：重装依赖（venv / node_modules）、重启 dev server、前端冷编译可能耗时数分钟
+
+**一句话定义**：`git worktree` 让同一个仓库拥有多个独立工作目录，**共享同一个 `.git`** 但各自 checkout 不同分支。所有提交历史、远端配置、git hooks 都自动共享，工作目录、依赖、运行进程完全隔离。
+
+**和分支模型的关系**：worktree **并存而非替代**分支。Feature 分支仍然按 `feat/<version>/<id>-<name>` 命名，只是承载它的工作目录可以是主仓库本身，也可以是一个独立 worktree。
+
+### 11.2 决策树：何时分支、何时 Worktree
+
+| 场景 | 推荐方案 | 理由 |
+|------|---------|------|
+| 单人单任务、串行开发 | 普通分支 | 切换成本低，worktree 反而增加管理负担 |
+| 并发 ≥2 个 Feature | Worktree | 避免相互 stash / context switch |
+| 多 AI Agent 同时工作 | Worktree（一 agent 一 worktree） | 避免多 agent 同时写同一文件 |
+| 长跑任务运行中需切分支（E2E / 训练 / 数据迁移） | Worktree | 不中断长跑、不丢失环境状态 |
+| 主开发线 + 紧急 hotfix 共存 | Worktree | 主分支保留工作树，hotfix 在新 worktree 即开即用 |
+| 大型 monorepo（依赖装载 / 前端编译成本高） | Worktree | 每个 worktree 一套独立 build cache |
+
+**口诀**：**"并发数 ≥ 2 或单任务长跑 >10 分钟"** 是 worktree 的甜区。
+
+### 11.3 与 SDD 九步法的嵌合
+
+| 步骤 | 在哪里执行 |
+|------|----------|
+| 步骤 0-5（版本契约、Spec Discovery、spec.md、tasks.md、文档审查）| **主工作区**（main 分支）|
+| 步骤 6 创建工作空间 | `git worktree add ../<repo>-<feature-id> -b feat/<version>/<id>-<name>` |
+| 步骤 7（逐任务实现）+ 7.5（E2E 测试） | **Feature worktree 内**，进程、端口、依赖、AI Agent 都隔离 |
+| 步骤 8 `/code-review` | Feature worktree 内执行（Claude Code 内置，审当前 diff） |
+| 步骤 9 合并 | 回主工作区 → `git merge --no-ff` → `git worktree remove <path>` → `git branch -d` |
+
+**规则**：文档阶段（步骤 1-5）始终在主工作区完成，只有进入"代码实现"才创建 worktree。这确保 spec/tasks 审查不会被多 worktree 切换分散注意力。
+
+### 11.4 核心命令速查
+
+```bash
+# 创建新 worktree（同时新建分支）
+git worktree add ../<repo>-<feature-id> -b feat/<version>/<id>-<name>
+
+# 把已有分支 checkout 到新 worktree
+git worktree add ../<repo>-<feature-id> <existing-branch>
+
+# 列出所有 worktree（路径 / 分支 / HEAD）
+git worktree list
+
+# 移除 worktree（要求工作目录干净）
+git worktree remove <path>
+
+# 强制移除（含未提交变更，慎用）
+git worktree remove --force <path>
+
+# 清理已被外部删除的 worktree 注册记录
+git worktree prune
+```
+
+**命名约定**：worktree 路径用 `../<repo>-<feature-id>`（如 `../bisheng-005-user-auth`），与分支名 `feat/<version>/<feature-id>-<name>` 对齐，扫一眼 `git worktree list` 就能定位是哪个 Feature。
+
+### 11.5 隔离边界：什么共享、什么必须独立 <!-- ADAPT -->
+
+| 资源类型 | 默认行为 | 推荐做法 |
+|---------|---------|---------|
+| `.git/` 仓库元数据、提交历史、远端配置、git hooks | **自动共享** | 接受默认 |
+| 语言依赖目录（Python `.venv` / Node `node_modules` / Go `vendor` / Rust `target` 等） | 每 worktree 各自一份 | 每 worktree 创建后立即重装依赖 |
+| `.env` / `.envrc` 等本地配置 | 每 worktree 各自一份 | 从主工作区复制后按需改端口/路径 |
+| 构建产物（`dist/` `build/` `target/` 等） | 每 worktree 各自一份 | 接受默认；可在 `.gitignore` 已排除 |
+| IDE 工作区设置（`.idea/` `.vscode/`） | 每 worktree 各自一份 | 按需复制；用户级配置无需迁移 |
+| AI Agent 本地配置（如 `.claude/settings.local.json`） | 每 worktree 各自一份 | **不应进 git**；按需复制后调整 |
+| 本地数据库 / Redis / 文件存储（如本机 MySQL、Docker compose 起的中间件） | **默认共享，可能互相污染** ⚠️ | 每 worktree 用独立端口 + 独立数据目录，或用 Docker compose project name 隔离 |
+| 本地端口（dev server / debugger / test server） | **默认冲突** ⚠️ | 参数化端口或用环境变量区分 |
+
+**核心原则**：凡是"写入"到工作目录外的副作用（数据库、文件存储、监听端口），都必须显式隔离，否则多 worktree 会互相覆盖。
+
+### 11.6 常见坑与规避
+
+| 坑 | 真相 | 规避 |
+|----|------|------|
+| **同一分支拒绝 double-checkout** | git 强制拒绝同一分支同时存在于两个 worktree | 这是 feature 不是 bug；想并发改同一分支，请先拉新分支 |
+| **端口冲突** | dev server / 测试服务 / 调试器默认监听固定端口，多 worktree 同启即冲突 | 端口参数化（如 `PORT=4001 npm run dev`），或在每 worktree 的 `.env` 里写死不同端口 |
+| **Hook 路径陷阱** | `.claude/settings.json` 中脚本路径若写成绝对路径，跨 worktree 会指错文件 | 使用 `$CLAUDE_PROJECT_DIR` 或相对路径（联动 [§10 自动化基础设施](#10-自动化基础设施)）|
+| **长跑进程忘 kill** | 切到新 worktree 干活时，旧 worktree 的 celery / dev server / queue worker 还在跑，占资源 / 占端口 | 切之前先 `ps`/`lsof` 核对；为每个 worktree 用 `tmux` / `screen` 命名会话便于回切 |
+| **`git worktree remove` 拒绝删** | 工作目录有未提交变更时 remove 会拒绝 | 先 commit 或 stash，或显式 `--force`（确认要丢弃改动） |
+| **`.claude/settings.local.json` 误进 git** | 该文件包含本机/本 worktree 专属配置（如端口、本地路径） | `.gitignore` 排除，每 worktree 各自维护一份 |
+| **prune 未执行导致 stale 列表** | 手动 `rm -rf` 某个 worktree 目录后，`git worktree list` 仍然显示 | 用 `git worktree remove` 走正规清理；事后用 `git worktree prune` 兜底 |
+
+### 11.7 AI Agent 并发开发实践
+
+**一 Agent 一 Worktree**：每个 Claude Code 实例绑定一个 worktree，避免多 Agent 同时改同一文件造成"最后写入者获胜"覆盖。Claude Code 启动时自动识别当前根目录，hook / skill / settings 各自独立加载，开箱即用。
+
+**用 Agent 工具的 `isolation: "worktree"`**：在主 Agent 内 spawn 子 Agent 时传入 `isolation: "worktree"`，运行时会自动创建临时 worktree、agent 在隔离副本里工作、无改动时自动清理。适合并行试验型任务。
+
+**合并顺序建议**：多 Feature 并发完成后合并到主线时，**先合 `release-contract.md` 影响小的、再合改动大的**，让冲突域逐步收敛。被依赖的 Feature 应该先合并、依赖它的 Feature 在合并前先 `git fetch && git rebase main` 同步。
+
+**清理时机**：Feature 合并并删除分支后**立刻** `git worktree remove`，避免 stale 目录长期累积；周期性运行 `git worktree prune` 清理外部删除的注册。
+
+---
+
+## 12. 适配指南
 
 将 SDD 规范适配到新项目时，按以下步骤操作：
 
@@ -1001,7 +1112,7 @@ cp features/_templates/release-contract.md features/v1.0.0/release-contract.md
 - 每个 Feature 由一个人负责（Owner），从 spec 到实现
 - release-contract.md 是协作的核心——避免多人修改同一领域对象
 - spec 评审可以由团队其他成员进行（步骤 3 的手动暂停点）
-- 实现阶段各 Feature 在独立分支上并行
+- 实现阶段各 Feature 在独立分支上并行；并行人数 ≥2 时推荐每人一个 worktree（详见 [§11.3](#113-与-sdd-九步法的嵌合)）
 
 ### Q: AI 和人各负责什么？
 
@@ -1013,6 +1124,20 @@ cp features/_templates/release-contract.md features/v1.0.0/release-contract.md
 | **审查** | 自动执行检查清单 | 决定是否修复 |
 | **实现** | 逐任务写代码 | 验证功能正确 |
 | **E2E 测试** | 生成并运行 | 处理 3 轮修复后的遗留问题 |
+
+### Q: worktree 多大场景才划算？
+
+**收益显著**：
+- 同时推进 ≥2 个 Feature 时
+- 任一任务长跑 >10 分钟（E2E、数据迁移、训练、大规模重构）
+- 多个 AI Agent 并发开发同一仓库
+- 主开发分支正在跑长任务，又需要紧急 hotfix
+
+**不必引入**：
+- 单人单任务串行开发，普通分支足够
+- 仓库小、切分支几乎无成本（不重装依赖、不重启 dev server）
+
+权衡点：worktree 占磁盘（每个 worktree 都是完整 checkout + 独立依赖），收益在于"避免上下文切换 + 并发"。完整决策树见 [§11.2](#112-决策树何时分支何时-worktree)。
 
 ---
 

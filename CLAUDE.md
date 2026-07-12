@@ -2,7 +2,7 @@
 
 ## 项目概述
 
-Open Ontology 是一个受 Palantir Ontology 启发的开源项目，目标是构建面向 Agent 时代的本体平台，提供以业务为中心的统一数据建模框架。v0.1.0 MVP（**Ontology Manager** 本体管理后台）已完成。当前处于 **v0.2.0（AI-Assisted Ontology Building）** 开发阶段，聚焦 Agent 辅助本体构建能力，包括 deepagents 引擎、`oo` CLI 统一能力层、素材分析与蓝图生成。
+Open Ontology 是一个受 Palantir Ontology 启发的开源项目，目标是构建面向 Agent 时代的本体平台，提供以业务为中心的统一数据建模框架。v0.1.0 MVP（**Ontology Manager** 本体管理后台）已完成。**v0.2.0（AI-Assisted Ontology Building）** 主体已交付——deepagents 引擎、`oo` CLI 统一能力层、素材分析与蓝图生成、Workshop 本体工坊全流程、人机审查与应用；仅剩 F019 本体导入导出待启动。
 
 规格文档仍是意图的权威来源；新特性必须遵循 SDD 工作流。
 ## 目录结构
