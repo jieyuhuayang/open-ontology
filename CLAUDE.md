@@ -111,9 +111,9 @@ cd apps/web && pnpm dev
 ### v0.1.0（MVP）— 已完成
 UI 框架、Object Type CRUD、Link Type CRUD、属性管理、本体搜索、变更管理/版本控制、数据连接、对象实例同步。
 
-### v0.2.0（AI-Assisted Ontology Building）— 进行中
-- **已完成**：F012 Agent Foundation（deepagents 引擎 + SSE 流式通信 + 会话管理）、F013 CLI & Skills（`oo` 统一能力层 + 16 个 Agent Skills）
-- **计划中**：F014 素材与蓝图、F015-016 Workshop、F017 人机审查与应用、F019 本体导入导出
+### v0.2.0（AI-Assisted Ontology Building）— 主体已交付
+- **已完成**：F012 Agent Foundation（deepagents 引擎 + SSE 流式通信 + 会话管理）、F013 CLI & Skills（`oo` 统一能力层 + 20 个 Agent Skills）、F014 素材与蓝图（素材上传分析 → 蓝图生成）、F015-016 Workshop（本体工坊：3D 星空画布 + Chat 面板 + 画布增强）、F017 人机审查与应用（蓝图逐项审查 + 批量应用 + 冲突预警）
+- **未启动**：F019 本体导入导出
 - **已取消**：~~F018 Agent Sidekick~~（v0.2.1 决策：能力合并到 Workshop Chat 面板）
 
 ### 延后
